@@ -1,0 +1,144 @@
+---
+title: "gp3tools compatibility and cross-package handoff"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gp3tools compatibility and cross-package handoff}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+
+package_candidates <- c(
+  getwd(),
+  file.path(getwd(), ".."),
+  file.path(getwd(), "..", "..")
+)
+
+valid_root <-
+  file.exists(file.path(package_candidates, "DESCRIPTION")) &
+  dir.exists(file.path(package_candidates, "R"))
+
+package_root <- package_candidates[valid_root][1L]
+
+if (length(package_root) == 0L || is.na(package_root)) {
+  stop("Could not locate the gpbiometrics package root.", call. = FALSE)
+}
+
+package_root <- normalizePath(
+  package_root,
+  winslash = "/",
+  mustWork = TRUE
+)
+
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  stop("Rendering from source requires devtools.", call. = FALSE)
+}
+
+devtools::load_all(package_root, quiet = TRUE)
+```
+
+## Purpose
+
+This article defines the lightweight data contract between `gpbiometrics`
+and the cross-package integration workflow implemented in `gp3tools`.
+It documents compatible identifiers, time fields, biometric signals, and
+event markers without duplicating synchronization logic across packages.
+
+The package boundary is deliberate:
+
+- `gpbiometrics` imports, validates, preprocesses, and summarizes biometric
+  exports;
+- `gp3tools` owns the newer nearest-time cross-package synchronization,
+  tolerance handling, alignment audit, and combined workflow report;
+- `join_gazepoint_biometrics_to_gp3tools()` remains available in
+  `gpbiometrics` for an explicit package-local join when that direction is
+  appropriate.
+
+## Compatible biometric schema
+
+A biometric table prepared for the `gp3tools` integration workflow should
+contain the following information.
+
+| Role | Requirement | Typical examples |
+|---|---|---|
+| Participant identifier | Required | `participant`, `USER_ID`, `Participant` |
+| Trial or media identifier | Required when synchronization is trial-specific | `trial`, `TRIAL_ID`, `MEDIA_ID` |
+| Time | Required | seconds or milliseconds from a shared recording origin |
+| Biometric signal | At least one numeric signal | EDA/GSR, SCR, heart rate, IBI, PPG, DIAL |
+| Event marker | Optional | stimulus onset, task phase, response, or annotation |
+
+Identifier values must refer to the same participant and trial definitions
+used by the gaze table. Time values may be expressed in seconds or
+milliseconds, but their units and recording origin must be known.
+
+## Minimal contract example
+
+```{r}
+biometric_table <- data.frame(
+  participant = c("P001", "P001", "P001"),
+  trial = c("T01", "T01", "T01"),
+  time_ms = c(0, 16, 32),
+  eda = c(3.10, 3.12, 3.11),
+  heart_rate = c(71, 71, 72),
+  event = c("trial_start", "", "")
+)
+
+biometric_table
+```
+
+This example illustrates the schema only. Real projects should preserve
+the original signal units, validity fields, sampling information, and
+preprocessing decisions required for auditability.
+
+## Two supported handoff directions
+
+### Synchronization owned by gp3tools
+
+Use the `gp3tools` workflow when gaze samples must be standardized, aligned
+to biometric observations by participant, trial, and nearest timestamp, and
+summarized with an explicit synchronization audit. The relevant functions
+are:
+
+- `gp3tools::prepare_gazepoint_gpbiometrics_bridge()`;
+- `gp3tools::run_gazepoint_gpbiometrics_workflow()`;
+- `gp3tools::create_gazepoint_cross_package_report()`.
+
+Consult the installed `gp3tools` documentation for the exact arguments and
+supported Gazepoint column-name detection rules.
+
+### Explicit join owned by gpbiometrics
+
+`join_gazepoint_biometrics_to_gp3tools()` remains suitable when the
+biometric workflow is already being managed in `gpbiometrics` and an
+explicit join to a prepared gp3tools table is required.
+
+```{r}
+args(join_gazepoint_biometrics_to_gp3tools)
+```
+
+Whichever direction is used, retain the participant and trial keys, document
+the time unit, report the synchronization tolerance, and audit unmatched
+rows rather than silently discarding them.
+
+## Interpretation guardrails
+
+Aligned gaze and biometric signals are measurements, not direct labels of
+mental states. The cross-package result must not be interpreted as direct
+evidence of emotion, stress, cognition, preference, comprehension, intent,
+or diagnosis. Such interpretations require an appropriate study design,
+validated operationalization, convergent evidence, and cautious reporting.
+
+## Reproducibility checklist
+
+Report at minimum:
+
+- package versions and session information;
+- participant and trial identifiers used for alignment;
+- time units and time-origin assumptions;
+- synchronization method and tolerance;
+- matched and unmatched row counts;
+- preprocessing applied before synchronization;
+- biometric signal units and validity rules;
+- any AOI or event grouping used in downstream summaries.

@@ -1,0 +1,177 @@
+---
+title: "Using gpbiometrics with eyetrackingR, PupillometryR, and gazeR"
+description: "Compare and prepare Gazepoint data for three optional R eye-tracking and pupillometry ecosystems."
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using gpbiometrics with eyetrackingR, PupillometryR, and gazeR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+
+if (file.exists("DESCRIPTION") && dir.exists("R")) {
+  devtools::load_all(".", quiet = TRUE)
+} else {
+  library(gpbiometrics)
+}
+```
+
+# Purpose
+
+`gpbiometrics` provides optional bridges to `eyetrackingR`,
+`PupillometryR`, and gazeR. These bridges standardize source columns, preserve
+an audit record, and optionally construct an external-package object when that
+package is installed.
+
+The bridge is a data-preparation boundary. Downstream modelling,
+visualization, and package-specific assumptions remain the responsibility of
+the selected external package.
+
+# Which bridge should be used?
+
+```{r bridge-table}
+bridge_functions <- data.frame(
+  target = c(
+    "eyetrackingR",
+    "PupillometryR",
+    "gazeR"
+  ),
+  helper = c(
+    "prepare_gazepoint_eyetrackingr_input",
+    "prepare_gazepoint_pupillometryr_input",
+    "prepare_gazepoint_gazer_input"
+  ),
+  primary_focus = c(
+    "AOI and time-window analysis",
+    "Pupil preprocessing and time-course analysis",
+    "Gaze, pupil, blink, and AOI preparation"
+  ),
+  stringsAsFactors = FALSE
+)
+
+bridge_functions$available <-
+  bridge_functions$helper %in%
+  getNamespaceExports("gpbiometrics")
+
+bridge_functions
+
+stopifnot(all(bridge_functions$available))
+```
+
+# Common source contract
+
+A bridge-ready table should preserve:
+
+- participant identifier;
+- trial or media identifier;
+- ordered time variable with a documented unit;
+- gaze coordinates where required;
+- pupil values where required;
+- validity or track-loss information;
+- blink information where available;
+- AOI membership or the columns required to construct AOIs;
+- condition and stimulus metadata.
+
+Do not remove original Gazepoint columns until the conversion audit has been
+reviewed.
+
+# eyetrackingR preparation
+
+```{r eyetrackingr-signature}
+args(prepare_gazepoint_eyetrackingr_input)
+```
+
+```{r eyetrackingr-example, eval=FALSE}
+eyetrackingr_input <- prepare_gazepoint_eyetrackingr_input(
+  data = gaze_samples,
+  ...
+)
+```
+
+Review participant, trial, time, track-loss, and logical AOI columns before
+constructing an `eyetrackingR_data` object.
+
+# PupillometryR preparation
+
+```{r pupillometryr-signature}
+args(prepare_gazepoint_pupillometryr_input)
+```
+
+```{r pupillometryr-example, eval=FALSE}
+pupillometryr_input <- prepare_gazepoint_pupillometryr_input(
+  data = pupil_samples,
+  ...
+)
+```
+
+Document whether binocular or monocular pupil values were selected, how
+invalid values were masked, whether time was converted to milliseconds, and
+whether blink periods were retained or removed.
+
+# gazeR preparation
+
+```{r gazer-signature}
+args(prepare_gazepoint_gazer_input)
+```
+
+```{r gazer-example, eval=FALSE}
+gazer_input <- prepare_gazepoint_gazer_input(
+  data = gaze_samples,
+  ...
+)
+```
+
+gazeR preparation may include monocular or binocular coordinates, pupil
+columns, validity values, blink flags, time conversion, and
+irregular-sampling checks.
+
+# Cross-bridge comparison
+
+| Decision | Question |
+|---|---|
+| Analysis target | AOI proportions, pupil time course, blink processing, or gaze processing? |
+| Time unit | Does the target package require milliseconds? |
+| Validity rule | How will invalid coordinates or pupil values be represented? |
+| Trial structure | Are participant and trial identifiers complete and stable? |
+| AOI representation | Logical AOI columns or one categorical AOI field? |
+| External dependency | Is object construction required or only a data frame? |
+| Auditability | Are renamed, masked, omitted, and retained columns recorded? |
+
+# Optional object construction
+
+```{r object-construction, eval=FALSE}
+prepared <- prepare_gazepoint_eyetrackingr_input(
+  data = gaze_samples,
+  ...
+)
+
+# Inspect the prepared data, mapping, audit, and settings before
+# constructing an external-package object.
+```
+
+# Reporting checklist
+
+Report:
+
+- source Gazepoint export and package versions;
+- selected bridge and target-package version;
+- participant, trial, time, gaze, pupil, AOI, validity, and blink mappings;
+- time-unit conversion;
+- invalid-sample masking;
+- binocular or monocular processing;
+- dropped rows or columns;
+- irregular-sampling decisions;
+- whether an external-package object was constructed.
+
+# Interpretation guardrails
+
+Conversion does not validate downstream model assumptions. Pupil, gaze, AOI,
+blink, and track-loss outputs should be interpreted within the experimental
+design and documented preprocessing workflow.

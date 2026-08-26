@@ -1,0 +1,23 @@
+gpbiometricspy FINAL VALIDATION
+========================================================================
+Version: 0.1.0.dev0
+Frozen R reference: gpbiometrics 2.0.0
+R exports: 406
+Python implemented exports: 406
+Pending exports: 0
+Exact export set: True
+Python-test-referenced exports: 406/406
+R-test-referenced exports: 378/406
+Rd-documented exports: 406/406
+Vignette-referenced exports: 227/406
+Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files
+Full Python tests: 204 PASS
+Whole-package statement coverage: 90.44%
+Coverage gate (>=90%): PASS
+compileall: PASS
+Wheel clean-install smoke: PASS
+Sdist clean-install smoke: PASS
+Docs relative-link audit: PASS (0 broken links)
+Ruff local gate: NOT RUN (tool unavailable in offline sandbox; configured in CI)
+MkDocs local build: NOT RUN (tool unavailable in offline sandbox; configured in CI)
+Twine local check: NOT RUN (tool unavailable in offline sandbox; configured in CI)

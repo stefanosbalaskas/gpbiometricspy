@@ -1,0 +1,145 @@
+---
+title: "Quality-control workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quality-control workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Reviewer-facing QC sequence
+
+This article shows a compact quality-control workflow for Gazepoint-derived biometric and eye-tracking exports. The workflow is conservative: it validates dataset layout, metadata, missingness, signal quality, exclusion decisions, and reproducibility outputs. It does not infer clinical, affective, emotional, diagnostic, or psychological states.
+
+## Dataset layout
+
+```{r}
+layout_audit <- check_gazepoint_bids(
+  root = "path/to/gazepoint_dataset"
+)
+
+layout_audit
+```
+
+`check_gazepoint_bids()` is a lightweight Gazepoint-oriented layout audit. It is not a full BIDS validator and does not convert data.
+
+## Metadata and required columns
+
+```{r}
+metadata_audit <- validate_gazepoint_metadata(
+  data = gazepoint_data,
+  required_columns = c("participant_id", "time", "trial")
+)
+
+metadata_audit
+```
+
+## Missingness
+
+```{r}
+missingness_summary <- summarize_gazepoint_missingness(gazepoint_data)
+missingness_summary
+
+plot_gazepoint_missingness(gazepoint_data)
+```
+
+Missingness summaries and plots are descriptive QC tools. They help identify sparse recordings, dropouts, and participant-level recording problems.
+
+## Pupil and signal artifacts
+
+```{r}
+pupil_qc <- detect_gazepoint_blinks(
+  gazepoint_data,
+  pupil_cols = c("pupil_left", "pupil_right")
+)
+
+nonwear_qc <- detect_gazepoint_nonwear(
+  gazepoint_data,
+  signal_cols = c("eda", "ppg", "ecg")
+)
+```
+
+Masking, interpolation, filtering, and beat correction should be reported as transparent preprocessing steps.
+
+## Signal quality and rule-based flags
+
+```{r}
+signal_quality <- compute_gazepoint_signal_quality(
+  gazepoint_data,
+  signal_cols = c("eda", "ppg", "ecg")
+)
+
+quality_summary <- summarize_gazepoint_signal_quality(signal_quality)
+
+quality_flags <- classify_gazepoint_signal_quality(
+  signal_quality,
+  rules = list(
+    missingness_rate = 0.20,
+    quality_index = 0.50
+  )
+)
+```
+
+Rule-based quality flags support auditability. They are not clinical, psychological, or affective interpretations.
+
+## Exclusion recommendations
+
+```{r}
+exclusion_recommendations <- recommend_gazepoint_biometric_exclusions(
+  quality_flags
+)
+
+exclusion_recommendations
+```
+
+Exclusion helpers summarize evidence for review. They support analyst judgment but do not replace it.
+
+## Static dashboard
+
+```{r}
+dashboard <- pipeline_comparison_dashboard(
+  quality_flags,
+  participant_col = "participant_id",
+  session_col = "session",
+  missingness_col = "missingness_rate",
+  quality_col = "quality_index",
+  qc_status_col = "qc_status",
+  failed_rules_col = "failed_rules",
+  excluded_col = "excluded",
+  notes_col = "audit_notes"
+)
+
+dashboard
+```
+
+`pipeline_comparison_dashboard()` creates a static reviewer-facing summary. It is not a Shiny app, GUI dashboard, model, or interpretation layer.
+
+## Reproducibility outputs
+
+```{r}
+manifest <- create_gazepoint_analysis_manifest(
+  input_files = list.files("path/to/gazepoint_dataset", recursive = TRUE),
+  parameters = list(
+    missingness_threshold = 0.20,
+    quality_threshold = 0.50
+  )
+)
+
+dictionary <- create_gazepoint_dictionary(gazepoint_data)
+```
+
+## Recommended reporting language
+
+> Gazepoint-derived exports were processed using conservative, rule-based quality-control checks. Dataset layout, metadata fields, missingness, signal quality, artifact flags, and exclusion recommendations were summarized before analysis. The workflow produced audit-ready summaries and reproducibility metadata, but did not infer clinical, affective, emotional, or diagnostic states from biometric signals.
+
+## Summary
+
+The recommended sequence is: layout check, metadata validation, missingness review, artifact detection, signal-quality scoring, rule-based flags, exclusion review, dashboard summary, and reproducibility output.

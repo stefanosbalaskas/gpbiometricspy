@@ -1,0 +1,12 @@
+include README.md
+include LICENSE
+include VALIDATION.md
+include CHANGELOG.md
+include CITATION.cff
+include mkdocs.yml
+recursive-include reference *.csv *.R *.Rd *.Rmd *.md *.yml *.cff *.txt
+recursive-include tests *.py
+recursive-include docs *.md
+recursive-include scripts *.py
+recursive-include src/gpbiometricspy/data *.csv *.txt
+recursive-include .github *.yml *.yaml

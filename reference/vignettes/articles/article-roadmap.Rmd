@@ -1,0 +1,212 @@
+---
+title: "Article roadmap"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Article roadmap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Planned workflow articles
+
+`gpbiometrics` now contains a broad set of Gazepoint-oriented import, preprocessing, QC, plotting, modelling-preparation, reporting, and reproducibility helpers. The article section should make these helpers easier to use by organizing them into practical workflows rather than leaving users to navigate the reference index alone.
+
+This roadmap lists the next documentation articles planned for the package. The goal is conservative, reviewer-facing documentation: each article should show how to inspect, clean, summarize, and report Gazepoint-derived signals without making clinical, affective, emotional, or diagnostic claims.
+
+## Current articles
+
+- `gpbiometrics-workflow`: package-level workflow overview.
+- `quality-control-workflow`: reviewer-facing QC sequence linking layout checks, metadata validation, missingness, signal quality, exclusion recommendations, dashboard summaries, and reproducibility outputs.
+- `plot-gallery`: visual examples for package plotting helpers.
+- `cluster-permutation`: cluster-based time-course testing workflow.
+
+## Priority 1: pupil and gaze quality control
+
+Suggested file: `vignettes/articles/pupil-qc-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `detect_gazepoint_blinks()`
+- `detect_gazepoint_pupil_blinks()`
+- `smooth_gazepoint_pupil()`
+- `interpolate_gazepoint_pupil_blinks()`
+- `baseline_correct_gazepoint_pupil()`
+- `filter_gazepoint_gaze()`
+- `summarize_gazepoint_pupil_events()`
+- `plot_gazepoint_missingness()`
+
+Article purpose: show a transparent pupil/gaze preprocessing sequence, including blink detection, missingness review, smoothing, interpolation, baseline correction, and conservative reporting.
+
+## Priority 2: EDA, GSR, and SCR workflow
+
+Suggested file: `vignettes/articles/eda-scr-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `audit_gazepoint_gsr_units()`
+- `convert_gazepoint_gsr_to_conductance()`
+- `audit_gazepoint_gsr_quality()`
+- `audit_gazepoint_eda_artifacts()`
+- `baseline_correct_gazepoint_gsr()`
+- `decompose_gazepoint_eda()`
+- `detect_gazepoint_scr_events()`
+- `detect_gazepoint_scr_peaks()`
+- `normalize_gazepoint_scr()`
+- `summarise_gazepoint_gsr_tonic_phasic()`
+- `summarise_gazepoint_scr_event_windows()`
+- `plot_gazepoint_scr_events()`
+- `plot_gazepoint_eda_decomposition()`
+
+Article purpose: show how to audit, preprocess, decompose, summarize, and plot EDA/GSR/SCR signals using conservative signal-processing language.
+
+## Priority 3: PPG, IBI, HRV, and respiration workflow
+
+Suggested file: `vignettes/articles/ppg-hrv-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `filter_gazepoint_ppg_signal()`
+- `remove_gazepoint_ppg_baseline_wander()`
+- `detect_gazepoint_ppg_peaks()`
+- `detect_gazepoint_ppg_onsets()`
+- `audit_gazepoint_ibi_quality()`
+- `correct_gazepoint_beats()`
+- `summarize_gazepoint_beat_corrections()`
+- `extract_gazepoint_hrv_features()`
+- `summarise_gazepoint_hrv_features()`
+- `estimate_gazepoint_respiration_from_ppg()`
+- `plot_gazepoint_ppg_peak_detection()`
+- `plot_gazepoint_ppg_segmentwise()`
+- `plot_gazepoint_ppg_breathing()`
+
+Article purpose: show a reproducible PPG-to-IBI/HRV sequence with explicit quality checks and correction logs.
+
+## Priority 4: TTL, AOI, and event-locked workflow
+
+Suggested file: `vignettes/articles/event-alignment-aoi-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `extract_gazepoint_ttl_events()`
+- `align_gazepoint_biometrics_to_ttl()`
+- `align_gazepoint_streams_by_events()`
+- `match_gazepoint_events_to_biometrics()`
+- `sync_gazepoint_biometrics_with_gaze()`
+- `summarise_gazepoint_aoi_biometrics()`
+- `summarize_gazepoint_aoi_dwell()`
+- `summarize_gazepoint_eventlocked_multimodal()`
+- `plot_gazepoint_multimodal_timeline()`
+- `plot_gazepoint_aoi_biometrics()`
+
+Article purpose: show how to move from raw events and biometric streams to aligned, AOI-aware, event-locked analysis tables.
+
+## Priority 5: reporting and reproducibility workflow
+
+Suggested file: `vignettes/articles/reporting-reproducibility-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `create_gazepoint_analysis_manifest()`
+- `generate_gazepoint_manifest()`
+- `create_gazepoint_dictionary()`
+- `create_gazepoint_analysis_decision_log()`
+- `write_gazepoint_decision_log()`
+- `create_gazepoint_methods_section()`
+- `create_gazepoint_biometrics_methods_text()`
+- `create_gazepoint_qc_supplement()`
+- `create_gazepoint_reproducibility_statement()`
+- `export_gazepoint_biometrics_report_bundle()`
+
+Article purpose: show how to turn QC outputs into audit-ready tables, methods text, decision logs, manifests, and reproducibility statements.
+
+## Priority 6: synthetic-data showcase
+
+Suggested file: `vignettes/articles/synthetic-data-showcase.Rmd`.
+
+Core helpers to showcase:
+
+- `simulate_gazepoint_biometrics()`
+- `simulate_gazepoint_eye_data()`
+- `simulate_gazepoint_multimodal_data()`
+- `simulate_gazepoint_artifact()`
+- `run_gazepoint_biometrics_workflow()`
+- `diagnose_gazepoint_biometrics_workflow()`
+- `summarise_gazepoint_biometrics_workflow()`
+- `plot_gazepoint_biometric_report_dashboard()`
+
+Article purpose: provide a fully reproducible demonstration that does not depend on private Gazepoint exports.
+
+## Priority 7: design and event-coverage audit workflow
+
+Suggested file: `vignettes/articles/design-audit-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `audit_gazepoint_experiment_design()`
+- `audit_gazepoint_condition_balance()`
+- `audit_gazepoint_event_coverage()`
+- `audit_gazepoint_session_comparability()`
+- `audit_gazepoint_dataset_structure()`
+- `audit_gazepoint_export_schema()`
+- `audit_gazepoint_preregistration_consistency()`
+- `summarize_gazepoint_qc_overview()`
+- `create_gazepoint_preregistration_checklist()`
+
+Article purpose: show how to check whether the exported dataset matches the intended experimental design before analysis.
+
+## Priority 8: external-toolbox preparation workflow
+
+Suggested file: `vignettes/articles/toolbox-bridges-workflow.Rmd`.
+
+Core helpers to showcase:
+
+- `prepare_gazepoint_heartpy_input()`
+- `prepare_gazepoint_pyppg_input()`
+- `prepare_gazepoint_rhrv_input()`
+- `prepare_gazepoint_neurokit_eda_input()`
+- `prepare_gazepoint_ledalab_input()`
+- `prepare_gazepoint_pspm_input()`
+- `prepare_gazepoint_cvxeda_input()`
+- `export_gazepoint_heartpy_input()`
+- `export_gazepoint_rhrv_input()`
+
+Article purpose: show how gpbiometrics prepares Gazepoint-derived data for external physiological-analysis toolchains while keeping the native QC trail in R.
+
+## Plot-gallery expansion
+
+The existing `plot-gallery` article should eventually be expanded with examples for:
+
+- `plot_gazepoint_missingness()`
+- `plot_gazepoint_signal_quality()`
+- `plot_gazepoint_signal_activity()`
+- `plot_gazepoint_time_resets()`
+- `plot_gazepoint_biometric_quality()`
+- `plot_gazepoint_biometric_signals()`
+- `plot_gazepoint_multimodal_timeline()`
+- `plot_gazepoint_scr_events()`
+- `plot_gazepoint_ppg_peak_detection()`
+- `plot_gazepoint_biometric_report_dashboard()`
+
+## Implementation order
+
+Recommended branch order:
+
+1. `feature/pupil-qc-workflow-article`
+2. `feature/eda-scr-workflow-article`
+3. `feature/ppg-hrv-workflow-article`
+4. `feature/event-alignment-aoi-workflow-article`
+5. `feature/reporting-reproducibility-article`
+6. `feature/synthetic-data-showcase-article`
+7. `feature/design-audit-workflow-article`
+8. `feature/toolbox-bridges-workflow-article`
+9. `feature/plot-gallery-expansion`
+
+Each article should remain compact, reproducible with synthetic or example data where possible, and explicit about what the functions do and do not claim.

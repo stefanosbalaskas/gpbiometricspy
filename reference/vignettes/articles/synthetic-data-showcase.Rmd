@@ -1,0 +1,450 @@
+---
+title: "Synthetic data showcase"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Synthetic data showcase}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article demonstrates a complete reviewer-facing workflow using synthetic Gazepoint-like data.
+
+The purpose is to show how `gpbiometrics` can document import, validation, quality control, event alignment, pupil/gaze preprocessing, EDA/SCR summaries, PPG/IBI/HRV summaries, AOI-linked summaries, report tables, decision logs, and reproducibility outputs without exposing private participant data.
+
+The synthetic data are examples for software demonstration. They are not empirical evidence and should not be used to draw conclusions about attention, emotion, stress, arousal, health status, clinical state, workload, engagement, or psychological response.
+
+# Workflow overview
+
+The showcase follows a compact end-to-end sequence:
+
+1. Generate synthetic gaze, biometric, event, AOI, and trial-metadata objects.
+2. Validate and standardize column names.
+3. Inspect export structure and signal availability.
+4. Run pupil/gaze quality-control summaries.
+5. Run EDA/GSR/SCR quality-control summaries.
+6. Run PPG/IBI/HRV quality-control summaries.
+7. Align events and create AOI-linked biometric summaries.
+8. Prepare model-ready tables.
+9. Create decision logs, QC supplements, report tables, and reproducibility statements.
+
+# Step 1: generate synthetic data
+
+Synthetic examples allow documentation, tests, and reviewer demonstrations to be shared without private raw exports.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+eye <- simulate_gazepoint_eye_data(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+multimodal <- simulate_gazepoint_multimodal_data(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+artifact_demo <- simulate_gazepoint_artifact(
+  n = 500,
+  artifact_type = "dropout"
+)
+```
+
+Create minimal trial metadata and AOI definitions for the synthetic demonstration.
+
+```{r}
+master <- data.frame(
+  participant_id = rep(sprintf("P%02d", 1:8), each = 12),
+  trial_id = rep(seq_len(12), times = 8),
+  condition = rep(c("A", "B"), length.out = 96),
+  screen_id = rep(c("screen_simple", "screen_dense"), length.out = 96)
+)
+
+aoi_definitions <- data.frame(
+  aoi = c("header", "claim", "image", "button"),
+  x_min = c(0, 100, 600, 700),
+  x_max = c(1920, 550, 1300, 1000),
+  y_min = c(0, 200, 200, 800),
+  y_max = c(150, 700, 750, 950)
+)
+```
+
+# Step 2: standardize and validate
+
+Column-name standardization and validation are the first reproducibility checks.
+
+```{r}
+bio_std <- standardise_gazepoint_biometric_names(bio)
+eye_std <- standardize_gazepoint_column_names(eye)
+
+validate_gazepoint_biometrics(bio_std)
+validate_gazepoint_format(eye_std)
+validate_gazepoint_metadata(master)
+
+detect_active_biometric_channels(bio_std)
+detect_gazepoint_biometric_schema(bio_std)
+detect_gazepoint_biometric_timebase(bio_std)
+```
+
+# Step 3: inspect synthetic export structure
+
+When the synthetic data are written as files, folder-level profiling can be used to demonstrate the same checks used for real exports.
+
+```{r}
+synthetic_dir <- file.path(tempdir(), "gpbiometrics_synthetic_exports")
+dir.create(synthetic_dir, recursive = TRUE, showWarnings = FALSE)
+
+write.csv(bio_std, file.path(synthetic_dir, "synthetic_biometrics.csv"), row.names = FALSE)
+write.csv(eye_std, file.path(synthetic_dir, "synthetic_eye.csv"), row.names = FALSE)
+write.csv(master, file.path(synthetic_dir, "synthetic_master.csv"), row.names = FALSE)
+
+profile <- profile_gazepoint_export_folder(synthetic_dir)
+inventory <- summarize_gazepoint_export_inventory(synthetic_dir)
+
+write_gazepoint_export_profile(profile, path = "synthetic_export_profile.csv")
+```
+
+# Step 4: pupil and gaze QC
+
+Pupil and gaze quality-control summaries document missingness, blink-like gaps, tracking availability, and coordinate plausibility.
+
+```{r}
+eye_missing <- summarize_gazepoint_missingness(
+  eye_std,
+  group_cols = c("participant_id", "trial_id")
+)
+
+pupil_blinks <- detect_gazepoint_pupil_blinks(
+  eye_std,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+eye_smooth <- smooth_gazepoint_pupil(
+  eye_std,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+eye_gaze_qc <- filter_gazepoint_gaze(
+  eye_smooth,
+  x_col = "gaze_x",
+  y_col = "gaze_y",
+  screen_width = 1920,
+  screen_height = 1080
+)
+
+pupil_events <- summarize_gazepoint_pupil_events(
+  eye_gaze_qc,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 5: EDA, GSR, and SCR QC
+
+EDA/GSR/SCR summaries document unit handling, signal quality, artifacts, decomposition, and candidate SCR events.
+
+```{r}
+gsr_units <- audit_gazepoint_gsr_units(
+  bio_std,
+  gsr_col = "GSR"
+)
+
+bio_cond <- convert_gazepoint_gsr_to_conductance(
+  bio_std,
+  gsr_col = "GSR",
+  output_col = "GSR_US"
+)
+
+gsr_quality <- audit_gazepoint_gsr_quality(
+  bio_cond,
+  gsr_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+eda_decomp <- decompose_gazepoint_eda(
+  bio_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_events <- detect_gazepoint_scr_events(
+  eda_decomp,
+  phasic_col = "eda_phasic",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_windows <- summarise_gazepoint_scr_event_windows(
+  scr_events,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 6: PPG, IBI, HRV, and respiration-proxy QC
+
+PPG/IBI/HRV summaries document signal quality, filtering, beat detection, interval checks, beat correction, and feature extraction.
+
+```{r}
+ppg_quality <- flag_gazepoint_ppg_quality(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ppg_filtered <- filter_gazepoint_ppg_signal(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  output_col = "PPG_FILTERED"
+)
+
+ppg_peaks <- detect_gazepoint_ppg_peaks(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ibi_quality <- audit_gazepoint_ibi_quality(
+  bio_std,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ibi_windows <- summarise_gazepoint_ibi_windows(
+  bio_std,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+hrv_features <- extract_gazepoint_hrv_features(
+  bio_std,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ppg_resp <- estimate_gazepoint_respiration_from_ppg(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 7: event alignment and AOI summaries
+
+Synthetic event and AOI summaries demonstrate how gaze and biometric streams can be joined without private raw recordings.
+
+```{r}
+events <- extract_gazepoint_ttl_events(
+  bio_std,
+  event_col = "EVENT",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+bio_event_locked <- align_gazepoint_biometrics_to_ttl(
+  biometrics = bio_std,
+  events = events,
+  time_col = "TIME_MS",
+  event_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  event_col = "EVENT"
+)
+
+gaze_bio <- sync_gazepoint_biometrics_with_gaze(
+  gaze = eye_std,
+  biometrics = bio_event_locked,
+  gaze_time_col = "time_ms",
+  biometric_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_timecourse <- build_gazepoint_aoi_timecourse(
+  gaze = eye_std,
+  aoi = aoi_definitions,
+  x_col = "gaze_x",
+  y_col = "gaze_y",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_bio <- summarise_gazepoint_aoi_biometrics(
+  gaze_biometrics = gaze_bio,
+  aoi_col = "aoi",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 8: model-ready tables
+
+Model-ready synthetic tables retain identifiers, condition fields, feature summaries, and QC indicators.
+
+```{r}
+bio_master <- join_gazepoint_biometrics_to_master(
+  biometrics = bio_event_locked,
+  master = master,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+multimodal_windows <- summarise_gazepoint_multimodal_windows(
+  bio_master,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_model <- prepare_gazepoint_aoi_biometrics_model_data(
+  aoi_bio,
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  aoi_col = "aoi"
+)
+
+multimodal_model <- prepare_gazepoint_multimodal_model_data(
+  multimodal_windows,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 9: reporting and reproducibility outputs
+
+The final step records the synthetic workflow decisions and creates reviewer-facing reporting objects.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "synthetic_data",
+      "validation",
+      "pupil_gaze_qc",
+      "eda_scr_qc",
+      "ppg_hrv_qc",
+      "event_aoi_alignment",
+      "reporting"
+    ),
+    decision = c(
+      "Synthetic Gazepoint-like data were generated for public documentation.",
+      "Synthetic streams were standardized and validated before analysis.",
+      "Pupil and gaze quality-control summaries were created.",
+      "EDA/GSR/SCR quality-control summaries were created.",
+      "PPG/IBI/HRV quality-control summaries were created.",
+      "Biometric and gaze streams were aligned to synthetic events and AOIs.",
+      "Decision logs, QC supplements, and reproducibility statements were generated."
+    )
+  )
+)
+
+qc_overview <- summarize_gazepoint_qc_overview(
+  bio_master,
+  group_cols = c("participant_id", "trial_id")
+)
+
+exclusions <- recommend_gazepoint_biometric_exclusions(
+  qc_overview,
+  participant_col = "participant_id"
+)
+
+qc_supplement <- create_gazepoint_qc_supplement(
+  qc_overview = qc_overview,
+  exclusions = exclusions,
+  decision_log = decision_log
+)
+
+report_tables <- create_gazepoint_biometrics_report_tables(
+  qc_overview = qc_overview,
+  exclusions = exclusions
+)
+
+repro_statement <- create_gazepoint_reproducibility_statement(
+  package = "gpbiometrics",
+  public_example = "synthetic Gazepoint-like data",
+  decision_log = decision_log
+)
+```
+
+# Optional one-command workflow checks
+
+For smoke testing or readiness checks, synthetic data can also be passed through higher-level workflow helpers.
+
+```{r}
+workflow_summary <- run_gazepoint_biometrics_workflow(
+  data = bio_std,
+  metadata = master
+)
+
+readiness <- run_gazepoint_biometrics_real_data_readiness(
+  data = bio_std,
+  metadata = master
+)
+```
+
+# Recommended reporting language
+
+Use precise demonstration language:
+
+- Report synthetic data as synthetic, simulated, or demonstration data.
+- State that synthetic examples are used to demonstrate software behavior and reproducibility workflows.
+- Keep private Gazepoint exports outside public documentation unless anonymization and consent permit sharing.
+- Report validation, QC, alignment, and feature-engineering steps separately.
+- Avoid treating synthetic signal summaries as empirical evidence.
+- Avoid interpreting biometric or gaze-derived features as direct psychological, clinical, emotional, attentional, or diagnostic states.
+
+# Minimal checklist
+
+Before using a synthetic showcase in documentation, confirm that it:
+
+- contains no private participant data;
+- exercises import, validation, QC, event-alignment, AOI, and reporting branches;
+- uses clear synthetic identifiers;
+- separates demonstration outputs from empirical results;
+- includes decision logs and reproducibility statements;
+- avoids clinical, affective, emotional, diagnostic, or psychological claims;
+- can be regenerated from code.
+
+# Next steps
+
+After the synthetic-data showcase, extend the documentation with design-audit and toolbox-bridge articles, then expand the plot gallery with representative QC and reporting figures.

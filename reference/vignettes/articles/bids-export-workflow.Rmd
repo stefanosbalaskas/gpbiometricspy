@@ -1,0 +1,173 @@
+---
+title: "Exporting Gazepoint eye-tracking and physiology to BIDS"
+description: "Preview, audit, and write standards-oriented Gazepoint eye-tracking and physiological data exports."
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Exporting Gazepoint eye-tracking and physiology to BIDS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+
+if (file.exists("DESCRIPTION") && dir.exists("R")) {
+  devtools::load_all(".", quiet = TRUE)
+} else {
+  library(gpbiometrics)
+}
+```
+
+# Purpose
+
+This article describes the standards-oriented BIDS export layer in
+`gpbiometrics`. The workflow separates eye-tracking and physiological
+preparation, validates required metadata, previews output paths, and writes
+tabular data and JSON sidecars.
+
+The helpers support transparent export preparation. They do not guarantee that
+an incomplete study description becomes fully BIDS compliant without
+researcher review.
+
+# Available helpers
+
+```{r function-inventory}
+bids_functions <- data.frame(
+  function_name = c(
+    "export_gazepoint_to_bids",
+    "prepare_gazepoint_bids_eye",
+    "prepare_gazepoint_bids_physio",
+    "check_gazepoint_bids"
+  ),
+  role = c(
+    "Integrated export workflow",
+    "Eye-tracking preparation",
+    "Physiological preparation",
+    "Dataset-layout audit"
+  ),
+  stringsAsFactors = FALSE
+)
+
+bids_functions$available <-
+  bids_functions$function_name %in%
+  getNamespaceExports("gpbiometrics")
+
+bids_functions
+
+stopifnot(all(bids_functions$available))
+```
+
+# Metadata required before export
+
+| Metadata area | Examples |
+|---|---|
+| Dataset identity | Dataset name, authors, license |
+| Participant structure | Subject, session, task, run |
+| Acquisition | Sampling rate, device, software version |
+| Eye tracking | Screen size, resolution, coordinate system, calibration |
+| Physiology | Channel names, units, sampling frequencies |
+| Timing | Time origin, event source, synchronization method |
+| Processing | Filtering, interpolation, resampling, exclusions |
+
+Missing screen or coordinate-system metadata should not be inferred from gaze
+values alone.
+
+# Inspect the function contracts
+
+```{r signatures}
+args(export_gazepoint_to_bids)
+args(prepare_gazepoint_bids_eye)
+args(prepare_gazepoint_bids_physio)
+args(check_gazepoint_bids)
+```
+
+# Prepare eye-tracking data
+
+```{r eye-example, eval=FALSE}
+eye_export <- prepare_gazepoint_bids_eye(
+  ...
+)
+```
+
+Retain gaze coordinates, pupil measurements, validity fields, blink flags,
+timestamps, event information, and coordinate metadata where available.
+
+Coordinate interpretation must state whether values are normalized,
+pixel-based, screen-centered, or expressed in another documented system.
+
+# Prepare physiological data
+
+```{r physio-example, eval=FALSE}
+physio_export <- prepare_gazepoint_bids_physio(
+  ...
+)
+```
+
+Physiological channel metadata should distinguish:
+
+- EDA or GSR conductance-related channels;
+- pulse or PPG waveform channels;
+- heart-rate summaries;
+- genuine IBI or RR intervals;
+- engagement-dial values;
+- validity or vendor-status columns.
+
+# Preview the complete export
+
+Always preview paths and metadata before writing files.
+
+```{r dry-run-example, eval=FALSE}
+preview <- export_gazepoint_to_bids(
+  ...,
+  dry_run = TRUE
+)
+
+preview
+```
+
+Check participant, session, task, acquisition, and run labels; filenames;
+compressed tables; JSON sidecars; coordinate-system files; overwrite
+decisions; and missing mandatory metadata.
+
+# Write and audit
+
+```{r write-example, eval=FALSE}
+written <- export_gazepoint_to_bids(
+  ...,
+  dry_run = FALSE
+)
+
+audit <- check_gazepoint_bids(
+  ...
+)
+```
+
+Do not overwrite an existing dataset until the preview and audit outputs have
+been reviewed.
+
+# Reproducibility checklist
+
+Report:
+
+- the BIDS specification targeted;
+- gpbiometrics and R versions;
+- source Gazepoint export types;
+- subject, session, task, and run mappings;
+- eye-coordinate conventions;
+- physiological channel units;
+- sampling rates and time origins;
+- preprocessing completed before export;
+- files omitted because required metadata were unavailable;
+- audit warnings and unresolved deviations.
+
+# Interpretation and scope
+
+BIDS organizes data and metadata. It does not validate experimental design,
+signal quality, clinical meaning, or psychological interpretation.
+Data-sharing readiness should therefore be assessed separately from analysis
+readiness.

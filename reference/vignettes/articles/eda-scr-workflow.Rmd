@@ -1,0 +1,342 @@
+---
+title: "EDA, GSR, and SCR workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EDA, GSR, and SCR workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative workflow for electrodermal activity (EDA), galvanic skin response (GSR), and skin-conductance response (SCR) data derived from Gazepoint Biometrics exports.
+
+The goal is to make signal-processing decisions transparent before analysis: check units, inspect quality, flag artifacts, apply baseline correction, separate tonic and phasic components, detect candidate SCR events, summarize event windows, and document all preprocessing decisions.
+
+The workflow is descriptive. EDA, GSR, and SCR signals are treated as physiological measurement streams requiring quality control. They are not interpreted here as direct evidence of emotion, stress, arousal, clinical status, deception, attention, or psychological state.
+
+# Workflow overview
+
+A typical EDA/GSR/SCR workflow is:
+
+1. Import or simulate Gazepoint-like biometric data.
+2. Audit GSR units and convert to a consistent conductance scale when needed.
+3. Inspect signal quality and missingness.
+4. Flag artifacts and non-response patterns.
+5. Apply baseline correction when required by the study design.
+6. Decompose the signal into tonic and phasic components.
+7. Detect candidate SCR events and peaks.
+8. Summarize event-locked or window-level SCR features.
+9. Plot decomposition, SCR events, and specification checks.
+10. Export decision logs, QC summaries, and reproducibility records.
+
+# Example data
+
+For public documentation, use synthetic or example data rather than private Gazepoint exports.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+str(bio)
+```
+
+# Step 1: audit GSR units
+
+Gazepoint exports may contain GSR/EDA columns with names or units that need to be checked before analysis. Start by identifying the relevant columns and auditing the expected unit scale.
+
+```{r}
+bio_std <- standardise_gazepoint_biometric_names(bio)
+
+audit_gazepoint_gsr_units(
+  bio_std,
+  gsr_col = "GSR"
+)
+```
+
+If the export uses resistance-like values or a non-standard representation, convert the signal to a conductance scale before downstream summaries.
+
+```{r}
+bio_cond <- convert_gazepoint_gsr_to_conductance(
+  bio_std,
+  gsr_col = "GSR",
+  output_col = "GSR_US"
+)
+```
+
+# Step 2: inspect GSR quality
+
+Quality checks should be performed before baseline correction, decomposition, or event detection. These checks help identify missing values, flat segments, implausible ranges, abrupt jumps, and other signal irregularities.
+
+```{r}
+gsr_quality <- audit_gazepoint_gsr_quality(
+  bio_cond,
+  gsr_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+gsr_quality
+```
+
+Artifact-focused checks can be added when the signal contains abrupt discontinuities, local spikes, or extended flat periods.
+
+```{r}
+eda_artifacts <- audit_gazepoint_eda_artifacts(
+  bio_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+eda_artifacts
+```
+
+# Step 3: screen non-responders and response patterns
+
+Some analyses require documenting participants or trials with little measurable EDA variation. This should be reported as a signal-quality or response-pattern issue, not as a psychological interpretation.
+
+```{r}
+nonresponders <- screen_gazepoint_eda_nonresponders(
+  bio_cond,
+  eda_col = "GSR_US",
+  participant_col = "participant_id"
+)
+
+response_patterns <- classify_gazepoint_eda_response_pattern(
+  bio_cond,
+  eda_col = "GSR_US",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 4: baseline-correct GSR
+
+Baseline correction should be tied to the experimental timing. The baseline window should be defined before modelling and reported in the methods section.
+
+```{r}
+bio_base <- baseline_correct_gazepoint_gsr(
+  bio_cond,
+  gsr_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  baseline_window = c(-1000, 0)
+)
+```
+
+# Step 5: decompose EDA into tonic and phasic components
+
+EDA decomposition separates slower tonic variation from faster phasic changes. The decomposition result should be treated as a preprocessing output whose assumptions and parameters are reported.
+
+```{r}
+eda_decomp <- decompose_gazepoint_eda(
+  bio_base,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+summarise_gazepoint_gsr_tonic_phasic(
+  eda_decomp,
+  tonic_col = "eda_tonic",
+  phasic_col = "eda_phasic",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+A decomposition plot is useful for checking whether the extracted tonic and phasic components are plausible for the recording scale and study timing.
+
+```{r}
+plot_gazepoint_eda_decomposition(
+  eda_decomp,
+  time_col = "TIME_MS",
+  eda_col = "GSR_US",
+  tonic_col = "eda_tonic",
+  phasic_col = "eda_phasic"
+)
+```
+
+# Step 6: detect SCR events and peaks
+
+SCR event detection should be described as candidate event detection. Thresholds, latency windows, amplitude criteria, and recovery rules should be documented.
+
+```{r}
+scr_events <- detect_gazepoint_scr_events(
+  eda_decomp,
+  phasic_col = "eda_phasic",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_peaks <- detect_gazepoint_scr_peaks(
+  eda_decomp,
+  phasic_col = "eda_phasic",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+Visual inspection helps check whether candidate peaks correspond to plausible local phasic changes.
+
+```{r}
+plot_gazepoint_scr_events(
+  eda_decomp,
+  events = scr_events,
+  time_col = "TIME_MS",
+  eda_col = "GSR_US",
+  phasic_col = "eda_phasic"
+)
+```
+
+# Step 7: normalize and summarize SCR features
+
+SCR amplitudes may need normalization depending on the design and comparison. Normalization choices should be reported because they affect scale and interpretation.
+
+```{r}
+scr_norm <- normalize_gazepoint_scr(
+  scr_events,
+  amplitude_col = "scr_amplitude",
+  participant_col = "participant_id"
+)
+
+scr_windows <- summarise_gazepoint_scr_event_windows(
+  scr_norm,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_windows
+```
+
+Window-level summaries can then be joined to trial metadata or aligned to AOIs/events in a later multimodal workflow.
+
+```{r}
+summarise_gazepoint_gsr_windows(
+  eda_decomp,
+  gsr_col = "GSR_US",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 8: run sensitivity checks
+
+SCR results can depend on thresholds and preprocessing choices. Sensitivity checks help document whether conclusions are robust to reasonable alternatives.
+
+```{r}
+scr_sensitivity <- run_gazepoint_scr_threshold_sensitivity(
+  eda_decomp,
+  phasic_col = "eda_phasic",
+  time_col = "TIME_MS",
+  thresholds = c(0.01, 0.03, 0.05)
+)
+
+scr_multiverse <- run_gazepoint_scr_multiverse(
+  bio_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS"
+)
+```
+
+Specification plots can be used to report how SCR counts or amplitudes change across threshold choices.
+
+```{r}
+plot_gazepoint_scr_specification_curve(scr_sensitivity)
+```
+
+# Step 9: prepare model-ready tables
+
+After QC and summarization, create explicit model-ready tables. These tables should contain participant, trial, condition, time-window, and QC variables needed for transparent analysis.
+
+```{r}
+scr_model <- prepare_gazepoint_scr_hurdle_model_data(
+  scr_windows,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_model
+```
+
+# Reporting outputs
+
+A reproducible EDA/SCR section should report unit handling, filtering or artifact rules, baseline definition, decomposition method, SCR detection thresholds, normalization approach, and the number of affected participants/trials.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "unit_audit",
+      "artifact_audit",
+      "baseline_correction",
+      "eda_decomposition",
+      "scr_detection"
+    ),
+    decision = c(
+      "GSR units were audited before analysis.",
+      "EDA artifacts were flagged before decomposition.",
+      "GSR was baseline-corrected using a design-defined pre-event window.",
+      "EDA was separated into tonic and phasic components.",
+      "Candidate SCR events were detected using documented thresholds."
+    )
+  )
+)
+
+create_gazepoint_qc_supplement(
+  qc_overview = gsr_quality,
+  decision_log = decision_log
+)
+
+create_gazepoint_reproducibility_statement()
+```
+
+# Recommended reporting language
+
+Use precise signal-processing language:
+
+- Report GSR/EDA unit checks and conversions.
+- Report artifact, flatline, and missingness checks.
+- Report baseline windows and decomposition settings.
+- Report SCR detection thresholds and event-window definitions.
+- Report sensitivity checks where thresholds may affect results.
+- Avoid describing EDA/GSR/SCR outputs as direct measures of stress, emotion, deception, arousal, attention, or clinical state unless the study includes a validated design and explicitly supports that interpretation.
+
+# Minimal checklist
+
+Before modelling EDA/GSR/SCR outcomes, confirm that the analysis has:
+
+- identified the raw GSR/EDA column and unit scale;
+- converted units where necessary;
+- summarized missingness, flat segments, and artifacts;
+- screened non-response or low-variation patterns;
+- stated the baseline window and correction method;
+- documented tonic/phasic decomposition settings;
+- documented SCR detection and peak rules;
+- summarized event-window features by participant, trial, and condition;
+- kept a decision log for exclusions and transformations;
+- used synthetic or anonymized examples in public documentation.
+
+# Next steps
+
+After EDA/SCR QC, combine event-window summaries with AOI, gaze, pupil, or PPG/HRV features depending on the study design. For pulse, IBI, HRV, and respiration workflows, use the dedicated PPG/HRV article planned in the article roadmap.

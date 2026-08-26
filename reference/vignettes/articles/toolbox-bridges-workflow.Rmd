@@ -1,0 +1,460 @@
+---
+title: "External toolbox bridges workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{External toolbox bridges workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative workflow for preparing `gpbiometrics` outputs for external physiological-signal toolboxes and cross-check pipelines.
+
+The purpose is interoperability: standardize Gazepoint Biometrics exports, inspect timing and signal columns, prepare toolbox-specific input tables, export files where needed, import or compare returned results, and document all transformations in decision logs and reproducibility outputs.
+
+The workflow focuses on data contracts and reproducibility. External-toolbox preparation and cross-checks do not by themselves validate psychological, clinical, emotional, attentional, diagnostic, workload-related, stress-related, or health-related interpretations.
+
+# Workflow overview
+
+A typical toolbox-bridge workflow is:
+
+1. Import or simulate Gazepoint-like biometric streams.
+2. Standardize column names and validate required fields.
+3. Audit sampling, timing, and active channels.
+4. Prepare PPG/IBI exports for HeartPy, pyPPG, pyHRV, and RHRV-style workflows.
+5. Prepare EDA/GSR exports for LEDALAB, PSPM, cvxEDA, NeuroKit, and BioSPPy-style workflows.
+6. Run available internal cross-check helpers.
+7. Import or summarize external results.
+8. Record export contracts, transformation decisions, and reproducibility statements.
+
+# Example data
+
+Use synthetic or anonymized data for public documentation. Private Gazepoint exports should not be committed to the package repository.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+bio_std <- standardise_gazepoint_biometric_names(bio)
+
+validate_gazepoint_biometrics(bio_std)
+detect_active_biometric_channels(bio_std)
+detect_gazepoint_biometric_schema(bio_std)
+detect_gazepoint_biometric_timebase(bio_std)
+```
+
+# Step 1: audit timing before export
+
+External toolboxes usually assume consistent timing, ordered samples, and well-defined sampling rates. Audit these before creating bridge files.
+
+```{r}
+sampling_audit <- assess_gazepoint_sampling_irregularity(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+time_resets <- audit_gazepoint_time_resets(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+timebase <- detect_gazepoint_biometric_timebase(bio_std)
+```
+
+# Step 2: prepare HeartPy-style PPG input
+
+HeartPy-style workflows usually require a PPG signal, a time or sample index, and a stable sampling-rate assumption.
+
+```{r}
+ppg_filtered <- filter_gazepoint_ppg_signal(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  output_col = "PPG_FILTERED"
+)
+
+heartpy_input <- prepare_gazepoint_heartpy_input(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+export_gazepoint_heartpy_input(
+  heartpy_input,
+  path = "heartpy_input"
+)
+```
+
+Internal HeartPy-style processing or cross-check helpers can be used as reproducibility checks where appropriate.
+
+```{r}
+heartpy_style <- process_gazepoint_ppg_heartpy_style(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+heartpy_crosscheck <- run_gazepoint_heartpy_crosscheck(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS"
+)
+```
+
+# Step 3: prepare pyPPG-style input
+
+pyPPG-style bridges should preserve the filtered PPG signal, timing fields, participant/trial identifiers, and sampling assumptions.
+
+```{r}
+pyppg_input <- prepare_gazepoint_pyppg_input(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+pyppg_input
+```
+
+If morphology or template summaries are prepared before export, document the preprocessing choices.
+
+```{r}
+ppg_peaks <- detect_gazepoint_ppg_peaks(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ppg_templates <- extract_gazepoint_ppg_templates(
+  ppg_filtered,
+  peaks = ppg_peaks,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS"
+)
+
+ppg_morphology <- extract_gazepoint_ppg_morphology(
+  ppg_filtered,
+  peaks = ppg_peaks,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS"
+)
+```
+
+# Step 4: prepare pyHRV-style and RHRV-style interval inputs
+
+HRV bridges should clearly distinguish raw IBI/RR values, filtered intervals, corrected intervals, and exported NN intervals.
+
+```{r}
+ibi_quality <- audit_gazepoint_ibi_quality(
+  bio_std,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ibi_filtered <- filter_gazepoint_ibi_implausible(
+  bio_std,
+  ibi_col = "IBI",
+  output_col = "IBI_FILTERED"
+)
+
+nn_intervals <- extract_gazepoint_pyhrv_nn_intervals(
+  ibi_filtered,
+  ibi_col = "IBI_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+pyhrv_results <- run_gazepoint_pyhrv_style(
+  nn_intervals,
+  ibi_col = "IBI_FILTERED",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+export_gazepoint_pyhrv_results(
+  pyhrv_results,
+  path = "pyhrv_results"
+)
+```
+
+RHRV-style exports should preserve interval units and grouping fields.
+
+```{r}
+rhrv_input <- prepare_gazepoint_rhrv_input(
+  ibi_filtered,
+  ibi_col = "IBI_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+export_gazepoint_rhrv_input(
+  rhrv_input,
+  path = "rhrv_input"
+)
+```
+
+# Step 5: prepare LEDALAB-style EDA input
+
+EDA bridges should document whether the exported values are raw resistance, converted conductance, filtered conductance, tonic/phasic components, or event summaries.
+
+```{r}
+gsr_units <- audit_gazepoint_gsr_units(
+  bio_std,
+  gsr_col = "GSR"
+)
+
+eda_cond <- convert_gazepoint_gsr_to_conductance(
+  bio_std,
+  gsr_col = "GSR",
+  output_col = "GSR_US"
+)
+
+ledalab_input <- prepare_gazepoint_ledalab_input(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 6: prepare PSPM-style inputs
+
+PSPM-style workflows may require marker channels, segment definitions, trimming rules, and model-design tables.
+
+```{r}
+pspm_input <- prepare_gazepoint_pspm_input(
+  eda_cond,
+  signal_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+pspm_segments <- extract_gazepoint_segments_pspm_style(
+  eda_cond,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+pspm_markers <- extract_gazepoint_markerinfo_pspm_style(
+  eda_cond,
+  marker_col = "EVENT",
+  time_col = "TIME_MS"
+)
+
+pspm_trimmed <- trim_gazepoint_biometrics_pspm_style(
+  eda_cond,
+  time_col = "TIME_MS",
+  window = c(-1000, 5000)
+)
+
+pspm_glm <- create_gazepoint_pspm_glm_design(
+  pspm_markers,
+  condition_col = "EVENT"
+)
+```
+
+# Step 7: prepare cvxEDA and NeuroKit/BioSPPy-style EDA inputs
+
+cvxEDA, NeuroKit-style, and BioSPPy-style workflows can be used as decomposition or event-detection bridges when signal preprocessing choices are documented.
+
+```{r}
+cvxeda_input <- prepare_gazepoint_cvxeda_input(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+neurokit_input <- prepare_gazepoint_neurokit_eda_input(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+neurokit_crosscheck <- run_gazepoint_neurokit_eda_crosscheck(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS"
+)
+
+biosppy_eda <- run_gazepoint_biosppy_eda(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS"
+)
+
+biosppy_ppg <- run_gazepoint_biosppy_ppg(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS"
+)
+```
+
+# Step 8: import and compare returned results
+
+When external software returns result files, import them as derived outputs and keep the original bridge input available for reproducibility.
+
+```{r}
+imported_pyhrv <- import_gazepoint_pyhrv_results(
+  path = "pyhrv_results"
+)
+
+hrv_summary <- summarise_gazepoint_hrv_features(pyhrv_results)
+
+feature_coverage <- summarize_gazepoint_feature_coverage(
+  pyhrv_results
+)
+```
+
+Cross-toolbox differences should be reported as differences between algorithms, preprocessing choices, and data contracts, not as direct evidence that one output captures a psychological state.
+
+# Step 9: document export contracts
+
+
+Each bridge should record the input signal, time variable, unit convention, grouping variables, preprocessing state, file path, and downstream tool version where available.
+
+```{r}
+bridge_contracts <- data.frame(
+  bridge = c(
+    "HeartPy",
+    "pyPPG",
+    "pyHRV",
+    "RHRV",
+    "LEDALAB",
+    "PSPM",
+    "cvxEDA",
+    "NeuroKit",
+    "BioSPPy"
+  ),
+  signal = c(
+    "PPG_FILTERED",
+    "PPG_FILTERED",
+    "IBI_FILTERED",
+    "IBI_FILTERED",
+    "GSR_US",
+    "GSR_US",
+    "GSR_US",
+    "GSR_US",
+    "GSR_US / PPG_FILTERED"
+  ),
+  output = c(
+    "heartpy_input",
+    "pyppg_input",
+    "pyhrv_results",
+    "rhrv_input",
+    "ledalab_input",
+    "pspm_input",
+    "cvxeda_input",
+    "neurokit_input",
+    "biosppy_outputs"
+  )
+)
+
+bridge_contracts
+```
+
+# Step 10: reporting and reproducibility outputs
+
+Toolbox bridges should be documented in the same decision log as the main preprocessing pipeline.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "timing_audit",
+      "heartpy_bridge",
+      "pyppg_bridge",
+      "pyhrv_rhrv_bridge",
+      "ledalab_bridge",
+      "pspm_bridge",
+      "cvxeda_neurokit_biosppy_bridge",
+      "result_import"
+    ),
+    decision = c(
+      "Timing, sampling irregularity, and time resets were checked before toolbox export.",
+      "HeartPy-style input was prepared from filtered PPG with identifiers retained.",
+      "pyPPG-style input preserved filtered PPG and timing fields.",
+      "pyHRV/RHRV-style inputs distinguished raw, filtered, and corrected interval fields.",
+      "LEDALAB-style input used documented GSR-to-conductance conversion.",
+      "PSPM-style input retained signal, marker, segment, and model-design information.",
+      "cvxEDA, NeuroKit, and BioSPPy-style bridges were treated as algorithmic cross-checks.",
+      "External results were treated as derived outputs linked to bridge inputs."
+    )
+  )
+)
+
+qc_supplement <- create_gazepoint_qc_supplement(
+  qc_overview = sampling_audit,
+  decision_log = decision_log
+)
+
+repro_statement <- create_gazepoint_reproducibility_statement(
+  package = "gpbiometrics",
+  public_example = "synthetic toolbox-bridge example",
+  decision_log = decision_log
+)
+```
+
+# Recommended reporting language
+
+Use precise interoperability language:
+
+- Report the input signal, time variable, unit convention, and grouping fields for each bridge.
+- Report whether exported values were raw, filtered, baseline-corrected, decomposed, corrected, or summarized.
+- Report event markers, segment definitions, and window rules for toolbox exports.
+- Report external-toolbox outputs as derived algorithmic outputs.
+- Report cross-checks as sensitivity or interoperability checks, not as proof of psychological validity.
+- Avoid interpreting bridge outputs as direct evidence of emotion, stress, attention, workload, clinical status, diagnosis, health condition, or psychological response unless the study design and external validation evidence support that interpretation.
+
+# Minimal checklist
+
+Before exporting to external toolboxes, confirm that the project has:
+
+- validated timing and sampling fields;
+- checked active channels and signal units;
+- documented preprocessing state for each exported signal;
+- retained participant, trial, session, and event identifiers where needed;
+- documented interval units for IBI/RR/NN exports;
+- documented event markers and segment windows for EDA/SCR exports;
+- stored bridge-input files separately from external result files;
+- recorded toolbox versions and settings where possible;
+- documented all transformations in a decision log;
+- avoided unsupported psychological, clinical, emotional, diagnostic, or attentional interpretations.
+
+# Next steps
+
+After toolbox-bridge documentation, expand the plot gallery with representative QC, signal-processing, event-alignment, reporting, and bridge-output figures.

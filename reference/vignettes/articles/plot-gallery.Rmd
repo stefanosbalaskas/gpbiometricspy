@@ -1,0 +1,710 @@
+---
+title: "Plot gallery"
+description: "Rendered examples of all exported gpbiometrics plot helpers."
+output: rmarkdown::html_vignette
+---
+
+<!--
+%\VignetteIndexEntry{Plot gallery}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  results = "hide",
+  fig.width = 8,
+  fig.height = 5,
+  warning = FALSE,
+  message = FALSE
+)
+
+library(gpbiometrics)
+
+.show_plot_result <- function(res) {
+  if (inherits(res, "ggplot")) {
+    print(res)
+    return(invisible(res))
+  }
+
+  if (inherits(res, "recordedplot")) {
+    replayPlot(res)
+    return(invisible(res))
+  }
+
+  if (inherits(res, c("grob", "gtable"))) {
+    grid::grid.newpage()
+    grid::grid.draw(res)
+    return(invisible(res))
+  }
+
+  if (is.list(res)) {
+    plot_like <- Filter(
+      function(z) inherits(z, c("ggplot", "recordedplot", "grob", "gtable")),
+      res
+    )
+
+    if (length(plot_like)) {
+      for (z in plot_like) {
+        .show_plot_result(z)
+      }
+    }
+  }
+
+  invisible(res)
+}
+
+.gp <- function(name) {
+  f <- get(name, envir = asNamespace("gpbiometrics"), inherits = FALSE)
+
+  function(...) {
+    res <- f(...)
+    .show_plot_result(res)
+    invisible(res)
+  }
+}
+set.seed(20260630)
+```
+
+# Plot gallery
+
+This article showcases all exported `plot_*` helpers in `gpbiometrics` using synthetic Gazepoint-like data.
+
+The example code is hidden so that the page functions as a compact visual gallery. Function names are shown above each rendered example.
+
+The examples are for documentation and visual inspection only. The synthetic signals are not real physiology and should not be interpreted as emotion, stress, cognition, preference, health status, or diagnosis.
+
+```{r synthetic-data}
+fs <- 60
+time_s <- seq(0, 120, by = 1 / fs)
+n <- length(time_s)
+
+condition <- rep(c("simple_clear", "dense_ambiguous"), length.out = n)
+
+ppg <- sin(2 * pi * 1.15 * time_s) +
+  0.25 * sin(2 * pi * 0.22 * time_s) +
+  0.04 * stats::rnorm(n)
+
+gsr_us <- 2.0 +
+  0.05 * sin(2 * pi * 0.015 * time_s) +
+  0.02 * stats::rnorm(n)
+
+scr_onsets <- seq(8, 110, by = 14)
+
+for (on in scr_onsets) {
+  gsr_us <- gsr_us + ifelse(time_s >= on, 0.12 * exp(-(time_s - on) / 2.5), 0)
+}
+
+hr <- 72 + 4 * sin(2 * pi * 0.01 * time_s) + stats::rnorm(n, 0, 0.5)
+ibi_ms <- 60000 / hr
+
+demo_signal <- data.frame(
+  participant = rep(sprintf("P%02d", 1:12), length.out = n),
+  trial = rep(1:12, length.out = n),
+  condition = condition,
+  time_s = time_s,
+  timestamp = time_s,
+  MSTIMER = time_s * 1000,
+  GSR_US = gsr_us,
+  GSR = gsr_us,
+  EDA = gsr_us,
+  PPG = ppg,
+  HR = hr,
+  IBI = ibi_ms,
+  pupil_left = 3.1 + 0.1 * sin(2 * pi * 0.04 * time_s) + stats::rnorm(n, 0, 0.02),
+  pupil_right = 3.1 + 0.1 * sin(2 * pi * 0.04 * time_s) + stats::rnorm(n, 0, 0.02),
+  gaze_x = 0.5 + 0.25 * sin(2 * pi * 0.03 * time_s) + stats::rnorm(n, 0, 0.03),
+  gaze_y = 0.5 + 0.20 * cos(2 * pi * 0.02 * time_s) + stats::rnorm(n, 0, 0.03),
+  TTL = as.integer(abs(time_s %% 10) < (1 / fs)),
+  stringsAsFactors = FALSE
+)
+
+demo_signal$AOI <- cut(
+  demo_signal$gaze_x,
+  breaks = c(-Inf, 0.35, 0.50, 0.65, 0.80, Inf),
+  labels = c("Instructions", "Claim", "Evidence", "CTA", "Other")
+)
+
+demo_signal$aoi <- as.character(demo_signal$AOI)
+
+rr_ms <- 820 +
+  45 * sin(seq(0, 8 * pi, length.out = 180)) +
+  stats::rnorm(180, 0, 18)
+
+rr_ms <- as.numeric(rr_ms)
+rr_ms <- rr_ms[is.finite(rr_ms) & rr_ms > 300 & rr_ms < 2000]
+
+nni_ms <- rr_ms
+nni_time_s <- seq_along(nni_ms)
+
+aoi_bio <- expand.grid(
+  aoi_label = c("Instructions", "Claim", "Evidence", "CTA"),
+  signal = c("GSR", "HR", "pupil_left"),
+  condition = c("simple_clear", "dense_ambiguous"),
+  stringsAsFactors = FALSE
+)
+
+aoi_bio$mean_value <- with(
+  aoi_bio,
+  ifelse(signal == "GSR", 2.0,
+    ifelse(signal == "HR", 72, 3.2)
+  ) +
+    ifelse(condition == "dense_ambiguous", 0.15, 0) +
+    rep(c(0.00, 0.06, 0.10, 0.04), length.out = nrow(aoi_bio))
+)
+
+ppg_detection <- .gp("detect_gazepoint_ppg_peaks")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_col = "PPG"
+)
+
+segment_measures <- data.frame(
+  segment = seq_len(12),
+  segment_id = seq_len(12),
+  segment_start_s = seq(0, by = 20, length.out = 12),
+  segment_end_s = seq(20, by = 20, length.out = 12),
+  bpm = 72 + 4 * sin(seq(0, 2 * pi, length.out = 12)) + stats::rnorm(12, 0, 0.8),
+  ibi_ms = 60000 / (72 + 4 * sin(seq(0, 2 * pi, length.out = 12))),
+  sdnn = 40 + 5 * sin(seq(0, 2 * pi, length.out = 12)),
+  rmssd = 32 + 4 * cos(seq(0, 2 * pi, length.out = 12)),
+  quality = runif(12, 0.85, 0.99)
+)
+
+segmentwise <- list(
+  measures = segment_measures,
+  segment_measures = segment_measures,
+  summary = segment_measures,
+  settings = list(measure = "bpm")
+)
+
+class(segmentwise) <- c("gazepoint_ppg_segmentwise", "list")
+
+measures <- data.frame(
+  sdnn = 52,
+  rmssd = 38,
+  sdsd = 36,
+  pnn50 = 18,
+  lf_norm = 54,
+  hf_norm = 46,
+  sd1 = 27,
+  sd2 = 68
+)
+
+scr_peaks <- data.frame(
+  onset_time_s = scr_onsets,
+  peak_time_s = scr_onsets + 2.0,
+  recovery_time_s = scr_onsets + 5.5,
+  amplitude = 0.10 + 0.04 * sin(seq_along(scr_onsets)),
+  peak_amplitude = 0.10 + 0.04 * sin(seq_along(scr_onsets)),
+  condition = rep(c("simple_clear", "dense_ambiguous"), length.out = length(scr_onsets)),
+  stringsAsFactors = FALSE
+)
+
+spec_curve <- data.frame(
+  specification_id = sprintf("spec_%02d", 1:24),
+  estimate = seq(-0.08, 0.18, length.out = 24) + stats::rnorm(24, 0, 0.01),
+  se = runif(24, 0.015, 0.035),
+  p_value = seq(0.20, 0.001, length.out = 24),
+  threshold = rep(c("0.01", "0.03", "0.05", "0.07"), length.out = 24),
+  baseline = rep(c("none", "pre_event", "trial"), length.out = 24),
+  smoothing = rep(c("raw", "ema"), length.out = 24),
+  stringsAsFactors = FALSE
+)
+
+saccades <- data.frame(
+  duration_ms = seq(20, 80, length.out = 80),
+  amplitude_deg = seq(0.5, 8, length.out = 80),
+  peak_velocity_deg_s = 60 + 45 * log1p(seq(0.5, 8, length.out = 80)) + stats::rnorm(80, 0, 8),
+  participant = rep(sprintf("P%02d", 1:10), length.out = 80),
+  condition = rep(c("simple_clear", "dense_ambiguous"), length.out = 80),
+  stringsAsFactors = FALSE
+)
+```
+
+# AOI and multimodal plots
+
+## `plot_gazepoint_aoi_biometrics()`
+
+```{r plot-aoi-biometrics}
+.gp("plot_gazepoint_aoi_biometrics")(
+  x = aoi_bio,
+  value_col = "mean_value",
+  aoi_col = "aoi_label",
+  signal_col = "signal",
+  group_col = "condition"
+)
+```
+
+## `plot_gazepoint_multimodal_timeline()`
+
+```{r plot-multimodal-timeline}
+.gp("plot_gazepoint_multimodal_timeline")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left"),
+  event_col = "TTL",
+  participant_col = "participant",
+  trial_col = "trial"
+)
+```
+
+# Biometric quality and signal plots
+
+## `plot_gazepoint_biometric_quality()`
+
+```{r plot-biometric-quality}
+.gp("plot_gazepoint_biometric_quality")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left"),
+  group_col = "condition"
+)
+```
+
+## `plot_gazepoint_biometric_report_dashboard()`
+
+```{r plot-report-dashboard}
+.gp("plot_gazepoint_biometric_report_dashboard")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left")
+)
+```
+
+## `plot_gazepoint_biometric_signals()`
+
+```{r plot-biometric-signals}
+.gp("plot_gazepoint_biometric_signals")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left"),
+  group_col = "condition"
+)
+```
+
+## `plot_gazepoint_signal_activity()`
+
+```{r plot-signal-activity}
+.gp("plot_gazepoint_signal_activity")(
+  data = demo_signal,
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left")
+)
+```
+
+## `plot_gazepoint_time_resets()`
+
+```{r plot-time-resets}
+.gp("plot_gazepoint_time_resets")(
+  data = demo_signal,
+  time_col = "time_s"
+)
+```
+
+# EDA and SCR plots
+
+## `plot_gazepoint_eda_decomposition()`
+
+```{r plot-eda-decomposition}
+.gp("plot_gazepoint_eda_decomposition")(
+  data = demo_signal,
+  time_col = "time_s",
+  signal_cols = c("GSR", "PPG", "HR", "IBI", "pupil_left")
+)
+```
+
+## `plot_gazepoint_eda_gram()`
+
+```{r plot-eda-gram}
+.gp("plot_gazepoint_eda_gram")(
+  dat = demo_signal,
+  time_col = "time_s",
+  eda_col = "GSR_US"
+)
+```
+
+## `plot_gazepoint_scr_events()`
+
+```{r plot-scr-events}
+.gp("plot_gazepoint_scr_events")(
+  data = demo_signal,
+  scr_peaks = scr_peaks,
+  time_col = "time_s",
+  signal_col = "GSR_US"
+)
+```
+
+## `plot_gazepoint_scr_specification_curve()`
+
+```{r plot-scr-specification-curve}
+.gp("plot_gazepoint_scr_specification_curve")(
+  x = spec_curve,
+  estimate_col = "estimate",
+  specification_col = "specification_id"
+)
+```
+
+# PPG, HRV, and respiration plots
+
+## `plot_gazepoint_ppg_breathing()`
+
+```{r plot-ppg-breathing}
+.gp("plot_gazepoint_ppg_breathing")(
+  rr_ms = rr_ms
+)
+```
+
+## `plot_gazepoint_ppg_peak_detection()`
+
+```{r plot-ppg-peak-detection}
+.gp("plot_gazepoint_ppg_peak_detection")(
+  detection = ppg_detection
+)
+```
+
+## `plot_gazepoint_ppg_poincare()`
+
+```{r plot-ppg-poincare}
+.gp("plot_gazepoint_ppg_poincare")(
+  rr_ms = rr_ms
+)
+```
+
+## `plot_gazepoint_ppg_segmentwise()`
+
+```{r plot-ppg-segmentwise}
+.gp("plot_gazepoint_ppg_segmentwise")(
+  segmentwise = segmentwise,
+  measure = "bpm"
+)
+```
+
+## `plot_gazepoint_pyhrv_hr_heatplot()`
+
+```{r plot-pyhrv-hr-heatplot}
+.gp("plot_gazepoint_pyhrv_hr_heatplot")(
+  nni_ms = nni_ms,
+  time_bins = 20,
+  hr_bins = 20
+)
+```
+
+## `plot_gazepoint_pyhrv_radar_chart()`
+
+```{r plot-pyhrv-radar-chart}
+.gp("plot_gazepoint_pyhrv_radar_chart")(
+  measures = measures
+)
+```
+
+## `plot_gazepoint_pyhrv_tachogram()`
+
+```{r plot-pyhrv-tachogram}
+.gp("plot_gazepoint_pyhrv_tachogram")(
+  nni_ms = nni_ms,
+  time_s = nni_time_s
+)
+```
+
+# Eye-movement plot
+
+## `plot_gazepoint_saccade_main_sequence()`
+
+```{r plot-saccade-main-sequence}
+.gp("plot_gazepoint_saccade_main_sequence")(
+  dat = saccades,
+  amplitude_col = "amplitude_deg",
+  peak_velocity_col = "peak_velocity_deg_s",
+  group_col = "condition"
+)
+```
+
+# Extended QC and reporting plot examples
+
+This section adds representative plot calls for common `gpbiometrics` quality-control, signal-processing, event-alignment, AOI, reporting, and toolbox-bridge workflows.
+
+The examples are intended as plotting contracts and documentation patterns. They show how diagnostic and report-ready figures can be produced from synthetic or already processed data. They should not be interpreted as direct evidence of emotion, stress, attention, workload, clinical status, diagnosis, health condition, or psychological response.
+
+```{r, eval = FALSE}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+eye <- simulate_gazepoint_eye_data(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+bio_std <- standardise_gazepoint_biometric_names(bio)
+eye_std <- standardize_gazepoint_column_names(eye)
+```
+
+## Missingness and signal-quality plots
+
+Missingness and signal-quality plots are useful for checking coverage and candidate data-quality issues before modelling.
+
+```{r, eval = FALSE}
+missingness <- summarize_gazepoint_missingness(
+  bio_std,
+  group_cols = c("participant_id", "trial_id")
+)
+
+signal_quality <- summarize_gazepoint_signal_quality(
+  bio_std,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_missingness(
+  missingness,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_signal_quality(
+  signal_quality,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_biometric_quality(
+  signal_quality,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+## Timing and activity plots
+
+Timing and activity plots help document sample availability, active channels, and possible time-reset issues.
+
+```{r, eval = FALSE}
+activity <- audit_gazepoint_signal_activity(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+time_resets <- audit_gazepoint_time_resets(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+plot_gazepoint_signal_activity(
+  activity,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_time_resets(
+  time_resets,
+  participant_col = "participant_id"
+)
+```
+
+## Raw and processed signal plots
+
+Signal plots should identify the plotted channel and preprocessing state.
+
+```{r, eval = FALSE}
+ppg_filtered <- filter_gazepoint_ppg_signal(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  output_col = "PPG_FILTERED"
+)
+
+plot_gazepoint_biometric_signals(
+  ppg_filtered,
+  time_col = "TIME_MS",
+  signal_cols = c("PPG", "PPG_FILTERED"),
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+## EDA, GSR, and SCR plots
+
+EDA/GSR/SCR plots document preprocessing, decomposition, and candidate event detection.
+
+```{r, eval = FALSE}
+eda_cond <- convert_gazepoint_gsr_to_conductance(
+  bio_std,
+  gsr_col = "GSR",
+  output_col = "GSR_US"
+)
+
+eda_decomp <- decompose_gazepoint_eda(
+  eda_cond,
+  eda_col = "GSR_US",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+scr_events <- detect_gazepoint_scr_events(
+  eda_decomp,
+  phasic_col = "eda_phasic",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_eda_decomposition(
+  eda_decomp,
+  time_col = "TIME_MS",
+  eda_col = "GSR_US",
+  tonic_col = "eda_tonic",
+  phasic_col = "eda_phasic"
+)
+
+plot_gazepoint_scr_events(
+  eda_decomp,
+  events = scr_events,
+  time_col = "TIME_MS",
+  signal_col = "eda_phasic"
+)
+```
+
+## PPG, IBI, HRV, and respiration-proxy plots
+
+PPG and interval plots document signal-processing and feature-extraction outputs.
+
+```{r, eval = FALSE}
+ppg_peaks <- detect_gazepoint_ppg_peaks(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+hrv_features <- extract_gazepoint_hrv_features(
+  bio_std,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+respiration_proxy <- estimate_gazepoint_respiration_from_ppg(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_ppg_peak_detection(
+  ppg_filtered,
+  peaks = ppg_peaks,
+  time_col = "TIME_MS",
+  ppg_col = "PPG_FILTERED"
+)
+
+plot_gazepoint_ppg_poincare(
+  hrv_features
+)
+
+plot_gazepoint_ppg_breathing(
+  respiration_proxy,
+  time_col = "TIME_MS"
+)
+```
+
+## Event-alignment, AOI, and multimodal plots
+
+Event-alignment and AOI-linked plots show synchronized summaries and should be reported as feature-engineering outputs.
+
+```{r, eval = FALSE}
+events <- extract_gazepoint_ttl_events(
+  bio_std,
+  event_col = "EVENT",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+event_locked <- align_gazepoint_biometrics_to_ttl(
+  biometrics = bio_std,
+  events = events,
+  time_col = "TIME_MS",
+  event_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  event_col = "EVENT"
+)
+
+plot_gazepoint_multimodal_timeline(
+  event_locked,
+  time_col = "TIME_MS",
+  signal_cols = c("GSR", "PPG", "HR")
+)
+
+aoi_summary <- summarise_gazepoint_aoi_biometrics(
+  event_locked,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_aoi_biometrics(
+  aoi_summary
+)
+```
+
+## Design and reporting plots
+
+Design and reporting plots support auditability and should be kept separate from substantive interpretation.
+
+```{r, eval = FALSE}
+master <- data.frame(
+  participant_id = rep(sprintf("P%02d", 1:8), each = 12),
+  trial_id = rep(seq_len(12), times = 8),
+  condition = rep(c("A", "B"), length.out = 96),
+  session = rep(c("morning", "afternoon"), length.out = 96)
+)
+
+plot_gazepoint_design_coverage(
+  master,
+  x = "condition",
+  fill = "session",
+  participant_col = "participant_id"
+)
+
+dashboard <- create_gazepoint_quality_dashboard(
+  qc_overview = signal_quality
+)
+
+plot_gazepoint_biometric_report_dashboard(
+  dashboard
+)
+```
+
+## Toolbox-bridge output plots
+
+Toolbox-bridge plots should document algorithmic outputs and export contracts.
+
+```{r, eval = FALSE}
+pyhrv_results <- run_gazepoint_pyhrv_style(
+  bio_std,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+plot_gazepoint_pyhrv_tachogram(pyhrv_results)
+plot_gazepoint_pyhrv_hr_heatplot(pyhrv_results)
+plot_gazepoint_pyhrv_radar_chart(pyhrv_results)
+```
+
+# Reporting note
+
+When using these plots in articles, reports, or supplementary materials, describe them as diagnostic, quality-control, synchronization, feature-engineering, or reproducibility displays unless the study design and validation evidence support stronger interpretation.

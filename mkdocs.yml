@@ -1,0 +1,26 @@
+site_name: gpbiometricspy
+site_description: Python port of gpbiometrics 2.0.0 for Gazepoint biometric workflows
+site_url: https://stefanosbalaskas.github.io/gpbiometricspy/
+repo_url: https://github.com/stefanosbalaskas/gpbiometricspy
+repo_name: stefanosbalaskas/gpbiometricspy
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Synthetic demo: demo.md
+  - Parity & validation: parity.md
+  - Interpretation guardrails: interpretation.md
+  - Integrations: integrations.md
+  - API reference: api/reference.md
+  - Article migration catalog: articles/index.md
+  - Development: development.md
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true

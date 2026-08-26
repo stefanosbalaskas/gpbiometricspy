@@ -1,0 +1,191 @@
+---
+title: "MNE, EEG, and LSL interoperability workflow"
+description: "Prepare Gazepoint events and signal channels for MNE, align Gazepoint and EEG clocks, and document LSL/XDF synchronization."
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MNE, EEG, and LSL interoperability workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+
+if (file.exists("DESCRIPTION") && dir.exists("R")) {
+  devtools::load_all(".", quiet = TRUE)
+} else {
+  library(gpbiometrics)
+}
+```
+
+# Purpose
+
+This article documents an auditable workflow for preparing Gazepoint events and
+signal channels for MNE-Python, aligning Gazepoint timestamps with an EEG
+clock, and handling LSL or XDF synchronization information.
+
+The interoperability helpers prepare data and synchronization records. They do
+not replace EEG preprocessing, event-quality review, or specialist MNE
+analysis.
+
+# Workflow map
+
+```{r function-inventory}
+workflow_functions <- data.frame(
+  stage = c(
+    "Event conversion",
+    "Channel preparation",
+    "EEG clock alignment",
+    "LSL stream synchronization",
+    "LSL clock-offset estimation",
+    "Optional FIF writing",
+    "Reproducibility metadata"
+  ),
+  function_name = c(
+    "prepare_gazepoint_mne_events",
+    "prepare_gazepoint_mne_input",
+    "align_gazepoint_to_eeg",
+    "sync_gazepoint_signals_via_lsl",
+    "estimate_gazepoint_lsl_clock_offsets",
+    "write_gazepoint_mne_fif",
+    "session_info_gazepoint"
+  ),
+  stringsAsFactors = FALSE
+)
+
+workflow_functions$available <-
+  workflow_functions$function_name %in%
+  getNamespaceExports("gpbiometrics")
+
+workflow_functions
+
+stopifnot(all(workflow_functions$available))
+```
+
+# Prepare event information
+
+A useful event table should retain:
+
+- participant and recording identifiers;
+- event labels or numeric event codes;
+- original Gazepoint timestamps;
+- the time unit and recording origin;
+- TTL validity or marker-channel information;
+- a stable event identifier.
+
+```{r mne-event-signature}
+args(prepare_gazepoint_mne_events)
+```
+
+```{r mne-event-example, eval=FALSE}
+mne_events <- prepare_gazepoint_mne_events(
+  ...
+)
+```
+
+Confirm that event order, sample indices, event codes, and timestamp conversion
+agree with the experimental log.
+
+# Prepare Gazepoint channels for MNE
+
+```{r mne-input-signature}
+args(prepare_gazepoint_mne_input)
+```
+
+```{r mne-input-example, eval=FALSE}
+mne_input <- prepare_gazepoint_mne_input(
+  ...
+)
+```
+
+Document every exported channel's source column, signal type, physical unit,
+sampling rate, missing-data handling, filtering history, and validity rule.
+
+Do not label an HRV validity field as an HRV metric. EDA, pupil, pulse, gaze,
+HR, and IBI channels should not be reinterpreted as direct psychological
+states.
+
+# Align Gazepoint and EEG clocks
+
+```{r eeg-alignment-signature}
+args(align_gazepoint_to_eeg)
+```
+
+```{r eeg-alignment-example, eval=FALSE}
+alignment <- align_gazepoint_to_eeg(
+  ...
+)
+```
+
+Retain original and adjusted timestamps, estimated offset, estimated drift,
+matched event pairs, unmatched events, and residual timing errors.
+
+Alignment should not silently remove events or conceal poor correspondence
+between recording clocks.
+
+# Synchronize LSL or XDF streams
+
+```{r lsl-signatures}
+args(sync_gazepoint_signals_via_lsl)
+args(estimate_gazepoint_lsl_clock_offsets)
+```
+
+```{r lsl-example, eval=FALSE}
+clock_offsets <- estimate_gazepoint_lsl_clock_offsets(
+  ...
+)
+
+lsl_sync <- sync_gazepoint_signals_via_lsl(
+  ...
+)
+```
+
+Live clock-offset estimation requires a local `pylsl` installation. Imported
+XDF workflows should retain stream names, source identifiers, nominal rates,
+original timestamps, corrected timestamps, and any dejittering decision.
+
+# Optional native FIF writing
+
+```{r fif-signature}
+args(write_gazepoint_mne_fif)
+```
+
+```{r fif-example, eval=FALSE}
+fif_result <- write_gazepoint_mne_fif(
+  ...
+)
+```
+
+Native FIF writing requires a local Python and MNE installation. Use a dry run
+or temporary output directory first and inspect the resulting channel
+metadata.
+
+# Reporting checklist
+
+Report at minimum:
+
+- Gazepoint and EEG acquisition rates;
+- event sources and marker definitions;
+- timestamp units and clock origins;
+- event-matching method;
+- estimated offset and drift;
+- synchronization residuals;
+- unmatched or excluded events;
+- resampling, interpolation, or dejittering decisions;
+- MNE, Python, pylsl, R, and gpbiometrics versions.
+
+```{r session-info-signature}
+args(session_info_gazepoint)
+```
+
+# Interpretation guardrails
+
+Synchronization establishes temporal correspondence, not causal or
+psychological interpretation. Aligned signals remain measurements whose
+interpretation depends on study design, preprocessing, operationalization, and
+convergent evidence.

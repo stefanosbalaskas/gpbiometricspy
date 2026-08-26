@@ -1,0 +1,280 @@
+---
+title: "gpbiometrics workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gpbiometrics workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Overview
+
+This vignette gives a compact workflow for using `gpbiometrics` with Gazepoint Biometrics or Gazepoint GP3 biometric exports.
+
+The package supports importing, schema checks, signal-quality auditing, preprocessing, feature extraction, TTL alignment, model-ready table preparation, visual diagnostics, and reproducible report generation.
+
+The examples are not evaluated during vignette build because they require local Gazepoint export files.
+
+# Load the package
+
+```{r}
+library(gpbiometrics)
+```
+
+
+# Built-in synthetic kiosk demo
+
+The package includes a public synthetic Gazepoint-like demo dataset. It simulates a public-service touchscreen kiosk usability task with 36 synthetic participants and four tasks per participant.
+
+The design crosses interface complexity (`simple` vs. `dense`) with feedback clarity (`clear` vs. `ambiguous`). The files contain gaze, AOI labels, pupil diameter, GSR/EDA, HR, IBI, pulse waveform, engagement dial, TTL markers, and task metadata.
+
+```{r}
+demo_dir <- system.file(
+  "extdata",
+  "gazepoint_biometrics_kiosk_demo_exports",
+  package = "gpbiometrics"
+)
+
+workflow <- run_gazepoint_biometrics_workflow(
+  path = demo_dir,
+  include_all_gaze = TRUE,
+  include_fixations = FALSE,
+  include_other_csv = FALSE,
+  expected_sampling_rate_hz = 60
+)
+
+summarise_gazepoint_biometrics_workflow(workflow)
+```
+
+The dataset is fully artificial and is provided for examples, tests, vignettes, and software demonstration. It is not real participant physiology.
+
+
+
+# 1. Import Gazepoint biometric exports
+
+For a single export file:
+
+```{r}
+dat <- import_gazepoint_biometrics("path/to/biometric_export.csv")
+```
+
+For a folder of exports:
+
+```{r}
+folder <- "path/to/gazepoint_exports"
+
+dat <- import_gazepoint_biometric_folder(folder)
+```
+
+For private real data, keep source exports outside the package repository.
+
+# 2. Inspect real-data readiness
+
+Run a readiness gate before modelling or reporting.
+
+```{r}
+readiness <- run_gazepoint_biometrics_real_data_readiness(dat)
+
+readiness$overview
+readiness$checks
+```
+
+This step makes data-quality issues explicit, including missing channels, inactive signals, time-ordering problems, TTL availability, and signal-level missingness.
+
+# 3. Run the full workflow
+
+The full workflow can import a folder, create diagnostic outputs, and optionally write plots and reports.
+
+```{r}
+workflow <- run_gazepoint_biometrics_workflow(
+  path = folder,
+  include_all_gaze = TRUE,
+  include_fixations = FALSE,
+  include_other_csv = FALSE,
+  expected_sampling_rate_hz = 60
+)
+
+summary <- summarise_gazepoint_biometrics_workflow(workflow)
+summary
+```
+
+# 4. EDA, GSR, and SCR examples
+
+Common EDA and SCR tasks include unit auditing, smoothing, artifact checks, baseline correction, response-window extraction, and recovery-time estimation.
+
+```{r}
+unit_audit <- audit_gazepoint_gsr_units(dat)
+
+smoothed <- standardise_gazepoint_adaptive_ema(
+  dat,
+  signal_col = "GSR_US",
+  time_col = "CNT"
+)
+
+scr_recovery <- extract_gazepoint_scr_recovery_times(
+  dat,
+  eda_col = "GSR_US",
+  time_col = "CNT",
+  event_onset_col = "event_onset"
+)
+```
+
+If ambient or body-temperature covariates are available, EDA can be adjusted for temperature:
+
+```{r}
+temperature_adjusted <- correct_gazepoint_eda_temperature(
+  dat,
+  eda_col = "GSR_US",
+  temperature_cols = c("ambient_temperature", "body_temperature"),
+  group_cols = "participant"
+)
+```
+
+Temperature-adjusted EDA is not "pure" cognitive or emotional EDA. It is an adjusted physiological signal that still requires conservative interpretation.
+
+# 5. Pulse, IBI, HRV, and respiration examples
+
+For IBI/HRV workflows:
+
+```{r}
+hrv <- extract_gazepoint_hrv_features(
+  dat,
+  ibi_col = "IBI",
+  group_cols = "participant"
+)
+
+hrv_summary <- summarise_gazepoint_hrv_features(hrv)
+```
+
+Advanced HRV descriptors are available when signal length and quality are adequate:
+
+```{r}
+nonlinear_hrv <- extract_gazepoint_hrv_nonlinear(
+  dat,
+  ibi_col = "IBI",
+  group_cols = "participant"
+)
+
+rcmse <- extract_gazepoint_hrv_rcmse(
+  dat,
+  ibi_col = "IBI",
+  group_cols = "participant"
+)
+
+fuzzy_csi <- extract_gazepoint_hrv_fuzzy_csi(
+  dat,
+  ibi_col = "IBI",
+  group_cols = "participant"
+)
+```
+
+For difficult Gazepoint pulse waveforms, k-means beat extraction can be used as a hardware-oriented fallback:
+
+```{r}
+beats <- extract_gazepoint_beats_kmeans(
+  dat,
+  pulse_col = "HRP",
+  time_col = "CNT",
+  group_cols = "participant"
+)
+```
+
+These beat candidates should be quality-checked before HRV inference.
+
+# 6. TTL alignment and model-ready data
+
+TTL markers and event windows can be used to align biometric signals with the experimental design.
+
+```{r}
+ttl_events <- extract_gazepoint_ttl_events(dat)
+
+aligned <- align_gazepoint_biometrics_to_ttl(
+  dat,
+  ttl_col = "TTL0",
+  time_col = "CNT"
+)
+
+model_data <- prepare_gazepoint_biometrics_lme_data(
+  dat,
+  outcome_cols = c("GSR_US", "HR"),
+  group_cols = c("participant", "condition"),
+  time_col = "CNT"
+)
+```
+
+# 7. Reporting bundle
+
+A report bundle can export tables, plots, and text summaries for reproducible documentation.
+
+```{r}
+bundle <- export_gazepoint_biometrics_report_bundle(
+  workflow,
+  output_dir = file.path(tempdir(), "gpbiometrics_report_bundle")
+)
+```
+
+# 8. Feature inventory
+
+The package includes a feature inventory for documenting workflow coverage.
+
+```{r}
+inventory <- create_gazepoint_biometrics_feature_inventory()
+
+formatted_inventory <- format_gazepoint_biometrics_feature_inventory(
+  inventory
+)
+
+inventory_summary <- summarise_gazepoint_biometrics_feature_inventory(
+  formatted_inventory
+)
+
+inventory$overview
+inventory_summary$domain_summary
+head(formatted_inventory)
+```
+
+# 9. Interpretation guardrails
+
+`gpbiometrics` follows conservative interpretation principles:
+
+- EDA/GSR/SCR features describe electrodermal dynamics; they do not directly identify emotion, stress, cognition, health status, or diagnosis.
+- HR, IBI, HRV, pulse, and respiration-proxy features describe cardiovascular or signal-derived dynamics; they are not clinical labels.
+- Pupil outputs are affected by luminance and visual context; luminance-adjusted residuals are not proof of cognitive-load-only effects.
+- Automated statistics and advanced models should be reviewed against the study design before confirmatory use.
+
+# 10. Private real-data smoke tests
+
+For private smoke tests, keep data and outputs outside the package repository.
+
+```{r, eval=FALSE}
+private_folder <- "path/to/private_gazepoint_exports"
+private_output <- file.path(tempdir(), "gpbiometrics_real_check")
+
+workflow <- run_gazepoint_biometrics_workflow(
+  path = private_folder,
+  include_all_gaze = TRUE,
+  include_fixations = FALSE,
+  include_other_csv = FALSE,
+  expected_sampling_rate_hz = 60
+)
+
+summarise_gazepoint_biometrics_workflow(workflow)
+
+export_gazepoint_biometrics_report_bundle(
+  workflow,
+  output_dir = private_output
+)
+
+summary <- summarise_gazepoint_biometrics_workflow(workflow)
+summary
+```
+
+Do not commit private Gazepoint exports or private smoke-test outputs.

@@ -1,0 +1,389 @@
+---
+title: "Event alignment and AOI-linked biometric workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Event alignment and AOI-linked biometric workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative workflow for aligning Gazepoint-derived biometric streams with task events, gaze records, and areas of interest (AOIs).
+
+The goal is to make synchronization and feature-engineering decisions explicit before analysis: extract events, audit timing, align biometric streams to task markers, join gaze and biometric records, build AOI time courses, summarize AOI-linked biometric windows, and prepare model-ready tables.
+
+The workflow is descriptive. Event-locked and AOI-linked biometric summaries are treated as synchronized measurement features. They are not interpreted here as direct evidence of attention, emotion, stress, cognitive load, clinical status, engagement, or psychological state.
+
+# Workflow overview
+
+A typical event-alignment and AOI-linked biometric workflow is:
+
+1. Import or simulate gaze, event, and biometric streams.
+2. Standardize column names and validate expected fields.
+3. Extract TTL or task-event markers.
+4. Audit timing, resets, sampling irregularity, and synchronization drift.
+5. Align biometric streams to task events.
+6. Synchronize gaze and biometric records.
+7. Join biometric records to master trial metadata.
+8. Build AOI time courses or AOI-window summaries.
+9. Summarize event-locked multimodal features.
+10. Prepare model-ready AOI and biometric tables.
+11. Export decision logs and reproducibility records.
+
+# Example data
+
+For public documentation, use synthetic or example data rather than private Gazepoint exports.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+eye <- simulate_gazepoint_eye_data(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+master <- data.frame(
+  participant_id = rep(sprintf("P%02d", 1:8), each = 12),
+  trial_id = rep(seq_len(12), times = 8),
+  condition = rep(c("A", "B"), length.out = 96)
+)
+```
+
+# Step 1: standardize and validate streams
+
+Start by standardizing names and checking that the expected identifiers and timing fields are available.
+
+```{r}
+bio_std <- standardise_gazepoint_biometric_names(bio)
+eye_std <- standardize_gazepoint_column_names(eye)
+
+validate_gazepoint_biometrics(bio_std)
+validate_gazepoint_format(eye_std)
+validate_gazepoint_metadata(master)
+```
+
+Timing checks should be performed before alignment. These checks help identify missing timestamps, irregular sampling, clock resets, and other synchronization risks.
+
+```{r}
+detect_gazepoint_biometric_timebase(bio_std)
+
+assess_gazepoint_sampling_irregularity(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+assess_gazepoint_time_resets(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+```
+
+# Step 2: extract task events
+
+Task events or TTL markers provide the timing anchors used for event-locked alignment. Event extraction should preserve the original timestamp and marker labels.
+
+```{r}
+events <- extract_gazepoint_ttl_events(
+  bio_std,
+  event_col = "EVENT",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+events
+```
+
+Event coverage should be checked before alignment. Missing or duplicated events can create ambiguous trial windows.
+
+```{r}
+audit_gazepoint_event_coverage(
+  events,
+  participant_col = "participant_id",
+  event_col = "EVENT"
+)
+```
+
+# Step 3: match events to biometric samples
+
+Event matching links task markers to the nearest or enclosing biometric samples. The matching rule and tolerance should be reported.
+
+```{r}
+event_matches <- match_gazepoint_events_to_biometrics(
+  events = events,
+  biometrics = bio_std,
+  event_time_col = "TIME_MS",
+  biometric_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  tolerance_ms = 100
+)
+
+event_matches
+```
+
+# Step 4: align biometric streams to events
+
+Event alignment creates relative time fields such as milliseconds from stimulus onset, response onset, or trial start. These fields should be derived consistently across participants and trials.
+
+```{r}
+bio_event_locked <- align_gazepoint_biometrics_to_ttl(
+  biometrics = bio_std,
+  events = events,
+  time_col = "TIME_MS",
+  event_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  event_col = "EVENT"
+)
+
+bio_event_locked
+```
+
+Multiple streams can also be aligned to shared event anchors.
+
+```{r}
+aligned_streams <- align_gazepoint_streams_by_events(
+  streams = list(
+    biometrics = bio_std,
+    gaze = eye_std
+  ),
+  events = events,
+  time_col = "TIME_MS",
+  event_time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+```
+
+# Step 5: audit synchronization drift
+
+Synchronization drift checks help identify whether timing offsets are stable across the recording. Drift should be reported as a data-quality property, not as a participant-level interpretation.
+
+```{r}
+drift <- audit_gazepoint_biometric_sync_drift(
+  bio_event_locked,
+  time_col = "TIME_MS",
+  event_time_col = "event_time_ms",
+  participant_col = "participant_id"
+)
+
+diagnose_gazepoint_sync_drift(drift)
+```
+
+# Step 6: synchronize biometrics with gaze
+
+After event alignment, gaze and biometric records can be synchronized using common participant, trial, and relative-time fields.
+
+```{r}
+gaze_bio <- sync_gazepoint_biometrics_with_gaze(
+  gaze = eye_std,
+  biometrics = bio_event_locked,
+  gaze_time_col = "time_ms",
+  biometric_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+gaze_bio
+```
+
+If the project also uses gp3tools outputs, keep this join explicit and auditable.
+
+```{r}
+join_gazepoint_biometrics_to_gp3tools(
+  biometrics = bio_event_locked,
+  gp3tools_data = eye_std,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 7: join master trial metadata
+
+Trial-level metadata should be joined after stream alignment so that condition labels, screen identifiers, and design variables are carried into downstream summaries.
+
+```{r}
+bio_master <- join_gazepoint_biometrics_to_master(
+  biometrics = bio_event_locked,
+  master = master,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+bio_master
+```
+
+# Step 8: build AOI time courses
+
+AOI time courses summarize when samples fall inside predefined regions. AOI membership should be treated as a screen-coordinate classification, not as direct evidence of attention or comprehension.
+
+```{r}
+aoi_definitions <- data.frame(
+  aoi = c("header", "claim", "image", "button"),
+  x_min = c(0, 100, 600, 700),
+  x_max = c(1920, 550, 1300, 1000),
+  y_min = c(0, 200, 200, 800),
+  y_max = c(150, 700, 750, 950)
+)
+
+aoi_timecourse <- build_gazepoint_aoi_timecourse(
+  gaze = eye_std,
+  aoi = aoi_definitions,
+  x_col = "gaze_x",
+  y_col = "gaze_y",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_timecourse
+```
+
+# Step 9: summarize AOI-linked biometrics
+
+AOI-linked biometric summaries aggregate biometric samples over windows associated with AOI membership. These summaries describe synchronized signal values during AOI-defined intervals.
+
+```{r}
+aoi_bio <- summarise_gazepoint_aoi_biometrics(
+  gaze_biometrics = gaze_bio,
+  aoi_col = "aoi",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_bio
+```
+
+For designs with predefined task windows, combine AOI summaries with event-locked windows.
+
+```{r}
+event_windows <- summarize_gazepoint_eventlocked_multimodal(
+  bio_master,
+  time_col = "time_from_event_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  window = c(0, 3000)
+)
+
+multimodal_windows <- summarise_gazepoint_multimodal_windows(
+  bio_master,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 10: visualize multimodal timing
+
+Timeline plots are useful for checking event alignment, AOI windows, and biometric summaries before modelling.
+
+```{r}
+plot_gazepoint_multimodal_timeline(
+  bio_master,
+  events = events,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 11: prepare model-ready tables
+
+Model-ready tables should contain identifiers, condition variables, AOI labels, event windows, synchronized biometric features, and QC indicators.
+
+```{r}
+aoi_model <- prepare_gazepoint_aoi_biometrics_model_data(
+  aoi_bio,
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  aoi_col = "aoi"
+)
+
+multimodal_model <- prepare_gazepoint_multimodal_model_data(
+  multimodal_windows,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+aoi_model
+multimodal_model
+```
+
+# Reporting outputs
+
+A reproducible event-alignment and AOI-linked biometric section should report timing anchors, event-matching tolerances, synchronization checks, AOI definitions, window definitions, feature summaries, and exclusion or QC rules.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "event_extraction",
+      "event_matching",
+      "stream_alignment",
+      "gaze_biometric_sync",
+      "aoi_timecourse",
+      "model_ready_tables"
+    ),
+    decision = c(
+      "Task events were extracted before stream alignment.",
+      "Events were matched to biometric samples using a documented tolerance.",
+      "Biometric and gaze streams were aligned to shared timing anchors.",
+      "Gaze and biometric records were synchronized before AOI summaries.",
+      "AOI membership was computed from screen-coordinate rules.",
+      "Model-ready tables retained identifiers, windows, features, and QC fields."
+    )
+  )
+)
+
+create_gazepoint_qc_supplement(
+  qc_overview = drift,
+  decision_log = decision_log
+)
+
+create_gazepoint_reproducibility_statement()
+```
+
+# Recommended reporting language
+
+Use precise synchronization and feature-engineering language:
+
+- Report event markers, timing anchors, and matching tolerances.
+- Report sampling irregularity, time resets, and synchronization drift checks.
+- Report AOI definitions as coordinate-based regions.
+- Report AOI-linked biometric summaries as synchronized window-level features.
+- Report the identifiers and QC fields retained in model-ready tables.
+- Avoid describing AOI-linked biometric summaries as direct evidence of attention, emotion, stress, cognitive load, engagement, clinical state, or psychological response unless the study design and validation evidence explicitly support that interpretation.
+
+# Minimal checklist
+
+Before modelling event-locked or AOI-linked biometric outcomes, confirm that the analysis has:
+
+- identified the original timing columns and event markers;
+- checked sampling irregularity and time resets;
+- documented event-matching tolerance and alignment rules;
+- audited synchronization drift;
+- defined AOIs using transparent coordinate rules;
+- joined biometric, gaze, event, and trial metadata explicitly;
+- summarized features by participant, trial, event window, and AOI where relevant;
+- retained QC indicators in model-ready tables;
+- kept a decision log for exclusions and transformations;
+- used synthetic or anonymized examples in public documentation.
+
+# Next steps
+
+After event alignment and AOI-linked summaries, prepare reporting, reproducibility, and synthetic-data showcase materials so that reviewers can inspect how raw streams are transformed into analysis-ready tables.

@@ -1,0 +1,273 @@
+---
+title: "Pupil and gaze quality-control workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pupil and gaze quality-control workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative pupil and gaze quality-control workflow for Gazepoint-derived exports. The goal is to make preprocessing decisions explicit before analysis: inspect missingness, identify blinks, review tracking quality, apply transparent cleaning steps, and document what was changed.
+
+The workflow is descriptive. Pupil size, gaze position, fixations, and missingness are treated as measurement streams requiring quality control. They are not interpreted here as direct evidence of cognitive load, emotion, clinical state, engagement, or psychological response.
+
+# Workflow overview
+
+A typical pupil and gaze QC sequence is:
+
+1. Import or simulate Gazepoint-like eye data.
+2. Standardize column names and validate expected fields.
+3. Summarize missingness and tracking availability.
+4. Detect blink-like pupil gaps.
+5. Smooth or interpolate only when justified.
+6. Apply baseline correction for task-locked pupil analyses.
+7. Filter gaze samples using transparent screen-coordinate and validity rules.
+8. Summarize QC events and export reproducibility records.
+
+# Example data
+
+For public documentation, use synthetic or example data rather than private Gazepoint exports.
+
+```{r}
+library(gpbiometrics)
+
+eye <- simulate_gazepoint_eye_data(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+str(eye)
+```
+
+# Step 1: standardize and validate
+
+Gazepoint exports can vary across software settings, export modes, and naming conventions. Start by standardizing column names and validating that expected fields are present.
+
+```{r}
+eye_std <- standardize_gazepoint_column_names(eye)
+
+validate_gazepoint_format(eye_std)
+validate_gazepoint_metadata(eye_std)
+```
+
+For larger folders of exports, run folder-level profiling before sample-level cleaning.
+
+```{r}
+profile_gazepoint_export_folder("path/to/gazepoint_exports")
+summarize_gazepoint_export_inventory("path/to/gazepoint_exports")
+```
+
+# Step 2: inspect missingness
+
+Missing pupil or gaze samples should be summarized before any interpolation or exclusion decision. Missingness can reflect blinks, tracking loss, off-screen gaze, recording interruptions, or export issues.
+
+```{r}
+missingness <- summarize_gazepoint_missingness(
+  eye_std,
+  group_cols = c("participant_id", "trial_id")
+)
+
+missingness
+```
+
+Visual summaries help identify participants, trials, or time windows with concentrated data loss.
+
+```{r}
+plot_gazepoint_missingness(
+  missingness,
+  group_col = "participant_id"
+)
+```
+
+# Step 3: detect blinks and pupil gaps
+
+Blink detection should be treated as a rule-based QC step. It marks candidate intervals for review or interpolation; it does not by itself justify removing participants or inferring behavior.
+
+```{r}
+blink_events <- detect_gazepoint_pupil_blinks(
+  eye_std,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+blink_events
+```
+
+If the data include gaze validity or tracking flags, blink-like events can be cross-checked against broader tracking loss.
+
+```{r}
+tracking_blinks <- detect_gazepoint_blinks(
+  eye_std,
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+tracking_blinks
+```
+
+# Step 4: smooth pupil signal
+
+Smoothing can reduce high-frequency noise, but it should be reported because it changes the signal. Keep the window short, document the method, and avoid smoothing across trial or participant boundaries.
+
+```{r}
+eye_smooth <- smooth_gazepoint_pupil(
+  eye_std,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  window = 5
+)
+```
+
+# Step 5: interpolate short blink gaps
+
+Interpolation should be restricted to short, well-defined gaps. Long gaps should normally remain missing or trigger trial-level QC flags.
+
+```{r}
+eye_interp <- interpolate_gazepoint_pupil_blinks(
+  eye_smooth,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  max_gap_ms = 250
+  )
+```
+
+After interpolation, rerun missingness summaries and compare the before/after counts.
+
+```{r}
+missing_after <- summarize_gazepoint_missingness(
+  eye_interp,
+  group_cols = c("participant_id", "trial_id")
+)
+
+pipeline_comparison_dashboard(
+  before = missingness,
+  after = missing_after,
+  group_cols = c("participant_id", "trial_id")
+)
+```
+
+# Step 6: baseline-correct pupil size
+
+Task-locked pupil analyses usually require a baseline window. The baseline definition should be tied to the experimental design and reported in the methods section.
+
+```{r}
+eye_baseline <- baseline_correct_gazepoint_pupil(
+  eye_interp,
+  pupil_col = "pupil_diameter",
+  time_col = "time_ms",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  baseline_window = c(-200, 0)
+)
+```
+
+# Step 7: filter gaze coordinates
+
+Gaze filtering should use explicit screen-coordinate and validity rules. Filtering removes implausible samples; it does not establish why those samples occurred.
+
+```{r}
+eye_gaze_qc <- filter_gazepoint_gaze(
+  eye_baseline,
+  x_col = "gaze_x",
+  y_col = "gaze_y",
+  screen_width = 1920,
+  screen_height = 1080
+)
+```
+
+# Step 8: summarize pupil QC events
+
+Summaries should be produced at the participant, trial, and condition levels before analysis.
+
+```{r}
+pupil_events <- summarize_gazepoint_pupil_events(
+  eye_gaze_qc,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+pupil_events
+```
+
+# Reporting outputs
+
+A reproducible pupil/gaze QC section should include the rules used, thresholds, affected samples, and exclusion recommendations.
+
+```{r}
+qc_overview <- summarize_gazepoint_qc_overview(
+  eye_gaze_qc,
+  group_cols = c("participant_id", "trial_id")
+)
+
+exclusions <- recommend_gazepoint_biometric_exclusions(
+  qc_overview,
+  participant_col = "participant_id"
+)
+
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c("blink_detection", "interpolation", "baseline_correction"),
+    decision = c(
+      "Rule-based blink candidates were marked before interpolation.",
+      "Only short pupil gaps were interpolated.",
+      "Pupil values were baseline-corrected within trial."
+    )
+  )
+)
+```
+
+The same information can be included in a QC supplement or report bundle.
+
+```{r}
+create_gazepoint_qc_supplement(
+  qc_overview = qc_overview,
+  exclusions = exclusions,
+  decision_log = decision_log
+)
+
+create_gazepoint_reproducibility_statement()
+```
+
+# Recommended reporting language
+
+Use precise measurement language:
+
+- Report pupil preprocessing as blink detection, smoothing, interpolation, and baseline correction.
+- Report gaze preprocessing as tracking, coordinate, validity, or AOI-quality filtering.
+- Report missingness and exclusions by participant, trial, and condition where possible.
+- Avoid interpreting longer fixation, pupil change, or missingness as direct evidence of psychological state without an explicit validated design and analysis model.
+
+# Minimal checklist
+
+Before modelling pupil or gaze-derived outcomes, confirm that the analysis has:
+
+- documented raw export source and software version;
+- validated expected columns and metadata;
+- summarized missingness before and after preprocessing;
+- reported blink and interpolation rules;
+- avoided interpolation over long tracking losses;
+- stated the baseline window and correction method;
+- kept a decision log for exclusions and transformations;
+- used synthetic or anonymized examples in public documentation.
+
+# Next steps
+
+After pupil and gaze QC, move to event alignment, AOI summaries, or multimodal workflows depending on the study design. For EDA/GSR/SCR and PPG/HRV workflows, use the dedicated articles planned in the article roadmap.

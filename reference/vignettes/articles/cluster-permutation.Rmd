@@ -1,0 +1,245 @@
+---
+title: "Cluster-permutation workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cluster-permutation workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+# Purpose
+
+This article demonstrates the conservative cluster-permutation workflow in `gpbiometrics` for two-condition, one-dimensional time-course data.
+
+The workflow is intentionally narrow: participant-level time courses, two conditions, one temporal dimension, cluster mass based on time-wise test statistics, permutation-based global inference, and descriptive interpretation of cluster timing.
+
+The goal is not to replace specialist EEG, MEG, pupillometry, or mixed-model permutation toolboxes. The goal is to provide a transparent, reproducible, and guarded workflow for Gazepoint-derived time-course signals.
+
+# Interpretation warning
+
+A significant cluster-permutation result indicates evidence against the global null hypothesis of no condition difference anywhere in the tested time range, under the implemented permutation scheme.
+
+It does **not** prove that an effect begins or ends exactly at the reported cluster boundaries. Cluster timing should be described as a descriptive interval, not as a precise physiological, attentional, or cognitive onset or offset.
+
+```{r}
+library(gpbiometrics)
+```
+
+# Simulate example data
+
+We first create a small synthetic two-condition time-course data set. The example is deliberately synthetic so that the vignette can run without private participant data.
+
+```{r}
+set.seed(123)
+
+dat <- simulate_gazepoint_cluster_timecourse_data(
+  n_subjects = 12,
+  n_time = 60,
+  effect_start = 25,
+  effect_end = 38,
+  seed = 123
+)
+
+head(dat)
+```
+
+# Audit the time-course grid
+
+Cluster-permutation tests require a consistent participant-by-condition-by-time grid. The audit helper checks whether the expected cells are present and whether duplicate cells exist.
+
+```{r}
+grid_audit <- audit_gazepoint_timecourse_grid(
+  data = dat,
+  subject = "subject",
+  condition = "condition",
+  time = "time",
+  value = "value"
+)
+
+grid_audit
+```
+
+# Diagnose the design
+
+The design diagnostic is a pre-analysis guardrail. It checks whether the data match the current supported scope: two conditions, repeated participant observations, and a common time grid.
+
+```{r}
+design_diagnostic <- diagnose_gazepoint_cluster_design(
+  data = dat,
+  subject = "subject",
+  condition = "condition",
+  time = "time",
+  value = "value",
+  design = "within"
+)
+
+design_diagnostic
+```
+
+# Prepare participant-level time-course data
+
+The preparation helper keeps the analysis at the participant-by-condition-by-time level. If raw trial-level samples are supplied, repeated cells can be aggregated before the cluster test.
+
+```{r}
+prepared <- prepare_gazepoint_timecourse_test_data(
+  data = dat,
+  outcome_col = "value",
+  time_col = "time",
+  condition_col = "condition",
+  participant_col = "subject"
+)
+
+head(prepared)
+```
+
+# Run the cluster-permutation test
+
+The example uses a small number of permutations so the vignette builds quickly. For real analyses, use more permutations and report the exact settings.
+
+```{r}
+cluster_result <- run_gazepoint_cluster_permutation(
+  data = prepared,
+  outcome_col = "value",
+  time_col = "time",
+  condition_col = "condition",
+  participant_col = "participant",
+  design = "within",
+  condition_a = "A",
+  condition_b = "B",
+  n_permutations = 199,
+  cluster_forming_alpha = 0.05,
+  cluster_alpha = 0.05,
+  seed = 123
+)
+
+cluster_result
+```
+
+# Summarize clusters
+
+The cluster summary reports detected clusters, cluster mass, and permutation p-values. The time range is useful for description, but it should not be interpreted as an exact onset or offset.
+
+```{r}
+cluster_summary <- summarize_gazepoint_time_clusters(cluster_result)
+
+cluster_summary
+```
+
+# Plot the result
+
+The plotting helper overlays the two time courses and the detected cluster information. Use the plot to communicate the pattern, not to claim exact temporal localization.
+
+```{r}
+plot_gazepoint_cluster_permutation(cluster_result)
+```
+
+# Inspect the null distribution
+
+The null-distribution plot shows the permutation distribution of the maximum cluster mass. This helps users understand the family-wise comparison used to evaluate observed clusters.
+
+```{r}
+plot_gazepoint_cluster_null_distribution(cluster_result)
+```
+
+# Check threshold sensitivity
+
+Cluster-forming thresholds affect which adjacent time points enter clusters. A sensitivity check helps document whether the conclusion is highly dependent on one arbitrary threshold.
+
+```{r}
+threshold_sensitivity <- run_gazepoint_cluster_threshold_sensitivity(
+  data = prepared,
+  dv = "value",
+  time = "time",
+  condition = "condition",
+  subject = "participant",
+  thresholds = c(0.025, 0.05, 0.10),
+  cluster_alpha = 0.05,
+  seed = 123,
+  design = "within",
+  condition_a = "A",
+  condition_b = "B",
+  n_permutations = 99
+)
+
+threshold_sensitivity
+```
+
+# Generate conservative report text
+
+The reporting helper produces cautious wording. It avoids treating cluster boundaries as precise onsets or offsets.
+
+```{r}
+cluster_report <- report_gazepoint_cluster_permutation(cluster_result)
+
+cluster_report
+```
+
+# Export results
+
+For reproducibility, the result object can be exported to a temporary folder. In a real project, use a project-level output folder such as `outputs/cluster_permutation/`.
+
+```{r}
+export_dir <- tempfile("gpbiometrics_cluster_export_")
+dir.create(export_dir)
+
+exported_files <- export_gazepoint_cluster_results(
+  cluster_result,
+  path = export_dir,
+  prefix = "cluster_example",
+  overwrite = TRUE
+)
+
+exported_files
+```
+
+# External interoperability
+
+`gpbiometrics` also includes export helpers for users who need to continue in specialist software. These helpers prepare data and metadata; they do not claim to run or validate external models.
+
+```{r}
+mne_input <- export_gazepoint_mne_cluster_input(
+  data = prepared,
+  outcome_col = "value",
+  time_col = "time",
+  condition_col = "condition",
+  participant_col = "participant",
+  condition_a = "A",
+  condition_b = "B"
+)
+
+names(mne_input)
+head(mne_input$difference_matrix[, 1:min(6, ncol(mne_input$difference_matrix))])
+```
+
+# Advanced guardrails
+
+Some advanced function names are exported deliberately as guardrails. They fail safely instead of pretending to provide validated ANOVA, mixed-model, TFCE, multidimensional, covariate-adjusted, parallel, or onset/offset cluster inference.
+
+```{r}
+try(run_gazepoint_tfce())
+```
+
+# Recommended wording
+
+Prefer wording such as:
+
+> A two-condition cluster-permutation test indicated evidence of a condition difference in the tested time course. The reported cluster interval is descriptive and should not be interpreted as a precise onset or offset estimate.
+
+Avoid wording such as:
+
+> The effect began exactly at time point X and ended exactly at time point Y.
+
+# Current scope
+
+The current validated workflow is suitable for conservative two-condition time-course analyses. More complex designs should be handled with specialist tools or treated as future methodological work, not as automatic extensions of this workflow.

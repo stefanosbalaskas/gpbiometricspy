@@ -1,0 +1,292 @@
+---
+title: "Reporting and reproducibility workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reporting and reproducibility workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative reporting and reproducibility workflow for Gazepoint Biometrics analyses.
+
+The goal is to document how raw exports become analysis-ready tables: record preprocessing decisions, summarize quality-control checks, retain exclusion and transformation rules, create reproducibility statements, generate report-ready tables, and prepare reviewer-facing supplements.
+
+The workflow is descriptive. Reporting outputs document data-processing decisions and analysis provenance. They do not convert biometric, gaze, pupil, EDA, PPG, HRV, or AOI summaries into direct evidence of emotion, stress, attention, cognitive load, health status, clinical state, or psychological response.
+
+# Workflow overview
+
+A typical reporting and reproducibility workflow is:
+
+1. Create an analysis decision log.
+2. Add preprocessing, QC, exclusion, and modelling decisions.
+3. Summarize the decision log for review.
+4. Create an analysis manifest.
+5. Create QC supplements and audit sections.
+6. Create methods text and checklist outputs.
+7. Prepare report-ready tables.
+8. Check preregistration readiness and consistency.
+9. Export reproducibility statements and report bundles.
+
+# Example objects
+
+For public documentation, use synthetic or example outputs rather than private Gazepoint exports.
+
+```{r}
+library(gpbiometrics)
+
+qc_overview <- data.frame(
+  participant_id = sprintf("P%02d", 1:6),
+  n_trials = c(12, 12, 12, 11, 12, 10),
+  missing_rate = c(0.03, 0.05, 0.02, 0.09, 0.04, 0.12),
+  flagged = c(FALSE, FALSE, FALSE, TRUE, FALSE, TRUE)
+)
+
+exclusions <- data.frame(
+  participant_id = c("P04", "P06"),
+  recommendation = c("review", "review"),
+  reason = c("Elevated missingness", "Reduced valid trials")
+)
+```
+
+# Step 1: create a decision log
+
+A decision log records the rules used during preprocessing, QC, exclusion, feature extraction, and model preparation.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "raw_import",
+      "column_standardization",
+      "quality_control",
+      "exclusion_review",
+      "feature_extraction"
+    ),
+    decision = c(
+      "Raw Gazepoint Biometrics exports were imported without manual editing.",
+      "Column names were standardized before validation.",
+      "Signal-quality summaries were created before analysis.",
+      "Participants and trials were flagged for review using documented thresholds.",
+      "Model-ready features were computed after QC checks."
+    )
+  )
+)
+
+decision_log
+```
+
+Additional decisions can be appended as the workflow develops.
+
+```{r}
+decision_log <- add_gazepoint_decision(
+  decision_log,
+  step = "reporting",
+  decision = "QC summaries, exclusion recommendations, and reproducibility text were exported for review."
+)
+```
+
+# Step 2: summarize and export the decision log
+
+The decision log should be summarized in a form that can be reviewed independently of the analysis script.
+
+```{r}
+decision_summary <- summarise_gazepoint_decision_log(decision_log)
+
+decision_summary
+
+write_gazepoint_decision_log(
+  decision_log,
+  path = "analysis_decision_log.csv"
+)
+```
+
+# Step 3: create an analysis manifest
+
+An analysis manifest records files, software versions, processing stages, and output locations. It helps reviewers understand which inputs produced which outputs.
+
+```{r}
+manifest <- create_gazepoint_analysis_manifest(
+  raw_data = "data/raw/gazepoint_exports",
+  processed_data = "data/processed",
+  scripts = "analysis",
+  outputs = "outputs",
+  package = "gpbiometrics"
+)
+
+manifest
+```
+
+For projects with multiple exported files, a sidecar or manifest can be created alongside the processed outputs.
+
+```{r}
+generate_gazepoint_manifest(
+  path = "data/processed"
+)
+
+create_gazepoint_sidecar_template(
+  output_path = "gazepoint_sidecar_template.json"
+)
+```
+
+# Step 4: create QC supplements
+
+QC supplements should report missingness, signal-quality checks, exclusion recommendations, and decision-log entries without requiring private raw data.
+
+```{r}
+qc_supplement <- create_gazepoint_qc_supplement(
+  qc_overview = qc_overview,
+  exclusions = exclusions,
+  decision_log = decision_log
+)
+
+qc_supplement
+```
+
+Audit sections can be prepared for manuscripts or supplementary material.
+
+```{r}
+audit_section <- create_gazepoint_audit_report_section(
+  qc_overview = qc_overview,
+  decision_log = decision_log
+)
+
+audit_index <- create_gazepoint_audit_index(
+  qc_overview = qc_overview,
+  decision_log = decision_log
+)
+```
+
+# Step 5: create checklist outputs
+
+Checklists make reporting more transparent by separating what was checked from what was interpreted.
+
+```{r}
+biometric_checklist <- create_gazepoint_biometrics_checklist()
+
+prereg_checklist <- create_gazepoint_preregistration_checklist()
+
+release_checklist <- create_gazepoint_release_checklist()
+```
+
+Preregistration templates and readiness checks can help identify missing design or reporting details before analysis.
+
+```{r}
+prereg_template <- create_gazepoint_preregistration_template()
+
+prereg_readiness <- summarize_gazepoint_preregistration_readiness(
+  preregistration = prereg_template
+)
+
+audit_gazepoint_preregistration_consistency(
+  preregistration = prereg_template,
+  decision_log = decision_log
+)
+```
+
+# Step 6: create methods text
+
+Methods text should describe the measurement streams, preprocessing rules, QC thresholds, exclusion decisions, and feature tables without overstating what the signals establish.
+
+```{r}
+methods_text <- create_gazepoint_biometrics_methods_text(
+  preprocessing = decision_log,
+  qc = qc_overview,
+  exclusions = exclusions
+)
+
+methods_section <- create_gazepoint_methods_section(
+  decision_log = decision_log,
+  qc_overview = qc_overview
+)
+
+methods_text
+methods_section
+```
+
+# Step 7: prepare report-ready tables
+
+Report tables should retain identifiers, quality indicators, exclusion flags, and feature definitions. They should not hide preprocessing or exclusion decisions.
+
+```{r}
+report_tables <- create_gazepoint_biometrics_report_tables(
+  qc_overview = qc_overview,
+  exclusions = exclusions
+)
+
+write_gazepoint_biometrics_report_tables(
+  report_tables,
+  path = "report_tables"
+)
+```
+
+# Step 8: export audit trails
+
+Audit trails help preserve how the analysis was produced, especially when multiple preprocessing branches or sensitivity checks were run.
+
+```{r}
+export_gazepoint_audit_trail_markdown(
+  decision_log = decision_log,
+  path = "audit_trail.md"
+)
+
+export_gazepoint_biometrics_report_bundle(
+  qc_overview = qc_overview,
+  exclusions = exclusions,
+  decision_log = decision_log,
+  output_dir = "report_bundle"
+)
+```
+
+# Step 9: create reproducibility statement
+
+A reproducibility statement should identify the package, version, raw-export handling, preprocessing rules, generated outputs, and availability of synthetic or anonymized examples.
+
+```{r}
+repro_statement <- create_gazepoint_reproducibility_statement(
+  package = "gpbiometrics",
+  raw_data = "private Gazepoint exports",
+  public_example = "synthetic demonstration data",
+  decision_log = decision_log
+)
+
+repro_statement
+```
+
+# Recommended reporting language
+
+Use precise reproducibility language:
+
+- Report the raw export source and software context.
+- Report preprocessing, QC, exclusion, and feature-extraction rules.
+- Report the number of participants, trials, samples, or windows affected by QC decisions.
+- Report decision logs, manifests, and reproducibility statements as provenance records.
+- Report public examples as synthetic or anonymized when private raw data cannot be shared.
+- Avoid using reporting outputs to imply direct psychological, clinical, emotional, attentional, or diagnostic interpretations of biometric signals.
+
+# Minimal checklist
+
+Before submitting a biometric-analysis manuscript or software case study, confirm that the project has:
+
+- a raw-export inventory or manifest;
+- a decision log covering preprocessing, QC, exclusions, and feature extraction;
+- explicit QC summaries and exclusion recommendations;
+- report-ready tables with identifiers and QC fields;
+- methods text describing preprocessing rules and thresholds;
+- a reproducibility statement;
+- synthetic or anonymized public examples where private data cannot be shared;
+- versioned code, package version, and validation results;
+- a clear separation between measurement features and substantive interpretation.
+
+# Next steps
+
+After reporting and reproducibility outputs are in place, prepare a synthetic-data showcase article to demonstrate the complete workflow without exposing private Gazepoint exports.

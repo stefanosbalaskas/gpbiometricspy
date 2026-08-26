@@ -1,0 +1,32 @@
+Package: gpbiometrics
+Type: Package
+Title: Process and Report Gazepoint Biometrics Data
+Version: 2.0.0
+Authors@R: person(given = "Stefanos", family = "Balaskas", email = "s.balaskas@ac.upatras.gr", role = c("aut", "cre"))
+Description: Gazepoint-native tools for reproducible analysis and reporting of Gazepoint
+    Biometrics and GP3-derived physiological, gaze, pupil, fixation, AOI,
+    marker, and event-level exports. The package supports import, validation,
+    preprocessing, missing-value imputation, EDA/GSR, SCR epoching, IBI/RR/HRV,
+    PPG/pulse workflows, pupil blink detection and cleaning, gaze filtering,
+    fixation summaries, engagement-dial indices, multimodal trial regressors,
+    quality reports, exclusion and QC recommendations, synthetic eye-data
+    generation, and interoperability or workflow-inspired helpers for common
+    psychophysiology toolchains. The package is designed for transparent,
+    CRAN-safe, scriptable analysis rather than as a full clone of external
+    commercial or open-source toolboxes.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0), reticulate, jsonlite,
+        ggplot2, shiny, eyetrackingR, PupillometryR
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
+VignetteBuilder: knitr
+URL: https://github.com/stefanosbalaskas/gpbiometrics,
+        https://stefanosbalaskas.github.io/gpbiometrics/
+BugReports: https://github.com/stefanosbalaskas/gpbiometrics/issues
+NeedsCompilation: no
+Packaged: 2026-08-09 22:58:09 UTC; Stefanos-PC
+Author: Stefanos Balaskas [aut, cre]
+Maintainer: Stefanos Balaskas <s.balaskas@ac.upatras.gr>

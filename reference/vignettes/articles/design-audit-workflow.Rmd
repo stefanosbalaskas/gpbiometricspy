@@ -1,0 +1,401 @@
+---
+title: "Design audit workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Design audit workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative design-audit workflow for Gazepoint Biometrics projects.
+
+The purpose is to check whether a study design, export folder, event structure, metadata table, and analysis plan are internally consistent before biometric, gaze, pupil, EDA, PPG, HRV, AOI, or multimodal summaries are interpreted.
+
+The workflow focuses on auditability: condition balance, participant and trial coverage, session comparability, export-schema consistency, event coverage, timing coverage, missing design cells, pipeline readiness, release readiness, and reviewer-facing design reports.
+
+Design audits document whether the dataset is structurally suitable for the planned analysis. They do not establish psychological, clinical, emotional, attentional, stress-related, workload-related, or diagnostic states.
+
+# Workflow overview
+
+A typical design-audit workflow is:
+
+1. Create or import trial metadata.
+2. Validate required identifiers and design fields.
+3. Audit dataset structure.
+4. Audit condition balance and missing design cells.
+5. Audit session comparability.
+6. Audit export schema and export-folder structure.
+7. Audit event coverage and timing grids.
+8. Audit preprocessing and analysis-pipeline steps.
+9. Create design-coverage plots.
+10. Create decision logs, audit sections, and reproducibility outputs.
+
+# Example data
+
+For public documentation, use synthetic metadata and synthetic Gazepoint-like streams rather than private exports.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 12,
+  n_trials = 16,
+  samples_per_trial = 100
+)
+
+eye <- simulate_gazepoint_eye_data(
+  n_participants = 12,
+  n_trials = 16,
+  samples_per_trial = 100
+)
+
+master <- data.frame(
+  participant_id = rep(sprintf("P%02d", 1:12), each = 16),
+  trial_id = rep(seq_len(16), times = 12),
+  condition = rep(c("A", "B", "C", "D"), length.out = 192),
+  session = rep(c("morning", "afternoon"), length.out = 192),
+  screen_id = rep(c("screen_simple", "screen_dense"), length.out = 192),
+  block = rep(rep(1:4, each = 4), times = 12)
+)
+```
+
+# Step 1: validate metadata and identifiers
+
+Start by checking that participant, trial, condition, session, and screen identifiers are present and consistently named.
+
+```{r}
+validate_gazepoint_metadata(master)
+
+assert_gazepoint_columns(
+  master,
+  columns = c(
+    "participant_id",
+    "trial_id",
+    "condition",
+    "session",
+    "screen_id"
+  )
+)
+```
+
+Column standardization should be performed before combining exports and metadata.
+
+```{r}
+bio_std <- standardise_gazepoint_biometric_names(bio)
+eye_std <- standardize_gazepoint_column_names(eye)
+
+validate_gazepoint_biometrics(bio_std)
+validate_gazepoint_format(eye_std)
+```
+
+# Step 2: audit dataset structure
+
+Dataset-structure audits document the number of participants, trials, conditions, sessions, and rows available for analysis.
+
+```{r}
+dataset_audit <- audit_gazepoint_dataset_structure(
+  master,
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  condition_col = "condition"
+)
+
+dataset_audit
+```
+
+Export inventories are useful when the design audit starts from a folder of Gazepoint exports.
+
+```{r}
+synthetic_dir <- file.path(tempdir(), "gpbiometrics_design_audit_exports")
+dir.create(synthetic_dir, recursive = TRUE, showWarnings = FALSE)
+
+write.csv(bio_std, file.path(synthetic_dir, "synthetic_biometrics.csv"), row.names = FALSE)
+write.csv(eye_std, file.path(synthetic_dir, "synthetic_eye.csv"), row.names = FALSE)
+write.csv(master, file.path(synthetic_dir, "synthetic_master.csv"), row.names = FALSE)
+
+export_profile <- profile_gazepoint_export_folder(synthetic_dir)
+export_inventory <- summarize_gazepoint_export_inventory(synthetic_dir)
+```
+
+# Step 3: audit condition balance
+
+Condition-balance audits check whether the intended design cells are represented across participants, trials, sessions, and screens.
+
+```{r}
+condition_balance <- audit_gazepoint_condition_balance(
+  master,
+  participant_col = "participant_id",
+  condition_col = "condition",
+  trial_col = "trial_id"
+)
+
+condition_balance
+```
+
+For factorial or crossed designs, include all design variables needed for the planned model.
+
+```{r}
+experiment_design <- audit_gazepoint_experiment_design(
+  master,
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  design_cols = c("condition", "session", "screen_id", "block")
+)
+
+experiment_design
+```
+
+# Step 4: audit session comparability
+
+Session comparability checks help identify whether recording sessions, blocks, or screen versions differ in sample counts, trial coverage, or available measurement streams.
+
+```{r}
+session_audit <- audit_gazepoint_session_comparability(
+  master,
+  session_col = "session",
+  participant_col = "participant_id",
+  trial_col = "trial_id",
+  condition_col = "condition"
+)
+
+session_audit
+```
+
+Session comparability is a structural data-quality question. It should be reported before substantive modelling.
+
+# Step 5: audit export schema
+
+
+Export-schema audits document whether expected columns and measurement channels are available across files.
+
+```{r}
+schema_audit <- audit_gazepoint_export_schema(
+  bio_std,
+  required_cols = c("participant_id", "trial_id", "TIME_MS")
+)
+
+active_channels <- detect_active_biometric_channels(bio_std)
+timebase <- detect_gazepoint_biometric_timebase(bio_std)
+
+schema_audit
+active_channels
+timebase
+```
+
+When multiple export folders or batches are present, compare their profiles before pooling them.
+
+```{r}
+compare_gazepoint_export_profiles(
+  list(
+    batch_1 = export_profile,
+    batch_2 = export_profile
+  )
+)
+```
+
+# Step 6: audit timing and sampling coverage
+
+Timing audits check whether sample spacing, time resets, and time-course grids are compatible with event-locked or windowed analysis.
+
+```{r}
+sampling_audit <- assess_gazepoint_sampling_irregularity(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+time_resets <- audit_gazepoint_time_resets(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+timecourse_grid <- audit_gazepoint_timecourse_grid(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 7: audit event coverage
+
+Event coverage checks whether task markers, TTL events, or screen-onset markers are present and sufficiently complete for event-locked analysis.
+
+```{r}
+events <- extract_gazepoint_ttl_events(
+  bio_std,
+  event_col = "EVENT",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+
+event_coverage <- audit_gazepoint_event_coverage(
+  events,
+  participant_col = "participant_id",
+  event_col = "EVENT"
+)
+
+event_coverage
+```
+
+Event coverage should be checked before aligning biometric and gaze streams.
+
+```{r}
+event_matches <- match_gazepoint_events_to_biometrics(
+  events = events,
+  biometrics = bio_std,
+  event_time_col = "TIME_MS",
+  biometric_time_col = "TIME_MS",
+  participant_col = "participant_id",
+  tolerance_ms = 100
+)
+```
+
+# Step 8: audit pipeline readiness
+
+Pipeline audits check whether planned preprocessing and analysis steps have corresponding inputs, outputs, and decision records.
+
+```{r}
+pipeline_steps <- data.frame(
+  step = c(
+    "import",
+    "validation",
+    "quality_control",
+    "event_alignment",
+    "feature_extraction",
+    "model_preparation",
+    "reporting"
+  ),
+  status = c(
+    "complete",
+    "complete",
+    "planned",
+    "planned",
+    "planned",
+    "planned",
+    "planned"
+  )
+)
+
+pipeline_audit <- audit_gazepoint_pipeline_steps(pipeline_steps)
+
+release_audit <- audit_gazepoint_release_readiness(
+  pipeline_steps = pipeline_steps,
+  required_steps = c(
+    "import",
+    "validation",
+    "quality_control",
+    "feature_extraction",
+    "reporting"
+  )
+)
+```
+
+# Step 9: create design-coverage plots
+
+Design-coverage plots are useful for checking imbalance, missing cells, and sparse combinations before modelling.
+
+```{r}
+plot_gazepoint_design_coverage(
+  master,
+  x = "condition",
+  fill = "session",
+  participant_col = "participant_id"
+)
+```
+
+Coverage plots should be used as audit displays, not as evidence of substantive effects.
+
+# Step 10: create design-audit report outputs
+
+
+The audit outputs can be combined into a decision log, QC supplement, audit report section, and reproducibility statement.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "metadata_validation",
+      "dataset_structure",
+      "condition_balance",
+      "session_comparability",
+      "export_schema",
+      "event_coverage",
+      "pipeline_readiness"
+    ),
+    decision = c(
+      "Required identifiers and design fields were checked before analysis.",
+      "Participant, trial, condition, and session coverage were audited.",
+      "Condition balance and missing design cells were reviewed.",
+      "Session comparability was audited before pooling sessions.",
+      "Export-schema and active-channel checks were completed.",
+      "Event coverage and event-to-sample matching were checked before event locking.",
+      "Pipeline and release-readiness checks were documented."
+    )
+  )
+)
+
+audit_section <- create_gazepoint_audit_report_section(
+  qc_overview = dataset_audit,
+  decision_log = decision_log
+)
+
+audit_index <- create_gazepoint_audit_index(
+  qc_overview = dataset_audit,
+  decision_log = decision_log
+)
+
+qc_supplement <- create_gazepoint_qc_supplement(
+  qc_overview = dataset_audit,
+  decision_log = decision_log
+)
+
+repro_statement <- create_gazepoint_reproducibility_statement(
+  package = "gpbiometrics",
+  public_example = "synthetic design-audit example",
+  decision_log = decision_log
+)
+```
+
+# Recommended reporting language
+
+Use precise audit language:
+
+- Report design variables and required identifiers before analysis.
+- Report participant, trial, condition, session, block, and screen coverage.
+- Report missing design cells and sparse combinations.
+- Report session comparability and export-schema consistency.
+- Report event coverage, timing-grid checks, and event-matching tolerances.
+- Report whether the analysis pipeline had the required inputs, outputs, and decision records.
+- Avoid using design-audit outputs as evidence of psychological, clinical, emotional, attentional, stress-related, workload-related, diagnostic, or substantive effects.
+
+# Minimal checklist
+
+Before modelling biometric or multimodal outcomes, confirm that the project has:
+
+- validated participant and trial identifiers;
+- validated design variables and metadata fields;
+- checked participant, trial, condition, session, block, and screen coverage;
+- identified missing or sparse design cells;
+- audited export-schema consistency and active measurement channels;
+- checked sampling irregularity, time resets, and timing grids;
+- audited event coverage before event-locked analysis;
+- checked pipeline and release readiness;
+- created design-coverage plots;
+- documented all audit decisions in a decision log.
+
+# Next steps
+
+After the design audit, prepare toolbox-bridge documentation for exporting gpbiometrics outputs to external analysis ecosystems and then expand the plot gallery.

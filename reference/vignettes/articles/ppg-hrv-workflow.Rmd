@@ -1,0 +1,433 @@
+---
+title: "PPG, IBI, HRV, and respiration workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PPG, IBI, HRV, and respiration workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Scope
+
+This article shows a conservative workflow for photoplethysmography (PPG), inter-beat interval (IBI), heart-rate variability (HRV), and respiration-proxy analyses using Gazepoint Biometrics exports.
+
+The goal is to make signal-processing decisions transparent before analysis: inspect PPG quality, filter and detrend the signal, detect peaks and onsets, derive or audit IBI/RR intervals, correct implausible beats, compute HRV summaries, estimate respiration-related proxies where appropriate, and document all preprocessing decisions.
+
+The workflow is descriptive. PPG, IBI, HR, HRV, and respiration-proxy outputs are treated as physiological measurement streams requiring quality control. They are not interpreted here as direct evidence of health status, stress, emotion, clinical condition, autonomic diagnosis, workload, or psychological state.
+
+# Workflow overview
+
+A typical PPG/IBI/HRV workflow is:
+
+1. Import or simulate Gazepoint-like biometric data.
+2. Standardize biometric column names.
+3. Inspect active channels, sampling rate, and timebase quality.
+4. Filter and detrend the PPG signal.
+5. Detect candidate PPG peaks and onsets.
+6. Audit IBI/RR interval quality.
+7. Correct implausible beats using documented rules.
+8. Compute HRV summaries from genuine IBI/RR intervals.
+9. Estimate respiration-related proxies when supported by signal quality.
+10. Plot peak detection, segment-wise signal quality, Poincare-style summaries, and respiration proxies.
+11. Export decision logs, QC summaries, and reproducibility records.
+
+# Example data
+
+For public documentation, use synthetic or example data rather than private Gazepoint exports.
+
+```{r}
+library(gpbiometrics)
+
+bio <- simulate_gazepoint_biometrics(
+  n_participants = 8,
+  n_trials = 12,
+  samples_per_trial = 120
+)
+
+str(bio)
+```
+
+# Step 1: standardize and inspect channels
+
+Gazepoint Biometrics exports can vary in naming conventions and available channels. Start by standardizing names and checking which biometric channels are active.
+
+```{r}
+bio_std <- standardise_gazepoint_biometric_names(bio)
+
+detect_active_biometric_channels(bio_std)
+detect_gazepoint_biometric_schema(bio_std)
+detect_gazepoint_biometric_timebase(bio_std)
+```
+
+Sampling irregularity should be checked before any HRV analysis because HRV metrics depend on accurate timing.
+
+```{r}
+assess_gazepoint_sampling_irregularity(
+  bio_std,
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 2: inspect PPG signal quality
+
+PPG quality checks should be performed before filtering, peak detection, or beat correction. Poor contact, movement, clipping, quantization, and flat segments can affect downstream IBI and HRV summaries.
+
+```{r}
+ppg_quality <- flag_gazepoint_ppg_quality(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ppg_quality
+```
+
+Binary or vendor-style quality indicators can be cross-checked when available.
+
+```{r}
+check_gazepoint_ppg_binary_quality(
+  bio_std,
+  quality_col = "PPG_QUALITY",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 3: filter and detrend PPG
+
+Filtering and baseline-wander removal can improve peak detection, but these operations change the signal. The filter type, cutoffs, and detrending rules should therefore be reported.
+
+```{r}
+ppg_filtered <- filter_gazepoint_ppg_signal(
+  bio_std,
+  ppg_col = "PPG",
+  time_col = "TIME_MS",
+  output_col = "PPG_FILTERED"
+)
+
+ppg_clean <- remove_gazepoint_ppg_baseline_wander(
+  ppg_filtered,
+  ppg_col = "PPG_FILTERED",
+  time_col = "TIME_MS",
+  output_col = "PPG_CLEAN"
+)
+```
+
+Segment-wise plots help identify whether filtering improved local waveform quality without introducing obvious artifacts.
+
+```{r}
+plot_gazepoint_ppg_segmentwise(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+```
+
+# Step 4: detect PPG peaks and onsets
+
+Peak and onset detection should be treated as candidate beat detection. Visual review and quality summaries are recommended before deriving IBI/RR intervals.
+
+```{r}
+ppg_peaks <- detect_gazepoint_ppg_peaks(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ppg_onsets <- detect_gazepoint_ppg_onsets(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+A peak-detection plot is useful for checking whether candidate peaks align with plausible waveform maxima.
+
+```{r}
+plot_gazepoint_ppg_peak_detection(
+  ppg_clean,
+  peaks = ppg_peaks,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS"
+)
+```
+
+# Step 5: derive or audit IBI/RR intervals
+
+HRV summaries should be computed only from genuine IBI/RR intervals. Vendor columns, validity indicators, or HRV-like labels should not be treated as HRV metrics unless their meaning is documented.
+
+```{r}
+ibi_quality <- audit_gazepoint_ibi_quality(
+  bio_std,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ibi_quality
+```
+
+Implausible intervals can be flagged before correction.
+
+```{r}
+ibi_flagged <- filter_gazepoint_ibi_implausible(
+  bio_std,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 6: correct implausible beats
+
+Beat correction should be limited and documented. Excessive correction may indicate that the segment is unsuitable for HRV summaries.
+
+```{r}
+beats_corrected <- correct_gazepoint_beats(
+  ibi_flagged,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+summarize_gazepoint_beat_corrections(
+  beats_corrected,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+Local correction rules can be compared with more conservative outlier-flagging approaches.
+
+```{r}
+flag_gazepoint_rr_outliers(
+  beats_corrected,
+  rr_col = "IBI",
+  participant_col = "participant_id"
+)
+
+correct_gazepoint_rri_artifacts_local(
+  beats_corrected,
+  rri_col = "IBI",
+  participant_col = "participant_id"
+)
+```
+
+# Step 7: compute HRV features
+
+HRV features should be computed from cleaned IBI/RR intervals using windows that are appropriate for the study design and metric family.
+
+```{r}
+hrv_features <- extract_gazepoint_hrv_features(
+  beats_corrected,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+summarise_gazepoint_hrv_features(
+  hrv_features,
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+Time-domain and frequency-domain summaries can be prepared separately when the signal duration and sampling assumptions support them.
+
+```{r}
+compute_gazepoint_pyhrv_time_domain(
+  beats_corrected,
+  nni_col = "IBI",
+  participant_col = "participant_id"
+)
+
+compute_gazepoint_pyhrv_frequency_domain(
+  beats_corrected,
+  nni_col = "IBI",
+  participant_col = "participant_id"
+)
+```
+
+# Step 8: check pyHRV-style interval preparation
+
+When preparing intervals for pyHRV-style summaries, check that the interval vector is genuine, ordered, positive, and expressed in the expected units.
+
+```{r}
+check_gazepoint_pyhrv_interval(
+  beats_corrected,
+  nni_col = "IBI"
+)
+
+pyhrv_ready <- extract_gazepoint_pyhrv_nn_intervals(
+  beats_corrected,
+  nni_col = "IBI",
+  participant_col = "participant_id"
+)
+
+run_gazepoint_pyhrv_style(pyhrv_ready)
+```
+
+# Step 9: estimate respiration-related proxies
+
+Respiration-related estimates from PPG or IBI are indirect proxies and should be labelled as such. They require adequate signal quality and should not be treated as clinical respiratory measurements.
+
+```{r}
+ppg_resp <- estimate_gazepoint_respiration_from_ppg(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+ibi_resp <- estimate_gazepoint_breathing_rate_from_ibi(
+  beats_corrected,
+  ibi_col = "IBI",
+  time_col = "TIME_MS",
+  participant_col = "participant_id"
+)
+```
+
+Plot respiration-proxy outputs for plausibility checks.
+
+```{r}
+plot_gazepoint_ppg_breathing(
+  ppg_resp,
+  time_col = "TIME_MS",
+  breathing_col = "ppg_respiration_proxy"
+)
+```
+
+# Step 10: model-ready summaries
+
+After QC and feature extraction, create explicit participant/trial/window-level tables for analysis. These should retain QC indicators, correction counts, and segment-duration information.
+
+```{r}
+ibi_windows <- summarise_gazepoint_ibi_windows(
+  beats_corrected,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+hrv_windows <- summarise_gazepoint_ibi_hrv_windows(
+  beats_corrected,
+  ibi_col = "IBI",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+
+hr_windows <- summarise_gazepoint_hr_windows(
+  bio_std,
+  hr_col = "HR",
+  participant_col = "participant_id",
+  trial_col = "trial_id"
+)
+```
+
+# Step 11: external-toolbox preparation
+
+`gpbiometrics` can prepare data for external physiological-analysis tools while retaining the Gazepoint-native QC trail in R.
+
+```{r}
+prepare_gazepoint_heartpy_input(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS"
+)
+
+prepare_gazepoint_pyppg_input(
+  ppg_clean,
+  ppg_col = "PPG_CLEAN",
+  time_col = "TIME_MS"
+)
+
+prepare_gazepoint_rhrv_input(
+  beats_corrected,
+  ibi_col = "IBI",
+  time_col = "TIME_MS"
+)
+```
+
+# Reporting outputs
+
+A reproducible PPG/IBI/HRV section should report the raw columns used, timebase checks, filtering settings, peak-detection rules, IBI quality checks, beat-correction rules, HRV window definitions, and the number of affected segments.
+
+```{r}
+decision_log <- create_gazepoint_analysis_decision_log(
+  decisions = data.frame(
+    step = c(
+      "ppg_quality",
+      "ppg_filtering",
+      "peak_detection",
+      "ibi_quality",
+      "beat_correction",
+      "hrv_summary"
+    ),
+    decision = c(
+      "PPG signal quality was inspected before peak detection.",
+      "PPG filtering and baseline-wander removal were documented.",
+      "Candidate PPG peaks were detected and plotted for review.",
+      "IBI intervals were audited before HRV feature extraction.",
+      "Implausible beats were corrected using documented rules.",
+      "HRV features were computed from cleaned IBI/RR intervals."
+    )
+  )
+)
+
+create_gazepoint_qc_supplement(
+  qc_overview = ibi_quality,
+  decision_log = decision_log
+)
+
+create_gazepoint_reproducibility_statement()
+```
+
+# Recommended reporting language
+
+Use precise signal-processing language:
+
+- Report PPG filtering, detrending, and peak-detection settings.
+- Report IBI/RR interval quality checks and beat-correction rules.
+- Report HRV window length, metric family, and required assumptions.
+- Report respiration-related estimates as indirect proxies.
+- Avoid describing PPG, IBI, HR, HRV, or respiration-proxy outputs as direct evidence of health, stress, emotion, workload, clinical condition, or psychological state unless the study design and validation evidence explicitly support that interpretation.
+
+# Minimal checklist
+
+Before modelling PPG/IBI/HRV outcomes, confirm that the analysis has:
+
+- identified the raw PPG, HR, and IBI/RR columns;
+- checked sampling rate and timebase consistency;
+- summarized signal quality and missingness;
+- documented filtering and detrending settings;
+- plotted candidate peak detection;
+- audited IBI/RR intervals before HRV computation;
+- documented beat-correction rules and correction counts;
+- used HRV windows appropriate for the selected metrics;
+- labelled respiration estimates as indirect proxies;
+- kept a decision log for exclusions and transformations;
+- used synthetic or anonymized examples in public documentation.
+
+# Next steps
+
+After PPG/IBI/HRV QC, combine window-level summaries with pupil, EDA/SCR, gaze, AOI, or event-locked features depending on the study design. For multimodal event alignment and AOI-aware workflows, use the dedicated event-alignment article planned in the article roadmap.

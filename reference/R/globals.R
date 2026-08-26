@@ -1,0 +1,12 @@
+utils::globalVariables(c(
+  ".data",
+  ".data_time",
+  ".data_value",
+  ".data_group",
+  ".data_signal",
+  ".event_time",
+  ".plot_aoi",
+  ".plot_value",
+  ".plot_group",
+  ".plot_signal"
+))
