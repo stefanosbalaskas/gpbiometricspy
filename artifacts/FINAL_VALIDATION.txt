@@ -12,7 +12,7 @@ Rd-documented exports: 406/406
 Vignette-referenced exports: 227/406
 Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files
 Full Python tests: 204 PASS
-Whole-package statement coverage: 90.44%
+Whole-package statement coverage: 90.45%
 Coverage gate (>=90%): PASS
 compileall: PASS
 Wheel clean-install smoke: PASS

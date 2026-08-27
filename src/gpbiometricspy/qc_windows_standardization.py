@@ -85,7 +85,9 @@ def _window(data,signal,group_columns,value_column,validity_column=None,exclude_
     if value_column not in dat:raise ValueError(f'`value_column` was not found in `data`: {value_column}')
     miss=[g for g in groups if g not in dat]
     if miss:raise ValueError(f'`group_columns` were not found in `data`: {", ".join(miss)}')
-    if groups: keys=dat[groups].astype(str).agg('||'.join,axis=1); uniq=keys.drop_duplicates().tolist()
+    if groups:
+        key_frame=pd.DataFrame({g:dat[g].astype(str).to_numpy(copy=True) for g in groups},index=dat.index)
+        keys=key_frame.agg('||'.join,axis=1); uniq=keys.drop_duplicates().tolist()
     else: keys=pd.Series(['all']*len(dat));uniq=['all']
     rows=[]
     for key in uniq:

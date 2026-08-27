@@ -67,7 +67,7 @@ def _running_mean(x, n):
     n=max(1,int(n))
     if n <= 1 or len(a) == 0: return a.copy()
     # R stats::filter sides=2 gives NAs at incomplete edges; helper restores original clean signal there.
-    s=pd.Series(a).rolling(n, center=True, min_periods=n).mean().to_numpy(float)
+    s=pd.Series(a).rolling(n, center=True, min_periods=n).mean().to_numpy(dtype=float,copy=True)
     bad=~np.isfinite(s)
     s[bad]=a[bad]
     return s

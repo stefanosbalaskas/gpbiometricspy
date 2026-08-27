@@ -408,7 +408,7 @@ def prepare_gazepoint_pyhrv_input(data,ibi_col=None,group_cols=None,unit='auto',
         if len(idx)>1:repeated[idx[1:]]=np.isfinite(cur[1:])&np.isfinite(cur[:-1])&(np.abs(cur[1:]-cur[:-1])<=repeated_tolerance_ms)
     if collapse_repeated_intervals:
         ri=repeated&included;included[ri]=False;reason[ri]='repeated_interval'
-    intervals=work.drop(columns=['.interval_raw']).copy();intervals['nni_ms']=nni;intervals['interval_status']=status;intervals['repeated_interval']=repeated;intervals['included']=included;intervals['exclusion_reason']=reason;intervals['interval_index']=pd.array([pd.NA]*len(nni),dtype='Int64');intervals['interval_end_time_s']=np.nan
+    intervals=work.drop(columns=['.interval_raw']).copy();intervals['nni_ms']=nni;intervals['interval_status']=status;intervals['repeated_interval']=repeated;intervals['included']=included;intervals['exclusion_reason']=pd.Series(reason,index=intervals.index,dtype=object);intervals['interval_index']=pd.array([pd.NA]*len(nni),dtype='Int64');intervals['interval_end_time_s']=np.nan
     vectors={}; manifest=[]
     for key,idx in split:
         if isinstance(key,tuple):gid='||'.join('<NA>' if pd.isna(v) else str(v) for v in key)

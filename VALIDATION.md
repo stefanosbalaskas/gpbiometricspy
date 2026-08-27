@@ -20,7 +20,7 @@ Frozen semantic reference: **gpbiometrics 2.0.0**.
 - every frozen export explicitly referenced by Python tests: **406 / 406**
 - exports explicitly referenced by the frozen R tests: **378 / 406**
 - exports documented in frozen Rd help: **406 / 406**
-- whole-package statement coverage: **90.44%**
+- whole-package statement coverage: **90.45%**
 - required coverage threshold: **90% — PASS**
 - `compileall`: **PASS**
 - synthetic kiosk demo: **69,120 rows / 36 participants — PASS**

@@ -159,7 +159,7 @@ def summarize_gazepoint_missingness(data,signal_cols=None,time_col=None,group_co
     for g,idx in _groups(data,groups):
         z=data.iloc[idx]; ts=_time_seconds(z[time_col]) if time_col else None
         for sig in signals:
-            vals=z[sig]; miss=vals.isna().to_numpy();
+            vals=z[sig]; miss=vals.isna().to_numpy(copy=True);
             if count_nonfinite and pd.api.types.is_numeric_dtype(vals):miss|=~np.isfinite(vals.to_numpy(float))
             runs=[];start=None
             med=np.median(np.diff(ts[np.isfinite(ts)])) if ts is not None and np.isfinite(ts).sum()>1 else np.nan

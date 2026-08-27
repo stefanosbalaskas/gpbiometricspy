@@ -393,9 +393,9 @@ def estimate_gazepoint_samplerate_mstimer(mstimer,robust=True):
 
 
 def estimate_gazepoint_samplerate_datetime(datetime,format=None,tz="UTC",robust=True):
-    t=pd.to_datetime(pd.Series(datetime),format=format,utc=True,errors="coerce");x=t.astype("int64").to_numpy(float)/1e9;x=x[np.isfinite(x)&(x>-9e9)]
-    if len(x)<2:return {"sampling_rate_hz":np.nan,"interval_seconds":np.nan,"n_intervals":0}
-    d=np.diff(np.unique(np.sort(x)));d=d[(d>0)&np.isfinite(d)]
+    t=pd.to_datetime(pd.Series(datetime),format=format,utc=True,errors="coerce").dropna().drop_duplicates().sort_values()
+    if len(t)<2:return {"sampling_rate_hz":np.nan,"interval_seconds":np.nan,"n_intervals":0}
+    d=t.diff().dt.total_seconds().dropna().to_numpy(dtype=float,copy=True);d=d[(d>0)&np.isfinite(d)]
     if len(d)==0:return {"sampling_rate_hz":np.nan,"interval_seconds":np.nan,"n_intervals":0}
     v=float(np.median(d) if robust else np.mean(d));return {"sampling_rate_hz":1/v,"interval_seconds":v,"n_intervals":len(d),"interval_iqr_seconds":_iqr(d)}
 

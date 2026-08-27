@@ -18,7 +18,7 @@ def _interp(x):
 def _running_mean(x,k):
     a=_interp(x); k=max(1,int(k))
     if k<=1:return a
-    y=pd.Series(a).rolling(k,center=True,min_periods=k).mean().to_numpy(float); bad=~np.isfinite(y); y[bad]=a[bad]; return y
+    y=pd.Series(a).rolling(k,center=True,min_periods=k).mean().to_numpy(dtype=float,copy=True); bad=~np.isfinite(y); y[bad]=a[bad]; return y
 
 
 def _running_median(x,k):
