@@ -42,3 +42,12 @@ def test_real_data_validator_runs_outside_repository(tmp_path):
     assert summary['rows']==600
     for required in ['import_schema_audit','active_channels','real_data_readiness','eda_quality','ppg_peak_detection','hrv_features','pupil_cleaning','gaze_validation','ttl_event_extraction','aggregate_report_bundle']:
         assert required in summary['steps'], required
+
+
+def test_optional_backend_compatibility_dependencies_are_declared():
+    pyproject=(ROOT/'pyproject.toml').read_text().lower()
+    workflow=(ROOT/'.github/workflows/interoperability.yml').read_text().lower()
+    assert 'peakutils>=1.3.4' in pyproject
+    assert 'setuptools>=77,<82' in pyproject
+    assert 'peakutils>=1.3.4' in workflow
+    assert 'setuptools>=77,<82' in workflow

@@ -50,7 +50,7 @@ Development after the stable freeze adds evidence rather than silently changing 
 
 Latest local `0.1.1.dev0` regression evidence after adding these layers:
 
-- **210 / 210** Python tests: **PASS**
+- **211 / 211** Python tests: **PASS**
 - whole-package statement coverage: **90.75%**
 - exact export audit: **406 / 406 implemented, 0 pending — PASS**
 - Python 3.11 grammar audit: **PASS**
@@ -68,3 +68,5 @@ The real-data workflow is opt-in. Private Gazepoint exports remain outside Git a
 ## Meaning of parity
 
 The 406-function freeze means the complete frozen R export surface has a Python implementation and direct Python-test evidence. It does **not** claim that every optional external-library call is bit-identical across every operating system, library release or numerical backend. Cross-runtime fixtures and optional-backend CI are maintained as additional evidence layers.
+
+- Optional-backend compatibility metadata now explicitly supplies BioSPPy/pyHRV `peakutils` and HeartPy `setuptools<82` requirements required by the upstream releases tested in CI.

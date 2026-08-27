@@ -75,6 +75,19 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install gpbiometricspy core
         run: python -m pip install -e .
+      - name: Install upstream compatibility dependency
+        shell: bash
+        run: |
+          case "${{ matrix.backend }}" in
+            biosppy|pyhrv)
+              # BioSPPy 2.2.4 imports PeakUtils but does not declare it.
+              python -m pip install "peakutils>=1.3.4"
+              ;;
+            heartpy)
+              # HeartPy 1.2.7 still imports pkg_resources, removed in setuptools 82.
+              python -m pip install "setuptools>=77,<82"
+              ;;
+          esac
       - name: Install optional backend
         run: python -m pip install "${{ matrix.install }}"
       - name: Run real backend smoke
