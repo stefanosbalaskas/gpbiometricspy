@@ -13,6 +13,10 @@ def test_golden_manifest_and_python_generation(tmp_path):
     out=tmp_path/'python.json'; subprocess.run([sys.executable,str(ROOT/'scripts/generate_python_golden.py'),'--output',str(out)],cwd=ROOT,check=True)
     data=json.loads(out.read_text()); assert set(data)=={c['id'] for c in manifest['cases']}
 
+def test_r_golden_writer_preserves_full_precision():
+    text=(ROOT/'reference/golden/generate_r_golden.R').read_text()
+    assert 'digits=NA' in text.replace(' ', '')
+
 def test_all_26_executable_tutorials():
     scripts=sorted(p for p in (ROOT/'examples/tutorials').glob('*.py') if p.name!='_shared.py'); assert len(scripts)==26
     tutorial_dir=str(ROOT/'examples/tutorials')

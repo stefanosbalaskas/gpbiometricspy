@@ -50,7 +50,7 @@ Development after the stable freeze adds evidence rather than silently changing 
 
 Latest local `0.1.1.dev0` regression evidence after adding these layers:
 
-- **209 / 209** Python tests: **PASS**
+- **210 / 210** Python tests: **PASS**
 - whole-package statement coverage: **90.75%**
 - exact export audit: **406 / 406 implemented, 0 pending — PASS**
 - Python 3.11 grammar audit: **PASS**
@@ -61,7 +61,7 @@ Latest local `0.1.1.dev0` regression evidence after adding these layers:
 - R golden comparison and optional-backend floor/current matrix: **live GitHub CI gates after push**
 - private participant-data validation: **not claimed without a user-supplied private dataset**
 
-The golden-fixture harness writes independent R and Python result JSON files and compares recursively with explicit absolute/relative tolerances. It is intentionally separate from ordinary Python unit tests so cross-runtime disagreements cannot be hidden by shared implementation code.
+The golden-fixture harness writes independent R and Python result JSON files at full numerical precision and compares recursively with explicit absolute/relative tolerances. It is intentionally separate from ordinary Python unit tests so cross-runtime disagreements cannot be hidden by shared implementation code.
 
 The real-data workflow is opt-in. Private Gazepoint exports remain outside Git and are supplied only at execution time. The workflow/reporting code checks paths and output locations to reduce accidental repository disclosure.
 

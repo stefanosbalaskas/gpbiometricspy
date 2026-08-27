@@ -62,5 +62,16 @@ bh <- data.frame(participant=rep("A",4),HR=c(60,62,65,67),HRV=rep(1,4))
 out$baseline_hr <- baseline_correct_gazepoint_hr(bh,baseline_rows=c(TRUE,TRUE,FALSE,FALSE),group_columns="participant")$HR_baseline_corrected
 
 dir.create(dirname(out_path), recursive=TRUE, showWarnings=FALSE)
-jsonlite::write_json(lapply(out,clean), out_path, auto_unbox=TRUE, pretty=TRUE, null="null", na="null")
+# jsonlite defaults to four significant digits. Golden fixtures must preserve the
+# full numerical precision produced by the frozen R implementation so the
+# comparator evaluates scientific parity rather than serialization rounding.
+jsonlite::write_json(
+  lapply(out,clean),
+  out_path,
+  auto_unbox=TRUE,
+  pretty=TRUE,
+  null="null",
+  na="null",
+  digits=NA
+)
 cat("wrote", out_path, "\n")
