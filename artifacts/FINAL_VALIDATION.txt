@@ -1,6 +1,6 @@
 gpbiometricspy FINAL VALIDATION
 ========================================================================
-Version: 0.1.0.dev0
+Version: 0.1.0.dev1
 Frozen R reference: gpbiometrics 2.0.0
 R exports: 406
 Python implemented exports: 406

@@ -7,7 +7,7 @@ import pandas as pd
 
 _LOG_COLS=['decision_id','timestamp','stage','object_type','object_id','decision','reason','function_name','parameter','value','reviewer_note']
 def create_gazepoint_analysis_decision_log(study_id=None,analyst=None,description=None):
- d=pd.DataFrame({c:pd.Series(dtype='object') for c in _LOG_COLS});d.attrs.update(study_id=study_id,analyst=analyst,description=description,created_at=datetime.now(timezone.utc).isoformat(),package_version='0.1.0.dev0',gazepoint_analysis_decision_log=True);return d
+ d=pd.DataFrame({c:pd.Series(dtype='object') for c in _LOG_COLS});d.attrs.update(study_id=study_id,analyst=analyst,description=description,created_at=datetime.now(timezone.utc).isoformat(),package_version='0.1.0.dev1',gazepoint_analysis_decision_log=True);return d
 
 def _valstr(v):
  if isinstance(v,dict):return '; '.join(f'{k}={v[k]}' for k in v)
@@ -91,7 +91,8 @@ def export_gazepoint_pipeline_dot(pipeline,file=None,graph_name='gazepoint_pipel
  if not isinstance(include_descriptions,bool):raise ValueError('`include_descriptions` must be TRUE or FALSE.')
  def ident(x):return re.sub(r'\W','_',str(x)) if re.match(r'^\d',str(x)) is None else 'n_'+re.sub(r'\W','_',str(x))
  def esc(x):return str(x).replace('\\','\\\\').replace('"','\\"').replace('\n','\\n')
- lines=[f'digraph {re.sub(r"\W","_",graph_name)} {{',f'  graph [rankdir="{rankdir}"];']
+ graph_id=re.sub(r'\W','_',graph_name)
+ lines=[f'digraph {graph_id} {{',f'  graph [rankdir="{rankdir}"];']
  for _,r in pipeline['nodes'].iterrows():
   lab=esc(r.get('label',r.step_id));desc=esc(r.get('description',''))
   if include_descriptions and desc:lab+=r'\n'+desc

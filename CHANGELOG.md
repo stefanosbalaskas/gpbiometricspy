@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0.dev1 — Python 3.11 compatibility and release hardening
+
+- fixed `export_gazepoint_pipeline_dot()` so the frozen implementation parses correctly under the declared Python 3.11 minimum without changing generated DOT output;
+- retained the exact 406/406 `gpbiometrics 2.0.0` export parity contract and 204-test scientific regression suite;
+- narrowed the Ruff release gate to high-signal correctness checks compatible with the intentionally compact parity-port source style;
+- made GitHub Release creation idempotent and able to rebuild an existing immutable tag via manual dispatch;
+- retained `v0.1.0.dev0` unchanged as the historical initial parity-freeze prerelease.
+
 ## 0.1.0.dev0 — gpbiometrics 2.0.0 parity freeze
 
 - froze `gpbiometrics 2.0.0` as the initial R semantic reference;
