@@ -60,7 +60,7 @@ data = gp.load_kiosk_demo()
 print(data.shape)  # (69120, ...)
 
 # Inspect biometric signal validity / availability.
-validity = gp.summarize_gazepoint_biometric_validity(data)
+validity = gp.summarise_gazepoint_biometric_validity(data)
 
 # Extract TTL transitions.
 events = gp.extract_gazepoint_ttl_events(data)
@@ -73,6 +73,10 @@ hrv = gp.run_gazepoint_pyhrv_style(
 
 The demo is **fully synthetic** and is intended only for examples, testing,
 and reproducible workflow demonstrations.
+
+## Deep validation layers
+
+Beyond the 406/406 export freeze, development on `main` includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, 26 executable Python article companions, and a privacy-preserving real-data validation CLI. See the documentation site for the distinction between API parity and deeper cross-runtime/backend evidence.
 
 ## Scientific scope
 

@@ -11,3 +11,7 @@ site/
 *.whl
 *.tar.gz
 .ruff_cache/
+private-data/
+real-data/
+artifacts/real-data/
+artifacts/golden/

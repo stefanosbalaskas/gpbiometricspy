@@ -1,18 +1,31 @@
 # Release checklist
 
-- [ ] Exact R export audit reports 406/406 implemented and 0 pending.
-- [ ] `compileall` passes.
-- [ ] Full pytest suite passes with coverage ≥90%.
-- [ ] Every frozen export remains directly referenced by a Python test.
-- [ ] Synthetic kiosk demo loads 69,120 rows / 36 participants.
-- [ ] Generated API reference contains 406 function entries.
-- [ ] Article migration catalog contains 26 companions.
-- [ ] Ruff passes in CI.
-- [ ] MkDocs strict build passes in CI.
-- [ ] Wheel and sdist build successfully.
-- [ ] Twine metadata check passes in CI.
-- [ ] Fresh wheel install smoke passes.
-- [ ] Fresh sdist install smoke passes.
-- [ ] Changelog, citation and version metadata are synchronized.
-- [ ] Git tag and GitHub release are created from the validated commit.
-- [ ] PyPI publication is performed only after the release candidate gates pass.
+## 0.1.0 — completed
+
+- [x] Exact R export audit reports 406/406 implemented and 0 pending.
+- [x] `compileall` passes.
+- [x] Full pytest suite passes with coverage ≥90%.
+- [x] Every frozen export remains directly referenced by a Python test.
+- [x] Synthetic kiosk demo loads 69,120 rows / 36 participants.
+- [x] Generated API reference contains 406 function entries.
+- [x] Article migration catalog contains 26 companions.
+- [x] Ruff passes in CI.
+- [x] MkDocs strict build passes in CI.
+- [x] Wheel and sdist build successfully.
+- [x] Twine metadata check passes in CI.
+- [x] Fresh wheel/public-PyPI install smoke passes.
+- [x] Stable wheel/sdist hashes match between GitHub Release and PyPI.
+- [x] Changelog, citation and version metadata were synchronized for the stable release.
+- [x] Annotated `v0.1.0` tag and non-prerelease GitHub release were created from the validated commit.
+- [x] PyPI publication occurred only after release gates passed.
+- [x] GitHub Pages is enabled from `gh-pages` `/` with HTTPS.
+
+## Next release — 0.1.1 (development starts at 0.1.1.dev0)
+
+- [ ] Core tests, export audit, coverage, docs and package builds remain green.
+- [ ] R/Python golden-fixture workflow passes.
+- [ ] Optional-backend floor/current interoperability workflow passes.
+- [ ] All 26 executable tutorial companions pass.
+- [ ] Real-data validator is exercised on at least one private Gazepoint export profile outside Git.
+- [ ] CodeQL/dependency automation is green.
+- [ ] Stable release notes distinguish validation/documentation changes from semantic API changes.

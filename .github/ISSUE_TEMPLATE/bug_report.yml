@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a reproducible gpbiometricspy problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not upload identifiable or private participant biometric data. Use synthetic/minimized examples."
+  - type: input
+    id: version
+    attributes:
+      label: gpbiometricspy version
+      placeholder: "0.1.0 or 0.1.1.dev0"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproducible example
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / traceback
+    validations:
+      required: true

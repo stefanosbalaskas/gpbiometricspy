@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a scientifically scoped enhancement
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Scientific or workflow problem
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: parity
+    attributes:
+      label: Relationship to frozen gpbiometrics reference
+      description: Is this parity, interoperability, validation, or Python-only functionality?

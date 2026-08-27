@@ -40,3 +40,19 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/pupil-qc-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+t=np.arange(-.5,1.01,.05); d=pd.DataFrame({'participant':'P01','trial':'T01','time':t,'pupil':3+.1*np.sin(4*t)}); base=gp.baseline_correct_gazepoint_pupil(d,pupil_col='pupil',time_col='time',trial_cols=['participant','trial'],baseline_window=(-.5,-.1)); smooth=gp.smooth_gazepoint_pupil(base,pupil_cols='pupil',id_cols=['participant','trial'],window=5); clean=gp.clean_gazepoint_pupil_signal(d,pupil_cols=['pupil'],time_col='time',group_cols=['participant','trial']); finish('pupil-qc-workflow',baseline=base,smooth=smooth,clean=clean)
+```

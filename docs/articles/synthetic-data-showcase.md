@@ -69,3 +69,19 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/synthetic-data-showcase.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+bio=gp.simulate_gazepoint_biometrics(n_seconds=5,sampling_rate=20,seed=1); eye=gp.simulate_gazepoint_eye_data({'n_samples':100,'seed':2}); multi=gp.simulate_gazepoint_multimodal_data(duration_s=5,sampling_rate_hz=20,seed=3); artifact=gp.simulate_gazepoint_artifact(bio,signal_cols=['GSR_US'],artifact='spike',seed=4); finish('synthetic-data-showcase',biometrics=bio,eye=eye,multimodal=multi,artifact=artifact)
+```

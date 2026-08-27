@@ -58,3 +58,19 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/ppg-hrv-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+d=pulse_frame(100,30); process=gp.process_gazepoint_ppg_heartpy_style(d,'pulse','time_s','participant',100,high_precision=False); nni=800+30*np.sin(np.linspace(0,12*np.pi,300)); pyhrv=gp.run_gazepoint_pyhrv_style(nni_ms=nni); freq=gp.compute_gazepoint_pyhrv_frequency_domain(nni,method='welch'); finish('ppg-hrv-workflow',process=process,pyhrv=pyhrv,frequency=freq)
+```

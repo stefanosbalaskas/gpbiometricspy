@@ -51,3 +51,22 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/design-audit-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+d=demo(900).rename(columns={'participant_id':'participant','MEDIA_ID':'trial','interface_complexity':'condition'})
+design=gp.audit_gazepoint_experiment_design(d,participant_col='participant',trial_col='trial',condition_col='condition')
+balance=gp.audit_gazepoint_condition_balance(d,participant_col='participant',condition_col='condition',trial_col='trial')
+events=gp.audit_gazepoint_event_coverage(d,event_col='TTL0',participant_col='participant',trial_col='trial'); finish('design-audit-workflow',design=design,balance=balance,events=events)
+```

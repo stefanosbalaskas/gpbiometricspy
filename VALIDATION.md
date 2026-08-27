@@ -11,36 +11,60 @@ Frozen semantic reference: **gpbiometrics 2.0.0**.
 - 26 vignette/article sources
 - 39 `inst/extdata` files
 
-## Python parity freeze
+## Stable 0.1.0 release evidence
+
+`gpbiometricspy 0.1.0` is a completed public release, not a release candidate.
 
 - **406 / 406** frozen R exports implemented
 - **0** pending exports
 - exact export-set audit: **PASS**
-- **204 / 204** Python tests: **PASS**
+- **204 / 204** Python tests at the stable freeze: **PASS**
 - every frozen export explicitly referenced by Python tests: **406 / 406**
 - exports explicitly referenced by the frozen R tests: **378 / 406**
 - exports documented in frozen Rd help: **406 / 406**
-- whole-package statement coverage: **90.45%**
+- whole-package statement coverage at the stable freeze: **90.45%**
 - required coverage threshold: **90% — PASS**
-- `compileall`: **PASS**
+- Python 3.11–3.14 on Linux, Windows and macOS: **PASS**
+- Ruff, `compileall`, MkDocs strict build, wheel build, sdist build and Twine metadata check: **PASS**
 - synthetic kiosk demo: **69,120 rows / 36 participants — PASS**
-- stable-candidate wheel PEP 517 build via pip with the installed setuptools backend: **PASS**
-- stable-candidate wheel clean-install/import/export smoke: **PASS**
-- stable sdist build and Twine validation: **release-workflow gate (not locally runnable because `build`/`twine` are absent in this sandbox)**
-- prior `0.1.0.dev1` wheel + sdist build/Twine/GitHub Release/PyPI publication chain: **PASS**
-- documentation relative-link audit: **PASS, 0 broken links**
-- pandas 4 forward-warning audit for the previously identified single-column groupby sites: **PASS, 0 warnings in the full suite**
+- stable GitHub release `v0.1.0`: **PASS**
+- PyPI Trusted Publishing through GitHub OIDC: **PASS**
+- PyPI wheel/sdist SHA-256 identity with GitHub Release assets: **PASS**
+- fresh public-PyPI install/import/export smoke: **PASS**
+- GitHub Pages documentation deployment over HTTPS: **PASS**
 
-The wheel contains the complete Python runtime package and all 39 synthetic-demo files. The source distribution additionally retains the frozen R reference: 144 R source files, 403 Rd files, 120 R test files and 26 Rmd vignette/article sources.
+Stable distribution digests:
 
-## Tooling limitation in this sandbox
+- `gpbiometricspy-0.1.0-py3-none-any.whl`: `3370c646825603d96165e890b36491acd07148ffbe992ad00ba3ab79044a31e6`
+- `gpbiometricspy-0.1.0.tar.gz`: `0e7cd9badeb64dae7f46690746fe9a7eca5f7b3eb61cd10f70af0e04f5f83970`
 
-Ruff, MkDocs, Twine and the `build` frontend were not installed in this execution environment and package installation from the internet was blocked. The repository contains CI workflows that install and execute these release tools. For the stable `0.1.0` candidate, a wheel was built through pip using the installed setuptools PEP 517 backend with build isolation disabled, then installed into an isolated target and import/export-smoke-tested successfully. Stable sdist construction and Twine validation remain mandatory GitHub release-workflow gates. The preceding `0.1.0.dev1` release already passed GitHub `python -m build`, Twine, exact-hash PyPI publication and a fresh public-index install/import smoke test.
+## 0.1.1.dev0 deep-validation tranche
+
+Development after the stable freeze adds evidence rather than silently changing the frozen R contract:
+
+1. paired R/Python golden fixtures for deterministic numerical families;
+2. optional-backend floor/current CI for HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf;
+3. executable Python companions for all 26 frozen R articles/vignettes;
+4. a repository-safe real-data validation CLI and manual workflow;
+5. CodeQL, Dependabot and contribution/issue templates.
+
+Latest local `0.1.1.dev0` regression evidence after adding these layers:
+
+- **209 / 209** Python tests: **PASS**
+- whole-package statement coverage: **90.75%**
+- exact export audit: **406 / 406 implemented, 0 pending — PASS**
+- Python 3.11 grammar audit: **PASS**
+- `compileall` across `src/`, `tests/`, `scripts/` and `examples/`: **PASS**
+- executable article companions: **26 / 26 — PASS**
+- development wheel build + isolated import/export smoke: **PASS**
+- documentation relative-link/nav audit: **PASS, 0 broken/missing targets**
+- R golden comparison and optional-backend floor/current matrix: **live GitHub CI gates after push**
+- private participant-data validation: **not claimed without a user-supplied private dataset**
+
+The golden-fixture harness writes independent R and Python result JSON files and compares recursively with explicit absolute/relative tolerances. It is intentionally separate from ordinary Python unit tests so cross-runtime disagreements cannot be hidden by shared implementation code.
+
+The real-data workflow is opt-in. Private Gazepoint exports remain outside Git and are supplied only at execution time. The workflow/reporting code checks paths and output locations to reduce accidental repository disclosure.
 
 ## Meaning of parity
 
-The 406-function freeze means the complete frozen R export surface has a Python implementation and test evidence. It does **not** claim that every optional external-library call will be bit-identical across all versions, operating systems or numerical backends. The original R implementation/tests/documentation are retained under `reference/` specifically so continued deep-parity audits remain reproducible.
-
-## Public distribution evidence
-
-The `0.1.0.dev1` prerelease was published to PyPI through GitHub OIDC Trusted Publishing. The PyPI wheel and sdist SHA-256 digests matched the corresponding immutable GitHub Release assets exactly, and a fresh public-index installation/import smoke test passed on Windows with Python 3.11 and pandas 3.0.5. The stable `0.1.0` candidate retains that distribution path and is gated by the same cross-platform test, documentation, GitHub Release and PyPI environment controls.
+The 406-function freeze means the complete frozen R export surface has a Python implementation and direct Python-test evidence. It does **not** claim that every optional external-library call is bit-identical across every operating system, library release or numerical backend. Cross-runtime fixtures and optional-backend CI are maintained as additional evidence layers.

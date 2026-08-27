@@ -32,3 +32,19 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/qc-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+d=demo(900); active=gp.detect_active_biometric_channels(d); miss=gp.summarize_gazepoint_missingness(d,signal_cols=['GSR_US','HR','IBI','LPMM']); validity=gp.summarise_gazepoint_biometric_validity(d); quality=gp.audit_gazepoint_gsr_quality(d,value_column='GSR_US'); finish('qc-workflow',active=active,missingness=miss,validity=validity,quality=quality)
+```

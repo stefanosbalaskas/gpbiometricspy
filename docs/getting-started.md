@@ -19,7 +19,7 @@ The packaged kiosk dataset contains 36 synthetic participants, four tasks per pa
 
 ```python
 active = gp.detect_gazepoint_active_channels(data)
-validity = gp.summarize_gazepoint_biometric_validity(data)
+validity = gp.summarise_gazepoint_biometric_validity(data)
 events = gp.extract_gazepoint_ttl_events(data)
 ```
 

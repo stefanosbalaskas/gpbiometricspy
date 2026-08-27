@@ -44,3 +44,21 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/eda-scr-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+d=demo(900); units=gp.audit_gazepoint_gsr_units(d,gsr_col='GSR_US'); quality=gp.audit_gazepoint_gsr_quality(d,value_column='GSR_US'); artifacts=gp.audit_gazepoint_eda_artifacts(d,signal_col='GSR_US',time_col='TIME',group_cols=['participant_id'])
+dec=gp.decompose_gazepoint_eda(d,signal_col='GSR_US',time_col='TIME',group_cols=['participant_id'],window_size=31); events=gp.detect_gazepoint_scr_events(dec,phasic_col='eda_phasic',time_col='TIME',group_cols=['participant_id'],min_peak_distance=10)
+finish('eda-scr-workflow',units=units,quality=quality,artifacts=artifacts,decomposition=dec,events=events)
+```

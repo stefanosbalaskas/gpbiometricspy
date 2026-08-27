@@ -48,3 +48,20 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/event-alignment-aoi-workflow.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+d=demo(900); ttl=gp.extract_gazepoint_ttl_events(d,ttl_columns=['TTL0'],group_columns=['participant_id']); aligned=gp.align_gazepoint_biometrics_to_ttl(d,ttl_cols=['TTL0'],time_col='TIME',group_cols=['participant_id'],pre_window_ms=250,post_window_ms=500)
+aoi=gp.summarize_gazepoint_aoi_dwell(d,aoi_col='AOI',group_cols=['participant_id']); finish('event-alignment-aoi-workflow',ttl=ttl,aligned=aligned,aoi=aoi)
+```

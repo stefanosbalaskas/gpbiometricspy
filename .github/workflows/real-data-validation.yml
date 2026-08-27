@@ -1,0 +1,15 @@
+name: private-real-data-validation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  instructions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Explain private-data execution model
+        run: |
+          echo "Private participant exports must not be uploaded to this public GitHub workflow."
+          echo "Run scripts/validate_real_data.py locally or on an approved self-hosted runner with data mounted outside the repository."
+          python -m compileall -q scripts/validate_real_data.py

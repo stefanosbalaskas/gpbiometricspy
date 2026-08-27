@@ -1,14 +1,29 @@
 # Roadmap
 
-## 0.1 parity freeze
+## Completed: 0.1.0 parity and public release
 
-The frozen `gpbiometrics 2.0.0` 406-export surface is implemented. The focus is release hardening, cross-platform CI, documentation, and independent cross-runtime numerical fixture generation.
+- frozen `gpbiometrics 2.0.0` 406-export surface implemented: **406/406, 0 pending**;
+- Python suite and ≥90% coverage gate;
+- Linux / Windows / macOS CI across Python 3.11–3.14;
+- Python 3.11 grammar and pandas 3 compatibility hardening;
+- MkDocs documentation and 406-function generated API reference;
+- GitHub `v0.1.0` stable release;
+- PyPI Trusted Publishing with exact GitHub/PyPI artifact hashes;
+- fresh public-index install smoke;
+- GitHub Pages publication over HTTPS.
 
-## Next validation work
+## In progress on main: 0.1.1.dev0 deep validation
 
-1. run the Python suite on Windows, Linux and macOS across Python 3.11–3.14;
-2. generate additional paired R/Python golden fixtures in an R-enabled environment;
-3. exercise optional HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf integrations across supported dependency versions;
-4. deepen branch coverage in complex workflow modules;
-5. convert high-traffic R articles from migration companions into fully executable Python narrative tutorials;
-6. adopt later `gpbiometrics` releases only through a new explicit reference freeze.
+- paired R/Python numerical golden fixtures with tolerance comparison;
+- floor/current optional-backend interoperability CI;
+- executable Python companions for all 26 frozen R articles/vignettes;
+- privacy-preserving real-data validation tooling;
+- CodeQL, Dependabot and repository contribution templates.
+
+## Longer-term work
+
+1. expand golden fixtures when a numerical edge case is discovered or a backend changes materially;
+2. deepen branch coverage in complex modelling/reporting workflows toward 95%+ without gaming the metric;
+3. validate on additional privately held real Gazepoint export profiles without committing participant data;
+4. add archival DOI/provenance metadata if a Zenodo release archive is created;
+5. adopt a later `gpbiometrics` release only through a new explicit semantic reference freeze.

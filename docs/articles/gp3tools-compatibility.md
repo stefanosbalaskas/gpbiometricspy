@@ -20,3 +20,22 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/gp3tools-compatibility.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+bio=pd.DataFrame({'participant':['P01','P01'],'time':[0.,1.],'GSR_US':[1.,1.2]}); gaze=pd.DataFrame({'participant':['P01','P01'],'time':[0.,1.],'FPOGX':[.2,.3],'FPOGY':[.4,.5]})
+try: joined=gp.join_gazepoint_biometrics_to_gp3tools(bio,gaze,by=['participant','time'])
+except TypeError: joined=gp.join_gazepoint_biometrics_to_gp3tools(bio,gaze)
+finish('gp3tools-compatibility',joined=joined)
+```

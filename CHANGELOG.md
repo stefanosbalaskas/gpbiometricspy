@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — 0.1.1.dev0 deep-validation and documentation tranche
+
+- adds paired R/Python numerical golden-fixture generation and tolerance comparison for deterministic physiology, QC, pupil, TTL, standardisation and HRV cases;
+- adds floor/current optional-backend interoperability CI for HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf;
+- adds executable Python companions for all 26 frozen R articles/vignettes and tests every companion;
+- adds a privacy-preserving real-data validation CLI/workflow that never requires private biometric exports to enter the repository;
+- adds CodeQL, Dependabot, issue templates and pull-request guidance;
+- closes the 0.1.0 release checklist and refreshes validation/roadmap records after the public GitHub/PyPI/Pages release.
+
 ## 0.1.0 — first stable PyPI release
 
 - promotes the validated `0.1.0.dev1` parity build to the first non-prerelease package version without changing the frozen 406-function `gpbiometrics 2.0.0` semantic contract;

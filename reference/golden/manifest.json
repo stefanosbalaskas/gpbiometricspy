@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "reference": "gpbiometrics 2.0.0",
+  "python_package": "gpbiometricspy",
+  "default_atol": 1e-08,
+  "default_rtol": 1e-07,
+  "cases": [
+    {
+      "id": "gsr_ohms_to_us",
+      "family": "EDA/GSR",
+      "atol": 1e-12
+    },
+    {
+      "id": "gsr_kohms_to_us",
+      "family": "EDA/GSR",
+      "atol": 1e-12
+    },
+    {
+      "id": "scr_percent_max",
+      "family": "SCR normalization"
+    },
+    {
+      "id": "scr_range",
+      "family": "SCR normalization"
+    },
+    {
+      "id": "scr_center",
+      "family": "SCR normalization"
+    },
+    {
+      "id": "scr_z",
+      "family": "SCR normalization"
+    },
+    {
+      "id": "scr_log_z",
+      "family": "SCR normalization"
+    },
+    {
+      "id": "pyhrv_sdnn",
+      "family": "HRV"
+    },
+    {
+      "id": "pyhrv_rmssd",
+      "family": "HRV"
+    },
+    {
+      "id": "pyhrv_sdsd",
+      "family": "HRV"
+    },
+    {
+      "id": "pyhrv_nn20",
+      "family": "HRV"
+    },
+    {
+      "id": "pyhrv_nn50",
+      "family": "HRV"
+    },
+    {
+      "id": "pupil_moving_average",
+      "family": "Pupil QC"
+    },
+    {
+      "id": "ttl_changes",
+      "family": "TTL/events"
+    },
+    {
+      "id": "zscore_grouped",
+      "family": "Standardisation"
+    },
+    {
+      "id": "baseline_gsr",
+      "family": "Baseline correction"
+    },
+    {
+      "id": "baseline_hr",
+      "family": "Baseline correction"
+    }
+  ]
+}

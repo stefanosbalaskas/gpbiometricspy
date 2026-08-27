@@ -14,6 +14,8 @@ nav:
   - Getting started: getting-started.md
   - Synthetic demo: demo.md
   - Parity & validation: parity.md
+  - Deep validation: deep-validation.md
+  - Private real-data validation: real-data-validation.md
   - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
   - API reference: api/reference.md

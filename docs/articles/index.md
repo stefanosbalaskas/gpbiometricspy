@@ -1,6 +1,6 @@
 # Article migration catalog
 
-All **26** frozen R vignette/article sources have a Python migration companion.
+All **26** frozen R vignette/article sources have a Python migration companion **and an executable Python workflow** under `examples/tutorials/`. The test suite executes every companion so documentation examples cannot silently rot.
 
 | Article | Python companion | Frozen R source | Referenced exports |
 |---|---|---|---:|

@@ -1,0 +1,81 @@
+name: interoperability
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  optional-backends:
+    name: ${{ matrix.backend }} (${{ matrix.mode }}, py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - backend: heartpy
+            mode: floor
+            python: '3.11'
+            install: 'heartpy==1.2.7'
+          - backend: heartpy
+            mode: current
+            python: '3.13'
+            install: 'heartpy'
+          - backend: biosppy
+            mode: floor
+            python: '3.11'
+            install: 'biosppy==2.2.4'
+          - backend: biosppy
+            mode: current
+            python: '3.13'
+            install: 'biosppy'
+          - backend: pyhrv
+            mode: floor
+            python: '3.11'
+            install: 'pyhrv==0.5.0'
+          - backend: pyhrv
+            mode: current
+            python: '3.13'
+            install: 'pyhrv'
+          - backend: neurokit
+            mode: floor
+            python: '3.11'
+            install: 'neurokit2==0.2.13'
+          - backend: neurokit
+            mode: current
+            python: '3.13'
+            install: 'neurokit2'
+          - backend: mne
+            mode: floor
+            python: '3.11'
+            install: 'mne==1.12.1'
+          - backend: mne
+            mode: current
+            python: '3.13'
+            install: 'mne'
+          - backend: pylsl
+            mode: floor
+            python: '3.11'
+            install: 'pylsl==1.18.2'
+          - backend: pylsl
+            mode: current
+            python: '3.13'
+            install: 'pylsl'
+          - backend: pyxdf
+            mode: floor
+            python: '3.11'
+            install: 'pyxdf==1.17.5'
+          - backend: pyxdf
+            mode: current
+            python: '3.13'
+            install: 'pyxdf'
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install gpbiometricspy core
+        run: python -m pip install -e .
+      - name: Install optional backend
+        run: python -m pip install "${{ matrix.install }}"
+      - name: Run real backend smoke
+        run: python scripts/interop_smoke.py "${{ matrix.backend }}"

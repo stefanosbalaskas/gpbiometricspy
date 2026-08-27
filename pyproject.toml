@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gpbiometricspy"
-version = "0.1.0"
+version = "0.1.1.dev0"
 description = "Python port of gpbiometrics 2.0.0 for Gazepoint biometric workflows"
 readme = "README.md"
 license = "MIT"

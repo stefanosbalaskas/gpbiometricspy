@@ -23,3 +23,21 @@ import gpbiometricspy as gp
 ## Interpretation
 
 Use the same conservative physiological interpretation as the R package: derived biometric features are signal-processing outputs and do not directly establish emotion, stress, cognition, preference, health status, or diagnosis.
+
+## Executable Python companion
+
+The frozen R call crosswalk above is retained for completeness. The following companion is an executable end-to-end Python workflow using synthetic/public data and the same scientific domain. It is also executed by the test suite.
+
+Run from the repository root:
+
+```bash
+python examples/tutorials/private-real-data-smoke-testing.py
+```
+
+```python
+from __future__ import annotations
+from _shared import *
+with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as od:
+    p=Path(td)/'synthetic_gazepoint.csv'; demo(300).to_csv(p,index=False); smoke=gp.run_gazepoint_real_data_smoke(td,output_dir=od,write_results=True,overwrite=True,protect_repository=True); privacy=gp.audit_gazepoint_smoke_privacy(smoke)
+finish('private-real-data-smoke-testing',smoke=smoke,privacy=privacy)
+```
