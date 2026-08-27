@@ -22,3 +22,7 @@ Two upstream packages currently need small packaging compatibility dependencies:
 - **HeartPy 1.2.7**: HeartPy imports the legacy `pkg_resources` API. Setuptools removed `pkg_resources` in version 82, so the `heartpy` and `interop` extras constrain Setuptools to `>=77,<82` until HeartPy migrates to `importlib.resources`.
 
 These dependencies are compatibility scaffolding for the external backends; they do not alter gpbiometricspy's native numerical implementations.
+
+### pyHRV / nolds compatibility
+
+`pyHRV 0.5.0` depends on `nolds` without an upper bound. `nolds 0.6.3` has a known `importlib.resources` regression on Python 3.11 (`TypeError: 'nolds.datasets' is not a package`). The `gpbiometricspy[pyhrv]` and `gpbiometricspy[interop]` extras therefore constrain `nolds<0.6.3` while that upstream regression remains unresolved.

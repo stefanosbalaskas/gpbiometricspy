@@ -79,9 +79,14 @@ jobs:
         shell: bash
         run: |
           case "${{ matrix.backend }}" in
-            biosppy|pyhrv)
+            biosppy)
               # BioSPPy 2.2.4 imports PeakUtils but does not declare it.
               python -m pip install "peakutils>=1.3.4"
+              ;;
+            pyhrv)
+              # pyHRV depends on BioSPPy (undeclared PeakUtils) and nolds.
+              # nolds 0.6.3 has a Python 3.11 importlib.resources regression.
+              python -m pip install "peakutils>=1.3.4" "nolds<0.6.3"
               ;;
             heartpy)
               # HeartPy 1.2.7 still imports pkg_resources, removed in setuptools 82.

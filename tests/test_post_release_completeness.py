@@ -49,5 +49,7 @@ def test_optional_backend_compatibility_dependencies_are_declared():
     workflow=(ROOT/'.github/workflows/interoperability.yml').read_text().lower()
     assert 'peakutils>=1.3.4' in pyproject
     assert 'setuptools>=77,<82' in pyproject
+    assert 'nolds<0.6.3' in pyproject
     assert 'peakutils>=1.3.4' in workflow
     assert 'setuptools>=77,<82' in workflow
+    assert 'nolds<0.6.3' in workflow

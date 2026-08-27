@@ -70,3 +70,5 @@ The real-data workflow is opt-in. Private Gazepoint exports remain outside Git a
 The 406-function freeze means the complete frozen R export surface has a Python implementation and direct Python-test evidence. It does **not** claim that every optional external-library call is bit-identical across every operating system, library release or numerical backend. Cross-runtime fixtures and optional-backend CI are maintained as additional evidence layers.
 
 - Optional-backend compatibility metadata now explicitly supplies BioSPPy/pyHRV `peakutils` and HeartPy `setuptools<82` requirements required by the upstream releases tested in CI.
+
+- pyHRV floor compatibility additionally constrains `nolds<0.6.3` because nolds 0.6.3 breaks imports on Python 3.11 via an `importlib.resources` regression.
