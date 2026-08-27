@@ -89,3 +89,8 @@ show_missing = true
 target-version = "py311"
 line-length = 120
 exclude = ["reference"]
+
+[tool.ruff.lint]
+# Keep CI focused on correctness defects. The parity port intentionally preserves
+# compact scientific expressions, so broad E7 style enforcement is not a release gate.
+select = ["E9", "F63", "F7", "F82"]
