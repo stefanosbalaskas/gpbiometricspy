@@ -504,7 +504,8 @@ def prepare_gazepoint_artifact_svm_features(dat,eda_col='GSR_US',time_col=None,g
     df=_df(dat,'dat');
     if eda_col not in df or not pd.api.types.is_numeric_dtype(df[eda_col]):raise ValueError('`eda_col` must identify a numeric column.')
     groups=_cols(group_cols);rows=[]
-    iterator=[('all_rows',df.index)] if not groups else df.groupby(groups,sort=False,dropna=False).groups.items()
+    group_key=groups[0] if len(groups)==1 else groups
+    iterator=[('all_rows',df.index)] if not groups else df.groupby(group_key,sort=False,dropna=False).groups.items()
     for gid,index in iterator:
         idx=np.asarray(list(index),int)
         if time_col:idx=idx[np.argsort(pd.to_numeric(df.loc[idx,time_col],errors='coerce').to_numpy(float))]
@@ -563,7 +564,7 @@ def _ig_params(intervals):
 
 def model_gazepoint_eda_point_process(dat,eda_col='GSR_US',time_col='CNT',group_cols=None,event_time_col=None,event_indicator_col=None,derivative_mad_multiplier=6,min_event_distance_s=1):
     df=_df(dat);rows=[];summary=[]
-    groups=_cols(group_cols);iterator=[('all_rows',df.index)] if not groups else df.groupby(groups,sort=False,dropna=False).groups.items()
+    groups=_cols(group_cols);group_key=groups[0] if len(groups)==1 else groups;iterator=[('all_rows',df.index)] if not groups else df.groupby(group_key,sort=False,dropna=False).groups.items()
     for gid,index in iterator:
         g=df.loc[list(index)].sort_values(time_col);t=pd.to_numeric(g[time_col],errors='coerce').to_numpy(float);x=pd.to_numeric(g[eda_col],errors='coerce').to_numpy(float)
         if event_indicator_col:mask=g[event_indicator_col].fillna(False).astype(bool).to_numpy();et=t[mask]
@@ -583,7 +584,7 @@ def model_gazepoint_eda_point_process(dat,eda_col='GSR_US',time_col='CNT',group_
 
 
 def model_gazepoint_hr_point_process(dat,ibi_col='IBI',time_col=None,beat_time_col=None,group_cols=None,ibi_units='auto'):
-    df=_df(dat);rows=[];summary=[];groups=_cols(group_cols);iterator=[('all_rows',df.index)] if not groups else df.groupby(groups,sort=False,dropna=False).groups.items()
+    df=_df(dat);rows=[];summary=[];groups=_cols(group_cols);group_key=groups[0] if len(groups)==1 else groups;iterator=[('all_rows',df.index)] if not groups else df.groupby(group_key,sort=False,dropna=False).groups.items()
     for gid,index in iterator:
         g=df.loc[list(index)];ibi=pd.to_numeric(g[ibi_col],errors='coerce').to_numpy(float);med=np.nanmedian(ibi);units=ibi_units
         if units=='auto':units='milliseconds' if med>10 else 'seconds'

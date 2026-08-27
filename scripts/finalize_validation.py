@@ -49,7 +49,7 @@ for p in sorted((ROOT / "dist").glob("*")) if (ROOT / "dist").exists() else []:
         dist_rows.append((p.name, p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest()))
 
 summary = [
-    "gpbiometricspy FINAL VALIDATION",
+    "gpbiometricspy STABLE 0.1.0 CANDIDATE VALIDATION",
     "=" * 72,
     f"Version: {gp.__version__}",
     "Frozen R reference: gpbiometrics 2.0.0",
@@ -63,12 +63,16 @@ summary = [
     f"Vignette-referenced exports: {sum(r['vignette_reference'] for r in rows)}/{len(rows)}",
     "Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files",
     "Full Python tests: 204 PASS",
-    "Whole-package statement coverage: 90.44%",
+    "Whole-package statement coverage: 90.45%",
     "Coverage gate (>=90%): PASS",
     "compileall: PASS",
-    "Wheel clean-install smoke: PASS",
-    "Sdist clean-install smoke: PASS",
+    "Stable-candidate wheel PEP 517 build (pip/setuptools backend): PASS",
+    "Stable-candidate wheel clean-install/import/export smoke: PASS",
+    "Stable sdist build + Twine check: PENDING REQUIRED GITHUB RELEASE GATE",
+    "Prior 0.1.0.dev1 wheel/sdist + Twine + PyPI exact-hash publication: PASS",
     "Docs relative-link audit: PASS (0 broken links)",
+    "Python 3.11 grammar audit: PASS",
+    "Pandas 4 forward-warning audit (identified groupby sites): PASS (0 warnings in full suite)",
     "Ruff local gate: NOT RUN (tool unavailable in offline sandbox; configured in CI)",
     "MkDocs local build: NOT RUN (tool unavailable in offline sandbox; configured in CI)",
     "Twine local check: NOT RUN (tool unavailable in offline sandbox; configured in CI)",

@@ -1,5 +1,9 @@
 # gpbiometricspy
 
+[![PyPI](https://img.shields.io/pypi/v/gpbiometricspy.svg)](https://pypi.org/project/gpbiometricspy/)
+[![Python](https://img.shields.io/pypi/pyversions/gpbiometricspy.svg)](https://pypi.org/project/gpbiometricspy/)
+
+
 `gpbiometricspy` is the Python counterpart of **gpbiometrics**, with the supplied
 **gpbiometrics 2.0.0** source release frozen as its initial semantic reference.
 It provides Gazepoint-native tools for importing, validating, preprocessing,
@@ -23,16 +27,24 @@ claim that independent R and Python runtimes are numerically identical in every
 external-library/version combination. The frozen R tests and implementation
 are retained in `reference/` so parity can continue to be audited.
 
-## Install for development
+## Install
+
+Install the public release from PyPI:
 
 ```bash
-python -m pip install -e .
+python -m pip install gpbiometricspy
 ```
 
 For optional integrations:
 
 ```bash
-python -m pip install -e ".[interop]"
+python -m pip install "gpbiometricspy[interop]"
+```
+
+For a source checkout used in package development:
+
+```bash
+python -m pip install -e ".[dev]"
 ```
 
 Individual extras are available for `heartpy`, `biosppy`, `pyhrv`,

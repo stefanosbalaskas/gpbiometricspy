@@ -2,6 +2,15 @@
 
 `gpbiometricspy` is the Python port of **gpbiometrics 2.0.0**, a Gazepoint-native toolkit for biometric and multimodal eye-tracking research.
 
+
+## Install
+
+```bash
+python -m pip install gpbiometricspy
+```
+
+The public package is distributed on [PyPI](https://pypi.org/project/gpbiometricspy/) and requires Python 3.11 or newer.
+
 ## Frozen parity contract
 
 - 406 R exports → 406 Python implementations

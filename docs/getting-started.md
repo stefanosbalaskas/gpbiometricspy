@@ -1,5 +1,11 @@
 # Getting started
 
+Install from PyPI:
+
+```bash
+python -m pip install gpbiometricspy
+```
+
 ```python
 import gpbiometricspy as gp
 

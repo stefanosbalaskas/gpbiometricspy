@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0 — first stable PyPI release
+
+- promotes the validated `0.1.0.dev1` parity build to the first non-prerelease package version without changing the frozen 406-function `gpbiometrics 2.0.0` semantic contract;
+- retains 406 / 406 implemented exports, 0 pending exports, the 204-test regression suite, and the >=90% whole-package coverage gate;
+- adds public PyPI installation guidance and package metadata while retaining the MIT license and Python 3.11-3.14 support matrix;
+- preserves the tokenless PyPI Trusted Publisher workflow and exact GitHub-Release-artifact publishing chain;
+- removes three pandas 4 forward-compatibility warnings by grouping single columns with a scalar key, preserving current scalar group identifiers;
+- retains `v0.1.0.dev0` and `v0.1.0.dev1` unchanged as immutable historical prereleases.
+
 ## 0.1.0.dev1 — Python 3.11 compatibility and release hardening
 
 - fixed `export_gazepoint_pipeline_dot()` so the frozen implementation parses correctly under the declared Python 3.11 minimum without changing generated DOT output;
