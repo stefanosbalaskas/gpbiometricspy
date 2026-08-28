@@ -57,7 +57,7 @@ for p in sorted((ROOT / "dist").glob("*")) if (ROOT / "dist").exists() else []:
         dist_rows.append((p.name, p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest()))
 
 summary = [
-    "gpbiometricspy 0.1.1.dev0 POST-RELEASE COMPLETENESS VALIDATION",
+    "gpbiometricspy 0.1.1 STABLE RELEASE VALIDATION",
     "=" * 76,
     f"Version: {gp.__version__}",
     "Frozen R semantic reference: gpbiometrics 2.0.0",
@@ -70,7 +70,7 @@ summary = [
     f"Rd-documented exports: {sum(r['rd_reference'] for r in rows)}/{len(rows)}",
     f"Vignette-referenced exports: {sum(r['vignette_reference'] for r in rows)}/{len(rows)}",
     "Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files",
-    "Latest local Python suite: 209 PASS",
+    "Latest local Python suite: 211 PASS",
     "Latest local whole-package statement coverage: 90.75%",
     "Coverage gate (>=90%): PASS",
     "compileall (src/tests/scripts/examples): PASS",

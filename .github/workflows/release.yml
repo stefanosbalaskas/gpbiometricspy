@@ -1,4 +1,5 @@
 name: release
+
 on:
   workflow_dispatch:
     inputs:
@@ -8,36 +9,127 @@ on:
         type: string
   push:
     tags: ['v*']
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
 permissions:
-  contents: write
+  contents: read
+
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
     env:
       RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     steps:
-      - uses: actions/checkout@v7.0.1
+      - name: Checkout exact release tag
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - run: python -m pip install build twine
-      - run: python -m build
-      - run: python -m twine check dist/*
-      - uses: actions/upload-artifact@v6
-        with:
-          name: distributions
-          path: dist/*
-      - name: Create or update GitHub Release
-        if: ${{ github.event_name == 'push' || inputs.tag != '' }}
+
+      - name: Verify tag and package version
+        run: |
+          set -euo pipefail
+          case "$RELEASE_TAG" in
+            v*) VERSION="${RELEASE_TAG#v}" ;;
+            *) echo "Release tag must start with v: $RELEASE_TAG" >&2; exit 1 ;;
+          esac
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+          python - <<'PY'
+          import os, pathlib, tomllib
+          version = os.environ['RELEASE_TAG'].removeprefix('v')
+          project = tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']
+          if project['version'] != version:
+              raise SystemExit(f"Tag/version mismatch: {os.environ['RELEASE_TAG']} vs {project['version']}")
+          PY
+
+      - name: Require successful validation runs on exact main commit
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          TARGET_SHA="$(git rev-parse HEAD)"
+          for workflow in tests.yml docs.yml codeql.yml deep-parity.yml interoperability.yml real-data-validation.yml; do
+            echo "Checking $workflow for $TARGET_SHA on main..."
+            ok="$(gh run list --workflow "$workflow" --commit "$TARGET_SHA" --branch main --limit 20 \
+              --json conclusion \
+              --jq '[.[] | select(.conclusion == "success")] | length')"
+            test "$ok" -ge 1 || { echo "Missing successful exact-commit validation for $workflow" >&2; exit 1; }
+          done
+
+      - name: Install build and validation tools
+        run: python -m pip install "build>=1.2" "twine==7.0.0"
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Check distribution metadata
+        run: python -m twine check dist/*
+
+      - name: Smoke-install wheel and sdist
+        run: |
+          set -euo pipefail
+          VERSION="${RELEASE_TAG#v}"
+          export VERSION
+          for artifact in "dist/gpbiometricspy-${VERSION}-py3-none-any.whl" "dist/gpbiometricspy-${VERSION}.tar.gz"; do
+            envdir="$(mktemp -d)"
+            python -m venv "$envdir/venv"
+            "$envdir/venv/bin/python" -m pip install --upgrade pip
+            "$envdir/venv/bin/python" -m pip install "$artifact"
+            "$envdir/venv/bin/python" - <<'PY'
+          import os
+          import gpbiometricspy as gp
+          assert gp.__version__ == os.environ["VERSION"]
+          assert len(gp.R_EXPORTS) == 406
+          assert len(gp.IMPLEMENTED_EXPORTS) == 406
+          assert len(gp.PENDING_EXPORTS) == 0
+          print("distribution smoke PASS", gp.__version__)
+          PY
+            rm -rf "$envdir"
+          done
+
+      - name: Write SHA-256 manifest
+        run: sha256sum dist/* > SHA256SUMS.txt
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: distributions
+          path: |
+            dist/*
+            SHA256SUMS.txt
+
+      - name: Create immutable GitHub Release if absent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" dist/* --clobber
+            echo "GitHub Release $RELEASE_TAG already exists; preserving existing assets unchanged."
           else
             prerelease=()
             if [[ "$RELEASE_TAG" == *".dev"* ]]; then prerelease+=(--prerelease); fi
-            gh release create "$RELEASE_TAG" dist/* --verify-tag --title "$RELEASE_TAG" --generate-notes "${prerelease[@]}"
+            gh release create "$RELEASE_TAG" dist/* SHA256SUMS.txt \
+              --verify-tag --title "$RELEASE_TAG" --generate-notes "${prerelease[@]}"
+          fi
+
+      - name: Dispatch protected PyPI Trusted Publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="${RELEASE_TAG#v}"
+          if curl --fail --silent --show-error "https://pypi.org/pypi/gpbiometricspy/${VERSION}/json" >/dev/null 2>&1; then
+            echo "gpbiometricspy ${VERSION} is already on PyPI; skipping duplicate publication dispatch."
+          else
+            gh workflow run pypi.yml --ref "$RELEASE_TAG" -f tag="$RELEASE_TAG"
+            echo "Dispatched pypi.yml for $RELEASE_TAG"
           fi

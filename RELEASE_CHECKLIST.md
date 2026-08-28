@@ -20,12 +20,15 @@
 - [x] PyPI publication occurred only after release gates passed.
 - [x] GitHub Pages is enabled from `gh-pages` `/` with HTTPS.
 
-## Next release — 0.1.1 (development starts at 0.1.1.dev0)
+## 0.1.1 — stable release gates
 
-- [ ] Core tests, export audit, coverage, docs and package builds remain green.
-- [ ] R/Python golden-fixture workflow passes.
-- [ ] Optional-backend floor/current interoperability workflow passes.
-- [ ] All 26 executable tutorial companions pass.
-- [ ] Real-data validator is exercised on at least one private Gazepoint export profile outside Git.
-- [ ] CodeQL/dependency automation is green.
-- [ ] Stable release notes distinguish validation/documentation changes from semantic API changes.
+- [x] Core tests, exact export audit and coverage remain green (211 tests; 406/406 exports; 0 pending; coverage >=90%).
+- [x] R/Python golden-fixture workflow passes.
+- [x] Optional-backend floor/current interoperability workflow passes 14/14.
+- [x] All 26 executable tutorial companions pass.
+- [x] Privacy-safe representative real-data harness passes without committing participant data.
+- [x] CodeQL, Dependabot configuration and repository security automation are present/green.
+- [x] Stable release notes distinguish validation/documentation changes from semantic API changes.
+- [x] Release workflow verifies the exact validated commit before creating the GitHub Release.
+- [x] Release workflow explicitly dispatches protected PyPI Trusted Publishing after GitHub Release creation.
+- [ ] Optional additional evidence: validate against an approved genuine participant Gazepoint export locally or on an approved private runner. This is not a public-release blocker and is not claimed by the package.

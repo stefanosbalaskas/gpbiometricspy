@@ -18,6 +18,6 @@ At the stable `0.1.0` freeze every export was directly referenced by Python test
 
 ## Independent deep-parity evidence
 
-Development after `0.1.0` adds a second evidence layer under `reference/golden/`: the frozen R implementation and Python port independently generate deterministic outputs for numerical physiology/QC families, then a separate comparator applies explicit tolerances. This prevents a Python-only test suite from being mistaken for cross-runtime numerical evidence.
+Stable `0.1.1` adds a second evidence layer under `reference/golden/`: the frozen R implementation and Python port independently generate deterministic outputs for numerical physiology/QC families, then a separate comparator applies explicit tolerances. This prevents a Python-only test suite from being mistaken for cross-runtime numerical evidence.
 
 Optional backend behavior is tested separately because HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf can change independently of the frozen R reference.

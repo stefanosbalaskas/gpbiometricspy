@@ -10,6 +10,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: pypi-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     name: publish to PyPI
@@ -21,12 +25,34 @@ jobs:
     env:
       PUBLISH_TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
+      - name: Validate requested tag
+        run: |
+          set -euo pipefail
+          case "$PUBLISH_TAG" in
+            v*) ;;
+            *) echo "Release tag must start with v: $PUBLISH_TAG" >&2; exit 1 ;;
+          esac
+
+      - name: Check whether version is already published
+        id: existing
+        run: |
+          set -euo pipefail
+          VERSION="${PUBLISH_TAG#v}"
+          if curl --fail --silent --show-error "https://pypi.org/pypi/gpbiometricspy/${VERSION}/json" >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "gpbiometricspy ${VERSION} already exists on PyPI; publication is an idempotent no-op."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout exact release tag
+        if: steps.existing.outputs.published != 'true'
         uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event.release.tag_name || inputs.tag }}
 
       - name: Download exact GitHub Release distributions
+        if: steps.existing.outputs.published != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -36,6 +62,7 @@ jobs:
           gh release download "$PUBLISH_TAG" --pattern '*.whl' --pattern '*.tar.gz' --dir dist
 
       - name: Verify tag, version, and distributions
+        if: steps.existing.outputs.published != 'true'
         run: |
           set -euo pipefail
           case "$PUBLISH_TAG" in
@@ -62,5 +89,7 @@ jobs:
           PY
 
       - name: Publish distributions to PyPI
+        if: steps.existing.outputs.published != 'true'
         # PyPA gh-action-pypi-publish v1.14.2, pinned to its verified release commit.
+        # Trusted Publishing also generates/uploads Sigstore attestations by default.
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33

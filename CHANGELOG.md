@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — 0.1.1.dev0 deep-validation and documentation tranche
+## 0.1.1 — 2026-08-28 — deep-validation and documentation release
 
 - adds paired R/Python numerical golden-fixture generation and tolerance comparison for deterministic physiology, QC, pupil, TTL, standardisation and HRV cases;
 - adds floor/current optional-backend interoperability CI for HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf;
@@ -8,7 +8,8 @@
 - adds executable Python companions for all 26 frozen R articles/vignettes and tests every companion;
 - adds a privacy-preserving real-data validation CLI/workflow that never requires private biometric exports to enter the repository;
 - adds CodeQL, Dependabot, issue templates and pull-request guidance;
-- closes the 0.1.0 release checklist and refreshes validation/roadmap records after the public GitHub/PyPI/Pages release.
+- closes the 0.1.0 release checklist and refreshes validation/roadmap records after the public GitHub/PyPI/Pages release;
+- hardens stable publishing so the release workflow verifies the exact validated commit, creates an immutable GitHub Release, and explicitly dispatches protected PyPI Trusted Publishing.
 
 ## 0.1.0 — first stable PyPI release
 

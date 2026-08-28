@@ -5,7 +5,8 @@ type: software
 authors:
   - family-names: Balaskas
     given-names: Stefanos
-version: 0.1.1.dev0
+version: 0.1.1
+date-released: 2026-08-28
 license: MIT
 repository-code: "https://github.com/stefanosbalaskas/gpbiometricspy"
 url: "https://stefanosbalaskas.github.io/gpbiometricspy/"

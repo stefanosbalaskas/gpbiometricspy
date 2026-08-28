@@ -38,9 +38,9 @@ Stable distribution digests:
 - `gpbiometricspy-0.1.0-py3-none-any.whl`: `3370c646825603d96165e890b36491acd07148ffbe992ad00ba3ab79044a31e6`
 - `gpbiometricspy-0.1.0.tar.gz`: `0e7cd9badeb64dae7f46690746fe9a7eca5f7b3eb61cd10f70af0e04f5f83970`
 
-## 0.1.1.dev0 deep-validation tranche
+## Stable 0.1.1 deep-validation release
 
-Development after the stable freeze adds evidence rather than silently changing the frozen R contract:
+The 0.1.1 release adds evidence and release hardening rather than silently changing the frozen R contract:
 
 1. paired R/Python golden fixtures for deterministic numerical families;
 2. optional-backend floor/current CI for HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf;
@@ -48,7 +48,7 @@ Development after the stable freeze adds evidence rather than silently changing 
 4. a repository-safe real-data validation CLI and manual workflow;
 5. CodeQL, Dependabot and contribution/issue templates.
 
-Latest local `0.1.1.dev0` regression evidence after adding these layers:
+Validated `0.1.1` regression evidence before the stable tag:
 
 - **211 / 211** Python tests: **PASS**
 - whole-package statement coverage: **90.75%**
@@ -58,7 +58,11 @@ Latest local `0.1.1.dev0` regression evidence after adding these layers:
 - executable article companions: **26 / 26 — PASS**
 - development wheel build + isolated import/export smoke: **PASS**
 - documentation relative-link/nav audit: **PASS, 0 broken/missing targets**
-- R golden comparison and optional-backend floor/current matrix: **live GitHub CI gates after push**
+- R/Python golden comparison: **PASS on GitHub Actions**
+- optional-backend floor/current matrix: **14 / 14 PASS on GitHub Actions**
+- strict docs + GitHub Pages: **PASS on GitHub Actions**
+- CodeQL: **PASS on GitHub Actions**
+- privacy-safe real-data harness workflow: **PASS on GitHub Actions**
 - private participant-data validation: **not claimed without a user-supplied private dataset**
 
 The golden-fixture harness writes independent R and Python result JSON files at full numerical precision and compares recursively with explicit absolute/relative tolerances. It is intentionally separate from ordinary Python unit tests so cross-runtime disagreements cannot be hidden by shared implementation code.
@@ -72,3 +76,8 @@ The 406-function freeze means the complete frozen R export surface has a Python 
 - Optional-backend compatibility metadata now explicitly supplies BioSPPy/pyHRV `peakutils` and HeartPy `setuptools<82` requirements required by the upstream releases tested in CI.
 
 - pyHRV compatibility constrains `nolds<0.6.3` because nolds 0.6.3 breaks imports via an `importlib.resources` regression; compatible earlier nolds releases still use `pkg_resources`, so pyHRV also inherits the `setuptools>=77,<82` compatibility boundary on current Python runtimes.
+
+
+## 0.1.1 release-gate policy
+
+The stable tag must point at the exact validated `main` commit. Before creating or publishing the GitHub Release, `release.yml` verifies successful `main` runs for the 12-job core matrix, strict documentation build, CodeQL, R/Python golden parity, 14-job optional-backend interoperability matrix, and the privacy-safe real-data harness. After the GitHub Release is created, the workflow explicitly dispatches the protected `pypi.yml` Trusted Publisher workflow. Public participant data are never required or uploaded.

@@ -1,6 +1,6 @@
-gpbiometricspy 0.1.1.dev0 POST-RELEASE COMPLETENESS VALIDATION
+gpbiometricspy 0.1.1 STABLE RELEASE VALIDATION
 ============================================================================
-Version: 0.1.1.dev0
+Version: 0.1.1
 Frozen R semantic reference: gpbiometrics 2.0.0
 R exports: 406
 Python implemented exports: 406
@@ -11,7 +11,7 @@ R-test-referenced exports: 378/406
 Rd-documented exports: 406/406
 Vignette-referenced exports: 227/406
 Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files
-Latest local Python suite: 209 PASS
+Latest local Python suite: 211 PASS
 Latest local whole-package statement coverage: 90.75%
 Coverage gate (>=90%): PASS
 compileall (src/tests/scripts/examples): PASS

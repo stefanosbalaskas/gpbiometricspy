@@ -12,13 +12,14 @@
 - fresh public-index install smoke;
 - GitHub Pages publication over HTTPS.
 
-## In progress on main: 0.1.1.dev0 deep validation
+## Completed: 0.1.1 deep validation and release hardening
 
 - paired R/Python numerical golden fixtures with tolerance comparison;
 - floor/current optional-backend interoperability CI;
 - executable Python companions for all 26 frozen R articles/vignettes;
 - privacy-preserving real-data validation tooling;
-- CodeQL, Dependabot and repository contribution templates.
+- CodeQL, Dependabot and repository contribution templates;
+- release-to-PyPI handoff hardening with exact-commit gate verification and explicit protected workflow dispatch.
 
 ## Longer-term work
 

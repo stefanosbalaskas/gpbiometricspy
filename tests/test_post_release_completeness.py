@@ -6,7 +6,7 @@ import gpbiometricspy as gp
 ROOT=Path(__file__).resolve().parents[1]
 
 def test_development_version_and_stable_contract():
-    assert gp.__version__=='0.1.1.dev0'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
+    assert gp.__version__=='0.1.1'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
 
 def test_golden_manifest_and_python_generation(tmp_path):
     manifest=json.loads((ROOT/'reference/golden/manifest.json').read_text()); assert len(manifest['cases'])>=15
