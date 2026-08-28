@@ -32,5 +32,6 @@
       "identifier": "https://doi.org/10.5281/zenodo.21434608",
       "relation": "isDerivedFrom"
     }
-  ]
+  ],
+  "version": "0.1.2"
 }

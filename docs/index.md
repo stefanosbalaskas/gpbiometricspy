@@ -3,7 +3,7 @@
 `gpbiometricspy` is the Python port of **gpbiometrics 2.0.0**, a Gazepoint-native toolkit for biometric and multimodal eye-tracking research.
 
 <div class="gp-version-note">
-<strong>Development documentation:</strong> this site tracks <code>main</code> (<code>0.1.2.dev0</code>). The latest stable PyPI release is <code>0.1.1</code>.
+<strong>Release documentation:</strong> this site tracks the <code>0.1.2</code> release source on <code>main</code>. Zenodo DOI registration follows publication of <code>v0.1.2</code>.
 </div>
 
 ## Install

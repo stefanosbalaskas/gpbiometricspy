@@ -57,7 +57,7 @@ for p in sorted((ROOT / "dist").glob("*")) if (ROOT / "dist").exists() else []:
         dist_rows.append((p.name, p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest()))
 
 summary = [
-    "gpbiometricspy 0.1.1 STABLE RELEASE VALIDATION",
+    "gpbiometricspy 0.1.2 STABLE RELEASE VALIDATION",
     "=" * 76,
     f"Version: {gp.__version__}",
     "Frozen R semantic reference: gpbiometrics 2.0.0",
@@ -70,9 +70,9 @@ summary = [
     f"Rd-documented exports: {sum(r['rd_reference'] for r in rows)}/{len(rows)}",
     f"Vignette-referenced exports: {sum(r['vignette_reference'] for r in rows)}/{len(rows)}",
     "Synthetic kiosk demo: 36 participants / 69,120 rows / 39 files",
-    "Latest local Python suite: 211 PASS",
-    "Latest local whole-package statement coverage: 90.75%",
-    "Coverage gate (>=90%): PASS",
+    "Latest local Python suite: 216 PASS",
+    "Whole-package statement coverage gate: >=90%",
+    "Coverage gate (>=90%): REQUIRED LIVE CI GATE",
     "compileall (src/tests/scripts/examples): PASS",
     "Python 3.11 grammar audit: PASS",
     f"Golden fixture manifest: {golden_cases} deterministic cross-runtime cases",
@@ -84,10 +84,10 @@ summary = [
     "Actual private participant data validation: NOT CLAIMED; requires user-supplied data outside Git",
     "Optional backend floor/current matrix: REQUIRED LIVE CI GATE",
     "CodeQL / Dependabot / issue and PR templates: CONFIGURED",
-    "Stable 0.1.0 GitHub Release + PyPI + Pages: PASS (immutable historical release)",
-    "Stable 0.1.0 public-index install/import/export smoke: PASS",
-    "Stable 0.1.0 wheel SHA256: 3370c646825603d96165e890b36491acd07148ffbe992ad00ba3ab79044a31e6",
-    "Stable 0.1.0 sdist SHA256: 0e7cd9badeb64dae7f46690746fe9a7eca5f7b3eb61cd10f70af0e04f5f83970",
+    "Stable 0.1.1 GitHub Release + PyPI + Pages: PASS (immutable historical release)",
+    "Stable 0.1.1 public-index install/import/export smoke: PASS",
+    "Stable 0.1.1 wheel SHA256: a266e916ba1ac00e77a9d30fc3e898eecf462229e28a8d09542fe01a0985a943",
+    "Stable 0.1.1 sdist SHA256: 2c701d664fd13fbea64921d34dce1410c46677fd788435d97369f1fbacf98231",
     "Ruff local gate: NOT RUN (tool unavailable locally; mandatory GitHub CI gate)",
     "MkDocs strict local build: NOT RUN (tool unavailable locally; mandatory GitHub docs gate)",
 ]

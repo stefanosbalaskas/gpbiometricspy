@@ -58,7 +58,11 @@ jobs:
           import json
           from pathlib import Path
 
+          import os
+          version = os.environ['RELEASE_TAG'].removeprefix('v')
           zenodo = json.loads(Path('.zenodo.json').read_text(encoding='utf-8'))
+          if zenodo.get('version') != version:
+              raise SystemExit(f"Zenodo version mismatch: {zenodo.get('version')} vs {version}")
           if zenodo.get('upload_type') != 'software':
               raise SystemExit('Zenodo metadata must declare upload_type=software')
           if zenodo.get('access_right') != 'open':
@@ -76,6 +80,8 @@ jobs:
               raise SystemExit('Frozen R reference DOI provenance is missing')
 
           cff = Path('CITATION.cff').read_text(encoding='utf-8')
+          if f'version: {version}' not in cff:
+              raise SystemExit(f'CITATION.cff version does not match release {version}')
           if 'https://orcid.org/0000-0003-2444-9796' not in cff:
               raise SystemExit('CITATION.cff ORCID is missing')
           if '10.5281/zenodo.21434608' in cff:

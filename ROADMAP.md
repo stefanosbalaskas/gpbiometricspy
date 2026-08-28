@@ -21,6 +21,14 @@
 - CodeQL, Dependabot and repository contribution templates;
 - release-to-PyPI handoff hardening with exact-commit gate verification and explicit protected workflow dispatch.
 
+## 0.1.2 release tranche — visual documentation and archival
+
+- first-class Examples and package-generated Plot Gallery;
+- all 26 curated executable article companions preserved through docs generation;
+- Zenodo integration enabled with versioned `.zenodo.json` and explicit R-reference provenance;
+- GitHub About/topics/language metadata and non-disruptive `main` protection;
+- stable `0.1.2` release source frozen pending exact-commit CI, GitHub/PyPI publication and Zenodo DOI capture.
+
 ## Longer-term work
 
 1. expand golden fixtures when a numerical edge case is discovered or a backend changes materially;

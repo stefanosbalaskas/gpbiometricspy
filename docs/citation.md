@@ -3,14 +3,14 @@
 `gpbiometricspy` is configured for software citation through GitHub and for archival through the Zenodo GitHub integration.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.1</code>; development branch <code>0.1.2.dev0</code>; Zenodo integration enabled; first Python DOI pending the next stable release.
+<strong>Current citation state:</strong> Python release <code>0.1.2</code>; Zenodo integration enabled; first Python DOI pending automatic ingestion of <code>v0.1.2</code>.
 </div>
 
 ## Cite the Python software
 
 GitHub reads the repository's [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) and exposes a **Cite this repository** control. Cite the exact Python version used in an analysis.
 
-The current stable release is **0.1.1**. It was published before the Zenodo GitHub integration was enabled, so it does not have a Zenodo DOI. The next stable GitHub release will be the first `gpbiometricspy` release automatically eligible for Zenodo ingestion and DOI registration.
+`0.1.2` is the first `gpbiometricspy` release prepared after the Zenodo GitHub integration was enabled. Its GitHub release is therefore eligible for automatic Zenodo ingestion and DOI registration. The DOI is recorded here only after Zenodo has actually minted it.
 
 ## R reference provenance
 

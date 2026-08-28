@@ -37,9 +37,9 @@
 - [x] Zenodo GitHub integration is enabled for `stefanosbalaskas/gpbiometricspy`.
 - [x] `CITATION.cff` contains ORCID, affiliation, abstract and software keywords.
 - [x] `.zenodo.json` declares software/open/MIT metadata and links the frozen R reference DOI `10.5281/zenodo.21434608` as `isDerivedFrom`.
-- [x] README/site distinguish stable `0.1.1`, development `0.1.2.dev0`, R-reference DOI and future Python DOI.
+- [x] README/site clearly distinguished stable `0.1.1` from development `0.1.2.dev0` during preparation; the stable freeze now identifies `0.1.2` as the release source.
 - [x] Release workflow validates archival metadata before building a stable release.
-- [ ] Promote `0.1.2.dev0` to stable `0.1.2` only after the development tranche is intentionally frozen.
+- [x] Promote `0.1.2.dev0` to stable `0.1.2` only after the development tranche is intentionally frozen.
 - [ ] Create annotated `v0.1.2` only from the exact fully validated stable commit.
 - [ ] Wait for Zenodo to ingest the GitHub release and confirm the software record is published.
 - [ ] Record the Zenodo **version DOI** for `v0.1.2` and the software **concept DOI**.

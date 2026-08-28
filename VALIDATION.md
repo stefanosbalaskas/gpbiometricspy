@@ -81,3 +81,16 @@ The 406-function freeze means the complete frozen R export surface has a Python 
 ## 0.1.1 release-gate policy
 
 The stable tag must point at the exact validated `main` commit. Before creating or publishing the GitHub Release, `release.yml` verifies successful `main` runs for the 12-job core matrix, strict documentation build, CodeQL, R/Python golden parity, 14-job optional-backend interoperability matrix, and the privacy-safe real-data harness. After the GitHub Release is created, the workflow explicitly dispatches the protected `pypi.yml` Trusted Publisher workflow. Public participant data are never required or uploaded.
+
+## 0.1.2 visual-documentation and Zenodo-backed release candidate
+
+The 0.1.2 tranche adds documentation, archival metadata and repository hardening without changing the frozen 406-function R semantic contract. Before tagging, the release source is required to retain:
+
+- **406 / 406** frozen R exports implemented and **0 pending**;
+- the complete Python regression suite and **>=90%** whole-package coverage gate;
+- all **26 / 26** executable article companions;
+- all **13 / 13** package-generated documentation figures;
+- R/Python golden parity, 14-job optional-backend interoperability, CodeQL, strict docs/Pages and the privacy-safe real-data harness as exact-commit GitHub gates;
+- `CITATION.cff` and `.zenodo.json` synchronized to **0.1.2**;
+- the R `gpbiometrics 2.0.0` DOI `10.5281/zenodo.21434608` preserved only as `isDerivedFrom` provenance;
+- no Python DOI claimed until Zenodo actually ingests the published `v0.1.2` GitHub release.

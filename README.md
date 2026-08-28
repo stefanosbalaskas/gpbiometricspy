@@ -17,11 +17,11 @@ multimodal eye-tracking data.
 
 | Channel | Current state |
 |---|---|
-| Stable PyPI / GitHub release | **0.1.1** |
-| Development branch | **0.1.2.dev0** |
+| Stable release target | **0.1.2** |
+| Release source | **`main` frozen at 0.1.2** |
 | Frozen R semantic reference | **gpbiometrics 2.0.0** |
 | Export parity | **406 / 406 implemented; 0 pending** |
-| Zenodo | **GitHub integration enabled; Python DOI will be minted by the next stable release** |
+| Zenodo | **GitHub integration enabled; 0.1.2 is the first DOI-producing Python release** |
 
 ## Parity status
 
@@ -129,9 +129,10 @@ other surrogate channels are proxies unless independently validated.
 ## Archival and citation
 
 The repository is connected to the Zenodo GitHub integration. The existing
-`v0.1.1` release predates that connection, so **gpbiometricspy does not yet have
-its own Zenodo DOI**. The next stable GitHub release will be the first Python
-release eligible for automatic Zenodo archival and DOI registration.
+`v0.1.1` release predates that connection. **`v0.1.2` is the first Python
+release configured for automatic Zenodo archival and DOI registration.** The
+version and concept DOI are added to the repository front after Zenodo finishes
+processing the GitHub release; no DOI is pre-invented in the release source.
 
 The frozen R semantic reference is archived independently as **gpbiometrics
 2.0.0**, DOI **[10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)**.
@@ -140,9 +141,8 @@ Python package DOI.
 
 Citation metadata is maintained in [`CITATION.cff`](CITATION.cff), while
 Zenodo-specific archival metadata and the explicit R-reference relationship are
-maintained in [`.zenodo.json`](.zenodo.json). After the first Zenodo-backed
-Python release, the resulting Python concept/version DOI will be added here and
-to the documentation.
+maintained in [`.zenodo.json`](.zenodo.json). After Zenodo processes `v0.1.2`, the resulting Python concept/version DOI is
+added here and to the documentation.
 
 ## Reference precedence
 
