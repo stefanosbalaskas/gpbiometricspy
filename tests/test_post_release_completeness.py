@@ -103,3 +103,17 @@ def test_docs_workflow_regenerates_visual_gallery():
     workflow=(ROOT/'.github/workflows/docs.yml').read_text()
     assert 'scripts/generate_docs_gallery.py' in workflow
     assert "len(d['figures']) == 13" in workflow
+
+def test_reference_docs_generator_preserves_curated_articles():
+    generator = (ROOT / "scripts/generate_reference_docs.py").read_text(encoding="utf-8")
+    assert "dest.write_text" not in generator
+    assert '(ART / "index.md").write_text' not in generator
+    assert "Curated article companions audited" in generator
+
+    articles = sorted((ROOT / "docs/articles").glob("*.md"))
+    companions = [p for p in articles if p.name != "index.md"]
+    assert len(companions) == 26
+    assert all("## Executable Python companion" in p.read_text(encoding="utf-8") for p in companions)
+    index = (ROOT / "docs/articles/index.md").read_text(encoding="utf-8")
+    assert "# Articles and tutorials" in index
+    assert "All **26** frozen R vignette/article sources" in index
