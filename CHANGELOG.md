@@ -4,6 +4,7 @@
 
 - adds paired R/Python numerical golden-fixture generation and tolerance comparison for deterministic physiology, QC, pupil, TTL, standardisation and HRV cases;
 - adds floor/current optional-backend interoperability CI for HeartPy, BioSPPy, pyHRV, NeuroKit2, MNE, pylsl and pyxdf;
+- hardens pyHRV compatibility with `peakutils>=1.3.4`, `nolds<0.6.3`, and `setuptools>=77,<82` to cover both floor and current Python runtimes despite upstream packaging regressions;
 - adds executable Python companions for all 26 frozen R articles/vignettes and tests every companion;
 - adds a privacy-preserving real-data validation CLI/workflow that never requires private biometric exports to enter the repository;
 - adds CodeQL, Dependabot, issue templates and pull-request guidance;

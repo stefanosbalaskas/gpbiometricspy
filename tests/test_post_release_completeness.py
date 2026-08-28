@@ -45,11 +45,20 @@ def test_real_data_validator_runs_outside_repository(tmp_path):
 
 
 def test_optional_backend_compatibility_dependencies_are_declared():
-    pyproject=(ROOT/'pyproject.toml').read_text().lower()
+    import tomllib
+
+    metadata=tomllib.loads((ROOT/'pyproject.toml').read_text())
+    extras=metadata['project']['optional-dependencies']
     workflow=(ROOT/'.github/workflows/interoperability.yml').read_text().lower()
-    assert 'peakutils>=1.3.4' in pyproject
-    assert 'setuptools>=77,<82' in pyproject
-    assert 'nolds<0.6.3' in pyproject
+
+    assert 'peakutils>=1.3.4' in extras['biosppy']
+    assert 'setuptools>=77,<82' in extras['heartpy']
+    assert 'peakutils>=1.3.4' in extras['pyhrv']
+    assert 'nolds<0.6.3' in extras['pyhrv']
+    assert 'setuptools>=77,<82' in extras['pyhrv']
+    assert 'peakutils>=1.3.4' in extras['interop']
+    assert 'nolds<0.6.3' in extras['interop']
+    assert 'setuptools>=77,<82' in extras['interop']
     assert 'peakutils>=1.3.4' in workflow
     assert 'setuptools>=77,<82' in workflow
     assert 'nolds<0.6.3' in workflow

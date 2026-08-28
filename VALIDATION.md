@@ -71,4 +71,4 @@ The 406-function freeze means the complete frozen R export surface has a Python 
 
 - Optional-backend compatibility metadata now explicitly supplies BioSPPy/pyHRV `peakutils` and HeartPy `setuptools<82` requirements required by the upstream releases tested in CI.
 
-- pyHRV floor compatibility additionally constrains `nolds<0.6.3` because nolds 0.6.3 breaks imports on Python 3.11 via an `importlib.resources` regression.
+- pyHRV compatibility constrains `nolds<0.6.3` because nolds 0.6.3 breaks imports via an `importlib.resources` regression; compatible earlier nolds releases still use `pkg_resources`, so pyHRV also inherits the `setuptools>=77,<82` compatibility boundary on current Python runtimes.

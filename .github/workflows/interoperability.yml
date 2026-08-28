@@ -85,8 +85,8 @@ jobs:
               ;;
             pyhrv)
               # pyHRV depends on BioSPPy (undeclared PeakUtils) and nolds.
-              # nolds 0.6.3 has a Python 3.11 importlib.resources regression.
-              python -m pip install "peakutils>=1.3.4" "nolds<0.6.3"
+              # nolds 0.6.3 has an importlib.resources regression; earlier nolds uses pkg_resources.
+              python -m pip install "peakutils>=1.3.4" "nolds<0.6.3" "setuptools>=77,<82"
               ;;
             heartpy)
               # HeartPy 1.2.7 still imports pkg_resources, removed in setuptools 82.

@@ -25,4 +25,4 @@ These dependencies are compatibility scaffolding for the external backends; they
 
 ### pyHRV / nolds compatibility
 
-`pyHRV 0.5.0` depends on `nolds` without an upper bound. `nolds 0.6.3` has a known `importlib.resources` regression on Python 3.11 (`TypeError: 'nolds.datasets' is not a package`). The `gpbiometricspy[pyhrv]` and `gpbiometricspy[interop]` extras therefore constrain `nolds<0.6.3` while that upstream regression remains unresolved.
+`pyHRV 0.5.0` depends on `nolds` without an upper bound. `nolds 0.6.3` has a known `importlib.resources` regression on Python 3.11 (`TypeError: 'nolds.datasets' is not a package`). The `gpbiometricspy[pyhrv]` and `gpbiometricspy[interop]` extras therefore constrain `nolds<0.6.3` while that upstream regression remains unresolved. Because the compatible pre-0.6.3 nolds releases still import legacy `pkg_resources`, the pyHRV extra also constrains Setuptools to `>=77,<82` on modern Python runtimes.
