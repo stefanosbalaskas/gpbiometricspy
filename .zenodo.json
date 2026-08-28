@@ -1,0 +1,36 @@
+{
+  "creators": [
+    {
+      "name": "Balaskas, Stefanos",
+      "orcid": "0000-0003-2444-9796",
+      "affiliation": "University of Patras"
+    }
+  ],
+  "title": "gpbiometricspy: Python tools for Gazepoint biometric workflows",
+  "description": "gpbiometricspy is the Python counterpart of gpbiometrics, with gpbiometrics 2.0.0 frozen as its initial semantic reference. It provides Gazepoint-native workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event alignment, multimodal quality control, analysis, plotting, reporting, simulation, reproducibility, and interoperability.",
+  "access_right": "open",
+  "license": "mit",
+  "upload_type": "software",
+  "language": "eng",
+  "keywords": [
+    "Gazepoint",
+    "eye tracking",
+    "biometrics",
+    "electrodermal activity",
+    "EDA",
+    "GSR",
+    "heart rate variability",
+    "HRV",
+    "photoplethysmography",
+    "PPG",
+    "pupillometry",
+    "multimodal research",
+    "scientific Python"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://doi.org/10.5281/zenodo.21434608",
+      "relation": "isDerivedFrom"
+    }
+  ]
+}

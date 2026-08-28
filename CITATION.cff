@@ -1,10 +1,27 @@
 cff-version: 1.2.0
-message: "If you use gpbiometricspy, please cite this software and the original methodological sources for specialized analyses used in your study."
+message: "If you use gpbiometricspy, please cite the software version used in your analysis and the original methodological sources for specialized analyses."
 title: "gpbiometricspy: Python tools for Gazepoint biometric workflows"
 type: software
+abstract: >-
+  gpbiometricspy is a Python port of gpbiometrics 2.0.0 providing Gazepoint-native
+  workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event
+  alignment, multimodal quality control, analysis, plotting, reporting, simulation,
+  reproducibility, and interoperability.
 authors:
   - family-names: Balaskas
     given-names: Stefanos
+    affiliation: "University of Patras"
+    orcid: "https://orcid.org/0000-0003-2444-9796"
+keywords:
+  - Gazepoint
+  - eye tracking
+  - biometrics
+  - electrodermal activity
+  - heart rate variability
+  - photoplethysmography
+  - pupillometry
+  - multimodal research
+  - scientific Python
 version: 0.1.1
 date-released: 2026-08-28
 license: MIT

@@ -32,3 +32,17 @@
 - [x] Release workflow verifies the exact validated commit before creating the GitHub Release.
 - [x] Release workflow explicitly dispatches protected PyPI Trusted Publishing after GitHub Release creation.
 - [ ] Optional additional evidence: validate against an approved genuine participant Gazepoint export locally or on an approved private runner. This is not a public-release blocker and is not claimed by the package.
+## 0.1.2 — Zenodo-backed release preparation
+
+- [x] Zenodo GitHub integration is enabled for `stefanosbalaskas/gpbiometricspy`.
+- [x] `CITATION.cff` contains ORCID, affiliation, abstract and software keywords.
+- [x] `.zenodo.json` declares software/open/MIT metadata and links the frozen R reference DOI `10.5281/zenodo.21434608` as `isDerivedFrom`.
+- [x] README/site distinguish stable `0.1.1`, development `0.1.2.dev0`, R-reference DOI and future Python DOI.
+- [x] Release workflow validates archival metadata before building a stable release.
+- [ ] Promote `0.1.2.dev0` to stable `0.1.2` only after the development tranche is intentionally frozen.
+- [ ] Create annotated `v0.1.2` only from the exact fully validated stable commit.
+- [ ] Wait for Zenodo to ingest the GitHub release and confirm the software record is published.
+- [ ] Record the Zenodo **version DOI** for `v0.1.2` and the software **concept DOI**.
+- [ ] Add the Python concept DOI badge/link to README and documentation; add the release DOI to release-specific citation metadata where appropriate.
+- [ ] Verify the Zenodo record preserves the R-reference `isDerivedFrom` relation without presenting the R DOI as the Python DOI.
+- [ ] Verify Software Heritage archival status once Zenodo reports it under external resources.

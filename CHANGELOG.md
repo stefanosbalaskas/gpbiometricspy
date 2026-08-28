@@ -7,7 +7,8 @@
 - exposes all 26 executable article companions directly in MkDocs navigation rather than hiding them behind a single migration catalog;
 - adds reproducible documentation-figure generation to the docs workflow and a manifest for the generated gallery assets;
 - adds optional tutorial figure export through `GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR`;
-- keeps stable `v0.1.1` immutable while advancing `main` to `0.1.2.dev0`.
+- keeps stable `v0.1.1` immutable while advancing `main` to `0.1.2.dev0`;
+- adds Zenodo-ready archival metadata, ORCID/affiliation citation metadata, explicit provenance to the archived R `gpbiometrics 2.0.0` DOI, live CI/docs/security badges, and repository-front hardening metadata.
 
 ## 0.1.1 — 2026-08-28 — deep-validation and documentation release
 

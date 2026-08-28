@@ -63,6 +63,7 @@ nav:
       - Private real-data validation: real-data-validation.md
       - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
+  - Citation & archival: citation.md
   - API reference: api/reference.md
   - Development: development.md
 

@@ -52,6 +52,36 @@ jobs:
               raise SystemExit(f"Tag/version mismatch: {os.environ['RELEASE_TAG']} vs {project['version']}")
           PY
 
+      - name: Verify archival metadata
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          zenodo = json.loads(Path('.zenodo.json').read_text(encoding='utf-8'))
+          if zenodo.get('upload_type') != 'software':
+              raise SystemExit('Zenodo metadata must declare upload_type=software')
+          if zenodo.get('access_right') != 'open':
+              raise SystemExit('Zenodo metadata must declare open access')
+          if zenodo.get('license') != 'mit':
+              raise SystemExit('Zenodo metadata must declare the MIT license')
+          creators = zenodo.get('creators', [])
+          if not creators or creators[0].get('orcid') != '0000-0003-2444-9796':
+              raise SystemExit('Zenodo creator ORCID is missing or incorrect')
+          expected = {
+              'identifier': 'https://doi.org/10.5281/zenodo.21434608',
+              'relation': 'isDerivedFrom',
+          }
+          if expected not in zenodo.get('related_identifiers', []):
+              raise SystemExit('Frozen R reference DOI provenance is missing')
+
+          cff = Path('CITATION.cff').read_text(encoding='utf-8')
+          if 'https://orcid.org/0000-0003-2444-9796' not in cff:
+              raise SystemExit('CITATION.cff ORCID is missing')
+          if '10.5281/zenodo.21434608' in cff:
+              raise SystemExit('R reference DOI must not be presented as the Python software identifier')
+          PY
+
       - name: Require successful validation runs on exact main commit
         env:
           GH_TOKEN: ${{ github.token }}

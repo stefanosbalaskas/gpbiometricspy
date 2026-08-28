@@ -117,3 +117,42 @@ def test_reference_docs_generator_preserves_curated_articles():
     index = (ROOT / "docs/articles/index.md").read_text(encoding="utf-8")
     assert "# Articles and tutorials" in index
     assert "All **26** frozen R vignette/article sources" in index
+
+
+def test_archival_metadata_is_zenodo_ready_and_unambiguous():
+    zenodo = json.loads((ROOT / ".zenodo.json").read_text(encoding="utf-8"))
+    assert zenodo["upload_type"] == "software"
+    assert zenodo["access_right"] == "open"
+    assert zenodo["license"] == "mit"
+    assert zenodo["creators"] == [
+        {
+            "name": "Balaskas, Stefanos",
+            "orcid": "0000-0003-2444-9796",
+            "affiliation": "University of Patras",
+        }
+    ]
+    related = zenodo["related_identifiers"]
+    assert {
+        "identifier": "https://doi.org/10.5281/zenodo.21434608",
+        "relation": "isDerivedFrom",
+    } in related
+    # Do not hard-code a future Python DOI before Zenodo actually mints it.
+    assert all("gpbiometricspy" not in item["identifier"].lower() for item in related)
+
+    cff = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+    assert 'orcid: "https://orcid.org/0000-0003-2444-9796"' in cff
+    assert 'affiliation: "University of Patras"' in cff
+    assert "version: 0.1.1" in cff
+    assert "10.5281/zenodo.21434608" not in cff  # R DOI is provenance, not Python identifier.
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "GitHub integration enabled" in readme
+    assert "does not yet have" in readme
+    assert "10.5281/zenodo.21434608" in readme
+    assert (ROOT / "docs/citation.md").exists()
+    assert "Citation & archival: citation.md" in (ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+
+
+def test_frozen_r_reference_is_excluded_from_github_language_statistics():
+    attrs = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert "reference/** linguist-detectable=false" in attrs

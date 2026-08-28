@@ -65,10 +65,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/stefanosbalaskas/gpbiometricspy"
+Homepage = "https://stefanosbalaskas.github.io/gpbiometricspy/"
 Repository = "https://github.com/stefanosbalaskas/gpbiometricspy"
 Documentation = "https://stefanosbalaskas.github.io/gpbiometricspy/"
 RReference = "https://stefanosbalaskas.github.io/gpbiometrics/"
+RReferenceDOI = "https://doi.org/10.5281/zenodo.21434608"
 Issues = "https://github.com/stefanosbalaskas/gpbiometricspy/issues"
 PyPI = "https://pypi.org/project/gpbiometricspy/"
 

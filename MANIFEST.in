@@ -3,6 +3,7 @@ include LICENSE
 include VALIDATION.md
 include CHANGELOG.md
 include CITATION.cff
+include .zenodo.json
 include mkdocs.yml
 recursive-include reference *.csv *.json *.R *.Rd *.Rmd *.md *.yml *.cff *.txt
 recursive-include tests *.py

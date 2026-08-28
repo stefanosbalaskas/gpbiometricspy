@@ -2,13 +2,26 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gpbiometricspy.svg)](https://pypi.org/project/gpbiometricspy/)
 [![Python](https://img.shields.io/pypi/pyversions/gpbiometricspy.svg)](https://pypi.org/project/gpbiometricspy/)
-
+[![GitHub release](https://img.shields.io/github/v/release/stefanosbalaskas/gpbiometricspy)](https://github.com/stefanosbalaskas/gpbiometricspy/releases/latest)
+[![Tests](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml)
+[![Docs](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml)
+[![CodeQL](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Zenodo integration](https://img.shields.io/badge/Zenodo-enabled-1682D4?logo=zenodo&logoColor=white)](https://zenodo.org/)
 
 `gpbiometricspy` is the Python counterpart of **gpbiometrics**, with the supplied
 **gpbiometrics 2.0.0** source release frozen as its initial semantic reference.
 It provides Gazepoint-native tools for importing, validating, preprocessing,
 analysing, plotting, modelling, synchronising, and reporting biometric and
 multimodal eye-tracking data.
+
+| Channel | Current state |
+|---|---|
+| Stable PyPI / GitHub release | **0.1.1** |
+| Development branch | **0.1.2.dev0** |
+| Frozen R semantic reference | **gpbiometrics 2.0.0** |
+| Export parity | **406 / 406 implemented; 0 pending** |
+| Zenodo | **GitHub integration enabled; Python DOI will be minted by the next stable release** |
 
 ## Parity status
 
@@ -112,6 +125,24 @@ features; they do **not** directly establish emotion, stress, cognition,
 preference, health status, or diagnosis. Pupil measurements remain sensitive
 to luminance and visual context, and respiration estimates derived from PPG or
 other surrogate channels are proxies unless independently validated.
+
+## Archival and citation
+
+The repository is connected to the Zenodo GitHub integration. The existing
+`v0.1.1` release predates that connection, so **gpbiometricspy does not yet have
+its own Zenodo DOI**. The next stable GitHub release will be the first Python
+release eligible for automatic Zenodo archival and DOI registration.
+
+The frozen R semantic reference is archived independently as **gpbiometrics
+2.0.0**, DOI **[10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)**.
+That DOI documents the R source/provenance and must not be presented as the
+Python package DOI.
+
+Citation metadata is maintained in [`CITATION.cff`](CITATION.cff), while
+Zenodo-specific archival metadata and the explicit R-reference relationship are
+maintained in [`.zenodo.json`](.zenodo.json). After the first Zenodo-backed
+Python release, the resulting Python concept/version DOI will be added here and
+to the documentation.
 
 ## Reference precedence
 
