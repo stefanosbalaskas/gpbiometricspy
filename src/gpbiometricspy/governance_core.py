@@ -7,7 +7,7 @@ import pandas as pd
 
 _LOG_COLS=['decision_id','timestamp','stage','object_type','object_id','decision','reason','function_name','parameter','value','reviewer_note']
 def create_gazepoint_analysis_decision_log(study_id=None,analyst=None,description=None):
- d=pd.DataFrame({c:pd.Series(dtype='object') for c in _LOG_COLS});d.attrs.update(study_id=study_id,analyst=analyst,description=description,created_at=datetime.now(timezone.utc).isoformat(),package_version='0.1.1',gazepoint_analysis_decision_log=True);return d
+ d=pd.DataFrame({c:pd.Series(dtype='object') for c in _LOG_COLS});d.attrs.update(study_id=study_id,analyst=analyst,description=description,created_at=datetime.now(timezone.utc).isoformat(),package_version='0.1.2.dev0',gazepoint_analysis_decision_log=True);return d
 
 def _valstr(v):
  if isinstance(v,dict):return '; '.join(f'{k}={v[k]}' for k in v)

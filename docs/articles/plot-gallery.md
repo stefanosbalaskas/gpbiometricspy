@@ -77,3 +77,26 @@ from __future__ import annotations
 from _shared import *
 d=demo(600); q=gp.audit_gazepoint_gsr_quality(d,value_column='GSR_US'); figs=[gp.plot_gazepoint_missingness(d,cols=['GSR_US','HR','IBI'],time_col='TIME'),gp.plot_gazepoint_biometric_signals(d,signal_cols=['GSR_US','HR'],time_col='TIME'),gp.plot_gazepoint_multimodal_timeline(d,time_col='TIME',signal_cols=['GSR_US','HR','LPMM'],group_cols=['participant_id'])]; finish('plot-gallery',quality=q,figures=figs)
 ```
+
+
+## Rendered Python output
+
+These figures are generated from bundled synthetic/public data by `scripts/generate_docs_gallery.py` using the current Python plotting API.
+
+### EDA decomposition
+
+![EDA decomposition](../assets/generated/eda-decomposition.png)
+
+### PPG peak detection
+
+![PPG peak detection](../assets/generated/ppg-peak-detection.png)
+
+### AOI-linked biometrics
+
+![AOI-linked biometrics](../assets/generated/aoi-biometrics.png)
+
+### Multimodal timeline
+
+![Multimodal timeline](../assets/generated/multimodal-timeline.png)
+
+See the dedicated [visual Plot gallery](../plot-gallery.md) for the complete generated collection.

@@ -1,6 +1,6 @@
-# Article migration catalog
+# Articles and tutorials
 
-All **26** frozen R vignette/article sources have a Python migration companion **and an executable Python workflow** under `examples/tutorials/`. The test suite executes every companion so documentation examples cannot silently rot.
+All **26** frozen R vignette/article sources have a Python companion **and an executable Python workflow** under `examples/tutorials/`. Each article is linked individually in the site navigation, and the test suite executes every companion so examples cannot silently rot. For rendered figures, start with the [Plot gallery](../plot-gallery.md) or the [domain examples](../examples/index.md).
 
 | Article | Python companion | Frozen R source | Referenced exports |
 |---|---|---|---:|

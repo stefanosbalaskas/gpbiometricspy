@@ -1,0 +1,57 @@
+:root {
+  --gp-card-border: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.gp-hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.gp-card {
+  border: 1px solid var(--gp-card-border);
+  border-radius: 0.7rem;
+  padding: 1rem;
+  background: var(--md-default-bg-color);
+}
+
+.gp-card h3 {
+  margin-top: 0;
+}
+
+.gp-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.2rem;
+  align-items: start;
+  margin: 1rem 0 2rem;
+}
+
+.gp-gallery figure {
+  margin: 0;
+  border: 1px solid var(--gp-card-border);
+  border-radius: 0.7rem;
+  padding: 0.75rem;
+  background: var(--md-default-bg-color);
+}
+
+.gp-gallery img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0.35rem;
+}
+
+.gp-gallery figcaption {
+  margin-top: 0.65rem;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.gp-version-note {
+  border-left: 0.25rem solid var(--md-primary-fg-color);
+  padding: 0.7rem 1rem;
+  margin: 1rem 0;
+  background: color-mix(in srgb, var(--md-primary-fg-color) 7%, transparent);
+}

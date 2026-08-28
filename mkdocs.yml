@@ -3,26 +3,73 @@ site_description: Python port of gpbiometrics 2.0.0 for Gazepoint biometric work
 site_url: https://stefanosbalaskas.github.io/gpbiometricspy/
 repo_url: https://github.com/stefanosbalaskas/gpbiometricspy
 repo_name: stefanosbalaskas/gpbiometricspy
+
 theme:
   name: material
   features:
+    - navigation.tabs
     - navigation.sections
     - navigation.indexes
+    - navigation.top
     - content.code.copy
+
+extra_css:
+  - stylesheets/extra.css
+
 nav:
   - Home: index.md
   - Getting started: getting-started.md
+  - Examples:
+      - Overview: examples/index.md
+      - EDA / GSR / SCR: examples/eda-scr.md
+      - PPG / HRV: examples/ppg-hrv.md
+      - Pupil / gaze / AOI: examples/pupil-gaze.md
+      - Multimodal alignment: examples/multimodal.md
+      - Quality control + reporting: examples/quality-reporting.md
+      - Interoperability: examples/interoperability.md
+  - Plot gallery: plot-gallery.md
+  - Articles:
+      - Overview: articles/index.md
+      - Article roadmap: articles/article-roadmap.md
+      - BIDS export workflow: articles/bids-export-workflow.md
+      - Cluster-permutation workflow: articles/cluster-permutation.md
+      - Design audit workflow: articles/design-audit-workflow.md
+      - Design release visual audit: articles/design-release-visual-audit.md
+      - EDA and SCR visual diagnostics: articles/eda-scr-visual-diagnostics.md
+      - EDA, GSR and SCR workflow: articles/eda-scr-workflow.md
+      - Event alignment and AOI-linked biometrics: articles/event-alignment-aoi-workflow.md
+      - Eye-tracking ecosystem bridges: articles/eye-tracking-ecosystem-bridges.md
+      - gp3tools compatibility: articles/gp3tools-compatibility.md
+      - gpbiometrics workflow: articles/gpbiometrics-workflow.md
+      - Interoperability version testing: articles/interoperability-version-testing.md
+      - MNE, EEG and LSL workflow: articles/mne-eeg-lsl-workflow.md
+      - Multimodal event dashboard: articles/multimodal-event-dashboard.md
+      - Original plot-gallery companion: articles/plot-gallery.md
+      - PPG and HRV visual diagnostics: articles/ppg-hrv-visual-diagnostics.md
+      - PPG, IBI, HRV and respiration: articles/ppg-hrv-workflow.md
+      - Private real-data smoke testing: articles/private-real-data-smoke-testing.md
+      - Pupil and gaze QC: articles/pupil-qc-workflow.md
+      - Quality-control workflow: articles/qc-workflow.md
+      - Reporting and reproducibility: articles/reporting-reproducibility-workflow.md
+      - Synthetic data showcase: articles/synthetic-data-showcase.md
+      - External toolbox bridges: articles/toolbox-bridges-workflow.md
+      - Toolbox crosscheck visuals: articles/toolbox-crosscheck-visuals.md
+      - Troubleshooting readiness: articles/troubleshooting-readiness.md
+      - Visual QC dashboard: articles/visual-qc-dashboard-workflow.md
   - Synthetic demo: demo.md
-  - Parity & validation: parity.md
-  - Deep validation: deep-validation.md
-  - Private real-data validation: real-data-validation.md
-  - Interpretation guardrails: interpretation.md
+  - Validation:
+      - Parity & validation: parity.md
+      - Deep validation: deep-validation.md
+      - Private real-data validation: real-data-validation.md
+      - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
   - API reference: api/reference.md
-  - Article migration catalog: articles/index.md
   - Development: development.md
+
 markdown_extensions:
   - admonition
+  - attr_list
+  - md_in_html
   - tables
   - toc:
       permalink: true

@@ -6,7 +6,7 @@ import gpbiometricspy as gp
 ROOT=Path(__file__).resolve().parents[1]
 
 def test_development_version_and_stable_contract():
-    assert gp.__version__=='0.1.1'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
+    assert gp.__version__=='0.1.2.dev0'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
 
 def test_golden_manifest_and_python_generation(tmp_path):
     manifest=json.loads((ROOT/'reference/golden/manifest.json').read_text()); assert len(manifest['cases'])>=15
@@ -62,3 +62,44 @@ def test_optional_backend_compatibility_dependencies_are_declared():
     assert 'peakutils>=1.3.4' in workflow
     assert 'setuptools>=77,<82' in workflow
     assert 'nolds<0.6.3' in workflow
+
+
+def test_visual_documentation_surface_is_committed_and_navigable():
+    manifest_path=ROOT/'docs/assets/generated/manifest.json'
+    manifest=json.loads(manifest_path.read_text())
+    assert manifest['package_version']=='0.1.2.dev0'
+    assert len(manifest['figures'])==13
+    for entry in manifest['figures']:
+        image=ROOT/'docs/assets/generated'/entry['file']
+        assert image.suffix=='.png'
+        assert image.exists(), entry['file']
+        assert image.stat().st_size>1000, entry['file']
+
+    required_pages=[
+        'docs/plot-gallery.md',
+        'docs/examples/index.md',
+        'docs/examples/eda-scr.md',
+        'docs/examples/ppg-hrv.md',
+        'docs/examples/pupil-gaze.md',
+        'docs/examples/multimodal.md',
+        'docs/examples/quality-reporting.md',
+        'docs/examples/interoperability.md',
+    ]
+    for rel in required_pages:
+        assert (ROOT/rel).exists(), rel
+
+    nav=(ROOT/'mkdocs.yml').read_text()
+    assert 'Plot gallery: plot-gallery.md' in nav
+    assert 'Examples:' in nav
+    assert 'Articles:' in nav
+    article_pages=list((ROOT/'docs/articles').glob('*.md'))
+    assert len([p for p in article_pages if p.name!='index.md'])==26
+    for page in article_pages:
+        if page.name!='index.md':
+            assert f'articles/{page.name}' in nav
+
+
+def test_docs_workflow_regenerates_visual_gallery():
+    workflow=(ROOT/'.github/workflows/docs.yml').read_text()
+    assert 'scripts/generate_docs_gallery.py' in workflow
+    assert "len(d['figures']) == 13" in workflow

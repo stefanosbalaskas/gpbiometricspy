@@ -74,6 +74,16 @@ hrv = gp.run_gazepoint_pyhrv_style(
 The demo is **fully synthetic** and is intended only for examples, testing,
 and reproducible workflow demonstrations.
 
+## Documentation, examples and plots
+
+The documentation site now exposes the package as a complete scientific workflow rather than only an API catalog:
+
+- [Examples](https://stefanosbalaskas.github.io/gpbiometricspy/examples/) — EDA/SCR, PPG/HRV, pupil/gaze/AOI, multimodal, QC/reporting and interoperability;
+- [Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/) — figures generated directly by the Python plotting API from bundled synthetic/public data;
+- [Articles and tutorials](https://stefanosbalaskas.github.io/gpbiometricspy/articles/) — all 26 frozen R vignette/article companions, each backed by executable Python code;
+- [API reference](https://stefanosbalaskas.github.io/gpbiometricspy/api/reference/) — all 406 exported functions.
+
+
 ## Deep validation layers
 
 Beyond the 406/406 export freeze, development on `main` includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, 26 executable Python article companions, and a privacy-preserving real-data validation CLI. See the documentation site for the distinction between API parity and deeper cross-runtime/backend evidence.

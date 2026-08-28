@@ -50,3 +50,20 @@ d=demo(900); dec=gp.decompose_gazepoint_eda(d,signal_col='GSR_US',time_col='TIME
 ev=gp.detect_gazepoint_scr_events(dec,phasic_col='eda_phasic',time_col='TIME',group_cols=['participant_id'],min_peak_distance=10)
 fig1=gp.plot_gazepoint_eda_decomposition(dec,time_col='TIME',signal_cols=['GSR_US','eda_tonic','eda_phasic'],group_cols=['participant_id']); finish('eda-scr-visual-diagnostics',decomposition=dec,events=ev,figure=fig1)
 ```
+
+
+## Rendered Python output
+
+These figures are generated from bundled synthetic/public data by `scripts/generate_docs_gallery.py` using the current Python plotting API.
+
+### EDA decomposition
+
+![EDA decomposition](../assets/generated/eda-decomposition.png)
+
+### Detected SCR events
+
+![Detected SCR events](../assets/generated/scr-events.png)
+
+### EDA-gram
+
+![EDA-gram](../assets/generated/eda-gram.png)
