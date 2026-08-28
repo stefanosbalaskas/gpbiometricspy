@@ -7,7 +7,7 @@
 [![Docs](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml)
 [![CodeQL](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Zenodo integration](https://img.shields.io/badge/Zenodo-enabled-1682D4?logo=zenodo&logoColor=white)](https://zenodo.org/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22150872.svg)](https://doi.org/10.5281/zenodo.22150872)
 
 `gpbiometricspy` is the Python counterpart of **gpbiometrics**, with the supplied
 **gpbiometrics 2.0.0** source release frozen as its initial semantic reference.
@@ -17,11 +17,12 @@ multimodal eye-tracking data.
 
 | Channel | Current state |
 |---|---|
-| Stable release target | **0.1.2** |
-| Release source | **`main` frozen at 0.1.2** |
+| Stable PyPI / GitHub release | **0.1.2** |
+| Development branch | **0.1.3.dev0** |
 | Frozen R semantic reference | **gpbiometrics 2.0.0** |
 | Export parity | **406 / 406 implemented; 0 pending** |
-| Zenodo | **GitHub integration enabled; 0.1.2 is the first DOI-producing Python release** |
+| Zenodo concept DOI | **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)** |
+| Zenodo 0.1.2 version DOI | **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)** |
 
 ## Parity status
 
@@ -128,21 +129,15 @@ other surrogate channels are proxies unless independently validated.
 
 ## Archival and citation
 
-The repository is connected to the Zenodo GitHub integration. The existing
-`v0.1.1` release predates that connection. **`v0.1.2` is the first Python
-release configured for automatic Zenodo archival and DOI registration.** The
-version and concept DOI are added to the repository front after Zenodo finishes
-processing the GitHub release; no DOI is pre-invented in the release source.
+`gpbiometricspy 0.1.2` is the first Python release archived automatically through the Zenodo GitHub integration.
 
-The frozen R semantic reference is archived independently as **gpbiometrics
-2.0.0**, DOI **[10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)**.
-That DOI documents the R source/provenance and must not be presented as the
-Python package DOI.
+- **Version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
+- **Concept DOI (all gpbiometricspy versions):** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
+- **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 
-Citation metadata is maintained in [`CITATION.cff`](CITATION.cff), while
-Zenodo-specific archival metadata and the explicit R-reference relationship are
-maintained in [`.zenodo.json`](.zenodo.json). After Zenodo processes `v0.1.2`, the resulting Python concept/version DOI is
-added here and to the documentation.
+For reproducible citation of analyses, cite the **version DOI** corresponding to the software release used. Use the **concept DOI** when referring to the evolving `gpbiometricspy` software family.
+
+The R DOI remains separate provenance and is recorded in `.zenodo.json` as `isDerivedFrom`; it is not the Python package DOI. GitHub citation metadata are maintained in [`CITATION.cff`](CITATION.cff).
 
 ## Reference precedence
 

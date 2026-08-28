@@ -40,9 +40,9 @@
 - [x] README/site clearly distinguished stable `0.1.1` from development `0.1.2.dev0` during preparation; the stable freeze now identifies `0.1.2` as the release source.
 - [x] Release workflow validates archival metadata before building a stable release.
 - [x] Promote `0.1.2.dev0` to stable `0.1.2` only after the development tranche is intentionally frozen.
-- [ ] Create annotated `v0.1.2` only from the exact fully validated stable commit.
-- [ ] Wait for Zenodo to ingest the GitHub release and confirm the software record is published.
-- [ ] Record the Zenodo **version DOI** for `v0.1.2` and the software **concept DOI**.
-- [ ] Add the Python concept DOI badge/link to README and documentation; add the release DOI to release-specific citation metadata where appropriate.
-- [ ] Verify the Zenodo record preserves the R-reference `isDerivedFrom` relation without presenting the R DOI as the Python DOI.
+- [x] Create annotated `v0.1.2` only from the exact fully validated stable commit.
+- [x] Wait for Zenodo to ingest the GitHub release and confirm the software record is published.
+- [x] Record the Zenodo **version DOI** `10.5281/zenodo.22150873` for `v0.1.2` and software **concept DOI** `10.5281/zenodo.22150872`.
+- [x] Add the Python concept DOI badge/link to README and documentation; add the release DOI to release-specific citation metadata where appropriate.
+- [x] Verify the Zenodo record preserves the R-reference `isDerivedFrom` relation without presenting the R DOI as the Python DOI.
 - [ ] Verify Software Heritage archival status once Zenodo reports it under external resources.

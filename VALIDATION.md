@@ -94,3 +94,12 @@ The 0.1.2 tranche adds documentation, archival metadata and repository hardening
 - `CITATION.cff` and `.zenodo.json` synchronized to **0.1.2**;
 - the R `gpbiometrics 2.0.0` DOI `10.5281/zenodo.21434608` preserved only as `isDerivedFrom` provenance;
 - no Python DOI claimed until Zenodo actually ingests the published `v0.1.2` GitHub release.
+
+## Stable 0.1.2 public release and archival evidence
+
+- immutable GitHub tag: `v0.1.2`;
+- public PyPI release: `gpbiometricspy 0.1.2`;
+- Zenodo version DOI: `10.5281/zenodo.22150873`;
+- Zenodo concept DOI: `10.5281/zenodo.22150872`;
+- frozen R reference DOI remains separate: `10.5281/zenodo.21434608` with `isDerivedFrom` provenance;
+- public release artifacts, exact-commit CI, documentation, PyPI installation and Zenodo ingestion were verified before returning `main` to development.

@@ -27,7 +27,7 @@
 - all 26 curated executable article companions preserved through docs generation;
 - Zenodo integration enabled with versioned `.zenodo.json` and explicit R-reference provenance;
 - GitHub About/topics/language metadata and non-disruptive `main` protection;
-- stable `0.1.2` release source frozen pending exact-commit CI, GitHub/PyPI publication and Zenodo DOI capture.
+- stable `v0.1.2` released to GitHub/PyPI and archived at Zenodo version DOI `10.5281/zenodo.22150873` under concept DOI `10.5281/zenodo.22150872`.
 
 ## Longer-term work
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gpbiometricspy"
-version = "0.1.2"
+version = "0.1.3.dev0"
 description = "Python port of gpbiometrics 2.0.0 for Gazepoint biometric workflows"
 readme = "README.md"
 license = "MIT"
@@ -70,6 +70,8 @@ Repository = "https://github.com/stefanosbalaskas/gpbiometricspy"
 Documentation = "https://stefanosbalaskas.github.io/gpbiometricspy/"
 RReference = "https://stefanosbalaskas.github.io/gpbiometrics/"
 RReferenceDOI = "https://doi.org/10.5281/zenodo.21434608"
+DOI = "https://doi.org/10.5281/zenodo.22150872"
+VersionDOI = "https://doi.org/10.5281/zenodo.22150873"
 Issues = "https://github.com/stefanosbalaskas/gpbiometricspy/issues"
 PyPI = "https://pypi.org/project/gpbiometricspy/"
 
