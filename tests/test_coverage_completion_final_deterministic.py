@@ -101,8 +101,24 @@ def test_final_deterministic_remaining_success_paths():
         # line belongs to smooth_gazepoint_ppg? verify if exposed here via current source function below
         m.summarise_gazepoint_hrv_features(pd.DataFrame({'IBI':[1,1,1]}), sampling_rate_hz=0) if 'sampling_rate_hz' in m.summarise_gazepoint_hrv_features.__code__.co_varnames else (_ for _ in ()).throw(ValueError('Invalid sampling'))
 
-def test_main_sequence_smoother_success_and_random_scr_generation():
+def test_main_sequence_smoother_success_and_random_scr_generation(monkeypatch):
     d=pd.DataFrame({'amplitude':[1.,2.,3.,4.,5.], 'peak_velocity':[100.,180.,250.,300.,340.]})
+    real_import=builtins.__import__
+
+    class FakeLowessModule:
+        @staticmethod
+        def lowess(y,x,return_sorted=True):
+            x=np.asarray(x)
+            y=np.asarray(y)
+            order=np.argsort(x)
+            return np.column_stack([x[order],y[order]])
+
+    def fake_import(name,*args,**kwargs):
+        if name=='statsmodels.nonparametric.smoothers_lowess':
+            return FakeLowessModule()
+        return real_import(name,*args,**kwargs)
+
+    monkeypatch.setattr(builtins,'__import__',fake_import)
     out=m.plot_gazepoint_saccade_main_sequence(d,add_smoother=True)
     assert len(out['figure'].axes[0].lines)>=1
     sim=m.simulate_gazepoint_biometrics(n_seconds=12,sampling_rate=10,scr_onsets=None,scr_rate_per_min=5,seed=3)
