@@ -15,16 +15,55 @@ jobs:
           python-version: '3.13'
       - run: python -m pip install -e ".[docs]"
       - run: PYTHONPATH=src python scripts/generate_reference_docs.py
-      - run: |
+      - name: Validate generated API and curated articles
+        run: |
           python - <<'PY'
           from pathlib import Path
+
+          api = Path("docs/api")
+          domains = [
+              "eda-scr",
+              "ppg-hrv",
+              "pupil-gaze-aoi",
+              "alignment-multimodal",
+              "qc-reporting",
+              "statistics-design",
+              "interoperability",
+              "core-io",
+          ]
+          required_api = [api / "index.md", api / "reference.md"] + [
+              api / f"{slug}.md" for slug in domains
+          ]
+          for page in required_api:
+              assert page.exists(), page
+
+          reference = (api / "reference.md").read_text(encoding="utf-8")
+          assert reference.count("\n## `") == 406
+          index = (api / "index.md").read_text(encoding="utf-8")
+          assert "data-api-filter" in index
+          assert "406 functions" in index
+
+          domain_total = 0
+          for slug in domains:
+              text = (api / f"{slug}.md").read_text(encoding="utf-8")
+              assert "## Functions" in text, slug
+              line = next(
+                  line for line in text.splitlines()
+                  if line.startswith("**") and " functions**" in line
+              )
+              domain_total += int(line.split("**", 2)[1].split()[0])
+          assert domain_total == 406, domain_total
+
           articles = sorted(Path("docs/articles").glob("*.md"))
           companions = [p for p in articles if p.name != "index.md"]
           assert len(companions) == 26, len(companions)
-          assert all("## Executable Python companion" in p.read_text(encoding="utf-8") for p in companions)
-          index = Path("docs/articles/index.md").read_text(encoding="utf-8")
-          assert "# Articles and tutorials" in index
-          assert "All **26** frozen R vignette/article sources" in index
+          assert all(
+              "## Executable Python companion" in p.read_text(encoding="utf-8")
+              for p in companions
+          )
+          article_index = Path("docs/articles/index.md").read_text(encoding="utf-8")
+          assert "# Articles and tutorials" in article_index
+          assert "All **26** frozen R vignette/article sources" in article_index
           PY
       - name: Validate citation and Zenodo metadata
         run: |

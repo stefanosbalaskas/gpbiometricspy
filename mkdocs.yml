@@ -56,6 +56,10 @@ extra:
 
 extra_css:
   - stylesheets/extra.css
+  - stylesheets/api.css
+
+extra_javascript:
+  - javascripts/api-filter.js
 
 nav:
   - Home: index.md
@@ -64,52 +68,70 @@ nav:
       - Workflow map: workflows.md
       - Synthetic demo: demo.md
   - Workflows:
-      - Overview: examples/index.md
-      - EDA / GSR / SCR: examples/eda-scr.md
-      - PPG / HRV: examples/ppg-hrv.md
-      - Pupil / gaze / AOI: examples/pupil-gaze.md
-      - Multimodal alignment: examples/multimodal.md
-      - Quality control + reporting: examples/quality-reporting.md
-      - Interoperability: examples/interoperability.md
+      - Workflow map: workflows.md
+      - Examples:
+          - Overview: examples/index.md
+          - EDA / GSR / SCR: examples/eda-scr.md
+          - PPG / HRV: examples/ppg-hrv.md
+          - Pupil / gaze / AOI: examples/pupil-gaze.md
+          - Multimodal alignment: examples/multimodal.md
+          - Quality control + reporting: examples/quality-reporting.md
+          - Interoperability: examples/interoperability.md
   - Gallery: plot-gallery.md
   - Articles:
       - Overview: articles/index.md
-      - Article roadmap: articles/article-roadmap.md
-      - BIDS export workflow: articles/bids-export-workflow.md
-      - Cluster-permutation workflow: articles/cluster-permutation.md
-      - Design audit workflow: articles/design-audit-workflow.md
-      - Design release visual audit: articles/design-release-visual-audit.md
-      - EDA and SCR visual diagnostics: articles/eda-scr-visual-diagnostics.md
-      - EDA, GSR and SCR workflow: articles/eda-scr-workflow.md
-      - Event alignment and AOI-linked biometrics: articles/event-alignment-aoi-workflow.md
-      - Eye-tracking ecosystem bridges: articles/eye-tracking-ecosystem-bridges.md
-      - gp3tools compatibility: articles/gp3tools-compatibility.md
-      - gpbiometrics workflow: articles/gpbiometrics-workflow.md
-      - Interoperability version testing: articles/interoperability-version-testing.md
-      - MNE, EEG and LSL workflow: articles/mne-eeg-lsl-workflow.md
-      - Multimodal event dashboard: articles/multimodal-event-dashboard.md
-      - Original plot-gallery companion: articles/plot-gallery.md
-      - PPG and HRV visual diagnostics: articles/ppg-hrv-visual-diagnostics.md
-      - PPG, IBI, HRV and respiration: articles/ppg-hrv-workflow.md
-      - Private real-data smoke testing: articles/private-real-data-smoke-testing.md
-      - Pupil and gaze QC: articles/pupil-qc-workflow.md
-      - Quality-control workflow: articles/qc-workflow.md
-      - Reporting and reproducibility: articles/reporting-reproducibility-workflow.md
-      - Synthetic data showcase: articles/synthetic-data-showcase.md
-      - External toolbox bridges: articles/toolbox-bridges-workflow.md
-      - Toolbox crosscheck visuals: articles/toolbox-crosscheck-visuals.md
-      - Troubleshooting readiness: articles/troubleshooting-readiness.md
-      - Visual QC dashboard: articles/visual-qc-dashboard-workflow.md
+      - Start + overview:
+          - Article roadmap: articles/article-roadmap.md
+          - gpbiometrics workflow: articles/gpbiometrics-workflow.md
+          - Synthetic data showcase: articles/synthetic-data-showcase.md
+          - Original plot-gallery companion: articles/plot-gallery.md
+      - EDA / SCR:
+          - EDA, GSR and SCR workflow: articles/eda-scr-workflow.md
+          - EDA and SCR visual diagnostics: articles/eda-scr-visual-diagnostics.md
+          - Toolbox crosscheck visuals: articles/toolbox-crosscheck-visuals.md
+      - PPG / HRV:
+          - PPG, IBI, HRV and respiration: articles/ppg-hrv-workflow.md
+          - PPG and HRV visual diagnostics: articles/ppg-hrv-visual-diagnostics.md
+      - Pupil / gaze / AOI:
+          - Pupil and gaze QC: articles/pupil-qc-workflow.md
+          - Eye-tracking ecosystem bridges: articles/eye-tracking-ecosystem-bridges.md
+          - Event alignment and AOI-linked biometrics: articles/event-alignment-aoi-workflow.md
+      - Design + multimodal:
+          - Multimodal event dashboard: articles/multimodal-event-dashboard.md
+          - Cluster-permutation workflow: articles/cluster-permutation.md
+          - Design audit workflow: articles/design-audit-workflow.md
+          - Design release visual audit: articles/design-release-visual-audit.md
+      - QC + reporting:
+          - Quality-control workflow: articles/qc-workflow.md
+          - Visual QC dashboard: articles/visual-qc-dashboard-workflow.md
+          - Reporting and reproducibility: articles/reporting-reproducibility-workflow.md
+          - Troubleshooting readiness: articles/troubleshooting-readiness.md
+          - Private real-data smoke testing: articles/private-real-data-smoke-testing.md
+      - Interoperability:
+          - BIDS export workflow: articles/bids-export-workflow.md
+          - MNE, EEG and LSL workflow: articles/mne-eeg-lsl-workflow.md
+          - External toolbox bridges: articles/toolbox-bridges-workflow.md
+          - Interoperability version testing: articles/interoperability-version-testing.md
+          - gp3tools compatibility: articles/gp3tools-compatibility.md
+  - API:
+      - Browse by domain: api/index.md
+      - EDA / GSR / SCR: api/eda-scr.md
+      - PPG / HRV / respiration: api/ppg-hrv.md
+      - Pupil / gaze / AOI: api/pupil-gaze-aoi.md
+      - Events / alignment / multimodal: api/alignment-multimodal.md
+      - QC / reporting / governance: api/qc-reporting.md
+      - Statistics / design / simulation: api/statistics-design.md
+      - Interoperability / exchange: api/interoperability.md
+      - Core I/O / schema: api/core-io.md
+      - Complete 406-function reference: api/reference.md
   - Validation & trust:
       - Parity & validation: parity.md
       - Deep validation: deep-validation.md
       - Private real-data validation: real-data-validation.md
       - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
-  - Citation: citation.md
-  - Reference:
-      - API reference: api/reference.md
-      - Development: development.md
+  - Citation & archival: citation.md
+  - Development: development.md
 
 markdown_extensions:
   - admonition
