@@ -77,7 +77,7 @@ nav:
           - Multimodal alignment: examples/multimodal.md
           - Quality control + reporting: examples/quality-reporting.md
           - Interoperability: examples/interoperability.md
-  - Gallery: plot-gallery.md
+  - Plot gallery: plot-gallery.md
   - Articles:
       - Overview: articles/index.md
       - Start + overview:
