@@ -247,7 +247,7 @@ def preprocess_gazepoint_scr_pspm_style(data,signal_col=None,time_col=None,sampl
     clean=sig.copy(); clean[artifact]=np.nan; clean=_interp_na(clean); processed=_running_mean(clean,max(1,int(round(smoothing_seconds*sampling_rate_hz))))
     out=d.copy(); out["scr_raw"]=sig; out["scr_clean"]=clean; out["scr_processed"]=processed; out["pspm_artifact"]=artifact; out["pspm_artifact_reason"]=reason
     artifacts=_artifact_table(time,artifact,reason)
-    summary=pd.DataFrame([{"n_samples":len(sig),"sampling_rate_hz":sampling_rate_hz,"n_artifact_samples":int(artifact.sum()),"artifact_fraction":float(artifact.mean()) if len(artifact) else np.nan,"n_artifact_epochs":len(artifacts),"mean_scr_processed":float(np.nanmean(processed)),"sd_scr_processed":float(np.nanstd(processed,ddof=1)) if np.isfinite(processed).sum()>1 else np.nan}])
+    summary=pd.DataFrame([{"n_samples":len(sig),"sampling_rate_hz":sampling_rate_hz,"n_artifact_samples":int(artifact.sum()),"artifact_fraction":float(artifact.mean()) if len(artifact) else np.nan,"n_artifact_epochs":len(artifacts),"mean_scr_processed":float(np.nanmean(processed)) if np.isfinite(processed).any() else np.nan,"sd_scr_processed":float(np.nanstd(processed,ddof=1)) if np.isfinite(processed).sum()>1 else np.nan}])
     settings={"range":tuple(range),"slope_limit_per_s":slope_limit_per_s,"clipping_tolerance":clipping_tolerance,"clipping_seconds":clipping_seconds,"min_valid_island_seconds":min_valid_island_seconds,"artifact_epoch_seconds":artifact_epoch_seconds,"smoothing_seconds":smoothing_seconds,"sampling_rate_hz":sampling_rate_hz}
     return {"signal":out,"artifacts":artifacts,"summary":summary,"settings":settings}
 

@@ -47,8 +47,6 @@ def _sample_entropy(x: np.ndarray, m: int = 2, r: float = np.nan) -> float:
 
     def matches(mm: int) -> float:
         n = len(x) - mm + 1
-        if n <= 1:
-            return np.nan
         emb = np.lib.stride_tricks.sliding_window_view(x, mm)
         count = 0
         total = 0
@@ -72,8 +70,6 @@ def _approx_entropy(x: np.ndarray, m: int = 2, r: float = np.nan) -> float:
 
     def phi(mm: int) -> float:
         emb = np.lib.stride_tricks.sliding_window_view(x, mm)
-        if len(emb) <= 1:
-            return np.nan
         ci = []
         for row in emb:
             d = np.max(np.abs(emb - row), axis=1)
@@ -95,8 +91,6 @@ def _dfa_alpha(x: np.ndarray) -> float:
     raw = np.floor(np.exp(np.linspace(np.log(4), np.log(upper), 8))).astype(int)
     scales = np.unique(raw)
     scales = scales[(scales >= 4) & (scales < n / 2)]
-    if len(scales) < 3:
-        return np.nan
     fluct = []
     used = []
     for s in scales:

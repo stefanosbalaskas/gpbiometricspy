@@ -222,17 +222,19 @@ def audit_gazepoint_signal_activity(
     for gname, idx in _group_positions(dat, groups):
         base = dat.iloc[idx[0]][groups].to_dict() if groups else {}
         for signal in signals:
-            x = pd.to_numeric(dat.iloc[idx][signal], errors="coerce").to_numpy(float)
+            source = dat.iloc[idx][signal]
+            x = pd.to_numeric(source, errors="coerce").to_numpy(float)
             numeric_or_coercible = not np.isnan(x).all()
+            source_all_missing = bool(source.isna().all())
             finite = x[np.isfinite(x)]
             nonzero = finite[finite != 0]
             n = len(x); nmiss = int(np.isnan(x).sum()); nzero = int((np.isfinite(x) & (x == 0)).sum())
             nnonzero = int((np.isfinite(x) & (x != 0)).sum())
             nuf, nunz = len(np.unique(finite)), len(np.unique(nonzero))
-            if not numeric_or_coercible:
-                status = "nonnumeric"
-            elif n == 0 or (missing_as_inactive and nmiss == n):
+            if n == 0 or (missing_as_inactive and nmiss == n and source_all_missing):
                 status = "insufficient_data"
+            elif not numeric_or_coercible:
+                status = "nonnumeric"
             elif zero_is_inactive and nnonzero == 0 and nzero > 0:
                 status = "inactive_all_zero"
             elif nuf <= 1:
@@ -541,8 +543,6 @@ def summarize_gazepoint_nonwear(nonwear, by="signal"):
     for key,piece in summary.groupby(groups, sort=False, dropna=False):
         if len(groups) == 1:
             key = key if isinstance(key, tuple) else (key,)
-        elif not isinstance(key, tuple):
-            key = (key,)
         row=dict(zip(groups,key)); ns=float(piece["n_samples"].sum()); nf=float(piece["n_flagged_samples"].sum())
         row.update({"n_signal_segments":len(piece),"n_samples_total":int(ns),"n_intervals_total":int(piece["n_intervals"].sum()),
                     "n_flagged_samples_total":int(nf),"prop_flagged_samples":nf/ns if ns>0 else np.nan,

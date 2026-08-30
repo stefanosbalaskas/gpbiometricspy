@@ -218,7 +218,7 @@ def _impute_vector(
     try:
         x = original.astype(float, copy=True)
     except (TypeError, ValueError):
-        x = pd.to_numeric(pd.Series(original), errors="coerce").to_numpy(float)
+        x = pd.to_numeric(pd.Series(original), errors="coerce").to_numpy(dtype=float, copy=True)
     if time is None:
         tt = np.arange(1, len(x) + 1, dtype=float)
     else:

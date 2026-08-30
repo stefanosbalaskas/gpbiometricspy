@@ -25,4 +25,4 @@ jobs:
       - name: Frozen export audit
         run: python scripts/audit_r_contract.py
       - name: Tests and coverage
-        run: python -m pytest -q --cov=src/gpbiometricspy --cov-report=term-missing --cov-fail-under=90
+        run: python -m pytest -q --cov=src/gpbiometricspy --cov-report=term-missing --cov-fail-under=100

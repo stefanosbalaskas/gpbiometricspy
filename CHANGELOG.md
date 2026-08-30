@@ -2,6 +2,10 @@
 
 ## 0.1.3.dev0 ??? post-release archival metadata
 
+- completes literal 100% whole-package statement coverage with behavioral, validation, fallback, and error-path tests;
+- raises the development CI statement-coverage floor from 90% to 100%;
+- fixes Windows/Pandas imputation fallback by requesting a writable NumPy copy;
+- distinguishes genuinely missing signal-activity data from nonnumeric text during QC.
 - records the Zenodo 0.1.2 version DOI `10.5281/zenodo.22150873` and software concept DOI `10.5281/zenodo.22150872`;
 - restores `main` to a development version after the immutable `v0.1.2` release;
 - keeps the R `gpbiometrics 2.0.0` DOI separate as `isDerivedFrom` provenance.

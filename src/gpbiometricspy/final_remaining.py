@@ -195,7 +195,7 @@ def _gaze_event_engine(data,time_col=None,x_col=None,y_col=None,group_cols=None,
     if any(c in df and not overwrite for c in [velocity_col,class_col,event_id_col]):raise ValueError('Output columns already exist.')
     samples=df.copy();samples[velocity_col]=np.nan;samples[class_col]='unclassified';samples[event_id_col]=pd.Series([pd.NA]*len(df),dtype='Int64')
     fix=[];sac=[];summ=[];eid=0
-    group_iter=[('all',df.index)] if not groups else df.groupby(groups,sort=False,dropna=False).groups.items()
+    group_iter=[('all',df.index)] if not groups else df.groupby(groups[0] if len(groups)==1 else groups,sort=False,dropna=False).groups.items()
     for key,index in group_iter:
         idx=np.asarray(list(index),dtype=int);ord_idx=idx[np.argsort(pd.to_numeric(df.loc[idx,time_col],errors='coerce').to_numpy(float),kind='stable')]
         t_raw=pd.to_numeric(df.loc[ord_idx,time_col],errors='coerce').to_numpy(float);tms=_time_ms(t_raw,time_unit,sampling_rate_hz);x=pd.to_numeric(df.loc[ord_idx,x_col],errors='coerce').to_numpy(float);y=pd.to_numeric(df.loc[ord_idx,y_col],errors='coerce').to_numpy(float)

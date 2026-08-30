@@ -103,3 +103,11 @@ The 0.1.2 tranche adds documentation, archival metadata and repository hardening
 - Zenodo concept DOI: `10.5281/zenodo.22150872`;
 - frozen R reference DOI remains separate: `10.5281/zenodo.21434608` with `isDerivedFrom` provenance;
 - public release artifacts, exact-commit CI, documentation, PyPI installation and Zenodo ingestion were verified before returning `main` to development.
+
+## 0.1.3.dev0 literal statement-coverage completion
+
+- Windows validation on the current development tree: **100.00% statement coverage**.
+- Coverage is enforced with `--cov-fail-under=100`.
+- Frozen R export contract remains **406 / 406 implemented; 0 pending**.
+- Completion uses executable behavioral/error-path tests and small dead-path cleanups; no `pragma: no cover`, coverage exclusion, or measurement-scope reduction is used.
+- Stable `v0.1.2` remains unchanged and immutable.

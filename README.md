@@ -31,7 +31,7 @@ The current development tree has reached the frozen R API contract:
 - **406 / 406 R exports implemented and registered**
 - **0 pending exports**
 - **200+ Python parity/edge tests**
-- **whole-package statement coverage ≥ 90%**
+- **whole-package statement coverage 100%**
 - packaged synthetic kiosk demo: **36 participants, 69,120 rows**
 - frozen R reference retained: 144 R sources, 403 Rd files, 120 R test files,
   and 26 vignette/article sources
