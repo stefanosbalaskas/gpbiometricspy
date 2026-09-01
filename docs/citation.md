@@ -17,6 +17,14 @@ Zenodo recommends the version DOI when citing a specific research artifact versi
 
 GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the file records the 0.1.2 version DOI.
 
+## Published gpbiometrics paper
+
+The peer-reviewed paper describing the original R package is:
+
+> Balaskas, S. **gpbiometrics: An R Package for Reproducible Analysis and Reporting of Gazepoint Biometrics Exports.** *Signals* **2026**, *7*, 86. [https://doi.org/10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
+
+This article documents the R `gpbiometrics` package that provides the scientific and software lineage for `gpbiometricspy`. When an analysis uses the Python package, cite the relevant `gpbiometricspy` software version as well; the R-package article is a related publication rather than a substitute for the Python software citation.
+
 ## R reference provenance
 
 The frozen semantic reference is **gpbiometrics 2.0.0**, independently archived at DOI **[10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)**.
@@ -25,7 +33,7 @@ That DOI identifies the R reference package. `.zenodo.json` preserves it with re
 
 ## Metadata files
 
-- `CITATION.cff` identifies the latest stable Python software version and its version DOI.
+- `CITATION.cff` identifies the latest stable Python software version and its version DOI, and records the published R-package paper as a related reference.
 - `.zenodo.json` provides Zenodo-specific archival metadata and the R-reference provenance relationship.
 - README and documentation use the Python concept DOI badge for the evolving software family.
 

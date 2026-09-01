@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use gpbiometricspy, please cite the software version used in your analysis and the original methodological sources for specialized analyses."
+message: "If you use gpbiometricspy, please cite the software version used in your analysis. The published gpbiometrics R-package paper is listed as a related reference."
 title: "gpbiometricspy: Python tools for Gazepoint biometric workflows"
 type: software
 abstract: >-
@@ -28,3 +28,15 @@ doi: 10.5281/zenodo.22150873
 license: MIT
 repository-code: "https://github.com/stefanosbalaskas/gpbiometricspy"
 url: "https://stefanosbalaskas.github.io/gpbiometricspy/"
+references:
+  - type: article
+    authors:
+      - family-names: Balaskas
+        given-names: Stefanos
+    title: "gpbiometrics: An R Package for Reproducible Analysis and Reporting of Gazepoint Biometrics Exports"
+    journal: "Signals"
+    year: 2026
+    volume: 7
+    issue: 5
+    doi: "10.3390/signals7050086"
+    url: "https://doi.org/10.3390/signals7050086"

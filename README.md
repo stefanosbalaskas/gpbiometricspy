@@ -17,6 +17,7 @@
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
   <a href="https://doi.org/10.5281/zenodo.22150872"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.22150872.svg"></a>
+  <a href="https://doi.org/10.3390/signals7050086"><img alt="gpbiometrics paper" src="https://img.shields.io/badge/gpbiometrics%20paper-10.3390%2Fsignals7050086-blue.svg"></a>
 </p>
 
 <p align="center">
@@ -149,8 +150,15 @@ See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation mat
 - **Version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
 - **Concept DOI (all gpbiometricspy versions):** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
 - **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
+- **Published gpbiometrics R-package paper:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
 For reproducible citation of analyses, cite the **version DOI** corresponding to the software release used. Use the **concept DOI** when referring to the evolving `gpbiometricspy` software family.
+
+The peer-reviewed paper describing the original R package is:
+
+> Balaskas, S. **gpbiometrics: An R Package for Reproducible Analysis and Reporting of Gazepoint Biometrics Exports.** *Signals* **2026**, *7*, 86. [https://doi.org/10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
+
+When using `gpbiometricspy`, cite the Python software release used in the analysis as well. The paper above documents the original R package and its scientific/software lineage; it does not replace the Python package's version-specific software citation.
 
 The R DOI remains separate provenance and is recorded in `.zenodo.json` as `isDerivedFrom`; it is not the Python package DOI. GitHub citation metadata are maintained in [`CITATION.cff`](CITATION.cff).
 
