@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/stefanosbalaskas/gpbiometricspy/main/docs/assets/python-suite-logo.png" width="260" alt="Python Suite research packages logo">
+</p>
+
 <h1 align="center">gpbiometricspy</h1>
 
 <p align="center">
