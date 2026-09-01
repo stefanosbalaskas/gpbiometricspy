@@ -9,8 +9,8 @@ copyright: Copyright &copy; 2026 Stefanos Balaskas · MIT License
 theme:
   name: material
   language: en
+  logo: assets/python-suite-logo.png
   icon:
-    logo: material/chart-timeline-variant-shimmer
     repo: fontawesome/brands/github
   palette:
     - media: "(prefers-color-scheme: light)"
