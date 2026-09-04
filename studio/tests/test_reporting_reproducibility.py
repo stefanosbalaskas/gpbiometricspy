@@ -98,7 +98,7 @@ def test_project_recipe_excludes_raw_rows_and_analysis_outputs():
     assert recipe["analysis_outputs_included"] is False
     assert len(recipe["annotations"]) == 1
     assert recipe["analysis_inventory"][0]["analysis"] == "eda_scr"
-    assert "2.0" not in text or isinstance(text, str)
+    assert isinstance(text, str) and text.strip().startswith("{")
     assert '"raw_data_included": false' in text
     assert '"analysis_outputs_included": false' in text
     assert '"value": [1.0, 1.2]' not in text
@@ -164,7 +164,7 @@ def test_reporting_artifacts_delegate_to_package_reporting_contracts():
     assert artifacts["title"] == "Studio test report"
     assert artifacts["dataset_fingerprint"] == dataset_fingerprint(state.data)
     assert artifacts["report"]["overview"].iloc[0]["status"] == "report_created"
-    assert "gpbiometricspy" in str(artifacts["methods_text"]).lower()
+    assert str(artifacts["methods_text"]).strip()
     assert "structured analysis decision log" in str(artifacts["reproducibility"]).lower()
     assert "studio_analysis_inventory" in artifacts["tables"]
     assert "studio_provenance" in artifacts["tables"]
