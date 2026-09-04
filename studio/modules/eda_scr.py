@@ -174,6 +174,14 @@ def eda_scr_server(input, output, session, state, status_text):
     def _result():
         return state().analyses.get("eda_scr")
 
+    def _preferred_summary_table() -> pd.DataFrame:
+        tables = eda_analysis_tables(_result())
+        for name in ("summary_summary", "summary_group_summary", "summary_overview"):
+            table = tables.get(name)
+            if isinstance(table, pd.DataFrame):
+                return table
+        return pd.DataFrame()
+
     @reactive.effect
     @reactive.event(input.run)
     def _run():
@@ -283,9 +291,8 @@ def eda_scr_server(input, output, session, state, status_text):
 
     @render.data_frame
     def tonic_phasic_summary():
-        tables = eda_analysis_tables(_result())
-        table = tables.get("summary_summary") or tables.get("summary_group_summary") or tables.get("summary_overview")
-        if not isinstance(table, pd.DataFrame) or table.empty:
+        table = _preferred_summary_table()
+        if table.empty:
             table = pd.DataFrame({"status": ["No tonic/phasic summary available."]})
         return render.DataGrid(table, filters=True, height="360px")
 
@@ -357,9 +364,7 @@ def eda_scr_server(input, output, session, state, status_text):
 
     @render.download_button(filename="gpbiometricspy_eda_summary.csv")
     def download_summary():
-        tables = eda_analysis_tables(_result())
-        table = tables.get("summary_summary") or tables.get("summary_group_summary") or tables.get("summary_overview") or pd.DataFrame()
-        yield table.to_csv(index=False)
+        yield _preferred_summary_table().to_csv(index=False)
 
     @render.download_button(filename="gpbiometricspy_eda_decomposition.csv")
     def download_decomposition():
