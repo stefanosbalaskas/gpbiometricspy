@@ -2,27 +2,68 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
 import pandas as pd
 
 import gpbiometricspy as gp
 
 
 EDA_CANDIDATES = [
-    "studio_eda_phasic", "studio_eda_tonic", "GSR_US", "EDA_US", "GSR", "EDA", "SKIN_CONDUCTANCE"
+    "studio_eda_phasic",
+    "studio_eda_tonic",
+    "GSR_US",
+    "EDA_US",
+    "GSR",
+    "EDA",
+    "SKIN_CONDUCTANCE",
 ]
-CARDIAC_CANDIDATES = ["HR", "HEART_RATE", "heart_rate", "HRP", "PPG", "PULSE", "BVP", "IBI", "RR", "RRI"]
+CARDIAC_CANDIDATES = [
+    "HR",
+    "HEART_RATE",
+    "heart_rate",
+    "HRP",
+    "PPG",
+    "PULSE",
+    "BVP",
+    "IBI",
+    "RR",
+    "RRI",
+]
 PUPIL_CANDIDATES = [
-    "LPD", "RPD", "LPMM", "RPMM", "pupil_left", "pupil_right", "left_pupil", "right_pupil", "pupil"
+    "LPD",
+    "RPD",
+    "LPMM",
+    "RPMM",
+    "pupil_left",
+    "pupil_right",
+    "left_pupil",
+    "right_pupil",
+    "pupil",
 ]
 GAZE_X_CANDIDATES = ["FPOGX", "BPOGX", "GPOGX", "LPOGX", "RPOGX", "gaze_x", "x"]
 GAZE_Y_CANDIDATES = ["FPOGY", "BPOGY", "GPOGY", "LPOGY", "RPOGY", "gaze_y", "y"]
 AOI_CANDIDATES = ["Studio_AOI", "AOI", "aoi", "AOI_NAME", "aoi_name", "area_of_interest"]
 TIME_CANDIDATES = ["time_s", "TIME", "time", "time_ms", "MSTIMER", "TIME_TICK", "timestamp", "CNT"]
 GROUP_CANDIDATES = [
-    "participant_id", "source_participant", "participant", "subject_id", "subject", "USER", "USERID", "session_id", "session"
+    "participant_id",
+    "source_participant",
+    "participant",
+    "subject_id",
+    "subject",
+    "USER",
+    "USERID",
+    "session_id",
+    "session",
 ]
-TRIAL_CANDIDATES = ["trial_id", "trial", "TRIAL", "stimulus_id", "stimulus", "MEDIA_ID", "MEDIA_NAME", "condition"]
+TRIAL_CANDIDATES = [
+    "trial_id",
+    "trial",
+    "TRIAL",
+    "stimulus_id",
+    "stimulus",
+    "MEDIA_ID",
+    "MEDIA_NAME",
+    "condition",
+]
 
 
 def _numeric_choices(data: pd.DataFrame | None, preferred: list[str]) -> list[str]:
@@ -52,7 +93,11 @@ def _analysis_result(analyses: dict[str, Any] | None, name: str) -> dict[str, An
     return value if isinstance(value, dict) else None
 
 
-def _eda_source(data: pd.DataFrame, analyses: dict[str, Any] | None, prefer_processed: bool) -> tuple[pd.DataFrame, str]:
+def _eda_source(
+    data: pd.DataFrame,
+    analyses: dict[str, Any] | None,
+    prefer_processed: bool,
+) -> tuple[pd.DataFrame, str]:
     result = _analysis_result(analyses, "eda_scr")
     decomposition = result.get("decomposition") if result else None
     if prefer_processed and isinstance(decomposition, pd.DataFrame) and not decomposition.empty:
@@ -60,7 +105,11 @@ def _eda_source(data: pd.DataFrame, analyses: dict[str, Any] | None, prefer_proc
     return data, "Loaded dataset"
 
 
-def _pupil_source(data: pd.DataFrame, analyses: dict[str, Any] | None, prefer_processed: bool) -> tuple[pd.DataFrame, str]:
+def _pupil_source(
+    data: pd.DataFrame,
+    analyses: dict[str, Any] | None,
+    prefer_processed: bool,
+) -> tuple[pd.DataFrame, str]:
     result = _analysis_result(analyses, "pupil")
     processed = result.get("processed_data") if result else None
     if prefer_processed and isinstance(processed, pd.DataFrame) and not processed.empty:
@@ -68,7 +117,11 @@ def _pupil_source(data: pd.DataFrame, analyses: dict[str, Any] | None, prefer_pr
     return data, "Loaded dataset"
 
 
-def _gaze_source(data: pd.DataFrame, analyses: dict[str, Any] | None, prefer_processed: bool) -> tuple[pd.DataFrame, str]:
+def _gaze_source(
+    data: pd.DataFrame,
+    analyses: dict[str, Any] | None,
+    prefer_processed: bool,
+) -> tuple[pd.DataFrame, str]:
     result = _analysis_result(analyses, "gaze")
     processed = result.get("processed_data") if result else None
     if prefer_processed and isinstance(processed, pd.DataFrame) and not processed.empty:
@@ -84,6 +137,7 @@ def multimodal_signal_choices(
 ) -> dict[str, list[str]]:
     if data is None:
         return {"eda": [], "cardiac": [], "pupil": [], "gaze_x": [], "gaze_y": [], "aoi": []}
+
     eda, _ = _eda_source(data, analyses, prefer_processed)
     pupil, _ = _pupil_source(data, analyses, prefer_processed)
     gaze, _ = _gaze_source(data, analyses, prefer_processed)
@@ -97,6 +151,7 @@ def multimodal_signal_choices(
         derived = pupil_result.get("analysis_pupil_col")
         if derived in pupil.columns and pd.api.types.is_numeric_dtype(pupil[derived]) and derived not in pupil_choices:
             pupil_choices.insert(0, derived)
+
     gaze_x_choices = _numeric_choices(gaze, GAZE_X_CANDIDATES)
     gaze_y_choices = _numeric_choices(gaze, GAZE_Y_CANDIDATES)
     if gaze_result:
@@ -106,11 +161,13 @@ def multimodal_signal_choices(
             gaze_x_choices.insert(0, derived_x)
         if derived_y in gaze.columns and derived_y not in gaze_y_choices:
             gaze_y_choices.insert(0, derived_y)
+
     aoi_choices = [c for c in AOI_CANDIDATES if c in gaze.columns]
     if gaze_result:
         derived_aoi = gaze_result.get("analysis_aoi_col")
         if derived_aoi in gaze.columns and derived_aoi not in aoi_choices:
             aoi_choices.insert(0, derived_aoi)
+
     return {
         "eda": eda_choices,
         "cardiac": cardiac_choices,
@@ -132,8 +189,7 @@ def _events_from_alignment(analyses: dict[str, Any] | None) -> pd.DataFrame:
     events = result.get("events") if result else None
     if not isinstance(events, pd.DataFrame) or events.empty:
         raise ValueError("Run Events & Alignment first so Multimodal Analysis has a validated event table.")
-    required = {"event_id", "event_time"}
-    if not required.issubset(events.columns):
+    if not {"event_id", "event_time"}.issubset(events.columns):
         raise ValueError("Events & Alignment did not retain standardized event_id/event_time columns.")
     return events.copy()
 
@@ -150,7 +206,11 @@ def _validate_group_event_scope(data: pd.DataFrame, events: pd.DataFrame, groups
             )
 
 
-def _copy_selected_processed_columns(base: pd.DataFrame, source: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+def _copy_selected_processed_columns(
+    base: pd.DataFrame,
+    source: pd.DataFrame,
+    columns: list[str],
+) -> pd.DataFrame:
     out = base.copy()
     if len(source) != len(out):
         return out
@@ -180,14 +240,14 @@ def _group_safe_event_windows(
             event_id_col="event_id",
             return_="windows",
         )
+
     blocks: list[pd.DataFrame] = []
-    event_groups = [c for c in group_cols if c in events.columns]
     grouped = data.groupby(group_cols, dropna=False, sort=False)
     for key, frame in grouped:
         values = key if isinstance(key, tuple) else (key,)
         event_subset = events.copy()
         for column, value in zip(group_cols, values):
-            if column in event_groups:
+            if column in events.columns:
                 event_subset = event_subset.loc[event_subset[column].astype(str) == str(value)]
         if event_subset.empty:
             continue
@@ -204,6 +264,17 @@ def _group_safe_event_windows(
         if not matched.empty:
             blocks.append(matched)
     return pd.concat(blocks, ignore_index=True) if blocks else pd.DataFrame()
+
+
+def _classic_window_support(data: pd.DataFrame) -> tuple[bool, list[str]]:
+    missing: list[str] = []
+    if not ({"GSR_US", "GSR"} & set(data.columns)):
+        missing.append("GSR_US/GSR")
+    if "HR" not in data.columns:
+        missing.append("HR")
+    if "DIAL" not in data.columns:
+        missing.append("DIAL")
+    return not missing, missing
 
 
 def run_multimodal_analysis(
@@ -259,13 +330,22 @@ def run_multimodal_analysis(
             return
         missing = [c for c in chosen if c not in source.columns]
         if missing:
-            raise ValueError(f"Selected {name} signal(s) are unavailable in the resolved source: {', '.join(missing)}.")
+            raise ValueError(
+                f"Selected {name} signal(s) are unavailable in the resolved source: {', '.join(missing)}."
+            )
         non_numeric = [c for c in chosen if not pd.api.types.is_numeric_dtype(source[c])]
         if non_numeric:
             raise TypeError(f"Selected {name} signal(s) must be numeric: {', '.join(non_numeric)}.")
         streams[name] = source
         signal_map[name] = chosen
-        source_rows.append({"modality": name, "source": source_name, "signals": ", ".join(chosen), "rows": len(source)})
+        source_rows.append(
+            {
+                "modality": name,
+                "source": source_name,
+                "signals": ", ".join(chosen),
+                "rows": len(source),
+            }
+        )
 
     add_stream("eda", eda_source, eda_source_name, [eda_col] if eda_col else [])
     add_stream("cardiac", data, "Loaded dataset", [cardiac_col] if cardiac_col else [])
@@ -294,19 +374,42 @@ def run_multimodal_analysis(
         "stream_sources": pd.DataFrame(source_rows),
     }
 
-    if groups:
-        result["multimodal_windows"] = gp.summarise_gazepoint_multimodal_windows(data, group_columns=groups)
-        result["model_data"] = gp.prepare_gazepoint_multimodal_model_data(data, group_columns=groups)
+    classic_ready, classic_missing = _classic_window_support(data)
+    if groups and classic_ready:
+        result["multimodal_windows"] = gp.summarise_gazepoint_multimodal_windows(
+            data,
+            group_columns=groups,
+        )
+        result["model_data"] = gp.prepare_gazepoint_multimodal_model_data(
+            data,
+            group_columns=groups,
+        )
+        result["grouped_window_status"] = pd.DataFrame(
+            [{"status": "complete", "missing_native_channels": ""}]
+        )
+    elif groups:
+        result["grouped_window_status"] = pd.DataFrame(
+            [
+                {
+                    "status": "not_applicable_partial_channels",
+                    "missing_native_channels": ", ".join(classic_missing),
+                }
+            ]
+        )
 
     if aoi_col:
         if aoi_col not in gaze_source.columns:
             raise ValueError("Selected AOI column is unavailable in the resolved gaze source.")
+        gaze_time_col = time_col if time_col in gaze_source.columns else next(
+            (c for c in TIME_CANDIDATES if c in gaze_source.columns),
+            None,
+        )
+        if gaze_time_col is None:
+            raise ValueError("The resolved gaze source has no supported time column for AOI event matching.")
         gaze_windows = _group_safe_event_windows(
             gaze_source,
             events,
-            time_col=time_col if time_col in gaze_source.columns else next(
-                (c for c in TIME_CANDIDATES if c in gaze_source.columns), time_col
-            ),
+            time_col=gaze_time_col,
             group_cols=groups,
             pre_s=float(pre_s),
             post_s=float(post_s),
@@ -314,21 +417,41 @@ def run_multimodal_analysis(
         result["aoi_event_windows"] = gaze_windows
         if not gaze_windows.empty:
             aoi_groups = [c for c in [*groups, "event_id"] if c in gaze_windows.columns]
-            aoi_signal_cols = [c for c in [eda_col, cardiac_col, pupil_col] if c and c in gaze_windows.columns]
-            result["aoi_biometrics"] = gp.summarise_gazepoint_aoi_biometrics(
-                gaze_windows,
-                aoi_col=aoi_col,
-                signal_cols=aoi_signal_cols or None,
-                group_cols=aoi_groups or None,
-                time_col="relative_time_s" if "relative_time_s" in gaze_windows.columns else None,
-                min_rows=1,
-            )
+            aoi_signal_cols = [
+                c for c in [eda_col, cardiac_col, pupil_col] if c and c in gaze_windows.columns
+            ]
+            if aoi_signal_cols:
+                result["aoi_biometrics"] = gp.summarise_gazepoint_aoi_biometrics(
+                    gaze_windows,
+                    aoi_col=aoi_col,
+                    signal_cols=aoi_signal_cols,
+                    group_cols=aoi_groups or None,
+                    time_col="relative_time_s" if "relative_time_s" in gaze_windows.columns else None,
+                    min_rows=1,
+                )
+            else:
+                result["aoi_biometrics_status"] = pd.DataFrame(
+                    [
+                        {
+                            "status": "no_selected_biometric_signal_present_in_gaze_stream",
+                            "aoi_col": aoi_col,
+                        }
+                    ]
+                )
 
     timeline = data.copy()
     timeline = _copy_selected_processed_columns(timeline, eda_source, [c for c in [eda_col] if c])
     timeline = _copy_selected_processed_columns(timeline, pupil_source, [c for c in [pupil_col] if c])
-    timeline = _copy_selected_processed_columns(timeline, gaze_source, [c for c in [gaze_x_col, gaze_y_col] if c])
-    timeline_signals = [c for c in [eda_col, cardiac_col, pupil_col, gaze_x_col, gaze_y_col] if c and c in timeline.columns]
+    timeline = _copy_selected_processed_columns(
+        timeline,
+        gaze_source,
+        [c for c in [gaze_x_col, gaze_y_col] if c],
+    )
+    timeline_signals = [
+        c
+        for c in [eda_col, cardiac_col, pupil_col, gaze_x_col, gaze_y_col]
+        if c and c in timeline.columns
+    ]
     result["timeline_data"] = timeline
     result["timeline_signal_cols"] = timeline_signals
 
@@ -350,6 +473,8 @@ def run_multimodal_analysis(
         "standardise_timeline": bool(standardise_timeline),
         "modalities": list(streams),
         "signal_map": signal_map,
+        "classic_grouped_windows_available": bool(classic_ready),
+        "classic_grouped_windows_missing": classic_missing,
     }
     return result
 
@@ -358,28 +483,43 @@ def multimodal_tables(result: dict[str, Any] | None) -> dict[str, pd.DataFrame]:
     if not result:
         return {}
     tables: dict[str, pd.DataFrame] = {}
-    for key in ["events", "stream_sources", "multimodal_windows", "model_data", "aoi_event_windows"]:
+    for key in [
+        "events",
+        "stream_sources",
+        "multimodal_windows",
+        "model_data",
+        "grouped_window_status",
+        "aoi_event_windows",
+        "aoi_biometrics_status",
+    ]:
         value = result.get(key)
         if isinstance(value, pd.DataFrame):
             tables[key] = value.copy()
+
     eventlocked = result.get("eventlocked")
     if isinstance(eventlocked, dict):
         for key in ["samples", "summary", "events"]:
             value = eventlocked.get(key)
             if isinstance(value, pd.DataFrame):
                 tables[f"eventlocked_{key}"] = value.copy()
+
     aoi = result.get("aoi_biometrics")
     if isinstance(aoi, dict):
         for key in ["overview", "summary", "signal_summary", "aoi_summary", "data"]:
             value = aoi.get(key)
             if isinstance(value, pd.DataFrame):
                 tables[f"aoi_{key}"] = value.copy()
+
     summary = tables.get("eventlocked_summary")
-    if isinstance(summary, pd.DataFrame) and not summary.empty and {"event_id", "modality", "signal", "summary_mean"}.issubset(summary.columns):
+    required = {"event_id", "modality", "signal", "summary_mean"}
+    if isinstance(summary, pd.DataFrame) and not summary.empty and required.issubset(summary.columns):
         matrix = summary.copy()
         matrix["modality_signal"] = matrix["modality"].astype(str) + ":" + matrix["signal"].astype(str)
         tables["response_matrix"] = matrix.pivot_table(
-            index="event_id", columns="modality_signal", values="summary_mean", aggfunc="first"
+            index="event_id",
+            columns="modality_signal",
+            values="summary_mean",
+            aggfunc="first",
         ).reset_index()
     return tables
 
@@ -390,13 +530,14 @@ def multimodal_reproducibility_script(result: dict[str, Any] | None) -> str:
     p = result.get("parameters") or {}
     groups = [c for c in [p.get("group_col"), p.get("trial_col")] if c]
     signal_map = p.get("signal_map") or {}
+    selected_signals = sum((list(v) for v in signal_map.values()), [])
     lines = [
         "import gpbiometricspy as gp",
         "",
         'data = gp.import_gazepoint_biometrics("your_gazepoint_export.csv")',
         "",
         "# Recreate or import the standardized event table used by Studio.",
-        "# events must contain event_id and event_time (seconds), plus grouping columns when required.",
+        "# It must retain grouping columns when the dataset contains multiple groups.",
         'events = gp.import_gazepoint_event_log("your_event_log.csv")',
         "",
         "eventlocked = gp.summarize_gazepoint_eventlocked_multimodal(",
@@ -404,14 +545,14 @@ def multimodal_reproducibility_script(result: dict[str, Any] | None) -> str:
         "    events=events,",
         f"    time_col={p.get('time_col')!r},",
         "    event_time_col='event_time', event_id_col='event_id',",
-        f"    group_cols={groups or None!r},",
-        f"    signal_cols={sum((list(v) for v in signal_map.values()), [])!r},",
+        f"    group_cols={(groups or None)!r},",
+        f"    signal_cols={selected_signals!r},",
         f"    pre_s={p.get('pre_s')!r}, post_s={p.get('post_s')!r},",
         f"    baseline_window_s={tuple(p.get('baseline_window_s', (-1.0, 0.0)))!r},",
         f"    summary_window_s={tuple(p.get('summary_window_s', (0.0, 3.0)))!r},",
         ")",
     ]
-    if groups:
+    if groups and p.get("classic_grouped_windows_available"):
         lines.extend(
             [
                 "",
@@ -427,9 +568,8 @@ def multimodal_reproducibility_script(result: dict[str, Any] | None) -> str:
         lines.extend(
             [
                 "",
-                "# AOI-linked biometric summaries require event-window samples carrying the AOI column.",
-                "# Studio performs group-safe event-window matching before calling:",
-                "# gp.summarise_gazepoint_aoi_biometrics(...) ",
+                "# AOI-linked biometric summaries require group-safe event-window samples carrying the AOI column.",
+                "# Studio performs that matching before calling gp.summarise_gazepoint_aoi_biometrics(...).",
             ]
         )
     return "\n".join(lines) + "\n"
