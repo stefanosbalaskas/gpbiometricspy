@@ -52,7 +52,7 @@ app_ui = ui.page_sidebar(
         ui.input_action_button("run_qc", "Run package-native QC", class_="btn-success w-100"),
         ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
         ui.hr(),
-        ui.small(ui.output_text("status")),
+        ui.tags.small(ui.output_text("status")),
         width=330,
     ),
     ui.layout_column_wrap(
