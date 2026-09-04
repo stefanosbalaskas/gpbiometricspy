@@ -43,7 +43,9 @@ def test_runtime_config_rejects_unknown_mode():
 def test_public_upload_guard_is_explicit():
     with pytest.raises(PermissionError, match="External file uploads are disabled"):
         reject_external_upload("Test upload")
-    assert "local or authenticated" in PUBLIC_UPLOAD_BLOCK_MESSAGE
+    assert "studio/app.py" in PUBLIC_UPLOAD_BLOCK_MESSAGE
+    assert "authenticated full Studio" in PUBLIC_UPLOAD_BLOCK_MESSAGE
+    assert "research data" in PUBLIC_UPLOAD_BLOCK_MESSAGE
 
 
 def test_connect_cloud_contract_files_are_minimal_and_public_entrypoint_is_sanitized():
