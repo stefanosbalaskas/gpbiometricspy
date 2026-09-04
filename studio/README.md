@@ -5,7 +5,7 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides seven workflow areas:
+Studio now provides eight workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
@@ -13,6 +13,7 @@ Studio now provides seven workflow areas:
 - **EDA / SCR Analysis** — Guided and Expert workflows for EDA quality review, tonic/phasic decomposition, candidate SCR detection, group summaries, package-native decomposition/SCR plots, CSV exports, and an exportable Python reproduction script;
 - **PPG / HR / HRV Analysis** — Guided and Expert workflows for pulse-waveform QC, peak detection and rejection, heart-rate quality/windows, IBI/RR quality, time-domain HRV, Poincare diagnostics, optional HeartPy/BioSPPy/pyHRV-style cross-checks, CSV exports, and reproducible Python code;
 - **Pupil Analysis** — Guided blink/invalid-sample auditing plus Expert opt-in interpolation, smoothing, baseline correction, event-locked pupil summaries, missingness/trace diagnostics, CSV exports, and reproducible Python code;
+- **Gaze / Fixation / AOI Analysis** — gaze validation and screen filtering, fixation/saccade detection, rectangular AOI assignment or existing AOI use, dwell/fixation summaries, scanpath metrics, saccade diagnostics, CSV exports, and reproducible Python code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -76,6 +77,19 @@ On **Pupil Analysis**:
 7. export blink intervals, the processed pupil dataset, event-response summaries, or an equivalent Python workflow script.
 
 Blink/dropout repair changes the measured time series and should be justified, bounded, flagged, and reported. Pupil responses also depend on event timing, baseline definition, usable-sample coverage, luminance and display conditions where relevant, and protocol-specific exclusions. Pupil diameter is not a direct measure of attention, effort, emotion, trust, preference, or diagnosis.
+
+On **Gaze / Fixation / AOI Analysis**:
+
+1. select gaze X/Y, time, optional validity, participant, and trial/stimulus columns;
+2. `validate_gazepoint_gaze()` audits missing/invalid gaze, timestamps, duplicate/non-monotonic time, gaps, coordinate range, and expected sampling rate;
+3. screen-bound filtering is optional and uses `filter_gazepoint_gaze()`; normalized data use the 0–1 screen and pixel data use the supplied screen dimensions;
+4. Guided mode can classify fixation/saccade events through `detect_gazepoint_fixations()` using operational duration/velocity starting points, while Expert mode exposes the event thresholds explicitly;
+5. AOIs can come from an existing AOI column or an uploaded rectangular definition table (`aoi,xmin,xmax,ymin,ymax[,priority]`) delegated to `assign_gazepoint_aoi()` with explicit overlap and boundary rules;
+6. detected fixation tables are summarized with `summarize_gazepoint_fixations()` and, when AOI geometry is available, `summarise_gazepoint_fixations_by_aoi()`;
+7. AOI dwell/entry metrics use `summarize_gazepoint_aoi_dwell()`, while path length, step distance, saccade-like steps, regression-like movements, AOI transition count and transition entropy use `summarize_gazepoint_scanpath_metrics()`;
+8. review the gaze trajectory, AOI geometry, package-native saccade main-sequence diagnostic, event/AOI tables and scanpath metrics, then export processed gaze, fixations, saccades, AOI dwell, scanpath metrics, or reproducible Python code.
+
+Velocity-based event classification depends on sampling rate, coordinate units, calibration, preprocessing, and threshold definitions; Guided settings are starting points rather than universal classifiers. AOI results likewise depend on accurate geometry and stimulus alignment. Gaze measures describe oculomotor behaviour and should not be treated as direct evidence of attention, comprehension, preference, intent, emotion, trust, or diagnosis.
 
 ## State and reproducibility
 
