@@ -5,7 +5,7 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides eight workflow areas:
+Studio now provides nine workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
@@ -14,6 +14,7 @@ Studio now provides eight workflow areas:
 - **PPG / HR / HRV Analysis** — Guided and Expert workflows for pulse-waveform QC, peak detection and rejection, heart-rate quality/windows, IBI/RR quality, time-domain HRV, Poincare diagnostics, optional HeartPy/BioSPPy/pyHRV-style cross-checks, CSV exports, and reproducible Python code;
 - **Pupil Analysis** — Guided blink/invalid-sample auditing plus Expert opt-in interpolation, smoothing, baseline correction, event-locked pupil summaries, missingness/trace diagnostics, CSV exports, and reproducible Python code;
 - **Gaze / Fixation / AOI Analysis** — gaze validation and screen filtering, fixation/saccade detection, rectangular AOI assignment or existing AOI use, dwell/fixation summaries, scanpath metrics, saccade diagnostics, CSV exports, and reproducible Python code;
+- **Events & Alignment** — TTL/marker extraction, external event-log import, group-safe event windows, TTL-relative alignment, optional two-stream event-anchor synchronization, lag/drift diagnostics, CSV exports, and reproducible Python code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -90,6 +91,19 @@ On **Gaze / Fixation / AOI Analysis**:
 8. review the gaze trajectory, AOI geometry, package-native saccade main-sequence diagnostic, event/AOI tables and scanpath metrics, then export processed gaze, fixations, saccades, AOI dwell, scanpath metrics, or reproducible Python code.
 
 Velocity-based event classification depends on sampling rate, coordinate units, calibration, preprocessing, and threshold definitions; Guided settings are starting points rather than universal classifiers. AOI results likewise depend on accurate geometry and stimulus alignment. Gaze measures describe oculomotor behaviour and should not be treated as direct evidence of attention, comprehension, preference, intent, emotion, trust, or diagnosis.
+
+On **Events & Alignment**:
+
+1. choose a reference time column and use either a TTL/marker column in the loaded recording or an external event-log CSV/TXT/TSV;
+2. TTL audit rows are extracted with `extract_gazepoint_ttl_events()`, while TTL-relative windows and event identities come from `align_gazepoint_biometrics_to_ttl()`;
+3. external logs are standardized with `import_gazepoint_event_log()` into `event_id`, `event_time`, and `event_label` while preserving extra design/grouping columns;
+4. sample-level and event-level windows are generated through `match_gazepoint_events_to_biometrics()`; when a grouping column is selected, Studio calls that package matcher separately within each group to prevent cross-participant event leakage;
+5. Guided mode uses a rising-edge TTL rule, a 1 s pre-event window, a 5 s post-event window, and no nearby-event collapse; Expert mode exposes TTL extraction mode, edge rule, collapse interval, and the event window explicitly;
+6. a second Gazepoint stream can optionally be uploaded and aligned from shared TTL/event anchors using `align_gazepoint_streams_by_events()` with either a constant-offset or linear offset+drift model;
+7. event-anchor lag and drift are diagnosed with `diagnose_gazepoint_sync_drift()`; cross-stream clock fitting is intentionally restricted to one participant/session at a time rather than pooling independent clocks;
+8. review standardized events, TTL extraction/alignment tables, event-locked samples and summaries, clock-model residuals and lag/drift plots, then export reference events, matched windows, aligned target timestamps, lag tables, or a Python reproduction script.
+
+Event synchronization is only as defensible as its anchors. Misordered, duplicated, sparse, or semantically mismatched events can create plausible-looking but incorrect clock fits. Event-locked measurement changes also do not establish causal responses without an appropriate experimental design.
 
 ## State and reproducibility
 
