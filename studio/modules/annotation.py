@@ -6,7 +6,10 @@ from shiny import module, reactive, render, ui
 
 import gpbiometricspy as gp
 
-from studio.services import annotation_signal_choices, annotations_frame, time_column_choices
+try:
+    from studio.services import annotation_signal_choices, annotations_frame, time_column_choices
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from services import annotation_signal_choices, annotations_frame, time_column_choices
 
 
 @module.ui
