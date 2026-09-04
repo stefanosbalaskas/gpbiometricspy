@@ -1,14 +1,21 @@
 # Changelog
 
-## 0.1.3.dev0 ??? post-release archival metadata
+## 0.1.3.dev0 — Studio application and production-readiness development
 
 - completes literal 100% whole-package statement coverage with behavioral, validation, fallback, and error-path tests;
 - raises the development CI statement-coverage floor from 90% to 100%;
 - fixes Windows/Pandas imputation fallback by requesting a writable NumPy copy;
-- distinguishes genuinely missing signal-activity data from nonnumeric text during QC.
-- records the Zenodo 0.1.2 version DOI `10.5281/zenodo.22150873` and software concept DOI `10.5281/zenodo.22150872`;
-- restores `main` to a development version after the immutable `v0.1.2` release;
-- keeps the R `gpbiometrics 2.0.0` DOI separate as `isDerivedFrom` provenance.
+- distinguishes genuinely missing signal-activity data from nonnumeric text during QC;
+- records the Zenodo 0.1.2 version DOI `10.5281/zenodo.22150873` and software concept DOI `10.5281/zenodo.22150872` while keeping the R `gpbiometrics 2.0.0` DOI separate as `isDerivedFrom` provenance;
+- adds **gpbiometricspy Studio**, a Shiny for Python application layer that calls public `gpbiometricspy` APIs rather than reimplementing scientific methods;
+- adds stateful Studio workflows for project intake/foundation QC, advanced QC, annotation, EDA/SCR, PPG/HR/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility;
+- adds Guided/Expert analysis modes, package-native diagnostic plots, provenance-aware analysis state, CSV/report/script exports, privacy-preserving project recipes, and conservative interpretation guardrails;
+- adds Chromium browser E2E validation on Python 3.11/3.14 and production/deployment smoke validation with synthetic runtime metrics;
+- adds a fail-closed public synthetic-demo deployment boundary that suppresses external upload affordances and blocks server-side biometric/AOI/event/secondary-stream/project-recipe file consumers;
+- adds repository-root Connect-style deployment files (`app.py`, `requirements.txt`) plus deployment/accessibility/responsiveness hardening and `DEPLOYMENT.md`;
+- makes Studio distributable in the Python wheel/sdist as a separate top-level `studio` package, including CSS assets, with `gpbiometricspy-studio` and `gpbiometricspy-studio-public` launch commands;
+- promotes Studio to the README and MkDocs site, adds a first-class Studio guide, and validates documentation on pull requests before GitHub Pages deployment;
+- strengthens the stable-release workflow so an eventual `0.1.3` release requires exact-commit Studio smoke, Chromium E2E, and Studio production/distribution success in addition to the existing scientific, docs, parity, interoperability, private-data and CodeQL gates.
 
 ## 0.1.2 — 2026-08-29 — visual documentation and Zenodo-ready release
 
@@ -28,9 +35,10 @@
 - hardens pyHRV compatibility with `peakutils>=1.3.4`, `nolds<0.6.3`, and `setuptools>=77,<82` to cover both floor and current Python runtimes despite upstream packaging regressions;
 - adds executable Python companions for all 26 frozen R articles/vignettes and tests every companion;
 - adds a privacy-preserving real-data validation CLI/workflow that never requires private biometric exports to enter the repository;
-- adds CodeQL, Dependabot, issue templates and pull-request guidance;
+- adds CodeQL, Dependabot and repository contribution templates;
 - closes the 0.1.0 release checklist and refreshes validation/roadmap records after the public GitHub/PyPI/Pages release;
-- hardens stable publishing so the release workflow verifies the exact validated commit, creates an immutable GitHub Release, and explicitly dispatches protected PyPI Trusted Publishing.
+- hardens stable publishing so the release workflow verifies the exact validated commit before creating the GitHub Release;
+- release workflow explicitly dispatches protected PyPI Trusted Publishing after GitHub Release creation.
 
 ## 0.1.0 — first stable PyPI release
 
