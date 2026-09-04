@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from shiny import App, reactive, render, ui
 
 import gpbiometricspy as gp
 
 try:
+    from studio.modules.annotation import annotation_server, annotation_ui
+    from studio.modules.qc import qc_server, qc_ui
     from studio.services import (
         active_channels_table,
         inspect_dataset,
@@ -19,6 +20,8 @@ try:
     )
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from modules.annotation import annotation_server, annotation_ui
+    from modules.qc import qc_server, qc_ui
     from services import (
         active_channels_table,
         inspect_dataset,
@@ -36,8 +39,9 @@ GUARDRAIL = (
     "trust, preference, cognition, or diagnosis."
 )
 
-app_ui = ui.page_sidebar(
-    ui.sidebar(
+
+def _project_sidebar():
+    return ui.sidebar(
         ui.h5("Project intake"),
         ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),
         ui.hr(),
@@ -49,58 +53,100 @@ app_ui = ui.page_sidebar(
         ),
         ui.input_action_button("load_upload", "Import uploaded file", class_="btn-outline-primary w-100"),
         ui.hr(),
-        ui.input_action_button("run_qc", "Run package-native QC", class_="btn-success w-100"),
+        ui.input_task_button(
+            "run_qc",
+            "Run foundation QC",
+            label_busy="Running QC...",
+            type="success",
+            width="100%",
+        ),
         ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
         ui.hr(),
-        ui.tags.small(ui.output_text("status")),
+        ui.tags.small(ui.output_text("status"), class_="text-secondary"),
         width=330,
-    ),
-    ui.layout_column_wrap(
-        ui.value_box("Dataset", ui.output_text("dataset_name"), theme="primary"),
-        ui.value_box("Rows", ui.output_text("row_count")),
-        ui.value_box("Columns", ui.output_text("column_count")),
-        ui.value_box("Active biometric signals", ui.output_text("active_count")),
-        width=1 / 4,
-    ),
-    ui.layout_columns(
-        ui.card(
-            ui.card_header("Data preview"),
-            ui.output_data_frame("preview"),
-            full_screen=True,
+    )
+
+
+def _home_panel():
+    return ui.div(
+        ui.layout_column_wrap(
+            ui.value_box("Dataset", ui.output_text("dataset_name"), theme="primary"),
+            ui.value_box("Rows", ui.output_text("row_count")),
+            ui.value_box("Columns", ui.output_text("column_count")),
+            ui.value_box("Active biometric signals", ui.output_text("active_count")),
+            width=1 / 4,
+        ),
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Data preview"),
+                ui.output_data_frame("preview"),
+                full_screen=True,
+            ),
+            ui.card(
+                ui.card_header("Detected channels"),
+                ui.output_data_frame("active_channels"),
+                full_screen=True,
+            ),
+            col_widths=(7, 5),
+        ),
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Missingness and zero-value audit"),
+                ui.output_data_frame("missingness"),
+                full_screen=True,
+            ),
+            ui.card(
+                ui.card_header("Validation issues"),
+                ui.output_data_frame("issues"),
+                full_screen=True,
+            ),
+            col_widths=(7, 5),
         ),
         ui.card(
-            ui.card_header("Detected channels"),
-            ui.output_data_frame("active_channels"),
+            ui.card_header("Signal activity QC"),
+            ui.output_plot("activity_plot", height="420px"),
             full_screen=True,
         ),
-        col_widths=(7, 5),
-    ),
-    ui.layout_columns(
-        ui.card(
-            ui.card_header("Missingness and zero-value audit"),
-            ui.output_data_frame("missingness"),
-            full_screen=True,
+        ui.p(ui.tags.strong("Interpretation guardrail: "), GUARDRAIL, class_="text-secondary small"),
+    )
+
+
+def _reproducibility_panel():
+    return ui.div(
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Session provenance"),
+                ui.output_data_frame("provenance"),
+                full_screen=True,
+            ),
+            ui.card(
+                ui.card_header("Reproducibility policy"),
+                ui.p(
+                    "Studio records workflow operations and delegates scientific calculations to the installed gpbiometricspy package."
+                ),
+                ui.p(
+                    "Raw uploaded data are not intentionally written to the repository or application assets. Annotation downloads are generated from current session state.",
+                    class_="text-secondary",
+                ),
+                ui.output_text_verbatim("session_summary"),
+            ),
+            col_widths=(8, 4),
         ),
-        ui.card(
-            ui.card_header("Validation issues"),
-            ui.output_data_frame("issues"),
-            full_screen=True,
-        ),
-        col_widths=(7, 5),
-    ),
-    ui.card(
-        ui.card_header("Signal activity QC"),
-        ui.output_plot("activity_plot", height="420px"),
-        full_screen=True,
-    ),
-    ui.card(
-        ui.card_header("Reproducibility trail"),
-        ui.output_data_frame("provenance"),
-    ),
-    ui.p(ui.tags.strong("Interpretation guardrail: "), GUARDRAIL, class_="text-secondary small"),
+        ui.p(ui.tags.strong("Interpretation guardrail: "), GUARDRAIL, class_="text-secondary small"),
+    )
+
+
+app_ui = ui.page_navbar(
+    ui.nav_panel("Home", _home_panel(), value="home"),
+    ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
+    ui.nav_panel("Annotation", annotation_ui("annotation"), value="annotation"),
+    ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
     title="gpbiometricspy Studio",
-    window_title="gpbiometricspy Studio",
+    id="main_nav",
+    selected="home",
+    sidebar=_project_sidebar(),
     fillable=False,
+    window_title="gpbiometricspy Studio",
 )
 
 
@@ -125,7 +171,7 @@ def server(input, output, session):
         try:
             data, source_name = load_demo_dataset()
             set_dataset(data, source_name, "load_demo")
-            status_text.set("Synthetic kiosk demo loaded. Run QC when ready.")
+            status_text.set("Synthetic kiosk demo loaded. Run foundation or advanced QC when ready.")
         except Exception as exc:  # UI boundary: surface a concise error instead of crashing the session.
             status_text.set(f"Load failed: {exc}")
 
@@ -149,7 +195,7 @@ def server(input, output, session):
         try:
             qc = run_qc(current.data)
             state.set(current.with_qc(qc))
-            status_text.set("QC complete. Results below were produced by public gpbiometricspy APIs.")
+            status_text.set("Foundation QC complete. Open Quality Control for deeper diagnostics.")
         except Exception as exc:
             status_text.set(f"QC failed: {exc}")
 
@@ -158,6 +204,9 @@ def server(input, output, session):
     def _reset():
         state.set(ProjectState())
         status_text.set("Session reset. No dataset is loaded.")
+
+    qc_server("qc", state, status_text)
+    annotation_server("annotation", state, status_text)
 
     @render.text
     def status():
@@ -206,21 +255,33 @@ def server(input, output, session):
             table = pd.DataFrame({"status": ["No validation issues detected"]})
         return render.DataGrid(table, filters=True)
 
-    @render.plot
+    @render.plot(alt="Gazepoint biometric signal activity quality-control plot")
     def activity_plot():
         current = state()
-        if current.data is None or current.qc is None:
+        if current.data is None or current.qc is None or "activity" not in current.qc:
             fig, ax = plt.subplots()
-            ax.text(0.5, 0.5, "Run QC to generate the signal-activity plot.", ha="center", va="center")
+            ax.text(0.5, 0.5, "Run foundation QC to generate the signal-activity plot.", ha="center", va="center")
             ax.set_axis_off()
             return fig
-        return gp.plot_gazepoint_signal_activity(current.data)
+        return gp.plot_gazepoint_signal_activity(current.qc["activity"])
 
     @render.data_frame
     def provenance():
         rows = list(state().provenance)
         table = pd.DataFrame(rows) if rows else pd.DataFrame({"status": ["No operations recorded yet"]})
-        return render.DataGrid(table, filters=True)
+        return render.DataGrid(table, filters=True, height="430px")
+
+    @render.text
+    def session_summary():
+        current = state()
+        return (
+            f"gpbiometricspy: {gp.__version__}\n"
+            f"Dataset: {current.source_name}\n"
+            f"Rows: {current.n_rows:,}\n"
+            f"Columns: {current.n_columns:,}\n"
+            f"Annotations: {len(current.annotations)}\n"
+            f"Recorded operations: {len(current.provenance)}"
+        )
 
 
 app = App(app_ui, server)
