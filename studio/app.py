@@ -9,6 +9,7 @@ import gpbiometricspy as gp
 try:
     from studio.modules.annotation import annotation_server, annotation_ui
     from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
+    from studio.modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from studio.modules.qc import qc_server, qc_ui
     from studio.services import (
         active_channels_table,
@@ -23,6 +24,7 @@ try:
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.annotation import annotation_server, annotation_ui
     from modules.eda_scr import eda_scr_server, eda_scr_ui
+    from modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from modules.qc import qc_server, qc_ui
     from services import (
         active_channels_table,
@@ -143,6 +145,7 @@ app_ui = ui.page_navbar(
     ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
     ui.nav_panel("Annotation", annotation_ui("annotation"), value="annotation"),
     ui.nav_panel("EDA / SCR Analysis", eda_scr_ui("eda_scr"), value="eda_scr"),
+    ui.nav_panel("PPG / HR / HRV Analysis", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),
     ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
     title="gpbiometricspy Studio",
     id="main_nav",
@@ -211,6 +214,7 @@ def server(input, output, session):
     qc_server("qc", state, status_text)
     annotation_server("annotation", state, status_text)
     eda_scr_server("eda_scr", state, status_text)
+    ppg_hr_hrv_server("ppg_hr_hrv", state, status_text)
 
     @render.text
     def status():
