@@ -15,6 +15,7 @@ try:
     from studio.modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from studio.modules.pupil import pupil_server, pupil_ui
     from studio.modules.qc import qc_server, qc_ui
+    from studio.modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
     from studio.services import (
         active_channels_table,
         inspect_dataset,
@@ -34,6 +35,7 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from modules.pupil import pupil_server, pupil_ui
     from modules.qc import qc_server, qc_ui
+    from modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
     from services import (
         active_channels_table,
         inspect_dataset,
@@ -158,6 +160,7 @@ app_ui = ui.page_navbar(
     ui.nav_panel("Gaze / Fixation / AOI Analysis", gaze_ui("gaze"), value="gaze"),
     ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),
     ui.nav_panel("Multimodal Analysis", multimodal_ui("multimodal"), value="multimodal"),
+    ui.nav_panel("Statistics & Modelling", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),
     ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
     title="gpbiometricspy Studio",
     id="main_nav",
@@ -231,6 +234,7 @@ def server(input, output, session):
     gaze_server("gaze", state, status_text)
     event_alignment_server("event_alignment", state, status_text)
     multimodal_server("multimodal", state, status_text)
+    statistics_modelling_server("statistics_modelling", state, status_text)
 
     @render.text
     def status():

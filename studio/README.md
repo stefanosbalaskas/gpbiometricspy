@@ -5,7 +5,7 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides ten workflow areas:
+Studio now provides eleven workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
@@ -16,6 +16,7 @@ Studio now provides ten workflow areas:
 - **Gaze / Fixation / AOI Analysis** — gaze validation and screen filtering, fixation/saccade detection, rectangular AOI assignment or existing AOI use, dwell/fixation summaries, scanpath metrics, saccade diagnostics, CSV exports, and reproducible Python code;
 - **Events & Alignment** — TTL/marker extraction, external event-log import, group-safe event windows, TTL-relative alignment, optional two-stream event-anchor synchronization, lag/drift diagnostics, CSV exports, and reproducible Python code;
 - **Multimodal Analysis** — event-locked EDA/cardiac/pupil/gaze summaries on the validated event clock, reuse of prior processed Studio streams, AOI-linked biometrics, participant/trial windows, model-ready tables, package-native timeline diagnostics, exports, and reproducible code;
+- **Statistics & Modelling** — auditable mixed-effects model-data preparation plus design-gated two-condition within-subject cluster permutation, package-native diagnostics/plots/reports, threshold sensitivity, guardrails, exports, and reproducible code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -118,6 +119,20 @@ On **Multimodal Analysis**:
 8. export event-response summaries, sample-level event windows, an event × modality matrix, participant/trial windows, model-ready data, AOI-linked summaries, or a Python reproduction script.
 
 A common event clock permits multimodal comparison but does not make physiological and oculomotor channels interchangeable. Their latency, smoothing, sampling, artifact, and valid response-window assumptions remain modality-specific. Cross-modal co-occurrence should not be interpreted as direct evidence of emotion, attention, trust, preference, cognition, or diagnosis.
+
+On **Statistics & Modelling**:
+
+1. Studio exposes curated statistical source tables from the loaded dataset and prior analyses, including multimodal event responses/samples, multimodal model data, modality-specific processed samples, and selected summary tables;
+2. **Model Preparation** delegates to `prepare_gazepoint_biometrics_lme_data()` to define the numeric outcome, fixed effects, covariates, participant/trial random-effect identifiers, optional baseline correction, factor roles, continuous scaling, complete cases, and an auditable formula;
+3. Model Preparation intentionally stops at a model-ready table and formula. Studio does not claim that a mixed model has been fitted because the current public package contract provides model-data preparation rather than a general mixed-model estimator;
+4. **Cluster Permutation** first calls `prepare_gazepoint_timecourse_test_data()` to aggregate repeated participant × condition × time observations and optionally bin time;
+5. the prepared grid must then pass `diagnose_gazepoint_cluster_design()`. Error-level failures such as a non-complete participant × two-condition × time grid block permutations rather than being silently ignored;
+6. valid designs run `run_gazepoint_cluster_permutation()` using the package-supported within-subject sign-flip scheme, followed by `summarize_gazepoint_time_clusters()`, `report_gazepoint_cluster_permutation()`, package-native time-course plotting, and null-distribution plotting;
+7. Expert mode can vary the time bin, mean/median aggregation, diagnostic participant target, permutation count, cluster-forming alpha, cluster alpha, tail, seed, and optional `run_gazepoint_cluster_threshold_sensitivity()` analysis;
+8. Studio explicitly lists the package guardrails for unsupported ANOVA/>2-condition cluster inference, mixed-model cluster permutation, TFCE, multidimensional clusters, and precise cluster onset/offset estimation instead of presenting those exports as functioning methods;
+9. model-ready data, variable audits, cluster results, timewise statistics, prepared grids, and exact Python reproduction scripts are downloadable and their parameters are stored in immutable Studio provenance.
+
+A significant cluster is cluster-level evidence against the tested global null, not proof that every time point in the cluster differs and not a precise estimator of effect onset or offset. Model formulas likewise describe a proposed statistical design; they do not establish identifiability, convergence, distributional adequacy, causal interpretation, or substantive validity on their own.
 
 ## State and reproducibility
 
