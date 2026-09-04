@@ -3,16 +3,16 @@
 `gpbiometricspy Studio` is the first-party Shiny for Python application layer for `gpbiometricspy`.
 The scientific package remains the computational engine; Studio calls the public package API instead of reimplementing scientific algorithms.
 
-## Current MVP
+## Current application
 
-- load the bundled, fully synthetic kiosk demonstration dataset;
-- upload one Gazepoint CSV/TXT file (100 MB MVP limit);
-- validate the imported schema with `validate_gazepoint_biometrics()`;
-- inspect detected/active biometric channels;
-- run missingness and signal-activity QC with public package functions;
-- render the package-native signal-activity plot;
-- retain a per-session provenance trail;
-- preserve the package interpretation guardrails in the UI.
+Studio now provides four workflow areas:
+
+- **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
+- **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
+- **Annotation** — native Python EDA review with plot-click manual peaks, brushed artifact intervals, notes, editable session annotation state, and CSV export;
+- **Reproducibility** — package version, dataset/session summary, operation provenance, and interpretation guardrails.
+
+The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
 
 ## Positron setup
 
@@ -28,10 +28,21 @@ Then open `studio/app.py` in Positron and use **Run Shiny App**, or run from the
 shiny run --reload studio/app.py
 ```
 
-The app runs locally by default. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
+## Interaction model
+
+Foundation QC is available from the global project sidebar. The **Quality Control** page exposes thresholds and timing parameters explicitly and uses a Shiny task button for the deeper QC pass.
+
+On **Annotation**:
+
+1. select an EDA signal and time column;
+2. click the plot and choose **Add clicked peak** to record a manual peak;
+3. brush an x-axis interval and choose **Add brushed artifact interval** to record an artifact;
+4. add optional notes, remove rows, clear session annotations, or download the annotation table as CSV.
+
+Annotations are expert-review metadata; they do not replace automated scoring and do not infer emotion, stress, cognition, trust, preference, or diagnosis.
 
 ## Architecture rule
 
-Scientific transformations, QC, models, and scientific plots belong in `src/gpbiometricspy/`. Interactive orchestration, session state, presentation, and workflow navigation belong in `studio/`.
+Scientific transformations, QC, models, and scientific plots belong in `src/gpbiometricspy/`. Interactive orchestration, session state, presentation, modules, and workflow navigation belong in `studio/`.
 
-The Studio test suite is intentionally separate from the package's frozen 100% scientific-core coverage gate.
+Reusable Shiny modules live under `studio/modules/`. The Studio test suite remains separate from the package's frozen scientific-core coverage gate.
