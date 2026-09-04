@@ -3,6 +3,8 @@ name: studio-e2e
 on:
   pull_request:
     paths:
+      - "app.py"
+      - "requirements.txt"
       - "studio/**"
       - "pyproject.toml"
       - ".github/workflows/studio-e2e.yml"
@@ -10,6 +12,8 @@ on:
     branches:
       - main
     paths:
+      - "app.py"
+      - "requirements.txt"
       - "studio/**"
       - "pyproject.toml"
       - ".github/workflows/studio-e2e.yml"

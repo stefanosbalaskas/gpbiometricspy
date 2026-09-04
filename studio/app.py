@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from shiny import App, reactive, render, ui
@@ -7,6 +9,7 @@ from shiny import App, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.config import studio_runtime_config
     from studio.modules.annotation import annotation_server, annotation_ui
     from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
     from studio.modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -28,6 +31,7 @@ try:
     )
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from config import studio_runtime_config
     from modules.annotation import annotation_server, annotation_ui
     from modules.eda_scr import eda_scr_server, eda_scr_ui
     from modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -50,6 +54,9 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from state import ProjectState
 
 
+RUNTIME_CONFIG = studio_runtime_config()
+STUDIO_DIR = Path(__file__).resolve().parent
+
 GUARDRAIL = (
     "Signals and derived features are measurements, not direct evidence of emotion, stress, "
     "trust, preference, cognition, or diagnosis."
@@ -57,30 +64,55 @@ GUARDRAIL = (
 
 
 def _project_sidebar():
-    return ui.sidebar(
+    intake_items = [
         ui.h5("Project intake"),
         ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),
-        ui.hr(),
-        ui.input_file(
-            "upload",
-            "Upload Gazepoint CSV/TXT",
-            accept=[".csv", ".txt", "text/csv", "text/plain"],
-            multiple=False,
-        ),
-        ui.input_action_button("load_upload", "Import uploaded file", class_="btn-outline-primary w-100"),
-        ui.hr(),
-        ui.input_task_button(
-            "run_qc",
-            "Run foundation QC",
-            label_busy="Running QC...",
-            type="success",
-            width="100%",
-        ),
-        ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
-        ui.hr(),
-        ui.tags.small(ui.output_text("status"), class_="text-secondary"),
-        width=330,
+    ]
+    if RUNTIME_CONFIG.allow_external_uploads:
+        intake_items.extend(
+            [
+                ui.hr(),
+                ui.input_file(
+                    "upload",
+                    "Upload Gazepoint CSV/TXT",
+                    accept=[".csv", ".txt", "text/csv", "text/plain"],
+                    multiple=False,
+                ),
+                ui.input_action_button("load_upload", "Import uploaded file", class_="btn-outline-primary w-100"),
+            ]
+        )
+    else:
+        intake_items.append(
+            ui.div(
+                ui.tags.strong("Synthetic data only."),
+                ui.p(
+                    "External file uploads are disabled on this public deployment. Use the local or authenticated Studio for research data.",
+                    class_="mb-0 small",
+                ),
+                class_="studio-public-demo-note",
+                role="note",
+            )
+        )
+
+    intake_items.extend(
+        [
+            ui.hr(),
+            ui.input_task_button(
+                "run_qc",
+                "Run foundation QC",
+                label_busy="Running QC...",
+                type="success",
+                width="100%",
+            ),
+            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
+            ui.hr(),
+            ui.tags.div(
+                {"role": "status", "aria-live": "polite", "aria-atomic": "true", "class": "small text-secondary"},
+                ui.output_text("status"),
+            ),
+        ]
     )
+    return ui.sidebar(*intake_items, width=330)
 
 
 def _home_panel():
@@ -127,6 +159,38 @@ def _home_panel():
     )
 
 
+def _page_title():
+    return ui.TagList(
+        ui.tags.a("Skip to content", href="#studio-main", class_="studio-skip-link"),
+        ui.tags.span("gpbiometricspy Studio"),
+    )
+
+
+def _page_header():
+    items = [ui.include_css(STUDIO_DIR / "www" / "studio.css")]
+    if RUNTIME_CONFIG.is_public_demo:
+        items.append(ui.include_css(STUDIO_DIR / "www" / "public-demo.css"))
+        items.append(
+            ui.div(
+                ui.tags.strong("Public synthetic demonstration."),
+                " External uploads are disabled and application errors are sanitized. No participant data should be submitted.",
+                class_="studio-runtime-banner",
+                role="note",
+            )
+        )
+    else:
+        items.append(
+            ui.div(
+                ui.tags.strong("Runtime: "),
+                RUNTIME_CONFIG.mode_label,
+                class_="visually-hidden",
+                role="note",
+            )
+        )
+    items.append(ui.div(id="studio-main", tabindex="-1"))
+    return ui.TagList(*items)
+
+
 app_ui = ui.page_navbar(
     ui.nav_panel("Home", _home_panel(), value="home"),
     ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
@@ -139,18 +203,25 @@ app_ui = ui.page_navbar(
     ui.nav_panel("Multimodal Analysis", multimodal_ui("multimodal"), value="multimodal"),
     ui.nav_panel("Statistics & Modelling", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),
     ui.nav_panel("Reporting & Reproducibility", reporting_ui("reporting"), value="reporting"),
-    title="gpbiometricspy Studio",
+    title=_page_title(),
     id="main_nav",
     selected="home",
     sidebar=_project_sidebar(),
+    header=_page_header(),
     fillable=False,
     window_title="gpbiometricspy Studio",
+    lang="en",
 )
 
 
 def server(input, output, session):
     state = reactive.Value(ProjectState())
-    status_text = reactive.Value("Ready. Load the bundled demo or upload a Gazepoint export.")
+    initial_status = (
+        "Public synthetic demonstration ready. Load the bundled demo to begin. External uploads are disabled."
+        if RUNTIME_CONFIG.is_public_demo
+        else "Ready. Load the bundled demo or upload a Gazepoint export."
+    )
+    status_text = reactive.Value(initial_status)
 
     def set_dataset(data: pd.DataFrame, source_name: str, operation: str) -> None:
         validation = inspect_dataset(data)
@@ -201,7 +272,11 @@ def server(input, output, session):
     @reactive.event(input.reset)
     def _reset():
         state.set(ProjectState())
-        status_text.set("Session reset. No dataset is loaded.")
+        status_text.set(
+            "Session reset. Load the bundled synthetic demo to continue."
+            if RUNTIME_CONFIG.is_public_demo
+            else "Session reset. No dataset is loaded."
+        )
 
     qc_server("qc", state, status_text)
     annotation_server("annotation", state, status_text)
@@ -273,3 +348,5 @@ def server(input, output, session):
 
 
 app = App(app_ui, server)
+if RUNTIME_CONFIG.sanitize_errors:
+    app.sanitize_errors = True

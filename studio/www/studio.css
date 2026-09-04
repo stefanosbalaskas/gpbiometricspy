@@ -1,0 +1,83 @@
+.studio-skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 2000;
+  padding: 0.65rem 0.9rem;
+  background: var(--bs-body-bg, #fff);
+  color: var(--bs-body-color, #212529);
+  border: 2px solid currentColor;
+  border-radius: 0.35rem;
+  text-decoration: none;
+}
+
+.studio-skip-link:focus {
+  top: 0.5rem;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid currentColor !important;
+  outline-offset: 3px !important;
+}
+
+#studio-main {
+  scroll-margin-top: 1rem;
+}
+
+.studio-runtime-banner {
+  margin: 0.75rem 1rem 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.5rem;
+  background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.studio-runtime-banner strong {
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+pre,
+.shiny-text-output,
+.shiny-text-output-error {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.bslib-card,
+.card {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .bslib-grid,
+  .grid {
+    min-width: 0;
+  }
+
+  .bslib-sidebar-layout > .sidebar {
+    max-width: min(92vw, 330px);
+  }
+
+  .studio-runtime-banner {
+    margin-inline: 0.5rem;
+  }
+
+  .navbar-brand {
+    max-width: calc(100vw - 5rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
