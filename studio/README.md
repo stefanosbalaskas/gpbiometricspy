@@ -5,12 +5,13 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides five workflow areas:
+Studio now provides six workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
 - **Annotation** — native Python EDA review with plot-click manual peaks, brushed artifact intervals, notes, editable session annotation state, and CSV export;
 - **EDA / SCR Analysis** — Guided and Expert workflows for EDA quality review, tonic/phasic decomposition, candidate SCR detection, group summaries, package-native decomposition/SCR plots, CSV exports, and an exportable Python reproduction script;
+- **PPG / HR / HRV Analysis** — Guided and Expert workflows for pulse-waveform QC, peak detection and rejection, heart-rate quality/windows, IBI/RR quality, time-domain HRV, Poincare diagnostics, optional HeartPy/BioSPPy/pyHRV-style cross-checks, CSV exports, and reproducible Python code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -49,6 +50,19 @@ On **EDA / SCR Analysis**:
 5. export SCR events, tonic/phasic summaries, the decomposed dataset, or a Python script containing the equivalent public package calls.
 
 The default rolling-median residual decomposition is descriptive. Confirmatory SCR/EDA research may require specialised decomposition, event-timing definitions, preregistered thresholds, and sensitivity analyses. EDA/SCR outputs quantify electrodermal signal characteristics and do not infer emotion, stress, cognition, trust, preference, or diagnosis.
+
+On **PPG / HR / HRV Analysis**:
+
+1. Studio detects eligible pulse/PPG, HR, and IBI/RR columns independently, so a file does not need to contain all three signal families;
+2. select the time and optional grouping columns and confirm the acquisition sampling rate;
+3. use **Guided** mode for the Studio defaults (40–180 bpm, RR tolerance 0.30, 300–2000 ms IBI range, 500 ms maximum jump, no spline refinement, and no optional backend cross-checks), or switch to **Expert** to set these choices explicitly;
+4. the waveform path calls `assess_gazepoint_hrp_waveform_quality()`, `detect_gazepoint_ppg_peaks()`, `reject_gazepoint_ppg_peaks()`, and `compute_gazepoint_ppg_measures()`;
+5. the HR path calls `audit_gazepoint_hr_quality()` and `summarise_gazepoint_hr_windows()`;
+6. the interval path calls `audit_gazepoint_ibi_quality()`, `summarise_gazepoint_ibi_windows()`, and `summarise_gazepoint_hrv_features()`; accepted PPG-derived RR intervals are also summarised when available;
+7. Expert mode can additionally request HeartPy, BioSPPy, and pyHRV-style cross-checks through the package bridge APIs;
+8. review peak-detection, HR, IBI/HRV, Poincare, and cross-check diagnostics, then export peaks, measures, HR windows, HRV features, or a Python reproduction script.
+
+HRV estimates require genuine beat-to-beat intervals or intervals derived from accepted pulse peaks. Vendor HRV validity fields are not treated as RR intervals. Frequency-domain values from short or sparse recordings are exploratory and should not be interpreted without appropriate segment duration, stationarity, artifact control, and protocol-specific validation. Cardiac outputs do not by themselves establish emotion, stress, trust, preference, cognition, health status, or diagnosis.
 
 ## State and reproducibility
 
