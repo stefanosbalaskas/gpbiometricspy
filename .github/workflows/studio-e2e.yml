@@ -1,0 +1,46 @@
+name: studio-e2e
+
+on:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "pyproject.toml"
+      - ".github/workflows/studio-e2e.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "pyproject.toml"
+      - ".github/workflows/studio-e2e.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  studio-e2e:
+    name: studio-e2e (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Studio browser-test environment
+        run: python -m pip install -e ".[dev,studio-test]"
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+      - name: Ruff E2E tests
+        run: ruff check studio/e2e
+      - name: Compile E2E tests
+        run: python -m compileall -q studio/e2e
+      - name: Run Studio end-to-end tests
+        run: python -m pytest -q studio/e2e --browser chromium
