@@ -9,6 +9,7 @@ import gpbiometricspy as gp
 try:
     from studio.modules.annotation import annotation_server, annotation_ui
     from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
+    from studio.modules.event_alignment import event_alignment_server, event_alignment_ui
     from studio.modules.gaze import gaze_server, gaze_ui
     from studio.modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from studio.modules.pupil import pupil_server, pupil_ui
@@ -26,6 +27,7 @@ try:
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.annotation import annotation_server, annotation_ui
     from modules.eda_scr import eda_scr_server, eda_scr_ui
+    from modules.event_alignment import event_alignment_server, event_alignment_ui
     from modules.gaze import gaze_server, gaze_ui
     from modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from modules.pupil import pupil_server, pupil_ui
@@ -152,6 +154,7 @@ app_ui = ui.page_navbar(
     ui.nav_panel("PPG / HR / HRV Analysis", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),
     ui.nav_panel("Pupil Analysis", pupil_ui("pupil"), value="pupil"),
     ui.nav_panel("Gaze / Fixation / AOI Analysis", gaze_ui("gaze"), value="gaze"),
+    ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),
     ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
     title="gpbiometricspy Studio",
     id="main_nav",
@@ -223,6 +226,7 @@ def server(input, output, session):
     ppg_hr_hrv_server("ppg_hr_hrv", state, status_text)
     pupil_server("pupil", state, status_text)
     gaze_server("gaze", state, status_text)
+    event_alignment_server("event_alignment", state, status_text)
 
     @render.text
     def status():
