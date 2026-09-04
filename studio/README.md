@@ -5,13 +5,14 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides six workflow areas:
+Studio now provides seven workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
 - **Annotation** — native Python EDA review with plot-click manual peaks, brushed artifact intervals, notes, editable session annotation state, and CSV export;
 - **EDA / SCR Analysis** — Guided and Expert workflows for EDA quality review, tonic/phasic decomposition, candidate SCR detection, group summaries, package-native decomposition/SCR plots, CSV exports, and an exportable Python reproduction script;
 - **PPG / HR / HRV Analysis** — Guided and Expert workflows for pulse-waveform QC, peak detection and rejection, heart-rate quality/windows, IBI/RR quality, time-domain HRV, Poincare diagnostics, optional HeartPy/BioSPPy/pyHRV-style cross-checks, CSV exports, and reproducible Python code;
+- **Pupil Analysis** — Guided blink/invalid-sample auditing plus Expert opt-in interpolation, smoothing, baseline correction, event-locked pupil summaries, missingness/trace diagnostics, CSV exports, and reproducible Python code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -63,6 +64,18 @@ On **PPG / HR / HRV Analysis**:
 8. review peak-detection, HR, IBI/HRV, Poincare, and cross-check diagnostics, then export peaks, measures, HR windows, HRV features, or a Python reproduction script.
 
 HRV estimates require genuine beat-to-beat intervals or intervals derived from accepted pulse peaks. Vendor HRV validity fields are not treated as RR intervals. Frequency-domain values from short or sparse recordings are exploratory and should not be interpreted without appropriate segment duration, stationarity, artifact control, and protocol-specific validation. Cardiac outputs do not by themselves establish emotion, stress, trust, preference, cognition, health status, or diagnosis.
+
+On **Pupil Analysis**:
+
+1. select a pupil channel such as Gazepoint `LPD`/`RPD`, its optional validity channel (`LPV`/`RPV`), a time column, and optional participant/trial identifiers;
+2. **Guided** mode runs only transparent blink/invalid-sample auditing using `detect_gazepoint_pupil_blinks()` and `detect_gazepoint_blinks()`; it never repairs samples automatically;
+3. **Expert** mode can explicitly enable short-gap interpolation through `interpolate_gazepoint_pupil_blinks()` and centered smoothing through `smooth_gazepoint_pupil()`; interpolation receives the validity-aware blink mask and retains `_was_interpolated` flags;
+4. task-locked workflows can optionally call `baseline_correct_gazepoint_pupil()` using an explicit stimulus-onset column and trial identifiers;
+5. an explicit event-onset column or TTL/marker source can be used with `summarize_gazepoint_pupil_events()` for baseline-relative response amplitude, latency, mean response, and AUC summaries;
+6. review blink intervals, sample-level QC, package-native missingness diagnostics, raw/processed traces, repair flags, and event summaries;
+7. export blink intervals, the processed pupil dataset, event-response summaries, or an equivalent Python workflow script.
+
+Blink/dropout repair changes the measured time series and should be justified, bounded, flagged, and reported. Pupil responses also depend on event timing, baseline definition, usable-sample coverage, luminance and display conditions where relevant, and protocol-specific exclusions. Pupil diameter is not a direct measure of attention, effort, emotion, trust, preference, or diagnosis.
 
 ## State and reproducibility
 
