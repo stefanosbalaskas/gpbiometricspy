@@ -51,6 +51,9 @@ interop = [
   "pyxdf>=1.17.5",
   "statsmodels>=0.14",
 ]
+studio = [
+  "shiny>=1.7,<2",
+]
 docs = [
   "mkdocs>=1.6",
   "mkdocs-material>=9.5",
