@@ -87,10 +87,16 @@ def _coordinate_mode(
         return requested
     x = pd.to_numeric(data[x_col], errors="coerce").to_numpy(float)
     y = pd.to_numeric(data[y_col], errors="coerce").to_numpy(float)
-    finite = np.r_[x[np.isfinite(x)], y[np.isfinite(y)]]
-    if finite.size and float(np.nanmin(finite)) >= -0.1 and float(np.nanmax(finite)) <= 1.5:
-        return "normalized"
-    if screen_width_px and screen_height_px:
+    finite = np.isfinite(x) & np.isfinite(y)
+    if finite.any():
+        xx, yy = x[finite], y[finite]
+        plausible_normalized = bool(
+            np.all((xx >= -0.5) & (xx <= 1.5) & (yy >= -0.5) & (yy <= 1.5))
+            or np.mean((xx >= 0) & (xx <= 1) & (yy >= 0) & (yy <= 1)) >= 0.90
+        )
+        if plausible_normalized:
+            return "normalized"
+    if screen_width_px is not None or screen_height_px is not None:
         return "pixels"
     return "native"
 
@@ -108,9 +114,7 @@ def _screen_bounds(
 
 
 def recommended_velocity_threshold(mode: str) -> float:
-    """Operational Studio starting point; researchers must verify protocol-specific thresholds."""
-    if mode == "normalized":
-        return 2.0
+    """Return an operational Studio starting point, not a universal classifier."""
     if mode == "pixels":
         return 1000.0
     return 2.0
@@ -129,7 +133,7 @@ def validate_aoi_definitions(definitions: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("Rectangular AOI definitions are missing: " + ", ".join(missing))
     for column in required:
         out[column] = pd.to_numeric(out[column], errors="coerce")
-        if out[column].isna().any():
+        if not np.isfinite(out[column].to_numpy(float)).all():
             raise ValueError(f"AOI column `{column}` must contain finite numeric coordinates.")
     if (out["xmin"] >= out["xmax"]).any() or (out["ymin"] >= out["ymax"]).any():
         raise ValueError("Every AOI must satisfy xmin < xmax and ymin < ymax.")
@@ -159,11 +163,12 @@ def load_aoi_definitions(file_info: list[dict[str, Any]] | None) -> tuple[pd.Dat
     datapath = info.get("datapath")
     if not datapath:
         raise ValueError("The AOI upload did not provide a readable temporary path.")
-    if suffix == ".txt":
-        definitions = pd.read_csv(datapath, sep=None, engine="python")
-    else:
-        definitions = pd.read_csv(datapath)
+    definitions = pd.read_csv(datapath, sep=None, engine="python") if suffix == ".txt" else pd.read_csv(datapath)
     return validate_aoi_definitions(definitions), name
+
+
+def _event_time_unit(time_col: str) -> str:
+    return "samples" if str(time_col).lower() in {"cnt", "sample", "sample_index", "index"} else "auto"
 
 
 def run_gaze_analysis(
@@ -204,9 +209,9 @@ def run_gaze_analysis(
             raise ValueError(f"Selected {label} column was not found in the dataset.")
     if coordinate_system not in {"auto", "normalized", "pixels"}:
         raise ValueError("Coordinate system must be auto, normalized, or pixels.")
-    if expected_sampling_rate_hz <= 0:
+    if not np.isfinite(expected_sampling_rate_hz) or expected_sampling_rate_hz <= 0:
         raise ValueError("Expected sampling rate must be positive.")
-    if not 0 <= missing_threshold <= 1:
+    if not np.isfinite(missing_threshold) or not 0 <= missing_threshold <= 1:
         raise ValueError("Missingness threshold must be between zero and one.")
     if min_fixation_duration_ms <= 0 or min_saccade_duration_ms <= 0 or max_gap_ms < 0:
         raise ValueError("Gaze event duration parameters must be positive, with a non-negative gap limit.")
@@ -219,13 +224,12 @@ def run_gaze_analysis(
 
     groups = _group_cols(group_col, trial_col)
     mode = _coordinate_mode(data, x_col, y_col, coordinate_system, screen_width_px, screen_height_px)
-    validate_coordinate = coordinate_system if coordinate_system != "auto" else "auto"
     validation_kwargs: dict[str, Any] = {
         "time_col": time_col,
         "x_col": x_col,
         "y_col": y_col,
         "group_cols": groups or None,
-        "coordinate_system": validate_coordinate,
+        "coordinate_system": coordinate_system,
         "expected_sampling_rate_hz": float(expected_sampling_rate_hz),
         "missing_threshold": float(missing_threshold),
     }
@@ -235,7 +239,7 @@ def run_gaze_analysis(
         validation_kwargs["screen_width_px"] = float(screen_width_px)
     if screen_height_px:
         validation_kwargs["screen_height_px"] = float(screen_height_px)
-    if str(time_col).lower() in {"cnt", "sample", "sample_index", "index"}:
+    if _event_time_unit(time_col) == "samples":
         validation_kwargs["sampling_rate_hz"] = float(expected_sampling_rate_hz)
     validation = gp.validate_gazepoint_gaze(data, **validation_kwargs)
 
@@ -259,12 +263,14 @@ def run_gaze_analysis(
         analysis_y = f"{y_col}_studio_filtered"
         result["filtered_data"] = working.copy()
 
+    time_unit = _event_time_unit(time_col)
     event_result: dict[str, Any] | None = None
     if detect_events:
         threshold = float(velocity_threshold) if velocity_threshold is not None else recommended_velocity_threshold(mode)
-        if threshold <= 0:
+        if not np.isfinite(threshold) or threshold <= 0:
             raise ValueError("Velocity threshold must be positive.")
-        time_unit = "samples" if str(time_col).lower() in {"cnt", "sample", "sample_index", "index"} else "auto"
+        # filter_gazepoint_gaze() intentionally creates `gaze_velocity`. Keep that
+        # diagnostic intact by assigning Studio-scoped event-classification columns.
         event_result = gp.detect_gazepoint_fixations(
             working,
             time_col=time_col,
@@ -280,6 +286,9 @@ def run_gaze_analysis(
             min_fixation_duration_ms=float(min_fixation_duration_ms),
             min_saccade_duration_ms=float(min_saccade_duration_ms),
             max_gap_ms=float(max_gap_ms),
+            velocity_col="studio_event_velocity",
+            class_col="studio_gaze_class",
+            event_id_col="studio_gaze_event_id",
         )
         result["gaze_events"] = event_result
         working = event_result["samples"].copy()
@@ -335,20 +344,20 @@ def run_gaze_analysis(
                     group_cols=groups or None,
                     start_col="start_time",
                     duration_col="duration_ms",
-                    time_unit="auto",
+                    time_unit=time_unit,
                     duration_unit="milliseconds",
                     sampling_rate_hz=float(expected_sampling_rate_hz),
                     include_unassigned=True,
                 )
 
     if aoi_col and aoi_col in working.columns:
-        valid_col = "gaze_valid" if "gaze_valid" in working.columns else validity_col
+        dwell_valid_col = "gaze_valid" if "gaze_valid" in working.columns else validity_col
         result["aoi_dwell"] = gp.summarize_gazepoint_aoi_dwell(
             working,
             time_col=time_col,
             aoi_col=aoi_col,
             group_cols=groups or None,
-            valid_col=valid_col,
+            valid_col=dwell_valid_col,
         )
 
     result["scanpath"] = gp.summarize_gazepoint_scanpath_metrics(
@@ -393,6 +402,7 @@ def run_gaze_analysis(
         "analysis_x_col": analysis_x,
         "analysis_y_col": analysis_y,
         "analysis_aoi_col": aoi_col,
+        "event_time_unit": time_unit,
     }
     return result
 
@@ -403,7 +413,11 @@ def gaze_analysis_tables(result: dict[str, Any] | None) -> dict[str, pd.DataFram
     tables: dict[str, pd.DataFrame] = {}
     validation = result.get("validation")
     if isinstance(validation, dict):
-        for source, target in [("summary", "validation_summary"), ("groups", "validation_groups"), ("group_summary", "validation_groups"), ("issues", "validation_issues")]:
+        for source, target in [
+            ("summary", "validation_summary"),
+            ("groups", "validation_groups"),
+            ("checks", "validation_checks"),
+        ]:
             value = validation.get(source)
             if isinstance(value, pd.DataFrame):
                 tables[target] = value.copy()
@@ -413,16 +427,10 @@ def gaze_analysis_tables(result: dict[str, Any] | None) -> dict[str, pd.DataFram
             value = events.get(source)
             if isinstance(value, pd.DataFrame):
                 tables[target] = value.copy()
-    for source, target in [
-        ("fixation_summary", "fixation_summary"),
-        ("fixations_by_aoi", "fixations_by_aoi"),
-        ("aoi_dwell", "aoi_dwell"),
-        ("scanpath", "scanpath"),
-        ("aoi_definitions", "aoi_definitions"),
-    ]:
+    for source in ["fixation_summary", "fixations_by_aoi", "aoi_dwell", "scanpath", "aoi_definitions"]:
         value = result.get(source)
         if isinstance(value, pd.DataFrame):
-            tables[target] = value.copy()
+            tables[source] = value.copy()
     log = result.get("aoi_assignment_log")
     if isinstance(log, dict):
         overview = log.get("overview")
@@ -437,6 +445,7 @@ def gaze_reproducibility_script(result: dict[str, Any] | None) -> str:
     p = result.get("parameters") or {}
     groups = [c for c in [p.get("group_col"), p.get("trial_col")] if c]
     group_expr = repr(groups) if groups else "None"
+    validity_expr = repr([p.get("validity_col")]) if p.get("validity_col") else "None"
     lines = [
         "import numpy as np",
         "import pandas as pd",
@@ -445,57 +454,65 @@ def gaze_reproducibility_script(result: dict[str, Any] | None) -> str:
         'data = gp.import_gazepoint_biometrics("your_gazepoint_export.csv")',
         "",
         "validation = gp.validate_gazepoint_gaze(",
-        "    data,",
-        f"    time_col={p.get('time_col')!r}, x_col={p.get('x_col')!r}, y_col={p.get('y_col')!r},",
-        f"    validity_cols={([p.get('validity_col')] if p.get('validity_col') else None)!r},",
-        f"    group_cols={group_expr}, coordinate_system={p.get('coordinate_system')!r},",
+        f"    data, time_col={p.get('time_col')!r}, x_col={p.get('x_col')!r}, y_col={p.get('y_col')!r},",
+        f"    validity_cols={validity_expr}, group_cols={group_expr}, coordinate_system={p.get('coordinate_system')!r},",
         f"    screen_width_px={p.get('screen_width_px')!r}, screen_height_px={p.get('screen_height_px')!r},",
         f"    expected_sampling_rate_hz={p.get('expected_sampling_rate_hz')!r}, missing_threshold={p.get('missing_threshold')!r},",
         ")",
         "working = data.copy()",
     ]
     if p.get("filter_to_screen") and result.get("screen_bounds") is not None:
-        lines.extend([
-            "working = gp.filter_gazepoint_gaze(",
-            "    working,",
-            f"    x_col={p.get('x_col')!r}, y_col={p.get('y_col')!r}, time_col={p.get('time_col')!r}, group_cols={group_expr},",
-            f"    screen_bounds={result.get('screen_bounds')!r}, max_velocity=np.inf, drop_invalid=False, suffix='_studio_filtered',",
-            ")",
-        ])
+        lines.extend(
+            [
+                "working = gp.filter_gazepoint_gaze(",
+                f"    working, x_col={p.get('x_col')!r}, y_col={p.get('y_col')!r}, time_col={p.get('time_col')!r},",
+                f"    group_cols={group_expr}, screen_bounds={result.get('screen_bounds')!r}, max_velocity=np.inf,",
+                "    drop_invalid=False, suffix='_studio_filtered',",
+                ")",
+            ]
+        )
     if p.get("detect_events"):
-        time_unit = "samples" if str(p.get("time_col", "")).lower() in {"cnt", "sample", "sample_index", "index"} else "auto"
-        lines.extend([
-            "events = gp.detect_gazepoint_fixations(",
-            "    working,",
-            f"    time_col={p.get('time_col')!r}, x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r},",
-            f"    group_cols={group_expr}, valid_col={p.get('validity_col')!r}, valid_values=(1, True),",
-            f"    time_unit={time_unit!r}, sampling_rate_hz={(p.get('expected_sampling_rate_hz') if time_unit == 'samples' else None)!r},",
-            f"    coordinate_unit={p.get('resolved_coordinate_mode')!r}, velocity_threshold={p.get('velocity_threshold')!r},",
-            f"    min_fixation_duration_ms={p.get('min_fixation_duration_ms')!r}, min_saccade_duration_ms={p.get('min_saccade_duration_ms')!r},",
-            f"    max_gap_ms={p.get('max_gap_ms')!r},",
-            ")",
-            "working = events['samples']",
-        ])
+        time_unit = p.get("event_time_unit", "auto")
+        lines.extend(
+            [
+                "events = gp.detect_gazepoint_fixations(",
+                f"    working, time_col={p.get('time_col')!r}, x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r},",
+                f"    group_cols={group_expr}, valid_col={p.get('validity_col')!r}, valid_values=(1, True),",
+                f"    time_unit={time_unit!r}, sampling_rate_hz={(p.get('expected_sampling_rate_hz') if time_unit == 'samples' else None)!r},",
+                f"    coordinate_unit={p.get('resolved_coordinate_mode')!r}, velocity_threshold={p.get('velocity_threshold')!r},",
+                f"    min_fixation_duration_ms={p.get('min_fixation_duration_ms')!r}, min_saccade_duration_ms={p.get('min_saccade_duration_ms')!r},",
+                f"    max_gap_ms={p.get('max_gap_ms')!r}, velocity_col='studio_event_velocity',",
+                "    class_col='studio_gaze_class', event_id_col='studio_gaze_event_id',",
+                ")",
+                "working = events['samples']",
+            ]
+        )
     if p.get("aoi_definition_rows", 0):
-        lines.extend([
-            "aoi_definitions = pd.read_csv('your_aoi_definitions.csv')",
-            "working = gp.assign_gazepoint_aoi(",
-            "    working, aoi_definitions,",
-            f"    x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r}, aoi_label_col='aoi',",
-            f"    format='rectangle', overlap={p.get('aoi_overlap')!r}, boundary={p.get('aoi_boundary')!r}, output_col='Studio_AOI',",
-            ")",
-        ])
+        lines.extend(
+            [
+                "aoi_definitions = pd.read_csv('your_aoi_definitions.csv')",
+                "working = gp.assign_gazepoint_aoi(",
+                f"    working, aoi_definitions, x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r},",
+                f"    aoi_label_col='aoi', format='rectangle', overlap={p.get('aoi_overlap')!r},",
+                f"    boundary={p.get('aoi_boundary')!r}, output_col='Studio_AOI',",
+                ")",
+            ]
+        )
     aoi_col = p.get("analysis_aoi_col")
     if aoi_col:
-        lines.extend([
-            "aoi_dwell = gp.summarize_gazepoint_aoi_dwell(",
-            f"    working, time_col={p.get('time_col')!r}, aoi_col={aoi_col!r}, group_cols={group_expr},",
+        lines.extend(
+            [
+                "aoi_dwell = gp.summarize_gazepoint_aoi_dwell(",
+                f"    working, time_col={p.get('time_col')!r}, aoi_col={aoi_col!r}, group_cols={group_expr},",
+                ")",
+            ]
+        )
+    lines.extend(
+        [
+            "scanpath = gp.summarize_gazepoint_scanpath_metrics(",
+            f"    working, x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r}, time_col={p.get('time_col')!r},",
+            f"    aoi_col={aoi_col!r}, group_cols={group_expr}, min_saccade_distance={p.get('min_saccade_distance')!r},",
             ")",
-        ])
-    lines.extend([
-        "scanpath = gp.summarize_gazepoint_scanpath_metrics(",
-        f"    working, x_col={p.get('analysis_x_col')!r}, y_col={p.get('analysis_y_col')!r}, time_col={p.get('time_col')!r},",
-        f"    aoi_col={aoi_col!r}, group_cols={group_expr}, min_saccade_distance={p.get('min_saccade_distance')!r},",
-        ")",
-    ])
+        ]
+    )
     return "\n".join(lines) + "\n"
