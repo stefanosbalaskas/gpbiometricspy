@@ -24,6 +24,7 @@ def _data() -> pd.DataFrame:
             "trial": np.where(t < 5, "T1", "T2"),
             "GSR": 2.0 + 0.1 * np.sin(t),
             "HR": 70.0 + 3.0 * np.cos(t / 2),
+            "DIAL": 0.5 + 0.1 * np.sin(t / 3),
             "LPD": 3.0 + 0.05 * np.sin(t * 1.5),
             "gaze_x": np.clip(0.5 + 0.25 * np.sin(t), 0, 1),
             "gaze_y": np.clip(0.5 + 0.20 * np.cos(t), 0, 1),
@@ -76,6 +77,7 @@ def test_multimodal_eventlocked_aoi_and_model_tables():
     )
     assert event_alignment_available(_analyses())
     assert set(result["parameters"]["modalities"]) == {"eda", "cardiac", "pupil", "gaze"}
+    assert result["parameters"]["classic_grouped_windows_available"]
     assert not result["eventlocked"]["samples"].empty
     summary = result["eventlocked"]["summary"]
     assert set(summary["modality"]) == {"eda", "cardiac", "pupil", "gaze"}
@@ -86,6 +88,24 @@ def test_multimodal_eventlocked_aoi_and_model_tables():
     tables = multimodal_tables(result)
     assert not tables["response_matrix"].empty
     assert not tables["aoi_summary"].empty
+
+
+def test_multimodal_partial_channels_keep_eventlocked_analysis():
+    data = _data().drop(columns="DIAL")
+    result = run_multimodal_analysis(
+        data,
+        _analyses(),
+        time_col="time_s",
+        group_col="participant",
+        trial_col="trial",
+        eda_col="GSR",
+        cardiac_col="HR",
+    )
+    assert not result["eventlocked"]["summary"].empty
+    assert "multimodal_windows" not in result
+    status = result["grouped_window_status"].iloc[0]
+    assert status["status"] == "not_applicable_partial_channels"
+    assert "DIAL" in status["missing_native_channels"]
 
 
 def test_multimodal_blocks_cross_participant_event_leakage():
