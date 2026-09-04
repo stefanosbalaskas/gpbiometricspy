@@ -5,7 +5,7 @@
 <h1 align="center">gpbiometricspy</h1>
 
 <p align="center">
-  <strong>Scientific Python infrastructure for EDA/SCR, PPG/HRV, pupil, gaze, AOI, synchronization, QC, and multimodal Gazepoint research.</strong>
+  <strong>Scientific Python infrastructure and a Shiny application for EDA/SCR, PPG/HRV, pupil, gaze, AOI, synchronization, QC, and multimodal Gazepoint research.</strong>
 </p>
 
 <p align="center">
@@ -14,6 +14,9 @@
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/v/release/stefanosbalaskas/gpbiometricspy"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml"><img alt="Docs" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio.yml"><img alt="Studio" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml"><img alt="Studio browser E2E" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-production.yml"><img alt="Studio production" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-production.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/codeql.yml/badge.svg?branch=main"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
   <a href="https://doi.org/10.5281/zenodo.22150872"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.22150872.svg"></a>
@@ -22,13 +25,14 @@
 
 <p align="center">
   <a href="https://stefanosbalaskas.github.io/gpbiometricspy/"><strong>Documentation</strong></a> ·
+  <a href="https://stefanosbalaskas.github.io/gpbiometricspy/studio/"><strong>Studio</strong></a> ·
   <a href="https://stefanosbalaskas.github.io/gpbiometricspy/workflows/"><strong>Workflow map</strong></a> ·
   <a href="https://stefanosbalaskas.github.io/gpbiometricspy/api/"><strong>Browse API</strong></a> ·
   <a href="https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/"><strong>Plot gallery</strong></a> ·
   <a href="#citation"><strong>Citation</strong></a>
 </p>
 
-`gpbiometricspy` is scientific Python infrastructure for Gazepoint and multimodal psychophysiology workflows spanning EDA/SCR, PPG/HRV, pupil, gaze/AOI, event alignment, quality control, statistics, interoperability, and reproducible reporting. It is the Python counterpart of **gpbiometrics**, using the supplied **gpbiometrics 2.0.0** source release as a frozen semantic reference.
+`gpbiometricspy` is scientific Python infrastructure for Gazepoint and multimodal psychophysiology workflows spanning EDA/SCR, PPG/HRV, pupil, gaze/AOI, event alignment, quality control, statistics, interoperability, and reproducible reporting. It is the Python counterpart of **gpbiometrics**, using the supplied **gpbiometrics 2.0.0** source release as a frozen semantic reference. **gpbiometricspy Studio** adds a Shiny for Python application layer that calls the same public package API rather than reimplementing the scientific methods.
 
 | Status | Current state |
 |---|---|
@@ -36,17 +40,19 @@
 | Development | **0.1.3.dev0** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Validation | **317 tests · 100.00% statement coverage** |
+| Validation | **317 scientific tests · 100.00% statement coverage** |
+| Studio | **11 application workflows · smoke + Chromium E2E + production CI** |
 | Supported Python | **3.11–3.14** |
 
 ## What you get
 
 - **Complete frozen API contract:** all **406 / 406** exported R functions are implemented and registered, with **0 pending exports**.
-- **Literal whole-package coverage:** **317 tests**, **10,316 statements**, **0 missed**, and a CI floor of **100%**.
+- **Literal whole-package coverage:** **317 scientific tests**, **10,316 statements**, **0 missed**, and a CI floor of **100%**.
+- **gpbiometricspy Studio:** a stateful Shiny interface for intake/QC, annotation, EDA/SCR, PPG/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility.
 - **Scientific-domain navigation:** the documentation groups the API into **8 research domains** while preserving the complete alphabetical 406-function reference.
 - **Executable learning material:** **26** frozen-R article/vignette companions are paired with Python workflows, examples, and generated figures.
 - **Reproducible public demo data:** a fully synthetic kiosk dataset with **36 participants and 69,120 rows** ships with the package.
-- **Deep validation layers:** independent R↔Python golden fixtures, optional-backend interoperability CI, privacy-preserving real-data validation, and frozen upstream provenance.
+- **Deep validation layers:** independent R↔Python golden fixtures, optional-backend interoperability CI, privacy-preserving real-data validation, Studio browser/production CI, and frozen upstream provenance.
 
 The project deliberately distinguishes **API completion** from an absolute claim that independent R and Python runtimes are numerically identical in every external-library/version combination. The frozen R implementation, tests, documentation, and article sources are retained in `reference/` so deeper parity can continue to be audited.
 
@@ -70,7 +76,34 @@ For a source checkout used in package development:
 python -m pip install -e ".[dev]"
 ```
 
-Individual extras are available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, `lsl`, `bayes`, `stats`, `docs`, and `dev`.
+Individual extras are available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, `lsl`, `bayes`, `stats`, `studio`, `studio-test`, `docs`, and `dev`.
+
+## gpbiometricspy Studio
+
+Studio is a repository/application layer over the public package API. On the current `0.1.3.dev0` development branch it is also included in the Python distribution with installed launch commands.
+
+From a source checkout:
+
+```bash
+git clone https://github.com/stefanosbalaskas/gpbiometricspy.git
+cd gpbiometricspy
+python -m pip install -e ".[studio]"
+gpbiometricspy-studio
+```
+
+For the synthetic-only public boundary:
+
+```bash
+gpbiometricspy-studio-public
+```
+
+Or run directly during development:
+
+```bash
+shiny run --reload studio/app.py
+```
+
+The **full Studio** accepts research-data files and is intended for local use or an appropriately authenticated/private deployment. The **public-demo boundary** removes external upload controls and independently rejects server-side external-file consumers; it is designed for the bundled synthetic dataset only. See the [Studio guide](https://stefanosbalaskas.github.io/gpbiometricspy/studio/) and [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## Quick start
 
@@ -100,6 +133,7 @@ The bundled kiosk demo is **fully synthetic** and is intended only for examples,
 Start with the route that matches what you want to do:
 
 - **[Documentation home](https://stefanosbalaskas.github.io/gpbiometricspy/)** — package overview, status, entry points, and validation story.
+- **[gpbiometricspy Studio](https://stefanosbalaskas.github.io/gpbiometricspy/studio/)** — application map, full/public runtime boundaries, launch commands, reproducibility and deployment.
 - **[Workflow map](https://stefanosbalaskas.github.io/gpbiometricspy/workflows/)** — choose a path based on the signals and events you recorded.
 - **[Browse API by scientific domain](https://stefanosbalaskas.github.io/gpbiometricspy/api/)** — navigate the 406-function surface by research task rather than alphabetically.
 - **[Complete 406-function reference](https://stefanosbalaskas.github.io/gpbiometricspy/api/reference/)** — exhaustive frozen export reference.
@@ -121,9 +155,9 @@ The frozen `gpbiometrics 2.0.0` parity surface covers, among other areas:
 
 ## Validation and parity
 
-Development on `main` goes beyond the 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, and a privacy-preserving real-data validation CLI.
+Development on `main` goes beyond the 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, privacy-preserving real-data validation, and independent Studio unit/browser/production gates.
 
-The current development validation baseline is:
+The current scientific development validation baseline is:
 
 ```text
 R exports:             406
@@ -136,7 +170,7 @@ Statement coverage: 100.00%
 CI coverage floor:      100%
 ```
 
-See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, and deeper cross-runtime/backend evidence.
+Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
 
 ## Interpretation guardrails
 
