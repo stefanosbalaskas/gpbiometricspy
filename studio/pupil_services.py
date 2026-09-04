@@ -17,24 +17,11 @@ def pupil_signal_choices(data: pd.DataFrame | None) -> list[str]:
     if data is None:
         return []
     preferred = [
-        "LPD",
-        "RPD",
-        "LPMM",
-        "RPMM",
-        "Pupil",
-        "PUPIL",
-        "pupil",
-        "pupil_size",
-        "pupil_diameter",
-        "left_pupil",
-        "right_pupil",
-        "pupil_left",
-        "pupil_right",
+        "LPD", "RPD", "LPMM", "RPMM", "Pupil", "PUPIL", "pupil",
+        "pupil_size", "pupil_diameter", "left_pupil", "right_pupil",
+        "pupil_left", "pupil_right",
     ]
-    found: list[str] = []
-    for column in preferred:
-        if column in data.columns and pd.api.types.is_numeric_dtype(data[column]) and column not in found:
-            found.append(column)
+    found = [c for c in preferred if c in data.columns and pd.api.types.is_numeric_dtype(data[c])]
     for column in data.columns:
         text = str(column)
         lower = text.lower()
@@ -71,15 +58,8 @@ def onset_column_choices(data: pd.DataFrame | None) -> list[str]:
     if data is None:
         return []
     preferred = [
-        "stimulus_onset",
-        "stimulus_onset_s",
-        "trial_onset",
-        "trial_onset_s",
-        "event_time",
-        "event_onset",
-        "onset",
-        "TTL_EVENT_TIME",
-        "TTL_TIME",
+        "stimulus_onset", "stimulus_onset_s", "trial_onset", "trial_onset_s",
+        "event_time", "event_onset", "onset", "TTL_EVENT_TIME", "TTL_TIME",
     ]
     found = [c for c in preferred if c in data.columns]
     for column in data.columns:
@@ -95,8 +75,7 @@ def marker_column_choices(data: pd.DataFrame | None) -> list[str]:
     preferred = ["TTL", "TTL0", "TTL1", "TTL2", "TTL3", "USER", "USER_DATA", "marker", "event_marker"]
     found = [c for c in preferred if c in data.columns]
     for column in data.columns:
-        upper = str(column).upper()
-        if upper.startswith("TTL") and column not in found:
+        if str(column).upper().startswith("TTL") and column not in found:
             found.append(column)
     return found
 
@@ -104,15 +83,14 @@ def marker_column_choices(data: pd.DataFrame | None) -> list[str]:
 def _events_from_onset_column(data: pd.DataFrame, onset_col: str, trial_col: str | None) -> pd.DataFrame:
     if onset_col not in data.columns:
         raise ValueError("Selected event-onset column was not found in the dataset.")
-    onset = pd.to_numeric(data[onset_col], errors="coerce")
-    work = pd.DataFrame({"event_time": onset})
+    work = pd.DataFrame({"event_time": pd.to_numeric(data[onset_col], errors="coerce")})
     if trial_col:
         if trial_col not in data.columns:
             raise ValueError("Selected trial column was not found in the dataset.")
         work["event_id"] = data[trial_col]
-        work = work.loc[work["event_time"].notna()].drop_duplicates(["event_id", "event_time"])
+        work = work.loc[work.event_time.notna()].drop_duplicates(["event_id", "event_time"])
     else:
-        work = work.loc[work["event_time"].notna()].drop_duplicates(["event_time"])
+        work = work.loc[work.event_time.notna()].drop_duplicates(["event_time"])
         work["event_id"] = np.arange(1, len(work) + 1)
     work["event_label"] = work["event_id"].astype(str)
     return work.reset_index(drop=True)
@@ -128,20 +106,41 @@ def _events_from_marker(data: pd.DataFrame, marker_col: str, time_col: str, grou
         mode="changes",
         include_initial=False,
     )
-    if not isinstance(extracted, pd.DataFrame) or extracted.empty:
-        return pd.DataFrame(columns=["event_id", "event_time", "event_label"])
-    event_time_col = next(
-        (c for c in ["event_time", "time", "TIME", "timestamp", "onset_time", time_col] if c in extracted.columns),
-        None,
-    )
-    if event_time_col is None:
-        raise ValueError("TTL extraction did not expose a recognizable event-time column.")
-    values = pd.to_numeric(extracted[event_time_col], errors="coerce")
-    out = pd.DataFrame({"event_time": values})
-    label_col = next((c for c in ["value", "event_value", "ttl_value", marker_col, "event"] if c in extracted.columns), None)
-    out["event_label"] = extracted[label_col].astype(str).to_numpy() if label_col else "TTL event"
-    out["event_id"] = np.arange(1, len(out) + 1)
-    return out.loc[out.event_time.notna(), ["event_id", "event_time", "event_label"]].reset_index(drop=True)
+    if isinstance(extracted, pd.DataFrame) and not extracted.empty:
+        event_time_col = next(
+            (c for c in ["event_time", "time", "TIME", "timestamp", "onset_time", time_col] if c in extracted.columns),
+            None,
+        )
+        if event_time_col is not None:
+            out = pd.DataFrame({"event_time": pd.to_numeric(extracted[event_time_col], errors="coerce")})
+            label_col = next((c for c in ["value", "event_value", "ttl_value", marker_col, "event"] if c in extracted.columns), None)
+            out["event_label"] = extracted[label_col].astype(str).to_numpy() if label_col else "TTL event"
+            out["event_id"] = np.arange(1, len(out) + 1)
+            return out.loc[out.event_time.notna(), ["event_id", "event_time", "event_label"]].reset_index(drop=True)
+
+    # Fallback only resolves event rows for the UI when the package-native event table does not retain time.
+    marker = data[marker_col]
+    changed = marker.ne(marker.shift()).fillna(False)
+    numeric = pd.to_numeric(marker, errors="coerce")
+    active = numeric.ne(0) & numeric.notna() if numeric.notna().any() else marker.notna()
+    rows = changed & active
+    out = pd.DataFrame(
+        {
+            "event_time": pd.to_numeric(data.loc[rows, time_col], errors="coerce"),
+            "event_label": marker.loc[rows].astype(str),
+        }
+    ).dropna(subset=["event_time"])
+    out.insert(0, "event_id", np.arange(1, len(out) + 1))
+    return out.reset_index(drop=True)
+
+
+def _event_baseline_seconds(window: tuple[float, float], time_values: pd.Series) -> tuple[float, float]:
+    values = pd.to_numeric(time_values, errors="coerce").dropna().drop_duplicates().sort_values().to_numpy(float)
+    diffs = np.diff(values)
+    diffs = diffs[np.isfinite(diffs) & (diffs > 0)]
+    if len(diffs) and np.median(diffs) > 5:
+        return (float(window[0]) / 1000.0, float(window[1]) / 1000.0)
+    return (float(window[0]), float(window[1]))
 
 
 def run_pupil_analysis(
@@ -199,7 +198,6 @@ def run_pupil_analysis(
     validity = [validity_col] if validity_col else None
     result: dict[str, Any] = {}
 
-    # Two complementary public package audits: interval-level blink structure and sample-level flags.
     result["blink_intervals"] = gp.detect_gazepoint_pupil_blinks(
         data,
         pupil_cols=[pupil_col],
@@ -210,6 +208,17 @@ def run_pupil_analysis(
         min_blink_samples=int(min_blink_samples),
         return_="intervals",
     )
+    blink_flags = gp.detect_gazepoint_pupil_blinks(
+        data,
+        pupil_cols=[pupil_col],
+        time_col=time_col,
+        group_cols=groups,
+        validity_cols=validity,
+        combine="all",
+        min_blink_samples=int(min_blink_samples),
+        return_="flags",
+    )
+    result["blink_flags"] = np.asarray(blink_flags, dtype=bool)
     result["blink_audit"] = gp.detect_gazepoint_blinks(
         data,
         pupil_cols=[pupil_col],
@@ -221,11 +230,15 @@ def run_pupil_analysis(
 
     working = data.copy()
     current_col = pupil_col
+    temporary_blink_col = "__studio_pupil_blink"
+    working[temporary_blink_col] = result["blink_flags"]
+
     if interpolate:
         working = gp.interpolate_gazepoint_pupil_blinks(
             working,
             pupil_cols=[current_col],
             time_col=time_col,
+            blink_col=temporary_blink_col,
             max_gap_s=interpolation_max_gap_s,
             method=interpolation_method,
             suffix="_studio_interp",
@@ -268,7 +281,6 @@ def run_pupil_analysis(
         current_col = f"{current_col}_studio_baseline"
         result["baseline_data"] = working.copy()
 
-    events = pd.DataFrame()
     if summarize_events:
         if event_onset_col:
             events = _events_from_onset_column(data, event_onset_col, trial_col)
@@ -288,10 +300,12 @@ def run_pupil_analysis(
             pupil_col=current_col,
             event_time_col="event_time",
             event_id_col="event_id",
-            baseline_window=baseline_window,
+            baseline_window=_event_baseline_seconds(baseline_window, data[time_col]),
             response_window=response_window,
         )
 
+    if temporary_blink_col in working.columns:
+        working = working.drop(columns=[temporary_blink_col])
     result["processed_data"] = working
     result["analysis_pupil_col"] = current_col
     result["parameters"] = {
@@ -335,12 +349,10 @@ def pupil_analysis_tables(result: dict[str, Any] | None) -> dict[str, pd.DataFra
     smoothing = result.get("smoothing")
     if isinstance(smoothing, dict) and isinstance(smoothing.get("summary"), pd.DataFrame):
         tables["smoothing_summary"] = smoothing["summary"].copy()
-    events = result.get("events")
-    if isinstance(events, pd.DataFrame):
-        tables["events"] = events.copy()
-    event_summary = result.get("event_summary")
-    if isinstance(event_summary, pd.DataFrame):
-        tables["event_summary"] = event_summary.copy()
+    for key in ["events", "event_summary"]:
+        table = result.get(key)
+        if isinstance(table, pd.DataFrame):
+            tables[key] = table.copy()
     processed = result.get("processed_data")
     if isinstance(processed, pd.DataFrame):
         flags = [c for c in processed.columns if c.endswith("_was_interpolated") or c.endswith("_blink_flag")]
@@ -355,35 +367,36 @@ def pupil_reproducibility_script(result: dict[str, Any] | None) -> str:
     p = result.get("parameters") or {}
     groups = [p.get("group_col")] if p.get("group_col") else None
     validity = [p.get("validity_col")] if p.get("validity_col") else None
+    current = p.get("pupil_col")
     lines = [
         "import gpbiometricspy as gp",
-        "import pandas as pd",
         "",
         'data = gp.import_gazepoint_biometrics("your_gazepoint_export.csv")',
         "",
         "blinks = gp.detect_gazepoint_pupil_blinks(",
-        f"    data, pupil_cols={[p.get('pupil_col')]!r}, time_col={p.get('time_col')!r},",
+        f"    data, pupil_cols={[current]!r}, time_col={p.get('time_col')!r},",
         f"    group_cols={groups!r}, validity_cols={validity!r}, min_blink_samples={p.get('min_blink_samples', 2)!r},",
         '    combine="all", return_="intervals",',
         ")",
-        "",
+        "blink_flags = gp.detect_gazepoint_pupil_blinks(",
+        f"    data, pupil_cols={[current]!r}, time_col={p.get('time_col')!r}, group_cols={groups!r},",
+        f"    validity_cols={validity!r}, min_blink_samples={p.get('min_blink_samples', 2)!r}, return_=\"flags\",",
+        ")",
         "working = data.copy()",
+        'working["__studio_pupil_blink"] = blink_flags',
     ]
-    current = p.get("pupil_col")
     if p.get("interpolate"):
         lines.extend([
             "working = gp.interpolate_gazepoint_pupil_blinks(",
-            f"    working, pupil_cols={[current]!r}, time_col={p.get('time_col')!r},",
-            f"    max_gap_s={p.get('interpolation_max_gap_s')!r}, method={p.get('interpolation_method', 'linear')!r},",
-            '    suffix="_studio_interp",',
+            f"    working, pupil_cols={[current]!r}, time_col={p.get('time_col')!r}, blink_col=\"__studio_pupil_blink\",",
+            f"    max_gap_s={p.get('interpolation_max_gap_s')!r}, method={p.get('interpolation_method', 'linear')!r}, suffix=\"_studio_interp\",",
             ")",
         ])
         current = f"{current}_studio_interp"
     if p.get("smooth"):
         lines.extend([
             "smooth_result = gp.smooth_gazepoint_pupil(",
-            f"    working, pupil_cols={[current]!r}, id_cols={groups!r}, window={p.get('smooth_window', 5)!r},",
-            '    suffix="_studio_smooth", min_nonmissing=1,',
+            f"    working, pupil_cols={[current]!r}, id_cols={groups!r}, window={p.get('smooth_window', 5)!r}, suffix=\"_studio_smooth\", min_nonmissing=1,",
             ")",
             'working = smooth_result["data"]',
         ])
@@ -392,9 +405,8 @@ def pupil_reproducibility_script(result: dict[str, Any] | None) -> str:
         trial_cols = [c for c in [p.get("group_col"), p.get("trial_col")] if c]
         lines.extend([
             "working = gp.baseline_correct_gazepoint_pupil(",
-            f"    working, pupil_col={current!r}, time_col={p.get('time_col')!r},",
-            f"    stimulus_onset_col={p.get('stimulus_onset_col')!r}, trial_cols={trial_cols or None!r},",
-            f"    baseline_window={tuple(p.get('baseline_window', (-0.5, -0.1)))!r},",
+            f"    working, pupil_col={current!r}, time_col={p.get('time_col')!r}, stimulus_onset_col={p.get('stimulus_onset_col')!r},",
+            f"    trial_cols={trial_cols or None!r}, baseline_window={tuple(p.get('baseline_window', (-0.5, -0.1)))!r},",
             f"    baseline_function={p.get('baseline_function', 'median')!r}, correction={p.get('correction', 'subtract')!r},",
             '    suffix="_studio_baseline", min_baseline_rows=2, overwrite=True,',
             ")",
@@ -402,12 +414,10 @@ def pupil_reproducibility_script(result: dict[str, Any] | None) -> str:
         current = f"{current}_studio_baseline"
     if p.get("summarize_events"):
         lines.extend([
-            "# Recreate `events` from the event-onset/marker source used in Studio, then:",
+            "# Recreate `events` from the onset/TTL source used in Studio, then:",
             "event_summary = gp.summarize_gazepoint_pupil_events(",
             f"    working, events, pre={p.get('pre_s', 1.0)!r}, post={p.get('post_s', 3.0)!r},",
-            f"    time_col={p.get('time_col')!r}, pupil_col={current!r},",
-            f"    baseline_window={tuple(p.get('baseline_window', (-0.5, -0.1)))!r},",
-            f"    response_window={tuple(p.get('response_window', (0.0, 3.0)))!r},",
+            f"    time_col={p.get('time_col')!r}, pupil_col={current!r}, response_window={tuple(p.get('response_window', (0.0, 3.0)))!r},",
             ")",
         ])
     return "\n".join(lines) + "\n"
