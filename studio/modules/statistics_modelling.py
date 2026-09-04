@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from shiny import module, reactive, render, ui
