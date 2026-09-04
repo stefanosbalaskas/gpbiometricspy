@@ -161,7 +161,7 @@ def test_project_state_records_cardiac_analysis_parameters():
     state = state.with_analysis("ppg_hr_hrv", result, parameters=result["parameters"])
     assert "ppg_hr_hrv" in state.analyses
     assert state.provenance[-1]["operation"] == "run_ppg_hr_hrv_analysis"
-    assert state.provenance[-1]["parameters"]["ppg_col"] == "HRP"
+    assert '"ppg_col": "HRP"' in state.provenance[-1]["parameters_json"]
 
 
 def test_cardiac_module_imports():
