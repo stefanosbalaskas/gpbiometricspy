@@ -9,7 +9,7 @@ from studio.config import PUBLIC_DEMO_MODE, STUDIO_MODE_ENV, reject_external_upl
 # before importing the full Studio so its UI is rendered in public-demo mode.
 os.environ[STUDIO_MODE_ENV] = PUBLIC_DEMO_MODE
 
-from studio import app as studio_app  # noqa: E402
+import studio.app as studio_app  # noqa: E402
 from studio.modules import event_alignment, gaze, reporting  # noqa: E402
 
 
