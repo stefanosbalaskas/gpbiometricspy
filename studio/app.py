@@ -8,6 +8,7 @@ import gpbiometricspy as gp
 
 try:
     from studio.modules.annotation import annotation_server, annotation_ui
+    from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
     from studio.modules.qc import qc_server, qc_ui
     from studio.services import (
         active_channels_table,
@@ -21,6 +22,7 @@ try:
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.annotation import annotation_server, annotation_ui
+    from modules.eda_scr import eda_scr_server, eda_scr_ui
     from modules.qc import qc_server, qc_ui
     from services import (
         active_channels_table,
@@ -125,7 +127,7 @@ def _reproducibility_panel():
                     "Studio records workflow operations and delegates scientific calculations to the installed gpbiometricspy package."
                 ),
                 ui.p(
-                    "Raw uploaded data are not intentionally written to the repository or application assets. Annotation downloads are generated from current session state.",
+                    "Raw uploaded data are not intentionally written to the repository or application assets. Annotation and analysis downloads are generated from current session state.",
                     class_="text-secondary",
                 ),
                 ui.output_text_verbatim("session_summary"),
@@ -140,6 +142,7 @@ app_ui = ui.page_navbar(
     ui.nav_panel("Home", _home_panel(), value="home"),
     ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
     ui.nav_panel("Annotation", annotation_ui("annotation"), value="annotation"),
+    ui.nav_panel("EDA / SCR Analysis", eda_scr_ui("eda_scr"), value="eda_scr"),
     ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
     title="gpbiometricspy Studio",
     id="main_nav",
@@ -171,7 +174,7 @@ def server(input, output, session):
         try:
             data, source_name = load_demo_dataset()
             set_dataset(data, source_name, "load_demo")
-            status_text.set("Synthetic kiosk demo loaded. Run foundation or advanced QC when ready.")
+            status_text.set("Synthetic kiosk demo loaded. Run QC or open an analysis workflow when ready.")
         except Exception as exc:  # UI boundary: surface a concise error instead of crashing the session.
             status_text.set(f"Load failed: {exc}")
 
@@ -181,7 +184,7 @@ def server(input, output, session):
         try:
             data, source_name = load_uploaded_dataset(input.upload())
             set_dataset(data, source_name, "load_upload")
-            status_text.set("Upload imported through gpbiometricspy. Run QC when ready.")
+            status_text.set("Upload imported through gpbiometricspy. Run QC or analysis when ready.")
         except Exception as exc:
             status_text.set(f"Import failed: {exc}")
 
@@ -207,6 +210,7 @@ def server(input, output, session):
 
     qc_server("qc", state, status_text)
     annotation_server("annotation", state, status_text)
+    eda_scr_server("eda_scr", state, status_text)
 
     @render.text
     def status():
@@ -280,6 +284,7 @@ def server(input, output, session):
             f"Rows: {current.n_rows:,}\n"
             f"Columns: {current.n_columns:,}\n"
             f"Annotations: {len(current.annotations)}\n"
+            f"Analyses: {len(current.analyses)}\n"
             f"Recorded operations: {len(current.provenance)}"
         )
 
