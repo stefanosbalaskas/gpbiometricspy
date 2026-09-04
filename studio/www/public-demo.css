@@ -1,0 +1,21 @@
+/* Public demo is intentionally synthetic-data-only. The corresponding server-side
+   loader functions are also replaced with fail-closed guards in public_demo.py. */
+.shiny-input-container:has(input[type="file"]),
+#load_upload,
+[id$="-load_target"],
+[id$="-validate_recipe"],
+[id$="-restore_recipe"] {
+  display: none !important;
+}
+
+.card:has(#reporting-recipe_upload) {
+  display: none !important;
+}
+
+.studio-public-demo-note {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.5rem;
+  background: var(--bs-tertiary-bg, #f8f9fa);
+}
