@@ -15,6 +15,7 @@ try:
     from studio.modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from studio.modules.pupil import pupil_server, pupil_ui
     from studio.modules.qc import qc_server, qc_ui
+    from studio.modules.reporting import reporting_server, reporting_ui
     from studio.modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
     from studio.services import (
         active_channels_table,
@@ -35,6 +36,7 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.ppg_hr_hrv import ppg_hr_hrv_server, ppg_hr_hrv_ui
     from modules.pupil import pupil_server, pupil_ui
     from modules.qc import qc_server, qc_ui
+    from modules.reporting import reporting_server, reporting_ui
     from modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
     from services import (
         active_channels_table,
@@ -125,31 +127,6 @@ def _home_panel():
     )
 
 
-def _reproducibility_panel():
-    return ui.div(
-        ui.layout_columns(
-            ui.card(
-                ui.card_header("Session provenance"),
-                ui.output_data_frame("provenance"),
-                full_screen=True,
-            ),
-            ui.card(
-                ui.card_header("Reproducibility policy"),
-                ui.p(
-                    "Studio records workflow operations and delegates scientific calculations to the installed gpbiometricspy package."
-                ),
-                ui.p(
-                    "Raw uploaded data are not intentionally written to the repository or application assets. Annotation and analysis downloads are generated from current session state.",
-                    class_="text-secondary",
-                ),
-                ui.output_text_verbatim("session_summary"),
-            ),
-            col_widths=(8, 4),
-        ),
-        ui.p(ui.tags.strong("Interpretation guardrail: "), GUARDRAIL, class_="text-secondary small"),
-    )
-
-
 app_ui = ui.page_navbar(
     ui.nav_panel("Home", _home_panel(), value="home"),
     ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
@@ -161,7 +138,7 @@ app_ui = ui.page_navbar(
     ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),
     ui.nav_panel("Multimodal Analysis", multimodal_ui("multimodal"), value="multimodal"),
     ui.nav_panel("Statistics & Modelling", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),
-    ui.nav_panel("Reproducibility", _reproducibility_panel(), value="reproducibility"),
+    ui.nav_panel("Reporting & Reproducibility", reporting_ui("reporting"), value="reporting"),
     title="gpbiometricspy Studio",
     id="main_nav",
     selected="home",
@@ -235,6 +212,7 @@ def server(input, output, session):
     event_alignment_server("event_alignment", state, status_text)
     multimodal_server("multimodal", state, status_text)
     statistics_modelling_server("statistics_modelling", state, status_text)
+    reporting_server("reporting", state, status_text)
 
     @render.text
     def status():
@@ -292,25 +270,6 @@ def server(input, output, session):
             ax.set_axis_off()
             return fig
         return gp.plot_gazepoint_signal_activity(current.qc["activity"])
-
-    @render.data_frame
-    def provenance():
-        rows = list(state().provenance)
-        table = pd.DataFrame(rows) if rows else pd.DataFrame({"status": ["No operations recorded yet"]})
-        return render.DataGrid(table, filters=True, height="430px")
-
-    @render.text
-    def session_summary():
-        current = state()
-        return (
-            f"gpbiometricspy: {gp.__version__}\n"
-            f"Dataset: {current.source_name}\n"
-            f"Rows: {current.n_rows:,}\n"
-            f"Columns: {current.n_columns:,}\n"
-            f"Annotations: {len(current.annotations)}\n"
-            f"Analyses: {len(current.analyses)}\n"
-            f"Recorded operations: {len(current.provenance)}"
-        )
 
 
 app = App(app_ui, server)
