@@ -20,6 +20,29 @@ def _event(operation: str, source: str, n_rows: int, n_columns: int, **extra: An
     }
 
 
+def _validated_annotations(annotations: Any) -> tuple[dict[str, Any], ...]:
+    rows: list[dict[str, Any]] = []
+    for annotation in annotations or ():
+        if not isinstance(annotation, dict):
+            raise TypeError("Restored annotations must be dictionaries.")
+        annotation_type = str(annotation.get("annotation_type") or "").strip()
+        if annotation_type not in {"manual_peak", "artifact_interval"}:
+            raise ValueError("Unsupported annotation type in restored project metadata.")
+        row = dict(annotation)
+        row["annotation_type"] = annotation_type
+        rows.append(row)
+    return tuple(rows)
+
+
+def _validated_provenance(provenance: Any) -> tuple[dict[str, Any], ...]:
+    rows: list[dict[str, Any]] = []
+    for event in provenance or ():
+        if not isinstance(event, dict):
+            raise TypeError("Restored provenance entries must be dictionaries.")
+        rows.append(dict(event))
+    return tuple(rows)
+
+
 @dataclass(frozen=True)
 class ProjectState:
     """Immutable per-session state for gpbiometricspy Studio."""
@@ -64,6 +87,14 @@ class ProjectState:
             analyses={},
             provenance=(*self.provenance, event),
         )
+
+    def with_operation(self, operation: str, **extra: Any) -> "ProjectState":
+        """Append an auditable Studio operation without mutating scientific results."""
+        key = str(operation).strip()
+        if not key:
+            raise ValueError("Operation must be non-empty.")
+        event = _event(key, self.source_name, self.n_rows, self.n_columns, **extra)
+        return replace(self, provenance=(*self.provenance, event))
 
     def with_qc(self, qc: dict[str, Any], *, operation: str = "run_qc") -> "ProjectState":
         if self.data is None:
@@ -142,3 +173,32 @@ class ProjectState:
             annotation_count=0,
         )
         return replace(self, annotations=(), provenance=(*self.provenance, event))
+
+    def with_restored_session_metadata(
+        self,
+        *,
+        annotations: Any = (),
+        provenance: Any = (),
+        recipe_fingerprint: str | None = None,
+    ) -> "ProjectState":
+        """Restore non-raw project metadata after an external fingerprint check."""
+        if self.data is None:
+            raise ValueError("Load the source dataset before restoring a Studio project recipe.")
+        restored_annotations = _validated_annotations(annotations)
+        restored_provenance = _validated_provenance(provenance)
+        event = _event(
+            "restore_project_recipe",
+            self.source_name,
+            self.n_rows,
+            self.n_columns,
+            restored_annotation_count=len(restored_annotations),
+            restored_provenance_count=len(restored_provenance),
+            recipe_fingerprint=recipe_fingerprint,
+            analysis_outputs_restored=False,
+        )
+        return replace(
+            self,
+            annotations=restored_annotations,
+            analyses={},
+            provenance=(*self.provenance, *restored_provenance, event),
+        )
