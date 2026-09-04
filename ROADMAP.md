@@ -21,7 +21,7 @@
 - CodeQL, Dependabot and repository contribution templates;
 - release-to-PyPI handoff hardening with exact-commit gate verification and explicit protected workflow dispatch.
 
-## 0.1.2 release tranche — visual documentation and archival
+## Completed: 0.1.2 visual documentation and archival
 
 - first-class Examples and package-generated Plot Gallery;
 - all 26 curated executable article companions preserved through docs generation;
@@ -29,10 +29,24 @@
 - GitHub About/topics/language metadata and non-disruptive `main` protection;
 - stable `v0.1.2` released to GitHub/PyPI and archived at Zenodo version DOI `10.5281/zenodo.22150873` under concept DOI `10.5281/zenodo.22150872`.
 
+## 0.1.3 release tranche — gpbiometricspy Studio
+
+Scientific/application development for the `0.1.3` freeze is functionally complete. The release tranche adds:
+
+- **gpbiometricspy Studio**, a Shiny for Python application layer over public package APIs;
+- project intake/foundation QC, advanced QC, annotation, EDA/SCR, PPG/HR/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility workflows;
+- Guided/Expert modes, provenance-aware state, exports, reproducible Python scripts, privacy-preserving project recipes, and interpretation guardrails;
+- a synthetic-only fail-closed public deployment boundary plus full local/authenticated research-data mode;
+- Chromium browser E2E, production/deployment smoke metrics, responsive/accessibility regression guards, and Connect-style deployment files;
+- distributable `studio` package content and installed Studio launch commands while keeping application code separate from `src/gpbiometricspy`;
+- README/MkDocs Studio launch surface and exact-commit Studio release gates.
+
+Remaining release actions are procedural rather than scientific: merge the launch/release-hardening tranche, freeze version metadata at `0.1.3`, require all exact-main gates, tag `v0.1.3`, publish through the protected GitHub→PyPI workflow, and record the resulting Zenodo version DOI after ingestion.
+
 ## Longer-term work
 
 1. expand golden fixtures when a numerical edge case is discovered or a backend changes materially;
-2. deepen branch coverage in complex modelling/reporting workflows toward 95%+ without gaming the metric;
+2. deepen branch-path validation in complex modelling/reporting workflows without gaming coverage metrics;
 3. validate on additional privately held real Gazepoint export profiles without committing participant data;
-4. add archival DOI/provenance metadata if a Zenodo release archive is created;
+4. extend Studio browser coverage to additional high-value analysis paths and authenticated deployment configurations where suitable infrastructure is available;
 5. adopt a later `gpbiometrics` release only through a new explicit semantic reference freeze.
