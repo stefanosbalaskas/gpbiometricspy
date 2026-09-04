@@ -5,7 +5,7 @@ The scientific package remains the computational engine; Studio calls the public
 
 ## Current application
 
-Studio now provides nine workflow areas:
+Studio now provides ten workflow areas:
 
 - **Home** — bundled synthetic demo or single CSV/TXT intake, schema validation, detected channels, preview, foundation missingness/activity QC, and package-native signal-activity plotting;
 - **Quality Control** — configurable time-reset/segment diagnostics, EDA and heart-rate quality audits, gaze validation, group-level gaze diagnostics, and package-native QC plots;
@@ -15,6 +15,7 @@ Studio now provides nine workflow areas:
 - **Pupil Analysis** — Guided blink/invalid-sample auditing plus Expert opt-in interpolation, smoothing, baseline correction, event-locked pupil summaries, missingness/trace diagnostics, CSV exports, and reproducible Python code;
 - **Gaze / Fixation / AOI Analysis** — gaze validation and screen filtering, fixation/saccade detection, rectangular AOI assignment or existing AOI use, dwell/fixation summaries, scanpath metrics, saccade diagnostics, CSV exports, and reproducible Python code;
 - **Events & Alignment** — TTL/marker extraction, external event-log import, group-safe event windows, TTL-relative alignment, optional two-stream event-anchor synchronization, lag/drift diagnostics, CSV exports, and reproducible Python code;
+- **Multimodal Analysis** — event-locked EDA/cardiac/pupil/gaze summaries on the validated event clock, reuse of prior processed Studio streams, AOI-linked biometrics, participant/trial windows, model-ready tables, package-native timeline diagnostics, exports, and reproducible code;
 - **Reproducibility** — package version, dataset/session summary, operation provenance, analysis count, and interpretation guardrails.
 
 The Studio application is local-first. Uploaded files use Shiny's temporary upload location and are imported by `gpbiometricspy`; Studio does not intentionally persist raw uploads.
@@ -104,6 +105,19 @@ On **Events & Alignment**:
 8. review standardized events, TTL extraction/alignment tables, event-locked samples and summaries, clock-model residuals and lag/drift plots, then export reference events, matched windows, aligned target timestamps, lag tables, or a Python reproduction script.
 
 Event synchronization is only as defensible as its anchors. Misordered, duplicated, sparse, or semantically mismatched events can create plausible-looking but incorrect clock fits. Event-locked measurement changes also do not establish causal responses without an appropriate experimental design.
+
+On **Multimodal Analysis**:
+
+1. complete **Events & Alignment** for the current dataset first; Multimodal Analysis deliberately refuses to invent or independently reinterpret the event clock;
+2. select EDA/SCR, cardiac, pupil, and optional gaze X/Y channels. Guided mode automatically prefers compatible processed EDA, pupil, and gaze outputs from prior Studio analyses and reports the resolved source for every modality;
+3. `summarize_gazepoint_eventlocked_multimodal()` creates event-relative samples and per-event/per-signal summaries, including baseline mean, summary mean, peak/minimum values, peak latency, AUC, and missingness;
+4. when participant/trial identifiers are selected, `summarise_gazepoint_multimodal_windows()` and `prepare_gazepoint_multimodal_model_data()` create grouped descriptive windows and a model-ready table;
+5. when a processed or native AOI column is available, Studio performs group-safe event-window matching and calls `summarise_gazepoint_aoi_biometrics()` so biometric values can be summarized within AOI membership for each event/group;
+6. `plot_gazepoint_multimodal_timeline()` provides the package-native synchronized signal view. Standardized event times from Events & Alignment are overlaid as timing references rather than being inferred from signal shape;
+7. Expert mode exposes the extraction window, baseline window, response-summary window, processed/raw preference, and timeline standardization;
+8. export event-response summaries, sample-level event windows, an event × modality matrix, participant/trial windows, model-ready data, AOI-linked summaries, or a Python reproduction script.
+
+A common event clock permits multimodal comparison but does not make physiological and oculomotor channels interchangeable. Their latency, smoothing, sampling, artifact, and valid response-window assumptions remain modality-specific. Cross-modal co-occurrence should not be interpreted as direct evidence of emotion, attention, trust, preference, cognition, or diagnosis.
 
 ## State and reproducibility
 
