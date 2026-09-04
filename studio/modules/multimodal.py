@@ -332,8 +332,7 @@ def multimodal_server(input, output, session, state, global_status):
 
     @render.text
     def aoi_count():
-        tables = _tables()
-        table = tables.get("aoi_summary")
+        table = _tables().get("aoi_summary")
         return f"{len(table):,}" if isinstance(table, pd.DataFrame) else "0"
 
     @render.data_frame
@@ -354,7 +353,10 @@ def multimodal_server(input, output, session, state, global_status):
 
     @render.data_frame
     def aoi_summary():
-        table = _tables().get("aoi_summary") or _tables().get("aoi_signal_summary")
+        tables = _tables()
+        table = tables.get("aoi_summary")
+        if not isinstance(table, pd.DataFrame) or table.empty:
+            table = tables.get("aoi_signal_summary")
         return _grid(table, "Select an AOI column and run the workflow to create AOI-linked biometric summaries.")
 
     @render.data_frame
@@ -375,7 +377,7 @@ def multimodal_server(input, output, session, state, global_status):
             return _placeholder("Event-locked sample table does not contain the expected plotting columns.")
         fig, ax = plt.subplots()
         work = samples.dropna(subset=["relative_time_s", "value"]).copy()
-        for (modality, signal, event_id), frame in work.groupby(["modality", "signal", "event_id"], sort=False):
+        for _, frame in work.groupby(["modality", "signal", "event_id"], sort=False):
             frame = frame.sort_values("relative_time_s")
             ax.plot(frame["relative_time_s"], frame["value"], alpha=0.18, linewidth=0.8)
         ax.axvline(0, linestyle="--", linewidth=1)
@@ -407,9 +409,9 @@ def multimodal_server(input, output, session, state, global_status):
         events = result.get("events")
         if isinstance(events, pd.DataFrame) and "event_time" in events.columns:
             event_times = pd.to_numeric(events["event_time"], errors="coerce").dropna().unique()
-            for ax in fig.axes:
+            for axis in fig.axes:
                 for event_time in event_times[:100]:
-                    ax.axvline(float(event_time), linestyle=":", linewidth=0.6, alpha=0.35)
+                    axis.axvline(float(event_time), linestyle=":", linewidth=0.6, alpha=0.35)
         return fig
 
     @render.plot(alt="AOI-linked biometric summary plot")
