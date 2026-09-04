@@ -46,6 +46,7 @@ def _cluster_table(n_subjects: int = 8, n_time: int = 18) -> pd.DataFrame:
         effect_start=7,
         effect_end=11,
         effect_size=0.8,
+        effect_condition="warning",
         seed=7,
     ).rename(columns={"subject": "participant"})
 
