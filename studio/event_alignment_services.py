@@ -23,7 +23,19 @@ def event_time_choices(data: pd.DataFrame | None) -> list[str]:
 def ttl_column_choices(data: pd.DataFrame | None) -> list[str]:
     if data is None:
         return []
-    preferred = ["TTL0", "TTL1", "TTL2", "TTL3", "TTL4", "TTL5", "TTL6", "TTL", "ttl_marker", "marker", "event_marker"]
+    preferred = [
+        "TTL0",
+        "TTL1",
+        "TTL2",
+        "TTL3",
+        "TTL4",
+        "TTL5",
+        "TTL6",
+        "TTL",
+        "ttl_marker",
+        "marker",
+        "event_marker",
+    ]
     return [c for c in preferred if c in data.columns]
 
 
@@ -98,8 +110,7 @@ def load_event_log(file_info: list[dict[str, Any]] | None) -> tuple[pd.DataFrame
         label="event log",
         max_bytes=MAX_EVENT_UPLOAD_BYTES,
     )
-    events = gp.import_gazepoint_event_log(datapath)
-    return events, name
+    return gp.import_gazepoint_event_log(datapath), name
 
 
 def load_target_stream(file_info: list[dict[str, Any]] | None) -> tuple[pd.DataFrame, str]:
@@ -108,8 +119,7 @@ def load_target_stream(file_info: list[dict[str, Any]] | None) -> tuple[pd.DataF
         label="target stream",
         max_bytes=MAX_TARGET_UPLOAD_BYTES,
     )
-    data = gp.import_gazepoint_biometrics(datapath)
-    return data, name
+    return gp.import_gazepoint_biometrics(datapath), name
 
 
 def _groups(group_col: str | None) -> list[str] | None:
@@ -176,8 +186,75 @@ def _ttl_workflow(
         collapse_nearby_ms=float(collapse_nearby_ms),
         require_valid_ttl=bool(validity_col),
     )
-    events = _standard_events_from_ttl_alignment(alignment)
-    return raw_events, alignment, events
+    return raw_events, alignment, _standard_events_from_ttl_alignment(alignment)
+
+
+def _group_mask(series: pd.Series, value: Any) -> pd.Series:
+    if pd.isna(value):
+        return series.isna()
+    return series.astype(str).eq(str(value))
+
+
+def _match_events(
+    data: pd.DataFrame,
+    events: pd.DataFrame,
+    *,
+    time_col: str,
+    group_col: str | None,
+    pre_s: float,
+    post_s: float,
+    summary_cols: list[str] | None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    common = dict(
+        pre=float(pre_s),
+        post=float(post_s),
+        time_col=time_col,
+        event_time_col="event_time",
+        event_id_col="event_id",
+        summary_cols=summary_cols or None,
+    )
+    if not group_col:
+        windows = gp.match_gazepoint_events_to_biometrics(data, events, return_="windows", **common)
+        summary = gp.match_gazepoint_events_to_biometrics(data, events, return_="summary", **common)
+        return windows, summary
+
+    if group_col not in events.columns:
+        raise ValueError(
+            f"Grouped event matching requires `{group_col}` in the standardized event table. "
+            "Include the grouping column in an external event log or use TTL events extracted from the grouped recording."
+        )
+
+    window_blocks: list[pd.DataFrame] = []
+    summary_blocks: list[pd.DataFrame] = []
+    for value, block in data.groupby(group_col, sort=False, dropna=False):
+        group_events = events.loc[_group_mask(events[group_col], value)].copy()
+        if group_events.empty:
+            continue
+        windows = gp.match_gazepoint_events_to_biometrics(block, group_events, return_="windows", **common)
+        summary = gp.match_gazepoint_events_to_biometrics(block, group_events, return_="summary", **common)
+        if not windows.empty and group_col not in windows.columns:
+            windows[group_col] = value
+        if not summary.empty:
+            summary[group_col] = value
+        window_blocks.append(windows)
+        summary_blocks.append(summary)
+    windows = pd.concat(window_blocks, ignore_index=True) if window_blocks else pd.DataFrame()
+    summary = pd.concat(summary_blocks, ignore_index=True) if summary_blocks else pd.DataFrame()
+    return windows, summary
+
+
+def _guard_cross_stream_grouping(data: pd.DataFrame, group_col: str | None, label: str) -> None:
+    if not group_col:
+        candidates = event_group_choices(data)
+        if candidates and data[candidates[0]].nunique(dropna=False) > 1:
+            raise ValueError(
+                f"{label} contains multiple `{candidates[0]}` groups. Cross-stream clock fitting must be run on one participant/session at a time."
+            )
+        return
+    if data[group_col].nunique(dropna=False) > 1:
+        raise ValueError(
+            f"{label} contains multiple `{group_col}` groups. Cross-stream clock fitting must be run on one participant/session at a time."
+        )
 
 
 def run_event_alignment(
@@ -224,9 +301,6 @@ def run_event_alignment(
         raise ValueError("Selected reference grouping column was not found.")
 
     result: dict[str, Any] = {}
-    ttl_alignment = None
-    raw_ttl_events = pd.DataFrame()
-
     if source_mode == "ttl":
         if not ttl_col:
             raise ValueError("Choose a TTL/marker column for TTL event extraction.")
@@ -254,27 +328,14 @@ def run_event_alignment(
     result["events"] = events
 
     summary_cols = [c for c in (summary_cols or []) if c in data.columns]
-    windows = gp.match_gazepoint_events_to_biometrics(
+    windows, summary = _match_events(
         data,
         events,
-        pre=float(pre_s),
-        post=float(post_s),
         time_col=time_col,
-        event_time_col="event_time",
-        event_id_col="event_id",
-        summary_cols=summary_cols or None,
-        return_="windows",
-    )
-    summary = gp.match_gazepoint_events_to_biometrics(
-        data,
-        events,
-        pre=float(pre_s),
-        post=float(post_s),
-        time_col=time_col,
-        event_time_col="event_time",
-        event_id_col="event_id",
-        summary_cols=summary_cols or None,
-        return_="summary",
+        group_col=group_col,
+        pre_s=pre_s,
+        post_s=post_s,
+        summary_cols=summary_cols,
     )
     result["event_windows"] = windows
     result["event_summary"] = summary
@@ -290,6 +351,9 @@ def run_event_alignment(
             raise ValueError("Selected target TTL validity column was not found.")
         if target_group_col and target_group_col not in target_stream.columns:
             raise ValueError("Selected target grouping column was not found.")
+
+        _guard_cross_stream_grouping(data, group_col, "Reference stream")
+        _guard_cross_stream_grouping(target_stream, target_group_col, "Target stream")
 
         target_raw_events, target_ttl_alignment, target_events = _ttl_workflow(
             target_stream,
@@ -325,11 +389,10 @@ def run_event_alignment(
 
         n_pairs = min(len(events), len(target_events))
         if n_pairs >= 2:
-            drift = gp.diagnose_gazepoint_sync_drift(
+            result["drift"] = gp.diagnose_gazepoint_sync_drift(
                 events["event_time"].iloc[:n_pairs].to_numpy(float),
                 target_events["event_time"].iloc[:n_pairs].to_numpy(float),
             )
-            result["drift"] = drift
 
     result["parameters"] = {
         "source_mode": source_mode,
@@ -393,19 +456,14 @@ def event_alignment_reproducibility_script(result: dict[str, Any]) -> str:
     p = result.get("parameters", {})
     source_mode = p.get("source_mode", "ttl")
     lines = [
+        "import pandas as pd",
         "import gpbiometricspy as gp",
         "",
-        "# Replace with your own Gazepoint export path.",
         "data = gp.import_gazepoint_biometrics('reference.csv')",
         "",
     ]
     if source_mode == "event_log":
-        lines.extend(
-            [
-                "events = gp.import_gazepoint_event_log('events.csv')",
-                "",
-            ]
-        )
+        lines.extend(["events = gp.import_gazepoint_event_log('events.csv')", ""])
     else:
         lines.extend(
             [
@@ -419,21 +477,45 @@ def event_alignment_reproducibility_script(result: dict[str, Any]) -> str:
                 "events = ttl_alignment['events'].copy()",
                 "events['event_time'] = events['event_time_ms'] / 1000.0",
                 "events['event_id'] = events['ttl_event_id'].astype(str)",
+                "events['event_label'] = events['event_ttl_value'].astype(str)",
                 "",
             ]
         )
-    lines.extend(
-        [
-            "windows = gp.match_gazepoint_events_to_biometrics(",
-            f"    data, events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
-            "    event_time_col='event_time', event_id_col='event_id', return_='windows',",
-            ")",
-            "summary = gp.match_gazepoint_events_to_biometrics(",
-            f"    data, events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
-            f"    event_time_col='event_time', event_id_col='event_id', summary_cols={p.get('summary_cols')!r}, return_='summary',",
-            ")",
-        ]
-    )
+    group_col = p.get("group_col")
+    if group_col:
+        lines.extend(
+            [
+                "window_blocks = []",
+                "summary_blocks = []",
+                f"for group_value, block in data.groupby({group_col!r}, sort=False, dropna=False):",
+                f"    group_events = events.loc[events[{group_col!r}].astype(str).eq(str(group_value))].copy()",
+                "    if group_events.empty:",
+                "        continue",
+                "    window_blocks.append(gp.match_gazepoint_events_to_biometrics(",
+                f"        block, group_events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
+                "        event_time_col='event_time', event_id_col='event_id', return_='windows'))",
+                "    group_summary = gp.match_gazepoint_events_to_biometrics(",
+                f"        block, group_events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
+                f"        event_time_col='event_time', event_id_col='event_id', summary_cols={p.get('summary_cols')!r}, return_='summary')",
+                f"    group_summary[{group_col!r}] = group_value",
+                "    summary_blocks.append(group_summary)",
+                "windows = pd.concat(window_blocks, ignore_index=True) if window_blocks else pd.DataFrame()",
+                "summary = pd.concat(summary_blocks, ignore_index=True) if summary_blocks else pd.DataFrame()",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "windows = gp.match_gazepoint_events_to_biometrics(",
+                f"    data, events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
+                "    event_time_col='event_time', event_id_col='event_id', return_='windows',",
+                ")",
+                "summary = gp.match_gazepoint_events_to_biometrics(",
+                f"    data, events, pre={p.get('pre_s')!r}, post={p.get('post_s')!r}, time_col={p.get('time_col')!r},",
+                f"    event_time_col='event_time', event_id_col='event_id', summary_cols={p.get('summary_cols')!r}, return_='summary',",
+                ")",
+            ]
+        )
     if p.get("target_stream_used"):
         lines.extend(
             [
