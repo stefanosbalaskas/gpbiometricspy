@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import pandas as pd
@@ -8,7 +7,7 @@ from shiny import module, reactive, render, ui
 
 try:
     from studio.reporting_services import (
-        analysis_inventory,
+        analysis_inventory as analysis_inventory_table,
         annotations_frame,
         build_reporting_artifacts,
         bundle_zip_bytes,
@@ -25,7 +24,7 @@ try:
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from reporting_services import (
-        analysis_inventory,
+        analysis_inventory as analysis_inventory_table,
         annotations_frame,
         build_reporting_artifacts,
         bundle_zip_bytes,
@@ -397,7 +396,7 @@ def reporting_server(input, output, session, state, global_status):
 
     @render.data_frame
     def analysis_inventory():
-        return _grid(analysis_inventory(state().analyses), "No analysis results are stored in this session.")
+        return _grid(analysis_inventory_table(state().analyses), "No analysis results are stored in this session.")
 
     @render.data_frame
     def result_catalog():
