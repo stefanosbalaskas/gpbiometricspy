@@ -73,6 +73,33 @@ def annotation_signal_choices(data: pd.DataFrame | None) -> list[str]:
     return [c for c in preferred if c in data.columns and pd.api.types.is_numeric_dtype(data[c])]
 
 
+def eda_signal_choices(data: pd.DataFrame | None) -> list[str]:
+    if data is None:
+        return []
+    preferred = ["GSR_US", "EDA_US", "GSR", "EDA", "GSR_OHMS", "SKIN_CONDUCTANCE"]
+    return [c for c in preferred if c in data.columns and pd.api.types.is_numeric_dtype(data[c])]
+
+
+def analysis_group_column_choices(data: pd.DataFrame | None) -> list[str]:
+    if data is None:
+        return []
+    preferred = [
+        "participant_id",
+        "source_participant",
+        "participant",
+        "subject_id",
+        "subject",
+        "USER",
+        "source_file",
+        "session_id",
+        "session",
+        "trial_id",
+        "trial",
+        "condition",
+    ]
+    return [c for c in preferred if c in data.columns]
+
+
 def gaze_available(data: pd.DataFrame) -> bool:
     x = {"FPOGX", "BPOGX", "LPOGX", "RPOGX", "POGX", "gaze_x", "x"}
     y = {"FPOGY", "BPOGY", "LPOGY", "RPOGY", "POGY", "gaze_y", "y"}
@@ -132,6 +159,132 @@ def run_advanced_qc(
         result["gaze_validation_error"] = "Gaze coordinates or a supported time column were not detected."
 
     return result
+
+
+def run_eda_scr_analysis(
+    data: pd.DataFrame,
+    *,
+    signal_col: str,
+    time_col: str | None,
+    group_col: str | None = None,
+    window_size: int = 31,
+    threshold: float | None = None,
+    min_peak_distance: int = 10,
+    standardise_plot: bool = False,
+) -> dict[str, Any]:
+    """Run the Studio EDA/SCR workflow entirely through public gpbiometricspy APIs."""
+    if signal_col not in data.columns:
+        raise ValueError("Selected EDA signal column was not found in the dataset.")
+    if not pd.api.types.is_numeric_dtype(data[signal_col]):
+        raise TypeError("Selected EDA signal column must be numeric.")
+    if time_col is not None and time_col not in data.columns:
+        raise ValueError("Selected time column was not found in the dataset.")
+    if group_col is not None and group_col not in data.columns:
+        raise ValueError("Selected grouping column was not found in the dataset.")
+    if int(window_size) < 1:
+        raise ValueError("EDA decomposition window must be positive.")
+    if int(min_peak_distance) < 1:
+        raise ValueError("Minimum SCR peak distance must be positive.")
+
+    groups = [group_col] if group_col else None
+    quality = gp.audit_gazepoint_gsr_quality(data, value_column=signal_col)
+    decomposition = gp.decompose_gazepoint_eda(
+        data,
+        signal_col=signal_col,
+        time_col=time_col,
+        group_cols=groups,
+        window_size=int(window_size),
+        output_prefix="studio_eda",
+        overwrite=True,
+    )
+    events = gp.detect_gazepoint_scr_events(
+        decomposition,
+        phasic_col="studio_eda_phasic",
+        time_col=time_col,
+        group_cols=groups,
+        threshold=threshold,
+        min_peak_distance=int(min_peak_distance),
+        window_size=int(window_size),
+    )
+    summary = gp.summarise_gazepoint_gsr_tonic_phasic(
+        decomposition,
+        gsr_col=signal_col,
+        group_cols=groups,
+        time_col=time_col,
+        window_n=int(window_size),
+        peak_threshold=threshold,
+        output_prefix="studio_gsr",
+    )
+    parameters = {
+        "signal_col": signal_col,
+        "time_col": time_col,
+        "group_col": group_col,
+        "window_size": int(window_size),
+        "threshold": threshold,
+        "min_peak_distance": int(min_peak_distance),
+        "standardise_plot": bool(standardise_plot),
+    }
+    return {
+        "quality": quality,
+        "decomposition": decomposition,
+        "events": events,
+        "summary": summary,
+        "parameters": parameters,
+    }
+
+
+def eda_analysis_tables(result: dict[str, Any] | None) -> dict[str, pd.DataFrame]:
+    if not result:
+        return {}
+    decomposition = result.get("decomposition")
+    events = result.get("events")
+    summary = result.get("summary")
+    tables: dict[str, pd.DataFrame] = {}
+    quality = result.get("quality")
+    if isinstance(quality, pd.DataFrame):
+        tables["quality"] = quality.copy()
+    if isinstance(decomposition, pd.DataFrame):
+        overview = decomposition.attrs.get("overview")
+        if isinstance(overview, pd.DataFrame):
+            tables["decomposition_overview"] = overview.copy()
+    if isinstance(events, dict):
+        for key in ["overview", "events", "group_summary"]:
+            table = events.get(key)
+            if isinstance(table, pd.DataFrame):
+                tables[f"events_{key}"] = table.copy()
+    if isinstance(summary, dict):
+        for key in ["overview", "summary", "group_summary", "events"]:
+            table = summary.get(key)
+            if isinstance(table, pd.DataFrame):
+                tables[f"summary_{key}"] = table.copy()
+    return tables
+
+
+def eda_reproducibility_script(result: dict[str, Any] | None) -> str:
+    if not result:
+        return "# Run an EDA/SCR analysis in gpbiometricspy Studio to generate reproducible code.\n"
+    p = result.get("parameters") or {}
+    groups = [p.get("group_col")] if p.get("group_col") else None
+    return (
+        "import gpbiometricspy as gp\n\n"
+        "data = gp.import_gazepoint_biometrics(\"your_gazepoint_export.csv\")\n\n"
+        "decomposition = gp.decompose_gazepoint_eda(\n"
+        f"    data, signal_col={p.get('signal_col')!r}, time_col={p.get('time_col')!r},\n"
+        f"    group_cols={groups!r}, window_size={p.get('window_size', 31)!r},\n"
+        "    output_prefix=\"studio_eda\", overwrite=True,\n"
+        ")\n\n"
+        "events = gp.detect_gazepoint_scr_events(\n"
+        "    decomposition, phasic_col=\"studio_eda_phasic\",\n"
+        f"    time_col={p.get('time_col')!r}, group_cols={groups!r},\n"
+        f"    threshold={p.get('threshold')!r}, min_peak_distance={p.get('min_peak_distance', 10)!r},\n"
+        f"    window_size={p.get('window_size', 31)!r},\n"
+        ")\n\n"
+        "summary = gp.summarise_gazepoint_gsr_tonic_phasic(\n"
+        f"    decomposition, gsr_col={p.get('signal_col')!r}, group_cols={groups!r},\n"
+        f"    time_col={p.get('time_col')!r}, window_n={p.get('window_size', 31)!r},\n"
+        f"    peak_threshold={p.get('threshold')!r}, output_prefix=\"studio_gsr\",\n"
+        ")\n"
+    )
 
 
 def active_channels_table(validation: dict[str, Any] | None) -> pd.DataFrame:

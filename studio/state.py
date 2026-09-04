@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
+import json
 from typing import Any
 
 import pandas as pd
@@ -29,6 +30,7 @@ class ProjectState:
     validation: dict[str, Any] | None = None
     qc: dict[str, Any] | None = None
     annotations: tuple[dict[str, Any], ...] = field(default_factory=tuple)
+    analyses: dict[str, Any] = field(default_factory=dict)
     provenance: tuple[dict[str, Any], ...] = field(default_factory=tuple)
 
     @property
@@ -59,6 +61,7 @@ class ProjectState:
             validation=validation,
             qc=None,
             annotations=(),
+            analyses={},
             provenance=(*self.provenance, event),
         )
 
@@ -68,6 +71,32 @@ class ProjectState:
         merged = {**(self.qc or {}), **qc}
         event = _event(operation, self.source_name, self.n_rows, self.n_columns)
         return replace(self, qc=merged, provenance=(*self.provenance, event))
+
+    def with_analysis(
+        self,
+        name: str,
+        result: dict[str, Any],
+        *,
+        parameters: dict[str, Any] | None = None,
+    ) -> "ProjectState":
+        if self.data is None:
+            raise ValueError("A dataset must be loaded before analysis can be stored.")
+        key = str(name).strip()
+        if not key:
+            raise ValueError("Analysis name must be non-empty.")
+        if not isinstance(result, dict):
+            raise TypeError("Analysis result must be a dictionary.")
+        merged = {**self.analyses, key: result}
+        event = _event(
+            f"run_{key}_analysis",
+            self.source_name,
+            self.n_rows,
+            self.n_columns,
+            analysis=key,
+            parameters_json=json.dumps(parameters or {}, sort_keys=True, default=str),
+            analysis_count=len(merged),
+        )
+        return replace(self, analyses=merged, provenance=(*self.provenance, event))
 
     def with_annotation(self, annotation: dict[str, Any]) -> "ProjectState":
         if self.data is None:
