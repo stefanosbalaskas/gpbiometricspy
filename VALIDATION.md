@@ -297,3 +297,19 @@ The twelfth 0.1.4 branch/path tranche targets the remaining roadmap helper contr
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:614014e7562b603e490a715b888ef37a3b158cde8e6e9e134f5e7286929dabc6`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **93.7% to 94.2%**, retaining headroom below the measured **94.5835%** while preventing regression to the prior **94.0829%** tranche level.
+
+### QC audits and design branch tranche
+
+The thirteenth 0.1.4 branch/path tranche closes the complete remaining control-flow debt in the QC-audit and experimental-design utilities through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the roadmap-helpers tranche: **5,291 / 5,594 branches = 94.5835%**;
+- post-tranche exact measured coverage: **5,319 / 5,594 branches = 95.0840%**;
+- missing branch paths reduced from **303 to 275** (**28 newly validated paths** in this tranche; **504 cumulatively** since the original 0.1.4 baseline);
+- `qc_audits_design.py`: **136 / 164 branches = 82.927% → 164 / 164 branches = 100.000%**;
+- public-API tests cover quality-index metric/type/mapping/weight/collision/all-nonfinite alternatives; beat-audit column/type/range/duplicate/relative-change guardrails; correction-summary input/schema/grouping validation; beat-correction audit/action/output-collision plus local- and group-reference fallback behavior; session-comparability validation; QC-overview quality-index and flag-column validation; condition-free experiment-design behavior and expected-condition validation; and design-coverage plot input validation;
+- all 28 pre-tranche residual `qc_audits_design.py` branch paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:199c8ac7c253855d455625bee5307eb821902af4fba291a9537fb47c3fac6ef5`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **94.2% to 94.7%**, retaining headroom below the measured **95.0840%** while preventing regression to the prior **94.5835%** tranche level.
