@@ -3,19 +3,20 @@
 `gpbiometricspy` is archived through the Zenodo GitHub integration.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.2</code>; development branch <code>0.1.3.dev0</code>; Zenodo version and concept DOI registered.
+<strong>Current citation state:</strong> stable Python release <code>0.1.3</code> (2026-09-05); its version-specific Zenodo DOI will be added after Zenodo ingests the GitHub release; the software concept DOI is already registered.
 </div>
 
 ## Cite the Python software
 
 For reproducibility, cite the exact software release used:
 
-- **0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
+- **0.1.3 version DOI:** pending Zenodo ingestion of the `v0.1.3` GitHub release
+- **Previous 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
 - **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**
 
 Zenodo recommends the version DOI when citing a specific research artifact version. The concept DOI resolves to the latest version and is appropriate when referring to the evolving software family.
 
-GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the file records the 0.1.2 version DOI.
+GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the release freeze records 0.1.3 identity and date, and its version DOI will be added after Zenodo mints it.
 
 ## Published gpbiometrics paper
 
@@ -33,7 +34,7 @@ That DOI identifies the R reference package. `.zenodo.json` preserves it with re
 
 ## Metadata files
 
-- `CITATION.cff` identifies the latest stable Python software version and its version DOI, and records the published R-package paper as a related reference.
+- `CITATION.cff` identifies the latest stable Python software version and release date, and records the published R-package paper as a related reference; the 0.1.3 version DOI is added after Zenodo ingestion.
 - `.zenodo.json` provides Zenodo-specific archival metadata and the R-reference provenance relationship.
 - README and documentation use the Python concept DOI badge for the evolving software family.
 

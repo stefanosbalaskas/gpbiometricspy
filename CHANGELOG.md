@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3.dev0 — Studio application and production-readiness development
+## 0.1.3 — 2026-09-05 — gpbiometricspy Studio and production-ready application
 
 - completes literal 100% whole-package statement coverage with behavioral, validation, fallback, and error-path tests;
 - raises the development CI statement-coverage floor from 90% to 100%;

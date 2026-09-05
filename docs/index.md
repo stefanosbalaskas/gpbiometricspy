@@ -16,15 +16,15 @@
 </div>
 
 <div class="gp-status-grid">
-<div><span class="gp-status-value">0.1.2</span><span class="gp-status-label">stable release</span></div>
-<div><span class="gp-status-value">0.1.3.dev0</span><span class="gp-status-label">development docs</span></div>
+<div><span class="gp-status-value">0.1.3</span><span class="gp-status-label">stable release</span></div>
+<div><span class="gp-status-value">2026-09-05</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">Python CI matrix</span></div>
 </div>
 
-!!! info "Development documentation"
-    This site tracks `main` (`0.1.3.dev0`). The latest stable release is `0.1.2`, archived at DOI [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873). The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
+!!! info "Stable 0.1.3 documentation"
+    This site is frozen for `gpbiometricspy 0.1.3` (2026-09-05). The 0.1.3 version DOI will be added after Zenodo ingests the GitHub release. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872); the previous 0.1.2 version DOI is [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873).
 
 ## Code or Studio
 
