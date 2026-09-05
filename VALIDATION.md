@@ -265,3 +265,19 @@ The tenth 0.1.4 branch/path tranche closes the complete remaining control-flow d
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:33b2dc01ed01c4b1ee8a599e980ab6034fa1922239d7ea6d6a6b447a6cbeda15`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **92.7% to 93.2%**, retaining headroom below the measured **93.5824%** while preventing regression to the prior **93.0461%** tranche level.
+
+### PsPM-style branch tranche
+
+The eleventh 0.1.4 branch/path tranche targets the remaining PsPM-style marker, SCR preprocessing, event/design, GLM, and export control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the final-deterministic tranche: **5,235 / 5,594 branches = 93.5824%**;
+- post-tranche exact measured coverage: **5,263 / 5,594 branches = 94.0829%**;
+- missing branch paths reduced from **359 to 331** (**28 newly validated paths** in this tranche; **448 cumulatively** since the original 0.1.4 baseline);
+- `pspm_style.py`: **121 / 150 branches = 80.667% → 149 / 150 branches = 99.333%**;
+- public-API tests cover SCR preprocessing helper guardrails through the exported preprocessor; marker extraction and empty-marker combination; empty and non-reset session splitting; explicit SCR signal and sampling validation; event-segment validation and no-overlap behavior; short/degenerate design timing and non-finite onset behavior; GLM signal/design/interpolation/regressor/complete-row guardrails; and export model/format/no-prediction/JSON-array alternatives;
+- the sole residual `pspm_style.py` branch is arc `116 → exit`, the defensive invalid/non-positive sampling-interval guard in private `_kernel()`; repository search confirms its only production caller is `create_gazepoint_pspm_glm_design()`, which first derives differences from unique sorted time points, retains only finite positive intervals, raises if none remain, and then passes their positive median to `_kernel()`; the guard is therefore structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing scientific code solely for nominal branch closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:c8dc94fde8c02a224edad26328de26133bd44bd1d0fd4f578bd6294887df1557`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **93.2% to 93.7%**, retaining headroom below the measured **94.0829%** while preventing regression to the prior **93.5824%** tranche level.
