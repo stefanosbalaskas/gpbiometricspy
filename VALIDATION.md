@@ -190,3 +190,17 @@ The fifth 0.1.4 branch/path tranche closes the largest remaining deterministic s
 - the frozen 406-export semantic contract, 100% statement-coverage gate, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating artifact for the measured head is bound by digest `sha256:40538f12fef16597d68dfd8785c5d8d2dbc8600e7abba0b0e69e040bbe406886`;
 - the persistent pure branch-coverage regression floor is raised conservatively from **89.5% to 90.3%**, retaining headroom below the measured **90.6686%** while preventing regression to the prior **89.8641%** tranche level.
+
+### pyHRV-style branch tranche
+
+The sixth 0.1.4 branch/path tranche targets the largest remaining HRV-style control-flow debt through exported pyHRV-compatible front doors while preserving the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the deterministic-extensions tranche: **5,072 / 5,594 branches = 90.6686%**;
+- post-tranche exact measured coverage: **5,111 / 5,594 branches = 91.3657%**;
+- missing branch paths reduced from **522 to 483** (**39 newly validated paths** in this tranche; **296 cumulatively** since the original 0.1.4 baseline);
+- `pyhrv_style.py`: **154 / 194 branches = 79.381% → 193 / 194 branches = 99.485%**;
+- public-API tests cover short/degenerate Welch, Lomb and autoregressive PSD behavior; NN-interval extraction and segmentation guardrails; empty time-domain, triangular-index and TINN alternatives; PSD waterfall and nonlinear short/invalid-scale behavior; plotting/radar validation; JSON conversion/export behavior; and `prepare_gazepoint_pyhrv_input()` validation, explicit/automatic unit resolution, missing/non-numeric columns, and multi-column grouping;
+- the sole residual `pyhrv_style.py` branch is arc `76 → exit`, the defensive `n < 4` guard in private `_fft_psd()`; repository search confirms the only pyHRV production caller is `_welch_psd()`, which returns before invoking `_fft_psd()` whenever `n < 8`, so the `n < 4` guard is structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing scientific code solely for a coverage number;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:2a818fd7c33b0a62fbeba0140b0e4b17c6910c763e6a8a51f46ffbbc084de331`;
+- the persistent pure branch-coverage regression floor is raised conservatively from **90.3% to 91.0%**, retaining headroom below the measured **91.3657%** while preventing regression to the prior **90.6686%** tranche level.
