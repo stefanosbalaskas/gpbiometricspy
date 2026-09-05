@@ -13,6 +13,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Summarize coverage.py branch debt by source file.")
     parser.add_argument("coverage_json", type=Path)
     parser.add_argument("--top", type=int, default=20)
+    parser.add_argument(
+        "--fail-under",
+        type=float,
+        default=None,
+        help="Fail when pure branch coverage is below this percentage.",
+    )
     args = parser.parse_args()
 
     payload = json.loads(args.coverage_json.read_text(encoding="utf-8"))
@@ -42,11 +48,18 @@ def main() -> None:
     print(f"covered branches : {covered:,}/{branch_total:,}")
     print(f"missing branches : {missing:,}")
     print(f"branch coverage  : {pct:.4f}%")
+    if args.fail_under is not None:
+        print(f"required floor   : {args.fail_under:.4f}%")
     print()
     print(f"Top {min(args.top, len(rows))} files by missing branch paths")
     print("-" * 76)
     for debt, path, hit, total, file_pct in rows[: args.top]:
         print(f"{debt:5d} missing | {hit:5d}/{total:<5d} | {file_pct:8.3f}% | {path}")
+
+    if args.fail_under is not None and pct + 1e-12 < args.fail_under:
+        raise SystemExit(
+            f"Pure branch coverage {pct:.4f}% is below required floor {args.fail_under:.4f}%."
+        )
 
 
 if __name__ == "__main__":
