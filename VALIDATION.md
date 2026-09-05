@@ -234,3 +234,18 @@ The eighth 0.1.4 branch/path tranche targets BioSPPy-style EDA/PPG, RRI, spectra
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:7c7ea93b9d555170135a5135c77d2dc6782651b504ea6ca61cfe5241291fa0c4`;
 - the persistent pure branch-coverage regression floor is raised conservatively from **91.6% to 92.1%**, retaining headroom below the measured **92.4920%** while preventing regression to the prior **91.9735%** tranche level.
+
+### MNE/EEG/LSL branch tranche
+
+The ninth 0.1.4 branch/path tranche closes the complete remaining MNE event, EEG alignment, MNE input, and LSL synchronization control-flow debt through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the BioSPPy-style tranche: **5,174 / 5,594 branches = 92.4920%**;
+- post-tranche exact measured coverage: **5,205 / 5,594 branches = 93.0461%**;
+- missing branch paths reduced from **420 to 389** (**31 newly validated paths** in this tranche; **390 cumulatively** since the original 0.1.4 baseline);
+- `mne_eeg_lsl.py`: **115 / 146 branches = 78.767% → 146 / 146 branches = 100.000%**;
+- public-API tests cover MNE event option/rate validation, empty and marker/no-marker time-resolution failures, marker-column and active-marker guardrails, sample-unit conversion, embedded event codes and incomplete mappings; MNE input type/option/time/rate/channel/metadata validation and EEG/ECG type inference; EEG alignment option/type/sample-rate/no-match/linear-minimum/residual-policy guardrails; and LSL stream/time/option/dejitter validation plus one-dimensional XDF-style stream normalization;
+- all 31 pre-tranche residual MNE/EEG/LSL branch paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:5909731d9feaead01ef06da5dee776a5ec0e72fb2f8abdceabf46660e07f7737`;
+- the frozen 406-export semantic contract, 100% statement-coverage gate, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **92.1% to 92.7%**, retaining headroom below the measured **93.0461%** while preventing regression to the prior **92.4920%** tranche level.
