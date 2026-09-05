@@ -96,7 +96,7 @@ src/gpbiometricspy/
 
 `app.py` imports the synthetic-only public boundary. The full `studio/app.py` should be deployed only in an environment whose authentication, access-control, storage, logging, retention, and data-governance configuration is suitable for the research data being processed.
 
-See **[Deployment and production hardening](../DEPLOYMENT.md)** for Posit Connect Cloud, self-hosted Posit Connect/`rsconnect`, runtime diagnostics, security boundaries, and accessibility notes.
+See **[Deployment and production hardening](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/DEPLOYMENT.md)** for Posit Connect Cloud, self-hosted Posit Connect/`rsconnect`, runtime diagnostics, security boundaries, and accessibility notes.
 
 ## Validation
 
