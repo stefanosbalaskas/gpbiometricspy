@@ -506,3 +506,19 @@ The twenty-fifth 0.1.4 branch/path tranche closes the complete remaining release
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is ID **9977319701** and is bound by digest `sha256:ab813dbea79db5aad23d0a38b417e70015776ad3a905ae52417a4e57956b4627`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **98.3% to 98.5%**, retaining headroom below the measured **98.6235%** while preventing regression to the prior **98.4269%** tranche level.
+
+### Advanced nonlinear branch tranche
+
+The twenty-sixth 0.1.4 branch/path tranche closes the complete remaining nonlinear-HRV, PDR, and RSA control-flow debt through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the release-profile tranche: **5,517 / 5,594 branches = 98.6235%**;
+- post-tranche exact measured coverage: **5,527 / 5,594 branches = 98.8023%**;
+- missing branch paths reduced from **77 to 67** (**10 newly validated paths** in this tranche; **712 cumulatively** since the original 0.1.4 baseline);
+- `advanced_nonlinear.py`: **124 / 134 branches = 92.537% → 134 / 134 branches = 100.000%**;
+- public-API tests cover short asymmetry input, single-direction acceleration/deceleration runs, automatic sampling-rate failure and millisecond inference, no-peak PDR behavior, short pulse-feature and resampling-grid spectral paths, interpolation-boundary behavior, short RSA input, short RSA spectral grids, and supplied PDR timeseries insufficient for peak-to-trough estimation;
+- all 10 pre-tranche residual `advanced_nonlinear.py` paths are closed through exported production behavior; the final `239 → 236` arc was confirmed as the exported short-asymmetry `continue` path rather than a structural residual;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the corrected validating measured-head artifact is ID **9977589504** and is bound by digest `sha256:996367e9f1bc18492fdc3811d56af718bb8375372eceb42c52a2fb111536a62d`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **98.5% to 98.7%**, retaining headroom below the measured **98.8023%** while preventing regression to the prior **98.6235%** tranche level.
