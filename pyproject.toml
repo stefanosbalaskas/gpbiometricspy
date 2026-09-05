@@ -71,6 +71,10 @@ dev = [
   "twine>=6",
 ]
 
+[project.scripts]
+gpbiometricspy-studio = "studio.cli:main"
+gpbiometricspy-studio-public = "studio.cli:main_public"
+
 [project.urls]
 Homepage = "https://stefanosbalaskas.github.io/gpbiometricspy/"
 Repository = "https://github.com/stefanosbalaskas/gpbiometricspy"
@@ -82,11 +86,13 @@ VersionDOI = "https://doi.org/10.5281/zenodo.22150873"
 Issues = "https://github.com/stefanosbalaskas/gpbiometricspy/issues"
 PyPI = "https://pypi.org/project/gpbiometricspy/"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+packages = ["gpbiometricspy", "studio", "studio.modules"]
+package-dir = {gpbiometricspy = "src/gpbiometricspy", studio = "studio"}
 
 [tool.setuptools.package-data]
 gpbiometricspy = ["data/**/*.csv", "data/**/*.txt"]
+studio = ["www/*.css"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

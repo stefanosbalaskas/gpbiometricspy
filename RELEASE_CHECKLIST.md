@@ -32,6 +32,7 @@
 - [x] Release workflow verifies the exact validated commit before creating the GitHub Release.
 - [x] Release workflow explicitly dispatches protected PyPI Trusted Publishing after GitHub Release creation.
 - [ ] Optional additional evidence: validate against an approved genuine participant Gazepoint export locally or on an approved private runner. This is not a public-release blocker and is not claimed by the package.
+
 ## 0.1.2 — Zenodo-backed release preparation
 
 - [x] Zenodo GitHub integration is enabled for `stefanosbalaskas/gpbiometricspy`.
@@ -46,3 +47,23 @@
 - [x] Add the Python concept DOI badge/link to README and documentation; add the release DOI to release-specific citation metadata where appropriate.
 - [x] Verify the Zenodo record preserves the R-reference `isDerivedFrom` relation without presenting the R DOI as the Python DOI.
 - [ ] Verify Software Heritage archival status once Zenodo reports it under external resources.
+
+## 0.1.3 — Studio release gates
+
+- [x] Scientific core remains frozen at 406/406 implemented exports and 0 pending exports.
+- [x] Scientific package validation remains at literal 100% statement coverage across Ubuntu/Windows/macOS and Python 3.11–3.14.
+- [x] gpbiometricspy Studio provides the complete planned application navigation: intake/QC, annotation, EDA/SCR, PPG/HR/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal, statistics/modelling, and reporting/reproducibility.
+- [x] Studio smoke validation runs on Python 3.11 and 3.14.
+- [x] Chromium Studio E2E validation runs on Python 3.11 and 3.14.
+- [x] Public synthetic-demo mode removes upload affordances and independently fails closed for external biometric/AOI/event/secondary-stream/project-recipe inputs.
+- [x] Production/deployment smoke validation reconstructs dependencies from root `requirements.txt` and records synthetic runtime metrics.
+- [x] Studio is included in wheel/sdist packaging as a separate top-level application package with installed `gpbiometricspy-studio` and `gpbiometricspy-studio-public` launchers.
+- [x] README/MkDocs expose a first-class Studio guide and distinguish public synthetic use from full local/authenticated research-data use.
+- [x] Stable release workflow requires exact-main Studio smoke, browser E2E, and production/distribution success in addition to the existing scientific/docs/security/parity/interoperability/private-data gates.
+- [ ] Merge the Studio launch/release-hardening tranche and confirm all pull-request gates are green.
+- [ ] Freeze package, `__version__`, Zenodo, citation, README/site and changelog metadata from `0.1.3.dev0` to `0.1.3`.
+- [ ] Require every stable-release gate to succeed on the exact stable `main` commit.
+- [ ] Create immutable `v0.1.3` from that exact commit and let the protected release workflow build/check/publish artifacts.
+- [ ] Confirm GitHub Release assets and SHA-256 manifest.
+- [ ] Confirm PyPI `gpbiometricspy==0.1.3` is public and fresh-index installable.
+- [ ] Wait for Zenodo ingestion; record the new `0.1.3` version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.

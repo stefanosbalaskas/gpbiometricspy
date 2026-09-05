@@ -5,10 +5,14 @@ include CHANGELOG.md
 include CITATION.cff
 include .zenodo.json
 include mkdocs.yml
+include app.py
+include requirements.txt
+include DEPLOYMENT.md
 recursive-include reference *.csv *.json *.R *.Rd *.Rmd *.md *.yml *.cff *.txt
 recursive-include tests *.py
 recursive-include docs *.md *.png *.css *.json
 recursive-include scripts *.py
 recursive-include examples *.py
+recursive-include studio *.py *.md *.css
 recursive-include src/gpbiometricspy/data *.csv *.txt
 recursive-include .github *.yml *.yaml *.md

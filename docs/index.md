@@ -4,10 +4,11 @@
 
 # Measure. Align. Validate. Report.
 
-**gpbiometricspy** brings the complete **406-function gpbiometrics 2.0.0 surface** into Python for EDA/GSR/SCR, PPG/IBI/HRV, pupil, gaze, AOIs, event alignment, quality control, reporting, and research-tool interoperability.
+**gpbiometricspy** brings the complete **406-function gpbiometrics 2.0.0 surface** into Python for EDA/GSR/SCR, PPG/IBI/HRV, pupil, gaze, AOIs, event alignment, quality control, reporting, and research-tool interoperability — with **gpbiometricspy Studio** as a Shiny for Python application layer over the same public scientific API.
 
 <div class="gp-actions">
 <a class="md-button md-button--primary" href="getting-started/">Get started</a>
+<a class="md-button" href="studio/">Open Studio guide</a>
 <a class="md-button" href="workflows/">Choose a workflow</a>
 <a class="md-button" href="plot-gallery/">See real plots</a>
 </div>
@@ -25,6 +26,30 @@
 !!! info "Development documentation"
     This site tracks `main` (`0.1.3.dev0`). The latest stable release is `0.1.2`, archived at DOI [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873). The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
 
+## Code or Studio
+
+Use the Python API when you want scripts, notebooks, pipelines, or direct integration into a larger analysis stack. Use Studio when you want one stateful research interface over the same package functions.
+
+<div class="gp-card-grid">
+
+<a class="gp-card gp-card-link" href="getting-started/">
+<span class="gp-card-icon">⌨</span>
+<h3>Python API</h3>
+<p>Install the package and build explicit scripts around the complete 406-function scientific surface.</p>
+<span class="gp-card-cta">Start coding →</span>
+</a>
+
+<a class="gp-card gp-card-link" href="studio/">
+<span class="gp-card-icon">▣</span>
+<h3>gpbiometricspy Studio</h3>
+<p>Run QC, annotation, EDA/SCR, PPG/HRV, pupil, gaze/AOI, alignment, multimodal, modelling and reproducibility workflows in Shiny for Python.</p>
+<span class="gp-card-cta">Open Studio guide →</span>
+</a>
+
+</div>
+
+The Studio public-deployment boundary is **synthetic-only and fail-closed for external file uploads**. Research data belong in the full local Studio or an appropriately authenticated/private deployment.
+
 ## Install and move
 
 === "Stable"
@@ -38,6 +63,15 @@
     ```bash
     python -m pip install \
       "gpbiometricspy @ git+https://github.com/stefanosbalaskas/gpbiometricspy.git@main"
+    ```
+
+=== "Development + Studio"
+
+    ```bash
+    git clone https://github.com/stefanosbalaskas/gpbiometricspy.git
+    cd gpbiometricspy
+    python -m pip install -e ".[studio]"
+    gpbiometricspy-studio
     ```
 
 ```python
@@ -110,7 +144,7 @@ events = gp.extract_gazepoint_ttl_events(data)
 </div>
 <div class="gp-pillar">
 <h3>Validation as a first-class output</h3>
-<p>Current CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14, plus deep parity and interoperability checks.</p>
+<p>Current CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14, plus deep parity, interoperability, Studio smoke, Chromium E2E and production-deployment checks.</p>
 <a href="deep-validation/">See validation →</a>
 </div>
 <div class="gp-pillar">
@@ -158,6 +192,7 @@ Every gallery image is regenerated from the current Python API during the docume
 
 <div class="gp-mini-grid">
 <a href="getting-started/">5-minute start</a>
+<a href="studio/">Studio application</a>
 <a href="workflows/">Workflow map</a>
 <a href="articles/">26 articles</a>
 <a href="integrations/">Integrations</a>

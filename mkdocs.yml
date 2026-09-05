@@ -65,6 +65,7 @@ nav:
   - Home: index.md
   - Start here:
       - Getting started: getting-started.md
+      - gpbiometricspy Studio: studio.md
       - Workflow map: workflows.md
       - Synthetic demo: demo.md
   - Workflows:

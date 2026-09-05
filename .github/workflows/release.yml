@@ -94,7 +94,16 @@ jobs:
         run: |
           set -euo pipefail
           TARGET_SHA="$(git rev-parse HEAD)"
-          for workflow in tests.yml docs.yml codeql.yml deep-parity.yml interoperability.yml real-data-validation.yml; do
+          for workflow in \
+            tests.yml \
+            docs.yml \
+            codeql.yml \
+            deep-parity.yml \
+            interoperability.yml \
+            real-data-validation.yml \
+            studio.yml \
+            studio-e2e.yml \
+            studio-production.yml; do
             echo "Checking $workflow for $TARGET_SHA on main..."
             ok="$(gh run list --workflow "$workflow" --commit "$TARGET_SHA" --branch main --limit 20 \
               --json conclusion \
@@ -111,6 +120,45 @@ jobs:
       - name: Check distribution metadata
         run: python -m twine check dist/*
 
+      - name: Verify Studio is present in release distributions
+        run: |
+          python - <<'PY'
+          import tarfile
+          import zipfile
+          from pathlib import Path
+
+          wheel = next(Path('dist').glob('gpbiometricspy-*.whl'))
+          with zipfile.ZipFile(wheel) as zf:
+              wheel_names = set(zf.namelist())
+          wheel_required = {
+              'studio/__init__.py',
+              'studio/app.py',
+              'studio/cli.py',
+              'studio/public_demo.py',
+              'studio/modules/__init__.py',
+              'studio/www/studio.css',
+              'studio/www/public-demo.css',
+          }
+          missing = sorted(wheel_required - wheel_names)
+          if missing:
+              raise SystemExit(f'Studio files missing from wheel: {missing}')
+
+          sdist = next(Path('dist').glob('gpbiometricspy-*.tar.gz'))
+          with tarfile.open(sdist, 'r:gz') as tf:
+              sdist_names = set(tf.getnames())
+          root = next(name.split('/', 1)[0] for name in sdist_names if '/studio/app.py' in name)
+          sdist_required = {
+              f'{root}/app.py',
+              f'{root}/requirements.txt',
+              f'{root}/DEPLOYMENT.md',
+              f'{root}/studio/app.py',
+              f'{root}/studio/public_demo.py',
+          }
+          missing = sorted(sdist_required - sdist_names)
+          if missing:
+              raise SystemExit(f'Studio deployment assets missing from sdist: {missing}')
+          PY
+
       - name: Smoke-install wheel and sdist
         run: |
           set -euo pipefail
@@ -123,11 +171,19 @@ jobs:
             "$envdir/venv/bin/python" -m pip install "$artifact"
             "$envdir/venv/bin/python" - <<'PY'
           import os
+          from importlib.metadata import distribution
           import gpbiometricspy as gp
+
           assert gp.__version__ == os.environ["VERSION"]
           assert len(gp.R_EXPORTS) == 406
           assert len(gp.IMPLEMENTED_EXPORTS) == 406
           assert len(gp.PENDING_EXPORTS) == 0
+          dist = distribution("gpbiometricspy")
+          paths = {str(item) for item in (dist.files or [])}
+          assert "studio/app.py" in paths
+          scripts = {ep.name: ep.value for ep in dist.entry_points if ep.group == "console_scripts"}
+          assert scripts.get("gpbiometricspy-studio") == "studio.cli:main"
+          assert scripts.get("gpbiometricspy-studio-public") == "studio.cli:main_public"
           print("distribution smoke PASS", gp.__version__)
           PY
             rm -rf "$envdir"
