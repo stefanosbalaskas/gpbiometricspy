@@ -67,3 +67,13 @@
 - [ ] Confirm GitHub Release assets and SHA-256 manifest.
 - [ ] Confirm PyPI `gpbiometricspy==0.1.3` is public and fresh-index installable.
 - [ ] Wait for Zenodo ingestion; record the new `0.1.3` version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
+
+
+### 0.1.3 post-release closeout
+
+- [x] Protected PyPI Trusted Publishing completed successfully.
+- [x] Public PyPI JSON hashes match the GitHub Release wheel and sdist.
+- [x] Clean public-index installs passed on Python 3.11 and 3.14, including Studio launchers.
+- [x] Zenodo ingested `v0.1.3`; version DOI: `10.5281/zenodo.22313884`.
+- [x] Concept DOI remains `10.5281/zenodo.22150872`.
+- [x] Move repository development identity to `0.1.4.dev0` after the immutable 0.1.3 release.

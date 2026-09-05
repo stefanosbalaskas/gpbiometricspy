@@ -24,7 +24,7 @@
 </div>
 
 !!! info "Stable 0.1.3 documentation"
-    This site is frozen for `gpbiometricspy 0.1.3` (2026-09-05). The 0.1.3 version DOI will be added after Zenodo ingests the GitHub release. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872); the previous 0.1.2 version DOI is [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873).
+    This site is frozen for `gpbiometricspy 0.1.3` (2026-09-05). The 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872); the previous 0.1.2 version DOI is [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873).
 
 ## Code or Studio
 

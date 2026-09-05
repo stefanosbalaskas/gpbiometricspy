@@ -37,6 +37,7 @@
 | Status | Current state |
 |---|---|
 | Stable release | **0.1.3** |
+| Development head | **0.1.4.dev0** |
 | Release date | **2026-09-05** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
@@ -179,7 +180,7 @@ Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and d
 <a id="citation"></a>
 ## Archival and citation
 
-`gpbiometricspy 0.1.3` is the current stable release. Its version-specific Zenodo DOI will be recorded after Zenodo ingests the GitHub release; until then the concept DOI identifies the evolving Python software record.
+`gpbiometricspy 0.1.3` is the current stable release. Its version-specific Zenodo DOI is **10.5281/zenodo.22313884**; the concept DOI identifies the evolving Python software record.
 
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
 - **Previous version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)

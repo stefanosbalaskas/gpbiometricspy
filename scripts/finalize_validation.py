@@ -57,7 +57,7 @@ for p in sorted((ROOT / "dist").glob("*")) if (ROOT / "dist").exists() else []:
         dist_rows.append((p.name, p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest()))
 
 summary = [
-    "gpbiometricspy 0.1.3 RELEASE VALIDATION",
+    f"gpbiometricspy {gp.__version__} VALIDATION",
     "=" * 76,
     f"Version: {gp.__version__}",
     "Frozen R semantic reference: gpbiometrics 2.0.0",

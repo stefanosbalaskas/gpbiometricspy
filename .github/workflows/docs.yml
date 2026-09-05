@@ -87,9 +87,18 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import re
+          import tomllib
           from pathlib import Path
+
+          project = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))['project']
+          project_version = project['version']
+          urls = project['urls']
+          version_doi = urls['VersionDOI'].removeprefix('https://doi.org/')
+          previous_doi = urls['PreviousVersionDOI'].removeprefix('https://doi.org/')
+
           z = json.loads(Path('.zenodo.json').read_text(encoding='utf-8'))
-          assert z['version'] == '0.1.3'
+          assert z['version'] == project_version
           assert z['upload_type'] == 'software'
           assert z['access_right'] == 'open'
           assert z['license'] == 'mit'
@@ -99,13 +108,17 @@ jobs:
               and item['relation'] == 'isDerivedFrom'
               for item in z['related_identifiers']
           )
+
           cff = Path('CITATION.cff').read_text(encoding='utf-8')
           assert 'https://orcid.org/0000-0003-2444-9796' in cff
-          assert 'version: 0.1.3' in cff
-          assert 'date-released: 2026-09-05' in cff
-          assert 'doi: 10.5281/zenodo.22150873' not in cff
+          cff_version = re.search(r'(?m)^version:\s*([^\s]+)\s*$', cff).group(1)
+          assert re.fullmatch(r'\d+\.\d+\.\d+', cff_version)
+          if re.fullmatch(r'\d+\.\d+\.\d+', project_version):
+              assert cff_version == project_version
+          assert f'doi: {version_doi}' in cff
+          assert f'doi: {previous_doi}' not in cff
           PY
-      - name: Audit stable release identity
+      - name: Audit package/release identity
         run: python scripts/audit_release_identity.py
       - run: PYTHONPATH=src python scripts/generate_docs_gallery.py
       - run: python -c "import json, pathlib; p=pathlib.Path('docs/assets/generated/manifest.json'); d=json.loads(p.read_text()); assert len(d['figures']) == 13"

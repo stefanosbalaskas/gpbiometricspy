@@ -206,7 +206,7 @@ def generate_gazepoint_manifest(input_paths=None, parameters=None, outputs=None,
     try:
         from . import __version__ as version
     except Exception:
-        version = "0.1.3"
+        version = "0.1.4.dev0"
     manifest = {
         "created_at": datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"),
         "package": "gpbiometricspy",

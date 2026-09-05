@@ -275,7 +275,7 @@ def _register_pending_exports(names):
 
 _register_pending_exports(PENDING_EXPORTS)
 
-__version__ = "0.1.3"
+__version__ = "0.1.4.dev0"
 __all__ = [*R_EXPORTS, "R_EXPORTS", "IMPLEMENTED_EXPORTS", "PENDING_EXPORTS", "ParityNotImplementedError", "ReportText", "kiosk_demo_files", "kiosk_demo_overview", "kiosk_demo_path", "kiosk_demo_trial_design", "load_kiosk_demo"]
 
 # Python-native convenience helpers; intentionally not members of the frozen R_EXPORTS contract.
