@@ -204,3 +204,18 @@ The sixth 0.1.4 branch/path tranche targets the largest remaining HRV-style cont
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:2a818fd7c33b0a62fbeba0140b0e4b17c6910c763e6a8a51f46ffbbc084de331`;
 - the persistent pure branch-coverage regression floor is raised conservatively from **90.3% to 91.0%**, retaining headroom below the measured **91.3657%** while preventing regression to the prior **90.6686%** tranche level.
+
+### HeartPy-style branch tranche
+
+The seventh 0.1.4 branch/path tranche targets the largest remaining HeartPy-style PPG/HRV control-flow debt through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the pyHRV-style tranche: **5,111 / 5,594 branches = 91.3657%**;
+- post-tranche exact measured coverage: **5,145 / 5,594 branches = 91.9735%**;
+- missing branch paths reduced from **483 to 449** (**34 newly validated paths** in this tranche; **330 cumulatively** since the original 0.1.4 baseline);
+- `heartpy_style.py`: **227 / 264 branches = 85.985% → 261 / 264 branches = 98.864%**;
+- public-API tests cover time-column inference and group validation, short/nonfinite/constant clipping inputs, enhancement/Butterworth/Hampel sampling guardrails, detector shape/sampling/high-precision fallback behavior, peak rejection and RR-from-peaks alternatives, empty/tiny RR resampling and frequency inputs, empty measures and plotting/report validation, unsectioned scaling, RR-cleaning invalid/short/zero-dispersion alternatives, and segmentwise input/plot guardrails;
+- the three residual `heartpy_style.py` branches are structural defensive paths rather than missing exported behavior: arc `134 → exit` checks for an empty `output_dir` only after `Path(output_dir)` construction, while `Path("")` normalizes to `.`; arc `154 → 156` is the false branch of `if n > 1` after an earlier unconditional return for every `n < 4`, so reaching that line implies `n >= 4`; and arc `399 → exit` checks for an empty positive datetime-difference vector only after timestamps have been de-duplicated, sorted, and required to have length at least two, which necessarily yields positive adjacent differences;
+- those defensive guards are retained rather than manufacturing private-helper tests or changing valid production code solely for nominal branch closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:e0437027b2000309f25aeae2e3852f24c5858839da8cb7a72449c017c2bf44ae`;
+- the persistent pure branch-coverage regression floor is raised conservatively from **91.0% to 91.6%**, retaining headroom below the measured **91.9735%** while preventing regression to the prior **91.3657%** tranche level.
