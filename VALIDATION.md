@@ -522,3 +522,19 @@ The twenty-sixth 0.1.4 branch/path tranche closes the complete remaining nonline
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the corrected validating measured-head artifact is ID **9977589504** and is bound by digest `sha256:996367e9f1bc18492fdc3811d56af718bb8375372eceb42c52a2fb111536a62d`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **98.5% to 98.7%**, retaining headroom below the measured **98.8023%** while preventing regression to the prior **98.6235%** tranche level.
+
+### Governance extra branch tranche
+
+The twenty-seventh 0.1.4 branch/path tranche closes the complete remaining preregistration-readiness and interoperability-governance control-flow debt through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the advanced-nonlinear tranche: **5,527 / 5,594 branches = 98.8023%**;
+- post-tranche exact measured coverage: **5,537 / 5,594 branches = 98.9811%**;
+- missing branch paths reduced from **67 to 57** (**10 newly validated paths** in this tranche; **722 cumulatively** since the original 0.1.4 baseline);
+- `governance_extra.py`: **48 / 58 branches = 82.759% → 58 / 58 branches = 100.000%**;
+- public-API tests cover preregistration optional-item and required-field boolean validation, invalid evidence mappings, missing readiness grouping columns, interoperability support/audit-flag validation, malformed manifest contracts, deterministic strict-mode failure, invalid writer objects, and invalid filename prefixes;
+- all 10 pre-tranche residual `governance_extra.py` paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**; the empirical branch run completed **517 tests** successfully;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is ID **9977712397** and is bound by digest `sha256:38b3f0f2acf1c7e4382745b1489ffb0c7e860f542db20229ee8dd7fa4dba4d94`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **98.7% to 98.9%**, retaining headroom below the measured **98.9811%** while preventing regression to the prior **98.8023%** tranche level.
