@@ -154,7 +154,7 @@ The third 0.1.4 branch/path tranche targets the largest remaining deterministic 
 
 - pre-tranche measurement inherited from the scientific-QC tranche: **4,928 / 5,594 branches = 88.0944%**;
 - post-tranche exact-head measurement: **4,981 / 5,594 branches = 89.0418%**;
-- missing branch paths reduced from **666 to 613** (**53 newly validated paths** in this tranche; **166 cumulatively** since the 0.1.4 baseline);
+- missing branch paths reduced from **666 to 613** (**53 newly validated paths** in this tranche; **166 cumulatively** since the original 0.1.4 baseline);
 - `final_remaining.py`: **279 / 332 branches = 84.036% → 332 / 332 branches = 100.000%**;
 - the added tests exercise exported AOI assignment, BIDS export, eyetrackingR/gazeR/pupillometryR adapters, data-quality/dashboard reporting, artifact-SVM features, autoencoder guardrails, point-process alternatives, preregistration/trial-regressor paths, and smoke/privacy behavior;
 - helper-level branches are reached through exported `gpbiometricspy` front doors rather than by directly testing private helpers;
@@ -329,3 +329,19 @@ The fourteenth 0.1.4 branch/path tranche closes the complete remaining control-f
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:aebdbcc35957bba2d3432dbc4cba32031b0f615069ceda2b182f8df22fc9708d`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **94.7% to 95.2%**, retaining headroom below the measured **95.5846%** while preventing regression to the prior **95.0840%** tranche level.
+
+### Final science bridges branch tranche
+
+The fifteenth 0.1.4 branch/path tranche closes the complete remaining control-flow debt in the final scientific bridge utilities through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the QC-dropouts tranche: **5,347 / 5,594 branches = 95.5846%**;
+- post-tranche exact measured coverage: **5,374 / 5,594 branches = 96.0672%**;
+- missing branch paths reduced from **247 to 220** (**27 newly validated paths** in this tranche; **559 cumulatively** since the original 0.1.4 baseline);
+- `final_science_bridges.py`: **133 / 160 branches = 83.125% → 160 / 160 branches = 100.000%**;
+- public-API tests cover automated-statistics validation, mixed-completion and non-Holm paths; cardiorespiratory missing-column, non-standardized and partial-group behavior; bootstrap empty/missing/paired/configuration validation, median contrasts and no-valid-bootstrap behavior; CTSI no-event/no-output alternatives; cvxEDA tau validation and failed/partial optimization; EDA pipeline blueprint/runner guardrails; non-flattened XDF import; online-design validation and previous-assignment/cost alternatives; PsPM DCM default/no-event behavior; and SCR multiverse failed/partial/model-callback paths;
+- all 27 pre-tranche residual `final_science_bridges.py` branch paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:1b0888fbe9feb9ce53c87c5cccbe505ad98777231e5e24696a42e413870c838c`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **95.2% to 95.7%**, retaining headroom below the measured **96.0672%** while preventing regression to the prior **95.5846%** tranche level.
