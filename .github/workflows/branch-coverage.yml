@@ -42,4 +42,14 @@ jobs:
           python scripts/report_branch_coverage.py \
             coverage-branch.json \
             --top 30 \
-            --fail-under 86.8
+            --fail-under 86.8 | tee branch-coverage-audit.txt
+      - name: Upload branch-coverage evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: branch-coverage-python-3.13
+          path: |
+            coverage-branch.json
+            branch-coverage-audit.txt
+          if-no-files-found: warn
+          retention-days: 30
