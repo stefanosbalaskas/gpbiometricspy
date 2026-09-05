@@ -410,3 +410,19 @@ The nineteenth 0.1.4 branch/path tranche targets the remaining preprocessing, sm
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:03b0acda0e232b8a303071d1ae47461192588d10d51964f356cd828adcbb0858`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **96.8% to 97.1%**, retaining headroom below the measured **97.3007%** while preventing regression to the prior **97.0147%** tranche level.
+
+### Compatibility branch tranche
+
+The twentieth 0.1.4 branch/path tranche targets compatibility-layer column standardization, pupil interpolation, and mixed-model preparation control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the remaining-core tranche: **5,443 / 5,594 branches = 97.3007%**;
+- post-tranche exact measured coverage: **5,458 / 5,594 branches = 97.5688%**;
+- missing branch paths reduced from **151 to 136** (**15 newly validated paths** in this tranche; **643 cumulatively** since the original 0.1.4 baseline);
+- `compatibility.py`: **56 / 72 branches = 77.778% → 71 / 72 branches = 98.611%**;
+- public-API tests cover non-data-frame and empty inputs, invalid conflict mode and conflict=`keep` standardization; short/degenerate time vectors, complete pupil data, too-sparse pupil data and edge gaps; interpolation method/pupil/time/blink validation; and mixed-model missing requested columns, disabled outcome dropping and disabled numeric scaling;
+- the sole residual `compatibility.py` branch is arc `36 → exit`, private `_unique_name()`'s early return when `target` is absent from `existing`: its only production caller invokes `_unique_name()` only inside a preceding `if target in ...` branch and passes that same competing-name list, so the target-absent path is structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing production solely for nominal closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:11a4cb2973fc86c58d634701230d006829e21589ead108ca9d2ed221a49ef3f2`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **97.1% to 97.4%**, retaining headroom below the measured **97.5688%** while preventing regression to the prior **97.3007%** tranche level.
