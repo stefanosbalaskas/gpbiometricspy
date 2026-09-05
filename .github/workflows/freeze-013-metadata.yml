@@ -1,0 +1,203 @@
+name: freeze-013-metadata
+
+on:
+  push:
+    branches: [release-0.1.3-freeze]
+    paths:
+      - ".github/workflows/freeze-013-metadata.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  freeze:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: release-0.1.3-freeze
+          fetch-depth: 0
+      - name: Freeze 0.1.3 release identity
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          def replace(path: str, old: str, new: str, *, count: int | None = None) -> None:
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              found = text.count(old)
+              if found == 0:
+                  raise SystemExit(f"Expected release-freeze pattern not found in {path}: {old!r}")
+              if count is not None and found != count:
+                  raise SystemExit(f"Unexpected count in {path}: {old!r} found {found}, expected {count}")
+              p.write_text(text.replace(old, new), encoding="utf-8")
+
+          simple_version_files = [
+              "src/gpbiometricspy/__init__.py",
+              "src/gpbiometricspy/governance_extra.py",
+              "src/gpbiometricspy/governance_core.py",
+              "src/gpbiometricspy/remaining_core.py",
+              "tests/test_post_release_completeness.py",
+              "tests/test_coverage_completion_remaining_core.py",
+              "docs/assets/generated/manifest.json",
+              "docs/plot-gallery.md",
+              "scripts/finalize_validation.py",
+              "VALIDATION.md",
+              "docs/studio.md",
+          ]
+          for path in simple_version_files:
+              replace(path, "0.1.3.dev0", "0.1.3")
+
+          replace(
+              "tests/test_post_release_completeness.py",
+              "def test_development_version_and_stable_contract():",
+              "def test_stable_version_and_contract():",
+              count=1,
+          )
+          replace(
+              "scripts/finalize_validation.py",
+              "gpbiometricspy 0.1.3 DEVELOPMENT VALIDATION",
+              "gpbiometricspy 0.1.3 RELEASE VALIDATION",
+              count=1,
+          )
+          replace(
+              "docs/studio.md",
+              "The Studio application is included in the `0.1.3` development distribution",
+              "The Studio application is included in the stable `0.1.3` distribution",
+              count=1,
+          )
+
+          zenodo_path = Path(".zenodo.json")
+          zenodo = json.loads(zenodo_path.read_text(encoding="utf-8"))
+          if zenodo.get("version") != "0.1.3.dev0":
+              raise SystemExit(f"Unexpected Zenodo version: {zenodo.get('version')}")
+          zenodo["version"] = "0.1.3"
+          if "Shiny for Python" not in zenodo["description"]:
+              zenodo["description"] += " Version 0.1.3 also distributes gpbiometricspy Studio, a Shiny for Python application layer over the public scientific API."
+          zenodo_path.write_text(json.dumps(zenodo, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+          replace("CITATION.cff", "version: 0.1.2", "version: 0.1.3", count=1)
+          replace("CITATION.cff", "date-released: 2026-08-29", "date-released: 2026-09-05", count=1)
+          replace("CITATION.cff", "doi: 10.5281/zenodo.22150873\n", "", count=1)
+
+          replace(
+              "README.md",
+              "| Stable release | **0.1.2** |\n| Development | **0.1.3.dev0** |",
+              "| Stable release | **0.1.3** |\n| Release date | **2026-09-05** |",
+              count=1,
+          )
+          replace(
+              "README.md",
+              "Studio is a repository/application layer over the public package API. On the current `0.1.3.dev0` development branch it is also included in the Python distribution with installed launch commands.",
+              "Studio is a repository/application layer over the public package API. In stable `0.1.3`, it is included in the Python distribution with installed launch commands.",
+              count=1,
+          )
+          replace(
+              "README.md",
+              "`gpbiometricspy 0.1.2` is the first Python release archived automatically through the Zenodo GitHub integration.\n\n- **Version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)\n- **Concept DOI (all gpbiometricspy versions):** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)\n- **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)",
+              "`gpbiometricspy 0.1.3` is the current stable release. Its version-specific Zenodo DOI will be recorded after Zenodo ingests the GitHub release; until then the concept DOI identifies the evolving Python software record.\n\n- **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)\n- **Previous version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)\n- **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)",
+              count=1,
+          )
+
+          replace(
+              "docs/index.md",
+              '<div><span class="gp-status-value">0.1.2</span><span class="gp-status-label">stable release</span></div>\n<div><span class="gp-status-value">0.1.3.dev0</span><span class="gp-status-label">development docs</span></div>',
+              '<div><span class="gp-status-value">0.1.3</span><span class="gp-status-label">stable release</span></div>\n<div><span class="gp-status-value">2026-09-05</span><span class="gp-status-label">release date</span></div>',
+              count=1,
+          )
+          replace(
+              "docs/index.md",
+              '!!! info "Development documentation"\n    This site tracks `main` (`0.1.3.dev0`). The latest stable release is `0.1.2`, archived at DOI [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873). The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).',
+              '!!! info "Stable 0.1.3 documentation"\n    This site is frozen for `gpbiometricspy 0.1.3` (2026-09-05). The 0.1.3 version DOI will be added after Zenodo ingests the GitHub release. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872); the previous 0.1.2 version DOI is [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873).',
+              count=1,
+          )
+
+          replace(
+              "docs/getting-started.md",
+              "Stable `0.1.2` is the public release; this documentation tracks `main` (`0.1.3.dev0`).",
+              "`0.1.3` is the stable public release; this documentation is frozen from the validated release source.",
+              count=1,
+          )
+
+          replace(
+              "docs/citation.md",
+              '<strong>Current citation state:</strong> stable Python release <code>0.1.2</code>; development branch <code>0.1.3.dev0</code>; Zenodo version and concept DOI registered.',
+              '<strong>Current citation state:</strong> stable Python release <code>0.1.3</code> (2026-09-05); its version-specific Zenodo DOI will be added after Zenodo ingests the GitHub release; the software concept DOI is already registered.',
+              count=1,
+          )
+          replace(
+              "docs/citation.md",
+              "- **0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**\n- **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**",
+              "- **0.1.3 version DOI:** pending Zenodo ingestion of the `v0.1.3` GitHub release\n- **Previous 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**\n- **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**",
+              count=1,
+          )
+          replace(
+              "docs/citation.md",
+              "GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the file records the 0.1.2 version DOI.",
+              "GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the release freeze records 0.1.3 identity and date, and its version DOI will be added after Zenodo mints it.",
+              count=1,
+          )
+          replace(
+              "docs/citation.md",
+              "- `CITATION.cff` identifies the latest stable Python software version and its version DOI, and records the published R-package paper as a related reference.",
+              "- `CITATION.cff` identifies the latest stable Python software version and release date, and records the published R-package paper as a related reference; the 0.1.3 version DOI is added after Zenodo ingestion.",
+              count=1,
+          )
+
+          replace(
+              "CHANGELOG.md",
+              "## 0.1.3.dev0 — Studio application and production-readiness development",
+              "## 0.1.3 — 2026-09-05 — gpbiometricspy Studio and production-ready application",
+              count=1,
+          )
+
+          replace(
+              "RELEASE_CHECKLIST.md",
+              "- [ ] Merge the Studio launch/release-hardening tranche and confirm all pull-request gates are green.",
+              "- [x] Merge the Studio launch/release-hardening tranche and confirm all pull-request gates are green.",
+              count=1,
+          )
+          replace(
+              "RELEASE_CHECKLIST.md",
+              "- [ ] Freeze package, `__version__`, Zenodo, citation, README/site and changelog metadata from `0.1.3.dev0` to `0.1.3`.",
+              "- [x] Freeze package, `__version__`, Zenodo, citation, README/site and changelog metadata from `0.1.3.dev0` to `0.1.3` without inventing a pre-ingestion Zenodo version DOI.",
+              count=1,
+          )
+
+          replace(".github/workflows/docs.yml", "assert z['version'] == '0.1.3.dev0'", "assert z['version'] == '0.1.3'", count=1)
+          replace(".github/workflows/docs.yml", "assert 'version: 0.1.2' in cff", "assert 'version: 0.1.3' in cff", count=1)
+          replace(
+              ".github/workflows/docs.yml",
+              "assert 'doi: 10.5281/zenodo.22150873' in cff",
+              "assert 'date-released: 2026-09-05' in cff\n          assert 'doi: 10.5281/zenodo.22150873' not in cff",
+              count=1,
+          )
+
+          # After the targeted replacements, no release-facing development version
+          # literal may remain in tracked source/docs/tests used by the stable tag.
+          scan_roots = [Path("src"), Path("tests"), Path("docs"), Path("scripts")]
+          offenders = []
+          for root in scan_roots:
+              for p in root.rglob("*"):
+                  if p.is_file() and p.suffix in {".py", ".md", ".json", ".yml", ".yaml", ".toml", ".cff"}:
+                      try:
+                          if "0.1.3.dev0" in p.read_text(encoding="utf-8"):
+                              offenders.append(str(p))
+                      except UnicodeDecodeError:
+                          pass
+          for p in [Path("README.md"), Path("CHANGELOG.md"), Path("VALIDATION.md"), Path("CITATION.cff"), Path(".zenodo.json")]:
+              if "0.1.3.dev0" in p.read_text(encoding="utf-8"):
+                  offenders.append(str(p))
+          if offenders:
+              raise SystemExit("Unfrozen 0.1.3.dev0 literals remain: " + ", ".join(sorted(set(offenders))))
+          PY
+      - name: Commit stable freeze
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src tests docs scripts README.md CHANGELOG.md VALIDATION.md CITATION.cff .zenodo.json RELEASE_CHECKLIST.md .github/workflows/docs.yml
+          git diff --cached --check
+          git commit -m "release: freeze 0.1.3 identity"
+          git push origin HEAD:release-0.1.3-freeze
