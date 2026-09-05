@@ -192,7 +192,7 @@ jobs:
       - name: Write SHA-256 manifest
         run: sha256sum dist/* > SHA256SUMS.txt
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: distributions
           path: |

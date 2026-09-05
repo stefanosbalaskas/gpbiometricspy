@@ -97,7 +97,7 @@ jobs:
       - name: Synthetic runtime smoke profile
         run: python -m studio.production --json studio-production-metrics.json
       - name: Upload runtime metrics
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: studio-production-metrics-py${{ matrix.python-version }}
           path: studio-production-metrics.json
