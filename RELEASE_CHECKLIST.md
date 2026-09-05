@@ -60,8 +60,8 @@
 - [x] Studio is included in wheel/sdist packaging as a separate top-level application package with installed `gpbiometricspy-studio` and `gpbiometricspy-studio-public` launchers.
 - [x] README/MkDocs expose a first-class Studio guide and distinguish public synthetic use from full local/authenticated research-data use.
 - [x] Stable release workflow requires exact-main Studio smoke, browser E2E, and production/distribution success in addition to the existing scientific/docs/security/parity/interoperability/private-data gates.
-- [ ] Merge the Studio launch/release-hardening tranche and confirm all pull-request gates are green.
-- [ ] Freeze package, `__version__`, Zenodo, citation, README/site and changelog metadata from `0.1.3.dev0` to `0.1.3`.
+- [x] Merge the Studio launch/release-hardening tranche and confirm all pull-request gates are green.
+- [x] Freeze package, `__version__`, Zenodo, citation, README/site and changelog metadata from `0.1.3.dev0` to `0.1.3` without inventing a pre-ingestion Zenodo version DOI.
 - [ ] Require every stable-release gate to succeed on the exact stable `main` commit.
 - [ ] Create immutable `v0.1.3` from that exact commit and let the protected release workflow build/check/publish artifacts.
 - [ ] Confirm GitHub Release assets and SHA-256 manifest.

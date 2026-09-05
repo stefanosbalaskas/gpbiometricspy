@@ -104,7 +104,7 @@ The 0.1.2 tranche adds documentation, archival metadata and repository hardening
 - frozen R reference DOI remains separate: `10.5281/zenodo.21434608` with `isDerivedFrom` provenance;
 - public release artifacts, exact-commit CI, documentation, PyPI installation and Zenodo ingestion were verified before returning `main` to development.
 
-## 0.1.3.dev0 literal statement-coverage completion
+## 0.1.3 literal statement-coverage completion
 
 - Windows validation on the current development tree: **100.00% statement coverage**.
 - Coverage is enforced with `--cov-fail-under=100`.

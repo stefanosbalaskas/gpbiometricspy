@@ -17,7 +17,7 @@ This page takes you from installation to a validated, event-aware biometric work
       "gpbiometricspy @ git+https://github.com/stefanosbalaskas/gpbiometricspy.git@main"
     ```
 
-The package requires **Python 3.11 or newer**. Stable `0.1.2` is the public release; this documentation tracks `main` (`0.1.3.dev0`).
+The package requires **Python 3.11 or newer**. `0.1.3` is the stable public release; this documentation is frozen from the validated release source.
 
 ## 2. Load the packaged demo
 
