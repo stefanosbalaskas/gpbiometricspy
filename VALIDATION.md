@@ -361,3 +361,20 @@ The sixteenth 0.1.4 branch/path tranche targets the remaining event-frontdoor co
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:fb2ef4a7c6bf296aeded590c11cd62c9ca37977df5973dab73a3fed780e50d21`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **95.7% to 96.1%**, retaining headroom below the measured **96.4069%** while preventing regression to the prior **96.0672%** tranche level.
+
+### User workflows branch tranche
+
+The seventeenth 0.1.4 branch/path tranche targets the remaining user-workflow plotting, readiness, workflow orchestration, and reporting control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the event-frontdoor tranche: **5,393 / 5,594 branches = 96.4069%**;
+- post-tranche exact measured coverage: **5,410 / 5,594 branches = 96.7108%**;
+- missing branch paths reduced from **201 to 184** (**17 newly validated paths** in this tranche; **595 cumulatively** since the original 0.1.4 baseline);
+- `user_workflows.py`: **346 / 366 branches = 94.536% → 363 / 366 branches = 99.180%**;
+- public-API tests cover points-only/no-legend biometric signal plots; ungrouped and empty explicit quality summaries; dashboard omission of time-reset plots; empty SCR peak overlays; hidden multimodal event markers; specification curves without a zero line; readiness without a detected time column; explicit sampling groups with exclusion recommendations disabled; existing recommendation columns in report tables; report-bundle non-Figure entries with README/session files disabled; and report creation without an output file;
+- the three residual `user_workflows.py` branches are structural defensive paths rather than missing exported behavior: arc `278 → 282` cannot follow the earlier non-empty audit requirement plus `max_groups >= 1` group selection; arc `582 → 584` cannot occur for normal produced HRV feature rows because `extract_gazepoint_hrv_features()` always includes `mean_ibi_ms` and does not emit `mean_ibi_sec`; and arc `673 → 672` cannot occur because all requested/inferred factor and random-effect columns are guaranteed present before the loop;
+- those guards are retained rather than manufacturing private-helper tests or changing valid production code solely for nominal closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:a04e6ab2e58e08fdf4100635022e7d993ce7d5eaa083626f3a3cf55c2640449d`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **96.1% to 96.5%**, retaining headroom below the measured **96.7108%** while preventing regression to the prior **96.4069%** tranche level.
