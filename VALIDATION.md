@@ -249,3 +249,19 @@ The ninth 0.1.4 branch/path tranche closes the complete remaining MNE event, EEG
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:5909731d9feaead01ef06da5dee776a5ec0e72fb2f8abdceabf46660e07f7737`;
 - the frozen 406-export semantic contract, 100% statement-coverage gate, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **92.1% to 92.7%**, retaining headroom below the measured **93.0461%** while preventing regression to the prior **92.4920%** tranche level.
+
+### Final deterministic branch tranche
+
+The tenth 0.1.4 branch/path tranche closes the complete remaining control-flow debt in the final deterministic utilities through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the MNE/EEG/LSL tranche: **5,205 / 5,594 branches = 93.0461%**;
+- post-tranche exact measured coverage: **5,235 / 5,594 branches = 93.5824%**;
+- missing branch paths reduced from **389 to 359** (**30 newly validated paths** in this tranche; **420 cumulatively** since the original 0.1.4 baseline);
+- `final_deterministic.py`: **206 / 236 branches = 87.288% → 236 / 236 branches = 100.000%**;
+- public-API tests cover adaptive EMA operation without an explicit time column; downsampling group/signal-selection validation; sampling-audit option/column/group validation and estimated-rate behavior; HRV feature validation, explicit IBI selection, validity-column omission and sparse-input alternatives; row-level/window-summary exclusion validation and no-participant aggregation; insufficient pupil-baseline reference rows; eye-simulator type/range/bounds guardrails and explicit zero invalid-gaze proportion; and biometric-simulator sampling/no-pulse/TTL-disabled behavior;
+- all 30 pre-tranche residual `final_deterministic.py` branch paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:33b2dc01ed01c4b1ee8a599e980ab6034fa1922239d7ea6d6a6b447a6cbeda15`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **92.7% to 93.2%**, retaining headroom below the measured **93.5824%** while preventing regression to the prior **93.0461%** tranche level.
