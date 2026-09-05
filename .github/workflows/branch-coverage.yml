@@ -7,6 +7,13 @@ on:
       - "tests/**"
       - "scripts/report_branch_coverage.py"
       - ".github/workflows/branch-coverage.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/gpbiometricspy/**"
+      - "tests/**"
+      - "scripts/report_branch_coverage.py"
+      - ".github/workflows/branch-coverage.yml"
   workflow_dispatch:
 
 jobs:
@@ -30,5 +37,9 @@ jobs:
             --cov-branch \
             --cov-report=term-missing \
             --cov-report=json:coverage-branch.json
-      - name: Report branch debt
-        run: python scripts/report_branch_coverage.py coverage-branch.json --top 30
+      - name: Enforce pure branch coverage floor and report debt
+        run: |
+          python scripts/report_branch_coverage.py \
+            coverage-branch.json \
+            --top 30 \
+            --fail-under 86.8
