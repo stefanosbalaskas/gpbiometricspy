@@ -219,3 +219,18 @@ The seventh 0.1.4 branch/path tranche targets the largest remaining HeartPy-styl
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:e0437027b2000309f25aeae2e3852f24c5858839da8cb7a72449c017c2bf44ae`;
 - the persistent pure branch-coverage regression floor is raised conservatively from **91.0% to 91.6%**, retaining headroom below the measured **91.9735%** while preventing regression to the prior **91.3657%** tranche level.
+
+### BioSPPy-style branch tranche
+
+The eighth 0.1.4 branch/path tranche targets BioSPPy-style EDA/PPG, RRI, spectral, and correlation control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the HeartPy-style tranche: **5,145 / 5,594 branches = 91.9735%**;
+- post-tranche exact measured coverage: **5,174 / 5,594 branches = 92.4920%**;
+- missing branch paths reduced from **449 to 420** (**29 newly validated paths** in this tranche; **359 cumulatively** since the original 0.1.4 baseline);
+- `biosppy_style.py`: **155 / 186 branches = 83.333% → 184 / 186 branches = 98.925%**;
+- public-API tests cover preparation/settings validation, explicit signal/time/group errors, nonfinite and nonincreasing time, invalid inferred rates, sparse interpolation and segment handling, overwrite/manifest behavior, exported EDA preparation failures, short PPG filtering and empty onset/template behavior, EDA recovery without a recovery point, RRI detrending/artifact-correction alternatives, short/invalid spectra, absolute/zero-total band power, phase locking, and correlation validation/lag insufficiency;
+- the two residual `biosppy_style.py` branches are caller-dominated defensive guards rather than missing exported behavior: arc `20 → exit` is private `_running_mean()`'s `k <= 1` return, while repository search confirms its sole BioSPPy production caller invokes it as `_running_mean(..., max(3, round(.25 * fs)))`; arc `85 → exit` is private `_peak_indices(peaks=None)`, while both exported PPG callers replace `peaks=None` with `_detect_ppg(...)` before invoking `_peak_indices()`;
+- those defensive guards are retained rather than manufacturing private-helper tests or changing valid production code solely for nominal branch closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:7c7ea93b9d555170135a5135c77d2dc6782651b504ea6ca61cfe5241291fa0c4`;
+- the persistent pure branch-coverage regression floor is raised conservatively from **91.6% to 92.1%**, retaining headroom below the measured **92.4920%** while preventing regression to the prior **91.9735%** tranche level.
