@@ -313,3 +313,19 @@ The thirteenth 0.1.4 branch/path tranche closes the complete remaining control-f
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:199c8ac7c253855d455625bee5307eb821902af4fba291a9537fb47c3fac6ef5`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **94.2% to 94.7%**, retaining headroom below the measured **95.0840%** while preventing regression to the prior **94.5835%** tranche level.
+
+### QC dropouts branch tranche
+
+The fourteenth 0.1.4 branch/path tranche closes the complete remaining control-flow debt in time-reset, dropout/nonwear, filtering, and upsampling utilities through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the QC-audits/design tranche: **5,319 / 5,594 branches = 95.0840%**;
+- post-tranche exact measured coverage: **5,347 / 5,594 branches = 95.5846%**;
+- missing branch paths reduced from **275 to 247** (**28 newly validated paths** in this tranche; **532 cumulatively** since the original 0.1.4 baseline);
+- `qc_dropouts.py`: **216 / 244 branches = 88.525% → 244 / 244 branches = 100.000%**;
+- public-API tests cover exact time-column autodetection and nonfinite reindex behavior; short missing and low-variance nonwear runs; nonwear-summary validation; filter signal/method/group/time/window/suffix guardrails, rolling missingness and sparse detrending; and upsampling empty/missing/group/signal/interval/method guardrails, insufficient/duplicate time groups, and sparse-signal interpolation fallback;
+- all 28 pre-tranche residual `qc_dropouts.py` branch paths are closed through exported production behavior; private run, rolling, low-variance and interpolation helpers are reached only through exported front doors, so no private-helper-only test or structural residual remains;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:aebdbcc35957bba2d3432dbc4cba32031b0f615069ceda2b182f8df22fc9708d`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **94.7% to 95.2%**, retaining headroom below the measured **95.5846%** while preventing regression to the prior **95.0840%** tranche level.
