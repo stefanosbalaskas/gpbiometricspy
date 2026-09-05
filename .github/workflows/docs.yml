@@ -10,6 +10,7 @@ on:
       - "pyproject.toml"
       - "scripts/generate_reference_docs.py"
       - "scripts/generate_docs_gallery.py"
+      - "scripts/audit_release_identity.py"
       - ".github/workflows/docs.yml"
   push:
     branches: [main, master]
@@ -104,6 +105,8 @@ jobs:
           assert 'date-released: 2026-09-05' in cff
           assert 'doi: 10.5281/zenodo.22150873' not in cff
           PY
+      - name: Audit stable release identity
+        run: python scripts/audit_release_identity.py
       - run: PYTHONPATH=src python scripts/generate_docs_gallery.py
       - run: python -c "import json, pathlib; p=pathlib.Path('docs/assets/generated/manifest.json'); d=json.loads(p.read_text()); assert len(d['figures']) == 13"
       - run: mkdocs build --strict
