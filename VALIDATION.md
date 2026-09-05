@@ -442,3 +442,19 @@ The twenty-first 0.1.4 branch/path tranche targets the remaining advanced physio
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:3accd5d6c1d4daaf9974211b19f615debccc5956bd1bb4b0a0b7bf4052025131`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **97.4% to 97.6%**, retaining headroom below the measured **97.7833%** while preventing regression to the prior **97.5688%** tranche level.
+
+### Alignment and AOI branch tranche
+
+The twenty-second 0.1.4 branch/path tranche closes the complete remaining control-flow debt in stream alignment, AOI timecourses, event-locked multimodal summaries, and quality-dashboard validation through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the advanced-physiology tranche: **5,470 / 5,594 branches = 97.7833%**;
+- post-tranche exact measured coverage: **5,483 / 5,594 branches = 98.0157%**;
+- missing branch paths reduced from **124 to 111** (**13 newly validated paths** in this tranche; **668 cumulatively** since the original 0.1.4 baseline);
+- `alignment_aoi.py`: **61 / 74 branches = 82.432% → 74 / 74 branches = 100.000%**;
+- public-API tests cover nonnumeric event-vector fallback and invalid alignment method; zero-pair and all-nonfinite-pair alignment failures; AOI-definition, grouping-column, bin-width and explicit AOI-column validation; all-nonfinite AOI time groups and `include_empty=False`; event-locked group mismatch and no-window-overlap paths; and quality-dashboard title validation;
+- all 13 pre-tranche residual `alignment_aoi.py` paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:6d8f635e83b2274a832051484fa7b2f82711f1de890bb3a768e4029fe592da09`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **97.6% to 97.8%**, retaining headroom below the measured **98.0157%** while preventing regression to the prior **97.7833%** tranche level.
