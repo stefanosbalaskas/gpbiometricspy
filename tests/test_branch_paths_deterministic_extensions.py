@@ -48,6 +48,14 @@ def test_plot_contract_validation_fallback_and_collection_paths():
     assert gp.get_gazepoint_plot_data(contracted).equals(data)
     assert gp.get_gazepoint_plot_settings(contracted)["plot_type"] == "trace"
 
+    singleton = gp.standardize_gazepoint_plot_contracts(
+        Figure(),
+        settings={"plot_type": "single"},
+        interpretation_notes="single",
+    )
+    assert singleton._gazepoint_plot_contract is True
+    assert singleton._gazepoint_plot_type == "single"
+
     with pytest.raises(TypeError, match="list of plot objects"):
         gp.standardize_gazepoint_plot_contracts(123)
     assert gp.standardize_gazepoint_plot_contracts([]) == []
@@ -87,7 +95,7 @@ def test_within_unit_standardization_validation_reference_and_zero_sd_paths():
         gp.standardize_gazepoint_biometrics_within_unit(
             pd.DataFrame({"sig": ["a", "b"]}), signal_cols="sig"
         )
-    with pytest.raises(ValueError, match="group_cols"):
+    with pytest.raises(ValueError, match="unit_cols"):
         gp.standardize_gazepoint_biometrics_within_unit(
             pd.DataFrame({"sig": [1.0, 2.0]}),
             signal_cols="sig",
@@ -299,6 +307,15 @@ def test_sync_drift_pair_construction_dataframe_and_status_paths():
     assert ref["overview"].loc[0, "signal_pair_count"] == 2
     assert ref["overview"].loc[0, "status"] == "review_sync_drift"
 
+    automatic = gp.audit_gazepoint_biometric_sync_drift(
+        df.iloc[:6],
+        signal_cols=["x", "y"],
+        max_lag=1,
+        lag_step=1,
+        min_complete_pairs=3,
+    )
+    assert automatic["overview"].loc[0, "signal_pair_count"] == 1
+
     pair_frame = pd.DataFrame({"signal_x": ["x"], "signal_y": ["y"]})
     framed = gp.audit_gazepoint_biometric_sync_drift(
         df.iloc[:6],
@@ -487,6 +504,11 @@ def test_scr_event_validation_decomposition_threshold_and_peak_replacement_paths
     )
     assert replaced["overview"].loc[0, "n_events"] == 1
     assert replaced["events"].peak_value.iloc[0] == 3.0
+
+    empty_mad = gp.detect_gazepoint_scr_events(
+        pd.DataFrame({"GSR_US_PHASIC": [np.nan, np.nan, np.nan]})
+    )
+    assert empty_mad["overview"].loc[0, "status"] == "no_scr_events_detected"
 
     none = gp.detect_gazepoint_scr_events(
         pd.DataFrame({"GSR_US_PHASIC": [0.0, 0.0, 0.0]}), threshold=1.0
