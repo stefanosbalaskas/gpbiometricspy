@@ -95,9 +95,9 @@ The 0.1.2 tranche adds documentation, archival metadata and repository hardening
 - the R `gpbiometrics 2.0.0` DOI `10.5281/zenodo.21434608` preserved only as `isDerivedFrom` provenance;
 - no Python DOI claimed until Zenodo actually ingests the published `v0.1.2` GitHub release.
 
-## Stable 0.1.2 public release and archival evidence
+## Stable 0.1.3 public release and archival evidence
 
-- immutable GitHub tag: `v0.1.2`;
+- immutable GitHub tag: `v0.1.3`;
 - public PyPI release: `gpbiometricspy 0.1.3`;
 - Zenodo version DOI: `10.5281/zenodo.22313884`;
 - previous 0.1.2 version DOI: `10.5281/zenodo.22150873`;
@@ -118,3 +118,18 @@ The 0.1.3 release source freezes the completed Studio application and the litera
 - the 0.1.3 version-specific Zenodo DOI is **not claimed before Zenodo ingestion**; the software concept DOI remains `10.5281/zenodo.22150872`, while `10.5281/zenodo.22150873` remains explicitly the previous 0.1.2 version DOI;
 - the stable tag cutter requires all nine release-gate workflow families to succeed on the exact current `main` commit before creating `v0.1.3`, then explicitly dispatches `release.yml` to avoid `GITHUB_TOKEN` tag-push recursion suppression;
 - a public `v0.1.3` GitHub Release, PyPI publication, release-asset digests, and Zenodo version DOI are recorded only after those downstream release steps actually complete.
+
+## 0.1.4 development branch-path validation
+
+The first 0.1.4 validation tranche adds control-flow coverage as a separate quality signal while preserving the existing **100% statement-coverage** contract.
+
+- empirical pre-tranche branch baseline: **4,815 / 5,594 branches = 86.0744%**;
+- post-tranche measurement: **4,869 / 5,594 branches = 87.0397%**;
+- missing branch paths reduced from **779 to 725** (**54 newly validated paths**);
+- `cluster_permutation.py`: **82 / 110 (74.545%) → 101 / 110 (91.818%)**;
+- `governance_core.py`: **112 / 160 (70.000%) → 143 / 160 (89.375%)**;
+- `reports.py`: **62 / 70 (88.571%) → 66 / 70 (94.286%)**;
+- the added tests exercise public modelling, guardrail, provenance, audit and reporting behavior; they do not call private helpers and do not alter production scientific algorithms;
+- a dedicated Python 3.13 branch-coverage workflow now measures the full suite with `--cov-branch` and enforces a **pure branch-coverage floor of 86.8%** using `covered_branches / num_branches` from coverage JSON;
+- the branch floor is intentionally separate from pytest-cov's combined statement/branch percentage and from the 12-cell **100% statement** gate;
+- the branch workflow runs for matching pull requests and matching pushes to `main`, so the measured improvement becomes a persistent regression gate rather than a one-off audit.
