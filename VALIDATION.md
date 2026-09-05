@@ -104,10 +104,16 @@ The 0.1.2 tranche adds documentation, archival metadata and repository hardening
 - frozen R reference DOI remains separate: `10.5281/zenodo.21434608` with `isDerivedFrom` provenance;
 - public release artifacts, exact-commit CI, documentation, PyPI installation and Zenodo ingestion were verified before returning `main` to development.
 
-## 0.1.3 literal statement-coverage completion
+## 0.1.3 stable-release freeze
 
-- Windows validation on the current development tree: **100.00% statement coverage**.
-- Coverage is enforced with `--cov-fail-under=100`.
-- Frozen R export contract remains **406 / 406 implemented; 0 pending**.
-- Completion uses executable behavioral/error-path tests and small dead-path cleanups; no `pragma: no cover`, coverage exclusion, or measurement-scope reduction is used.
-- Stable `v0.1.2` remains unchanged and immutable.
+The 0.1.3 release source freezes the completed Studio application and the literal whole-package coverage closure without changing the frozen 406-function scientific contract.
+
+- whole-package statement coverage: **100.00%**, enforced with `--cov-fail-under=100`;
+- frozen R export contract: **406 / 406 implemented; 0 pending**;
+- completion uses executable behavioral/error-path tests and small dead-path cleanups; no `pragma: no cover`, coverage exclusion, or measurement-scope reduction is used;
+- Studio is included as a separate distributable application package, with full and synthetic-only installed launchers;
+- Studio smoke, Chromium E2E, production/distribution, strict docs, CodeQL, deep parity, optional-backend interoperability, and the 12-cell scientific matrix were all green on the pre-freeze launch-hardening PR before merge;
+- release identity is synchronized to **0.1.3** across package metadata, `gpbiometricspy.__version__`, `.zenodo.json`, `CITATION.cff`, generated documentation metadata, governance/reproducibility outputs, and release-facing tests;
+- the 0.1.3 version-specific Zenodo DOI is **not claimed before Zenodo ingestion**; the software concept DOI remains `10.5281/zenodo.22150872`, while `10.5281/zenodo.22150873` remains explicitly the previous 0.1.2 version DOI;
+- the stable tag cutter requires all nine release-gate workflow families to succeed on the exact current `main` commit before creating `v0.1.3`, then explicitly dispatches `release.yml` to avoid `GITHUB_TOKEN` tag-push recursion suppression;
+- a public `v0.1.3` GitHub Release, PyPI publication, release-asset digests, and Zenodo version DOI are recorded only after those downstream release steps actually complete.
