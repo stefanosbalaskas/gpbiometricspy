@@ -161,3 +161,17 @@ The third 0.1.4 branch/path tranche targets the largest remaining deterministic 
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact branch evidence remains retained as the 30-day `branch-coverage-python-3.13` GitHub Actions artifact;
 - the persistent pure branch-coverage regression floor is raised conservatively from **87.8% to 88.7%**, retaining headroom below the measured **89.0418%** while preventing regression to the previous 88.0944% tranche level.
+
+### Endgame science branch tranche
+
+The fourth 0.1.4 branch/path tranche targets deterministic EDA/SCR, nonlinear-HRV, respiration, drift, changepoint, and recovery control flow while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the final-remaining tranche: **4,981 / 5,594 branches = 89.0418%**;
+- post-tranche measurement: **5,027 / 5,594 branches = 89.8641%**;
+- missing branch paths reduced from **613 to 567** (**46 newly validated paths** in this tranche; **212 cumulatively** since the original 0.1.4 baseline);
+- `endgame_science.py`: **205 / 252 branches = 81.349% → 251 / 252 branches = 99.603%**;
+- the added tests exercise only exported `gpbiometricspy` APIs for EDA artifact/SCR validation, event-window alternatives, nonresponder/hurdle/sensitivity guardrails, spectral/wavelet/TVSymp failure and partial paths, nonlinear-HRV alternatives, respiration fusion, MAD wall artifacts, distributional drift, changepoint fallbacks, and SCR recovery behavior;
+- the sole residual `endgame_science.py` branch is the defensive short-input guard in private `_match_count()`: repository search confirms its only production caller first requires coarse-grained length `>= m + 2`, which necessarily satisfies both subsequent `_match_count(..., m, ...)` and `_match_count(..., m + 1, ...)` minimum-length conditions; the guard is therefore structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper coverage test or changing production solely for a coverage number;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact branch evidence remains retained as the 30-day `branch-coverage-python-3.13` GitHub Actions artifact;
+- the persistent pure branch-coverage regression floor is raised conservatively from **88.7% to 89.5%**, retaining headroom below the measured **89.8641%** while preventing regression to the prior **89.0418%** tranche level.
