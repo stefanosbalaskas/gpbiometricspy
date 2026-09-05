@@ -175,3 +175,18 @@ The fourth 0.1.4 branch/path tranche targets deterministic EDA/SCR, nonlinear-HR
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact branch evidence remains retained as the 30-day `branch-coverage-python-3.13` GitHub Actions artifact;
 - the persistent pure branch-coverage regression floor is raised conservatively from **88.7% to 89.5%**, retaining headroom below the measured **89.8641%** while preventing regression to the prior **89.0418%** tranche level.
+
+### Deterministic extensions branch tranche
+
+The fifth 0.1.4 branch/path tranche closes the largest remaining deterministic source-file debt across plotting contracts, within-unit standardization, interoperability preparation, synchronization diagnostics, PPG/EDA utilities, and conservative reporting behavior.
+
+- pre-tranche measurement inherited from the endgame-science tranche: **5,027 / 5,594 branches = 89.8641%**;
+- post-tranche exact-head measurement: **5,072 / 5,594 branches = 90.6686%**;
+- missing branch paths reduced from **567 to 522** (**45 newly validated paths** in this tranche; **257 cumulatively** since the original 0.1.4 baseline);
+- `deterministic_extensions.py`: **179 / 224 branches = 79.911% → 224 / 224 branches = 100.000%**;
+- public-API tests cover plot-contract validation and metadata fallback, within-unit standardization guardrails/reference subsets/zero-SD and no-transform behavior, RHRV export and IBI-unit alternatives, NeuroKit EDA input preparation, lag and synchronization-drift alternatives, pyPPG preparation and waveform-quality statuses, EDA decomposition/SCR detection, and checklist/methods-text behavior;
+- branch testing exposed one genuine pandas 3 compatibility defect in the existing `center=False, scale=False` standardization path: `Series.to_numpy()` could return a read-only view before the existing finite-mask assignment; the implementation now requests `to_numpy(dtype=float, copy=True)`, preserving the same numerical transformation and scientific semantics while guaranteeing the intended writable working array;
+- repository search found this exact mutable-array pattern only at that standardization location; no broader production refactor was made;
+- the frozen 406-export semantic contract, 100% statement-coverage gate, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating artifact for the measured head is bound by digest `sha256:40538f12fef16597d68dfd8785c5d8d2dbc8600e7abba0b0e69e040bbe406886`;
+- the persistent pure branch-coverage regression floor is raised conservatively from **89.5% to 90.3%**, retaining headroom below the measured **90.6686%** while preventing regression to the prior **89.8641%** tranche level.

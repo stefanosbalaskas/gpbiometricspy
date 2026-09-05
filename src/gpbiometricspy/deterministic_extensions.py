@@ -120,7 +120,7 @@ def standardize_gazepoint_biometrics_within_unit(data, signal_cols=None, unit_co
             ref=pd.to_numeric(data.iloc[refidx][sig],errors="coerce").to_numpy(float); good=ref[np.isfinite(ref)]; status="standardized"; mu=sd=np.nan
             if len(good)<int(min_valid): status="insufficient_reference_rows"; transformed=np.full(len(idx),np.nan)
             else:
-                mu=float(np.mean(good)); sd=float(np.std(good,ddof=1)) if len(good)>1 else np.nan; transformed=pd.to_numeric(data.iloc[idx][sig],errors="coerce").to_numpy(float)
+                mu=float(np.mean(good)); sd=float(np.std(good,ddof=1)) if len(good)>1 else np.nan; transformed=pd.to_numeric(data.iloc[idx][sig],errors="coerce").to_numpy(dtype=float,copy=True)
                 if center: transformed=transformed-mu
                 if scale:
                     if not np.isfinite(sd) or sd==0:
