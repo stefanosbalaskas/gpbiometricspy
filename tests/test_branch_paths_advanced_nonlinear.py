@@ -6,6 +6,12 @@ import pandas as pd
 import gpbiometricspy as gp
 
 
+def test_hrv_asymmetry_short_group_path():
+    short = pd.DataFrame({"IBI": [0.80, 0.81, 0.82]})
+    out = gp.extract_gazepoint_hrv_asymmetry(short)
+    assert out["features"].loc[0, "status"] == "insufficient_intervals"
+
+
 def test_hrv_asymmetry_single_direction_run_paths():
     increasing = pd.DataFrame({"IBI": [0.80, 0.81, 0.82, 0.83, 0.84, 0.85]})
     inc = gp.extract_gazepoint_hrv_asymmetry(increasing)["features"].iloc[0]
