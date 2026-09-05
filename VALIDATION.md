@@ -130,6 +130,20 @@ The first 0.1.4 validation tranche adds control-flow coverage as a separate qual
 - `governance_core.py`: **112 / 160 (70.000%) → 143 / 160 (89.375%)**;
 - `reports.py`: **62 / 70 (88.571%) → 66 / 70 (94.286%)**;
 - the added tests exercise public modelling, guardrail, provenance, audit and reporting behavior; they do not call private helpers and do not alter production scientific algorithms;
-- a dedicated Python 3.13 branch-coverage workflow now measures the full suite with `--cov-branch` and enforces a **pure branch-coverage floor of 86.8%** using `covered_branches / num_branches` from coverage JSON;
+- a dedicated Python 3.13 branch-coverage workflow now measures the full suite with `--cov-branch` and enforces a pure branch-coverage floor using `covered_branches / num_branches` from coverage JSON;
 - the branch floor is intentionally separate from pytest-cov's combined statement/branch percentage and from the 12-cell **100% statement** gate;
 - the branch workflow runs for matching pull requests and matching pushes to `main`, so the measured improvement becomes a persistent regression gate rather than a one-off audit.
+
+### Scientific QC branch tranche
+
+The second 0.1.4 branch/path tranche closes deterministic alternatives and guardrails in scientific QC, standardization, and signal-quality reporting without changing production scientific implementations.
+
+- pre-tranche measurement inherited from the first 0.1.4 tranche: **4,869 / 5,594 branches = 87.0397%**;
+- post-tranche measurement: **4,928 / 5,594 branches = 88.0944%**;
+- missing branch paths reduced from **725 to 666** (**59 newly validated paths** in this tranche; **113 cumulatively** since the 0.1.4 baseline);
+- `scientific_qc.py`: **116 / 116 branches = 100.000%**;
+- `qc_windows_standardization.py`: **66 / 66 branches = 100.000%**;
+- `signal_quality.py`: **60 / 60 branches = 100.000%**;
+- the tranche exercises public IBI/RR, SCR interval, EDA artifact, GSR conversion/decomposition, standardization, GSR/HR/dial QC-window, and signal-quality APIs; no file under `src/gpbiometricspy/` is changed;
+- branch-coverage CI now retains both `coverage-branch.json` and a human-readable branch-debt audit as a **30-day GitHub Actions artifact** for exact-head evidence and next-tranche planning;
+- the persistent pure branch-coverage regression floor is raised conservatively from **86.8% to 87.8%**, retaining headroom below the measured **88.0944%** while preventing regression to the previous tranche level.
