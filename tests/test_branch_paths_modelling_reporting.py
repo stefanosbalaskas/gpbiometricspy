@@ -284,9 +284,9 @@ def test_governance_audit_index_summary_and_markdown_paths():
 
     manual = pd.DataFrame(
         {
-            "check": ["schema", "timing"],
-            "status": ["complete", "mystery"],
-            "message": ["ok", "review"],
+            "check": ["schema", "timing", "model"],
+            "status": ["complete", "warn", "mystery"],
+            "message": ["ok", "review", "unknown status retained"],
         }
     )
     recorded = {"metadata": "kept"}
@@ -296,7 +296,7 @@ def test_governance_audit_index_summary_and_markdown_paths():
         include_summary_rows=True,
     )
     assert set(index["audit_id"]) == {"manual", "recorded"}
-    assert {"pass", "other", "recorded"}.issubset(set(index["status"]))
+    assert {"pass", "warn", "other", "recorded"}.issubset(set(index["status"]))
 
     grouped = gp.summarize_gazepoint_audit_trail(index, by="audit_id")
     assert len(grouped) == 2
