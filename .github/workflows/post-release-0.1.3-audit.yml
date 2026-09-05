@@ -1,0 +1,141 @@
+name: post-release-0.1.3-audit
+
+on:
+  push:
+    branches:
+      - post-release-0.1.3-audit
+
+permissions:
+  contents: read
+
+jobs:
+  public-pypi:
+    name: public PyPI install (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14"]
+    steps:
+      - name: Checkout stable release commit
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: v0.1.3
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Verify public PyPI JSON and artifact hashes
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import urllib.request
+
+          url = "https://pypi.org/pypi/gpbiometricspy/0.1.3/json"
+          with urllib.request.urlopen(url, timeout=30) as response:
+              payload = json.load(response)
+
+          assert payload["info"]["name"].lower() == "gpbiometricspy"
+          assert payload["info"]["version"] == "0.1.3"
+
+          expected = {
+              "gpbiometricspy-0.1.3-py3-none-any.whl": "5ba72cdb636ed0039fa48e1845164e7a6571d7123e6d64b69cf597f364f18ee7",
+              "gpbiometricspy-0.1.3.tar.gz": "6d47d98d0f625cefad834b915774f183e6847126dd46fbfa3d630e611f175fb5",
+          }
+          observed = {item["filename"]: item["digests"]["sha256"] for item in payload["urls"]}
+          assert observed == expected, (observed, expected)
+          print("Public PyPI JSON verified for gpbiometricspy 0.1.3")
+          print(json.dumps(observed, indent=2, sort_keys=True))
+          PY
+
+      - name: Clean install from public PyPI
+        run: |
+          set -euo pipefail
+          python -m venv .public-release-venv
+          .public-release-venv/bin/python -m pip install --upgrade pip
+          .public-release-venv/bin/python -m pip install --no-cache-dir --index-url https://pypi.org/simple "gpbiometricspy[studio]==0.1.3"
+          .public-release-venv/bin/python - <<'PY'
+          import importlib.metadata as md
+          import gpbiometricspy
+          import studio
+
+          assert gpbiometricspy.__version__ == "0.1.3"
+          assert md.version("gpbiometricspy") == "0.1.3"
+          assert studio.__name__ == "studio"
+
+          scripts = {
+              ep.name: ep.value
+              for ep in md.entry_points(group="console_scripts")
+              if ep.name.startswith("gpbiometricspy-studio")
+          }
+          assert scripts == {
+              "gpbiometricspy-studio": "studio.cli:main",
+              "gpbiometricspy-studio-public": "studio.cli:main_public",
+          }, scripts
+          print("Clean public-index install verified")
+          print(scripts)
+          PY
+
+  zenodo:
+    name: Zenodo DOI resolution audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve software concept DOI
+        run: |
+          set -euo pipefail
+          effective_url="$(curl --fail --silent --show-error --location --output zenodo.html --write-out '%{url_effective}' 'https://doi.org/10.5281/zenodo.22150872')"
+          printf '%s\n' "$effective_url" > zenodo-effective-url.txt
+          EFFECTIVE_URL="$effective_url" python - <<'PY'
+          import json
+          import os
+          import pathlib
+          import re
+
+          html = pathlib.Path("zenodo.html").read_text(encoding="utf-8", errors="replace")
+          effective = os.environ["EFFECTIVE_URL"]
+
+          def meta(name):
+              patterns = [
+                  rf'<meta[^>]+name=["\']{re.escape(name)}["\'][^>]+content=["\']([^"\']+)',
+                  rf'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']{re.escape(name)}["\']',
+              ]
+              for pattern in patterns:
+                  match = re.search(pattern, html, flags=re.I)
+                  if match:
+                      return match.group(1)
+              return None
+
+          citation_doi = meta("citation_doi")
+          citation_title = meta("citation_title")
+          citation_version = meta("citation_version")
+          detected_013 = "0.1.3" in html or citation_version == "0.1.3"
+
+          result = {
+              "concept_doi": "10.5281/zenodo.22150872",
+              "effective_url": effective,
+              "citation_doi": citation_doi,
+              "citation_title": citation_title,
+              "citation_version": citation_version,
+              "version_0_1_3_detected": detected_013,
+          }
+          pathlib.Path("zenodo-audit.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(result, indent=2))
+
+          if detected_013 and citation_doi and citation_doi != "10.5281/zenodo.22150872":
+              print(f"Zenodo 0.1.3 version DOI detected: {citation_doi}")
+          elif detected_013:
+              print("Zenodo 0.1.3 appears in the concept landing page, but a distinct version DOI was not exposed in citation metadata.")
+          else:
+              print("Zenodo concept DOI has not yet resolved to a page identifying version 0.1.3; ingestion remains pending.")
+          PY
+
+      - name: Upload Zenodo audit
+        uses: actions/upload-artifact@v6
+        with:
+          name: zenodo-0.1.3-audit
+          path: |
+            zenodo-audit.json
+            zenodo-effective-url.txt
