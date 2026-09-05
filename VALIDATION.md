@@ -230,7 +230,7 @@ The eighth 0.1.4 branch/path tranche targets BioSPPy-style EDA/PPG, RRI, spectra
 - `biosppy_style.py`: **155 / 186 branches = 83.333% → 184 / 186 branches = 98.925%**;
 - public-API tests cover preparation/settings validation, explicit signal/time/group errors, nonfinite and nonincreasing time, invalid inferred rates, sparse interpolation and segment handling, overwrite/manifest behavior, exported EDA preparation failures, short PPG filtering and empty onset/template behavior, EDA recovery without a recovery point, RRI detrending/artifact-correction alternatives, short/invalid spectra, absolute/zero-total band power, phase locking, and correlation validation/lag insufficiency;
 - the two residual `biosppy_style.py` branches are caller-dominated defensive guards rather than missing exported behavior: arc `20 → exit` is private `_running_mean()`'s `k <= 1` return, while repository search confirms its sole BioSPPy production caller invokes it as `_running_mean(..., max(3, round(.25 * fs)))`; arc `85 → exit` is private `_peak_indices(peaks=None)`, while both exported PPG callers replace `peaks=None` with `_detect_ppg(...)` before invoking `_peak_indices()`;
-- those defensive guards are retained rather than manufacturing private-helper tests or changing valid production code solely for nominal branch closure;
+- those defensive guards are retained rather than manufacturing private-helper tests or changing valid production code solely for nominal closure;
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:7c7ea93b9d555170135a5135c77d2dc6782651b504ea6ca61cfe5241291fa0c4`;
 - the persistent pure branch-coverage regression floor is raised conservatively from **91.6% to 92.1%**, retaining headroom below the measured **92.4920%** while preventing regression to the prior **91.9735%** tranche level.
@@ -426,3 +426,19 @@ The twentieth 0.1.4 branch/path tranche targets compatibility-layer column stand
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:11a4cb2973fc86c58d634701230d006829e21589ead108ca9d2ed221a49ef3f2`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **97.1% to 97.4%**, retaining headroom below the measured **97.5688%** while preventing regression to the prior **97.3007%** tranche level.
+
+### Advanced physiology branch tranche
+
+The twenty-first 0.1.4 branch/path tranche targets the remaining advanced physiology control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the compatibility tranche: **5,458 / 5,594 branches = 97.5688%**;
+- post-tranche exact measured coverage: **5,470 / 5,594 branches = 97.7833%**;
+- missing branch paths reduced from **136 to 124** (**12 newly validated paths** in this tranche; **655 cumulatively** since the original 0.1.4 baseline);
+- `advanced_physiology.py`: **111 / 124 branches = 89.516% → 123 / 124 branches = 99.194%**;
+- public-API tests cover insufficient-beat IPFM behavior; explicit millisecond and second external-EDA time units; response-pattern failure when no EDA response column can be inferred; bilateral EDA asymmetry without a time column; quantization-noise output-collision protection; insufficient-complete and unscaled EDR-PCA paths; and skin-potential non-finite/zero threshold plus positive and negative response-direction alternatives;
+- the sole residual `advanced_physiology.py` branch is arc `60 → 65`, the zero-iteration exit of private `_simple_kmeans_1d()`'s fixed iteration loop: the helper's `iters` argument is not exposed by the exported beat-extraction front door, and its sole production caller uses the helper default `iters=50`, so a zero-iteration path is structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing production solely for nominal closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:3accd5d6c1d4daaf9974211b19f615debccc5956bd1bb4b0a0b7bf4052025131`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **97.4% to 97.6%**, retaining headroom below the measured **97.7833%** while preventing regression to the prior **97.5688%** tranche level.
