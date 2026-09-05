@@ -394,3 +394,19 @@ The eighteenth 0.1.4 branch/path tranche closes the complete remaining control-f
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating corrected measured-head artifact is bound by digest `sha256:4e3bbb76d40ff7867a5288c52b201cf9619710d62c0faa2c9957137fefbd520c`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **96.5% to 96.8%**, retaining headroom below the measured **97.0147%** while preventing regression to the prior **96.7108%** tranche level.
+
+### Remaining core branch tranche
+
+The nineteenth 0.1.4 branch/path tranche targets the remaining preprocessing, smoothing, IBI-filtering, HR↔IBI consistency, and HRV feature-extraction control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the governance-core tranche: **5,427 / 5,594 branches = 97.0147%**;
+- post-tranche exact measured coverage: **5,443 / 5,594 branches = 97.3007%**;
+- missing branch paths reduced from **167 to 151** (**16 newly validated paths** in this tranche; **628 cumulatively** since the original 0.1.4 baseline);
+- `remaining_core.py`: **191 / 208 branches = 91.827% → 207 / 208 branches = 99.519%**;
+- public-API tests cover explicit baseline-signal selection with zero inclusion and no validity column; smoothing without NA removal; IBI-filter missing time/validity and invalid-bound guardrails, singleton groups and ungrouped summaries; HR↔IBI missing-column/time guardrails and ungrouped summaries; and HRV missing-column handling plus singleton repeated-interval collapse and ungrouped output;
+- the sole residual `remaining_core.py` branch is arc `126 → 128`, the false branch of the final `elif artifact_type == "drift"` in `simulate_gazepoint_artifact()`: the exported front door first validates `artifact` against the exhaustive set `missing_run`, `flatline`, `spike`, `noise`, and `drift`, so once execution reaches that final `elif`, a false branch would require an already-rejected unsupported artifact type; the branch is therefore structurally unreachable through valid exported behavior and is retained rather than manufacturing a private-helper test or changing production solely for nominal closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:03b0acda0e232b8a303071d1ae47461192588d10d51964f356cd828adcbb0858`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **96.8% to 97.1%**, retaining headroom below the measured **97.3007%** while preventing regression to the prior **97.0147%** tranche level.
