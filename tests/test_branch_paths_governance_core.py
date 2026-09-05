@@ -42,6 +42,8 @@ def test_governance_inventory_validation_and_classifier_returns(tmp_path: Path):
     with pytest.raises(ValueError, match="path"):
         gp.summarize_gazepoint_export_inventory([])
 
+    biometric = tmp_path / "biometric_export.csv"
+    biometric.write_text("GSR_US\n1.0\n", encoding="utf-8")
     event_file = tmp_path / "event_export.csv"
     event_file.write_text("event_id,time\n1,0\n", encoding="utf-8")
     sidecar = tmp_path / "metadata.json"
@@ -50,10 +52,11 @@ def test_governance_inventory_validation_and_classifier_returns(tmp_path: Path):
     unknown.write_bytes(b"abc")
 
     inv = gp.summarize_gazepoint_export_inventory(
-        [event_file, sidecar, unknown],
+        [biometric, event_file, sidecar, unknown],
         recursive=False,
     )
     kinds = dict(zip(inv["file_name"], inv["likely_export_type"]))
+    assert kinds[biometric.name] == "biometrics"
     assert kinds[event_file.name] == "events"
     assert kinds[sidecar.name] == "sidecar"
     assert kinds[unknown.name] == "unknown"
