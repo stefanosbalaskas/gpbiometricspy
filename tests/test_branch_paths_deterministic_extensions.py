@@ -101,7 +101,7 @@ def test_within_unit_standardization_validation_reference_and_zero_sd_paths():
             signal_cols="sig",
             unit_cols="missing",
         )
-    with pytest.raises(ValueError, match="reference"):
+    with pytest.raises(ValueError, match="not found"):
         gp.standardize_gazepoint_biometrics_within_unit(
             pd.DataFrame({"sig": [1.0, 2.0]}),
             signal_cols="sig",
