@@ -167,7 +167,7 @@ def test_kleckner_transition_padding_time_and_validation_branches():
     )
     assert bool(padded.loc[2, "kleckner_range_artifact"])
     assert bool(padded.loc[1, "kleckner_transition_artifact"])
-    assert bool(padded.loc[3, "kleckner_transition_artifact"])
+    assert bool(padded.loc[3, "kleckner_rapid_change_artifact"])
 
     clean_single = gp.flag_kleckner_eda_artifacts(
         pd.DataFrame({"GSR_US": [1.0]}), transition_padding=2
@@ -195,7 +195,9 @@ def test_gsr_conductance_detection_passthrough_and_validation():
         )
 
     direct = gp.convert_gazepoint_gsr_to_conductance(
-        pd.DataFrame({"conductance_us": [1.2, np.inf, np.nan]})
+        pd.DataFrame({"conductance_us": [1.2, np.inf, np.nan]}),
+        gsr_col="conductance_us",
+        input_unit="microsiemens",
     )
     assert direct.GSR_US.iloc[0] == pytest.approx(1.2)
     assert direct.GSR_US.iloc[1:].isna().all()
@@ -255,9 +257,9 @@ def test_tonic_phasic_auto_threshold_and_validation_branches():
 def test_standardization_validation_insufficient_zero_and_overwrite_branches():
     with pytest.raises(TypeError, match="data frame"):
         gp.standardise_gazepoint_zscore([])
-    with pytest.raises(ValueError, match="signal"):
+    with pytest.raises(ValueError, match="SCR_Amplitude"):
         gp.standardise_gazepoint_zscore(pd.DataFrame({"source_participant": ["P1"]}))
-    with pytest.raises(ValueError, match="group"):
+    with pytest.raises(ValueError, match="source_participant"):
         gp.standardise_gazepoint_zscore(pd.DataFrame({"SCR_Amplitude": [1.0]}))
     with pytest.raises(TypeError, match="numeric"):
         gp.standardise_gazepoint_zscore(
@@ -287,7 +289,7 @@ def test_standardization_validation_insufficient_zero_and_overwrite_branches():
         gp.standardise_gazepoint_range_correction(
             pd.DataFrame({"source_participant": ["P1"]}), signal_col="x"
         )
-    with pytest.raises(ValueError, match="group"):
+    with pytest.raises(ValueError, match="source_participant"):
         gp.standardise_gazepoint_range_correction(
             pd.DataFrame({"x": [1.0]}), signal_col="x"
         )
@@ -432,11 +434,10 @@ def test_signal_quality_compute_validation_and_degenerate_signal_branches():
     assert short.loc[0, "spike_count"] == 0
     assert short.loc[0, "extreme_z_count"] == 0
 
-    empty = gp.compute_gazepoint_signal_quality(
-        pd.DataFrame({"signal": pd.Series(dtype=float)}), signal_cols="signal"
-    )
-    assert empty.loc[0, "n_samples"] == 0
-    assert np.isnan(empty.loc[0, "prop_missing"])
+    with pytest.raises(ValueError, match="has no rows"):
+        gp.compute_gazepoint_signal_quality(
+            pd.DataFrame({"signal": pd.Series(dtype=float)}), signal_cols="signal"
+        )
 
 
 def test_signal_quality_classification_rule_and_missing_metric_branches():
