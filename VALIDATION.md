@@ -538,3 +538,20 @@ The twenty-seventh 0.1.4 branch/path tranche closes the complete remaining prere
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is ID **9977712397** and is bound by digest `sha256:38b3f0f2acf1c7e4382745b1489ffb0c7e860f542db20229ee8dd7fa4dba4d94`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **98.7% to 98.9%**, retaining headroom below the measured **98.9811%** while preventing regression to the prior **98.8023%** tranche level.
+
+### Cluster permutation residual branch tranche
+
+The twenty-eighth 0.1.4 branch/path tranche closes all remaining cluster-permutation paths that are reachable through exported APIs while retaining caller-dominated defensive guards and leaving the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the governance-extra tranche: **5,537 / 5,594 branches = 98.9811%**;
+- post-tranche exact measured coverage: **5,544 / 5,594 branches = 99.1062%**;
+- missing branch paths reduced from **57 to 50** (**7 newly validated paths** in this tranche; **729 cumulatively** since the original 0.1.4 baseline);
+- `cluster_permutation.py`: **101 / 110 branches = 91.818% → 108 / 110 branches = 98.182%**;
+- public-API tests cover non-data-frame grid-audit validation, explicit observed-mass null-distribution plotting, component-file and report-file collision protection, missing-value rejection in external cluster exports, generic external-export collision protection, and MNE difference export with a non-two-condition dataset;
+- the two residual `cluster_permutation.py` paths are structural defensive guards rather than missing exported behavior: arc `37 → exit` follows aggregation by participant × condition × time and therefore cannot observe duplicate grouped keys; arc `48 → exit` is reached only after preparation with `require_complete=True`, where unique aggregation plus the full participant × two-condition × time row-count gate guarantees complete matrices after reindexing;
+- those two guards are retained rather than manufacturing private-helper tests or modifying validated cluster-permutation code solely for nominal branch closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**; the empirical branch run completed **524 tests** successfully;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is ID **9977852444** and is bound by digest `sha256:6c88cf2e31b62aee09d3df29347b18e21aff9eadeec7f8349d068f24b7b1bedc`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **98.9% to 99.0%**, retaining headroom below the measured **99.1062%** while preventing regression to the prior **98.9811%** tranche level.
