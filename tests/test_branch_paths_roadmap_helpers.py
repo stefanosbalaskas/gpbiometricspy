@@ -83,11 +83,11 @@ def test_roadmap_luminance_and_local_peak_public_paths():
 
 def test_roadmap_ppg_quality_empty_windows():
     q = gp.flag_gazepoint_ppg_quality(
-        pd.DataFrame({"time_s": [0.0, 10.0], "PPG": [0.0, 1.0]}),
-        window_s=1.0,
-        step_s=2.0,
+        pd.DataFrame({"time_s": [0.0, 1.0], "PPG": [0.0, 1.0]}),
+        window_s=0.1,
+        step_s=0.2,
     )
-    assert q.start_time.tolist() == [0.0, 10.0]
+    assert q.start_time.tolist() == pytest.approx([0.0, 1.0])
 
 
 def test_roadmap_event_log_public_import_paths(tmp_path):
