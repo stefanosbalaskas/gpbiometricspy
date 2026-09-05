@@ -42,7 +42,7 @@ jobs:
           python scripts/report_branch_coverage.py \
             coverage-branch.json \
             --top 30 \
-            --fail-under 96.5 | tee branch-coverage-audit.txt
+            --fail-under 96.8 | tee branch-coverage-audit.txt
       - name: Upload branch-coverage evidence
         if: always()
         uses: actions/upload-artifact@v6

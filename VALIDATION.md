@@ -171,7 +171,7 @@ The fourth 0.1.4 branch/path tranche targets deterministic EDA/SCR, nonlinear-HR
 - missing branch paths reduced from **613 to 567** (**46 newly validated paths** in this tranche; **212 cumulatively** since the original 0.1.4 baseline);
 - `endgame_science.py`: **205 / 252 branches = 81.349% → 251 / 252 branches = 99.603%**;
 - the added tests exercise only exported `gpbiometricspy` APIs for EDA artifact/SCR validation, event-window alternatives, nonresponder/hurdle/sensitivity guardrails, spectral/wavelet/TVSymp failure and partial paths, nonlinear-HRV alternatives, respiration fusion, MAD wall artifacts, distributional drift, changepoint fallbacks, and SCR recovery behavior;
-- the sole residual `endgame_science.py` branch is the defensive short-input guard in private `_match_count()`: repository search confirms its only production caller first requires coarse-grained length `>= m + 2`, which necessarily satisfies both subsequent `_match_count(..., m, ...)` and `_match_count(..., m + 1, ...)` minimum-length conditions; the guard is therefore structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper coverage test or changing production solely for a coverage number;
+- the sole residual `endgame_science.py` branch is the defensive short-input guard in private `_match_count()`: repository search confirms its only production caller first requires coarse-grained length `>= m + 2`, which necessarily satisfies both subsequent `_match_count(..., m, ...)` and `_match_count(..., m + 1, ...)` minimum-length conditions; the guard is therefore structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing production solely for a coverage number;
 - no file under `src/gpbiometricspy/` is changed by this tranche;
 - exact branch evidence remains retained as the 30-day `branch-coverage-python-3.13` GitHub Actions artifact;
 - the persistent pure branch-coverage regression floor is raised conservatively from **88.7% to 89.5%**, retaining headroom below the measured **89.8641%** while preventing regression to the prior **89.0418%** tranche level.
@@ -378,3 +378,19 @@ The seventeenth 0.1.4 branch/path tranche targets the remaining user-workflow pl
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:a04e6ab2e58e08fdf4100635022e7d993ce7d5eaa083626f3a3cf55c2640449d`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **96.1% to 96.5%**, retaining headroom below the measured **96.7108%** while preventing regression to the prior **96.4069%** tranche level.
+
+### Governance core branch tranche
+
+The eighteenth 0.1.4 branch/path tranche closes the complete remaining control-flow debt in governance, audit-trail, export-inventory, dataset-structure, and sidecar-template utilities through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the user-workflows tranche: **5,410 / 5,594 branches = 96.7108%**;
+- post-tranche exact measured coverage: **5,427 / 5,594 branches = 97.0147%**;
+- missing branch paths reduced from **184 to 167** (**17 newly validated paths** in this tranche; **612 cumulatively** since the original 0.1.4 baseline);
+- `governance_core.py`: **143 / 160 branches = 89.375% → 160 / 160 branches = 100.000%**;
+- public-API tests cover audit-index inclusion of check and summary tables; empty-summary Markdown rendering; export-inventory recursion/path validation and event, biometrics, JSON-sidecar and unknown-file classification; dataset-structure root/boolean/expected-directory/expected-file validation plus no-pattern/no-extension/no-sidecar-check behavior; and sidecar-template scalar/boolean/custom-field validation plus the no-custom-fields path;
+- all 17 pre-tranche residual `governance_core.py` branch paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating corrected measured-head artifact is bound by digest `sha256:4e3bbb76d40ff7867a5288c52b201cf9619710d62c0faa2c9957137fefbd520c`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **96.5% to 96.8%**, retaining headroom below the measured **97.0147%** while preventing regression to the prior **96.7108%** tranche level.
