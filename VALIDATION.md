@@ -345,3 +345,19 @@ The fifteenth 0.1.4 branch/path tranche closes the complete remaining control-fl
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:1b0888fbe9feb9ce53c87c5cccbe505ad98777231e5e24696a42e413870c838c`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **95.2% to 95.7%**, retaining headroom below the measured **96.0672%** while preventing regression to the prior **95.5846%** tranche level.
+
+### Event frontdoor branch tranche
+
+The sixteenth 0.1.4 branch/path tranche targets the remaining event-frontdoor control flow through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the final-science-bridges tranche: **5,374 / 5,594 branches = 96.0672%**;
+- post-tranche exact measured coverage: **5,393 / 5,594 branches = 96.4069%**;
+- missing branch paths reduced from **220 to 201** (**19 newly validated paths** in this tranche; **578 cumulatively** since the original 0.1.4 baseline);
+- `event_frontdoor.py`: **92 / 112 branches = 82.143% → 111 / 112 branches = 99.107%**;
+- public-API tests cover grouping and event-group validation; invalid epoch input; close-peak suppression, sub-threshold SCR rejection and sparse-response AUC behavior; `none`/`center` normalization plus invalid-method validation; engagement group-length/all-nonfinite/scalar alternatives; missingness validation; detrending missing-signal/all-nonfinite and `none`/`mean`/`median` alternatives; and biometrics-file audit validation;
+- the sole residual `event_frontdoor.py` branch is arc `61 → 58`, the `if len(before) == 0: continue` defensive path in private `_scr_peaks()`: local maxima are constructed only from `y[1:-1]` and shifted by `+1`, so every candidate index satisfies `ii >= 1` and `before = np.arange(ii)` necessarily has at least one element; the branch is therefore structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test or changing valid scientific code solely for nominal closure;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:fb2ef4a7c6bf296aeded590c11cd62c9ca37977df5973dab73a3fed780e50d21`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **95.7% to 96.1%**, retaining headroom below the measured **96.4069%** while preventing regression to the prior **96.0672%** tranche level.
