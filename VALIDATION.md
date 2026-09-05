@@ -147,3 +147,17 @@ The second 0.1.4 branch/path tranche closes deterministic alternatives and guard
 - the tranche exercises public IBI/RR, SCR interval, EDA artifact, GSR conversion/decomposition, standardization, GSR/HR/dial QC-window, and signal-quality APIs; no file under `src/gpbiometricspy/` is changed;
 - branch-coverage CI now retains both `coverage-branch.json` and a human-readable branch-debt audit as a **30-day GitHub Actions artifact** for exact-head evidence and next-tranche planning;
 - the persistent pure branch-coverage regression floor is raised conservatively from **86.8% to 87.8%**, retaining headroom below the measured **88.0944%** while preventing regression to the previous tranche level.
+
+### Final remaining branch tranche
+
+The third 0.1.4 branch/path tranche targets the largest remaining deterministic source-file debt while keeping the production scientific tree unchanged.
+
+- pre-tranche measurement inherited from the scientific-QC tranche: **4,928 / 5,594 branches = 88.0944%**;
+- post-tranche exact-head measurement: **4,981 / 5,594 branches = 89.0418%**;
+- missing branch paths reduced from **666 to 613** (**53 newly validated paths** in this tranche; **166 cumulatively** since the 0.1.4 baseline);
+- `final_remaining.py`: **279 / 332 branches = 84.036% → 332 / 332 branches = 100.000%**;
+- the added tests exercise exported AOI assignment, BIDS export, eyetrackingR/gazeR/pupillometryR adapters, data-quality/dashboard reporting, artifact-SVM features, autoencoder guardrails, point-process alternatives, preregistration/trial-regressor paths, and smoke/privacy behavior;
+- helper-level branches are reached through exported `gpbiometricspy` front doors rather than by directly testing private helpers;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- exact branch evidence remains retained as the 30-day `branch-coverage-python-3.13` GitHub Actions artifact;
+- the persistent pure branch-coverage regression floor is raised conservatively from **87.8% to 88.7%**, retaining headroom below the measured **89.0418%** while preventing regression to the previous 88.0944% tranche level.
