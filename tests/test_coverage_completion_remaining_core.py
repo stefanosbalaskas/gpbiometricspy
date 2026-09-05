@@ -82,4 +82,4 @@ def test_manifest_version_import_fallback(monkeypatch):
         return real_import(name, globals, locals, fromlist, level)
     monkeypatch.setattr(builtins,'__import__',fake_import)
     out=m.generate_gazepoint_manifest(include_session_info=False)
-    assert out['package_version']=='0.1.3'
+    assert out['package_version']=='0.1.4.dev0'

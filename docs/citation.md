@@ -3,14 +3,14 @@
 `gpbiometricspy` is archived through the Zenodo GitHub integration.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.3</code> (2026-09-05); its version-specific Zenodo DOI will be added after Zenodo ingests the GitHub release; the software concept DOI is already registered.
+<strong>Current citation state:</strong> stable Python release <code>0.1.3</code> (2026-09-05); its version-specific Zenodo DOI is <a href="https://doi.org/10.5281/zenodo.22313884">10.5281/zenodo.22313884</a>; the software concept DOI remains the identifier for the evolving record.
 </div>
 
 ## Cite the Python software
 
 For reproducibility, cite the exact software release used:
 
-- **0.1.3 version DOI:** pending Zenodo ingestion of the `v0.1.3` GitHub release
+- **0.1.3 version DOI:** **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**
 - **Previous 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
 - **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**
 

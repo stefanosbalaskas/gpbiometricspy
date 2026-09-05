@@ -28,3 +28,11 @@
 ## Compatibility
 
 This release does not intentionally alter the frozen scientific API or semantics. The core scientific changes in the stable-freeze diff are release-version/provenance literals only.
+
+
+## Post-release archival record
+
+- PyPI: `gpbiometricspy 0.1.3` published through Trusted Publishing with Sigstore attestations.
+- Zenodo version DOI: **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**.
+- Zenodo software concept DOI: **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**.
+- Public-index wheel/sdist hashes were independently revalidated against the GitHub Release and clean installs passed on Python 3.11 and 3.14.
