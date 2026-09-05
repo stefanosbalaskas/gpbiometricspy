@@ -1,0 +1,84 @@
+{
+  "figures": [
+    {
+      "description": "Missingness across EDA, heart-rate and IBI channels.",
+      "file": "missingness.png",
+      "slug": "missingness",
+      "title": "Missingness overview"
+    },
+    {
+      "description": "EDA and heart-rate traces from the bundled kiosk demonstration.",
+      "file": "biometric-signals.png",
+      "slug": "biometric-signals",
+      "title": "Biometric signal overview"
+    },
+    {
+      "description": "Standardised pupil diameter and gaze coordinates for one synthetic participant.",
+      "file": "pupil-gaze-overview.png",
+      "slug": "pupil-gaze-overview",
+      "title": "Pupil and gaze overview"
+    },
+    {
+      "description": "Synchronous EDA, heart-rate and pupil channels with event markers.",
+      "file": "multimodal-timeline.png",
+      "slug": "multimodal-timeline",
+      "title": "Multimodal timeline"
+    },
+    {
+      "description": "Observed, tonic and phasic electrodermal components.",
+      "file": "eda-decomposition.png",
+      "slug": "eda-decomposition",
+      "title": "EDA decomposition"
+    },
+    {
+      "description": "Detected skin-conductance responses over the EDA trace.",
+      "file": "scr-events.png",
+      "slug": "scr-events",
+      "title": "SCR event detection"
+    },
+    {
+      "description": "Pulse waveform with detected peaks from the deterministic synthetic generator.",
+      "file": "ppg-peak-detection.png",
+      "slug": "ppg-peak-detection",
+      "title": "PPG peak detection"
+    },
+    {
+      "description": "Successive RR-interval geometry for HRV quality inspection.",
+      "file": "ppg-poincare.png",
+      "slug": "ppg-poincare",
+      "title": "Poincar\u00e9 plot"
+    },
+    {
+      "description": "Beat-to-beat interval trajectory using the pyHRV-style visual interface.",
+      "file": "hrv-tachogram.png",
+      "slug": "hrv-tachogram",
+      "title": "HRV tachogram"
+    },
+    {
+      "description": "AOI summaries for EDA, heart-rate and pupil channels.",
+      "file": "aoi-biometrics.png",
+      "slug": "aoi-biometrics",
+      "title": "AOI-linked biometrics"
+    },
+    {
+      "description": "Missingness-based EDA quality diagnostic from the core QC family.",
+      "file": "signal-quality.png",
+      "slug": "signal-quality",
+      "title": "Signal-quality summary"
+    },
+    {
+      "description": "Time-frequency representation of the electrodermal signal.",
+      "file": "eda-gram.png",
+      "slug": "eda-gram",
+      "title": "EDA-gram"
+    },
+    {
+      "description": "Deterministic amplitude/peak-velocity diagnostic for gaze QC.",
+      "file": "saccade-main-sequence.png",
+      "slug": "saccade-main-sequence",
+      "title": "Saccade main sequence"
+    }
+  ],
+  "package_version": "0.1.4.dev0",
+  "source": "bundled synthetic/public demonstration data"
+}
