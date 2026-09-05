@@ -281,3 +281,19 @@ The eleventh 0.1.4 branch/path tranche targets the remaining PsPM-style marker, 
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:c8dc94fde8c02a224edad26328de26133bd44bd1d0fd4f578bd6294887df1557`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **93.2% to 93.7%**, retaining headroom below the measured **94.0829%** while preventing regression to the prior **93.5824%** tranche level.
+
+### Roadmap helpers branch tranche
+
+The twelfth 0.1.4 branch/path tranche targets the remaining roadmap helper control-flow debt across event normalization, recovery and pupil-event summaries, tracking, PPG morphology/quality, event import/matching, synchronization, scanpaths, manifests, and template similarity while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the PsPM-style tranche: **5,263 / 5,594 branches = 94.0829%**;
+- post-tranche exact measured coverage: **5,291 / 5,594 branches = 94.5835%**;
+- missing branch paths reduced from **331 to 303** (**28 newly validated paths** in this tranche; **476 cumulatively** since the original 0.1.4 baseline);
+- `roadmap_helpers.py`: **187 / 216 branches = 86.574% → 215 / 216 branches = 99.537%**;
+- public-API tests cover SCR recovery and pupil-event windows without recoverable/response samples; pupil-only and combined tracking validity; sparse/invalid-method luminance auditing and automatic close-peak suppression through PPG morphology; PPG-quality empty-window handling; event-log DataFrame/missing-file/explicit-separator paths; event matching invalid-return and no-overlap behavior; invalid column-assertion mode; synchronization vector/DataFrame/target/finite-pair guardrails; scanpath behavior without AOIs, with empty AOIs, and without transitions; manifest validation/no-path/no-output behavior; and template-similarity integer-index peaks plus short-window rejection.
+- the sole residual `roadmap_helpers.py` branch is arc `124 → 126`, the explicit `event_label_col` alternative inside private `_standardize_events()`; repository search confirms the exported production callers `summarize_gazepoint_scr_recovery()`, `summarize_gazepoint_pupil_events()`, and `match_gazepoint_events_to_biometrics()` expose/pass event-time and event-id overrides only and never supply the helper's fourth `event_label_col` argument, so this branch is structurally unreachable through exported production behavior and is retained rather than manufacturing a private-helper test;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is bound by digest `sha256:614014e7562b603e490a715b888ef37a3b158cde8e6e9e134f5e7286929dabc6`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **93.7% to 94.2%**, retaining headroom below the measured **94.5835%** while preventing regression to the prior **94.0829%** tranche level.
