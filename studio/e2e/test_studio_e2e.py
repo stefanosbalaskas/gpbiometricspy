@@ -78,6 +78,20 @@ def _run_ppg_hr_hrv_analysis(page: Page) -> None:
     assert peak_count > 0
 
 
+def _run_event_alignment(page: Page) -> None:
+    page.get_by_text("Events & Alignment", exact=True).click()
+    expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
+    page.locator("#event_alignment-run").click()
+    expect(page.locator("#event_alignment-status")).to_contain_text(
+        "Events & alignment complete:",
+        timeout=120_000,
+    )
+    event_count = int(page.locator("#event_alignment-event_count").inner_text().replace(",", ""))
+    window_count = int(page.locator("#event_alignment-window_count").inner_text().replace(",", ""))
+    assert event_count > 0
+    assert window_count > 0
+
+
 def test_studio_shell_loads_demo_and_exposes_reporting(page: Page, app: ShinyAppProc) -> None:
     _load_demo(page, app)
     _open_reporting(page)
@@ -186,6 +200,26 @@ def test_ppg_peak_detection_renders_and_peaks_download(page: Page, app: ShinyApp
     expect(page.locator("#ppg_hr_hrv-download_peaks")).to_be_visible()
     with page.expect_download(timeout=60_000) as download_info:
         page.locator("#ppg_hr_hrv-download_peaks").click()
+    download = download_info.value
+    path = download.path()
+    assert path is not None
+    csv_text = Path(path).read_text(encoding="utf-8")
+    assert len(csv_text.splitlines()) > 1
+
+
+def test_event_alignment_renders_and_events_download(page: Page, app: ShinyAppProc) -> None:
+    _load_demo(page, app)
+    _run_event_alignment(page)
+
+    page.get_by_role("tab", name="Event windows", exact=True).click()
+    expect(page.get_by_text("Event-locked diagnostic", exact=True)).to_be_visible()
+    expect(page.locator("#event_alignment-event_plot img")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
+
+    page.locator('a[data-value="Export"]:visible').click()
+    expect(page.locator("#event_alignment-download_events")).to_be_visible()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#event_alignment-download_events").click()
     download = download_info.value
     path = download.path()
     assert path is not None
