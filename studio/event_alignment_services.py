@@ -126,6 +126,13 @@ def _groups(group_col: str | None) -> list[str] | None:
     return [group_col] if group_col else None
 
 
+def _analysis_frame(data: pd.DataFrame) -> pd.DataFrame:
+    """Copy data while dropping attrs that make pandas concat equality ambiguous."""
+    out = data.copy()
+    out.attrs = {key: value for key, value in data.attrs.items() if not isinstance(value, pd.DataFrame)}
+    return out
+
+
 def _standard_events_from_ttl_alignment(alignment: dict[str, Any]) -> pd.DataFrame:
     events = alignment.get("events") if isinstance(alignment, dict) else None
     if not isinstance(events, pd.DataFrame) or events.empty:
@@ -300,6 +307,10 @@ def run_event_alignment(
     if group_col and group_col not in data.columns:
         raise ValueError("Selected reference grouping column was not found.")
 
+    data = _analysis_frame(data)
+    if target_stream is not None:
+        target_stream = _analysis_frame(target_stream)
+
     result: dict[str, Any] = {}
     if source_mode == "ttl":
         if not ttl_col:
@@ -460,6 +471,7 @@ def event_alignment_reproducibility_script(result: dict[str, Any]) -> str:
         "import gpbiometricspy as gp",
         "",
         "data = gp.import_gazepoint_biometrics('reference.csv')",
+        "data.attrs = {k: v for k, v in data.attrs.items() if not isinstance(v, pd.DataFrame)}",
         "",
     ]
     if source_mode == "event_log":
@@ -521,6 +533,7 @@ def event_alignment_reproducibility_script(result: dict[str, Any]) -> str:
             [
                 "",
                 "target = gp.import_gazepoint_biometrics('target.csv')",
+                "target.attrs = {k: v for k, v in target.attrs.items() if not isinstance(v, pd.DataFrame)}",
                 "target_alignment = gp.align_gazepoint_biometrics_to_ttl(",
                 f"    target, ttl_cols={[p.get('target_ttl_col')]!r}, ttl_valid_col={p.get('target_validity_col')!r},",
                 f"    time_col={p.get('target_time_col')!r}, group_cols={([p.get('target_group_col')] if p.get('target_group_col') else None)!r},",
