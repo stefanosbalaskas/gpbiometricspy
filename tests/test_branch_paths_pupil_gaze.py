@@ -49,6 +49,24 @@ def test_pupil_blinks_numeric_validity_marks_zero_and_nonfinite_invalid():
     assert flags.tolist() == [False, True, True]
 
 
+def test_pupil_blinks_boolean_validity_marks_false_and_missing_invalid():
+    data = pd.DataFrame(
+        {
+            "time_s": [0.0, 0.1, 0.2],
+            "LPD": [3.0, 3.1, 3.2],
+            "LPV": pd.Series([True, False, pd.NA], dtype="boolean"),
+        }
+    )
+    flags = gp.detect_gazepoint_pupil_blinks(
+        data,
+        pupil_cols="LPD",
+        time_col="time_s",
+        validity_cols="LPV",
+        return_="flags",
+    )
+    assert flags.tolist() == [False, True, True]
+
+
 def test_pupil_blinks_short_invalid_run_is_below_minimum_interval_length():
     data = pd.DataFrame(
         {
