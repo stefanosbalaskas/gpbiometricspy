@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -20,6 +21,22 @@ def _load_demo(page: Page, app: ShinyAppProc) -> None:
     rows_text = page.locator("#row_count").inner_text()
     cols_text = page.locator("#column_count").inner_text()
     assert int(rows_text.replace(",", "")) > 0
+    assert int(cols_text.replace(",", "")) > 0
+
+
+def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
+    page.goto(app.url)
+    expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
+    participant_path = gp.kiosk_demo_files()[0]
+    page.locator("#upload").set_input_files(str(participant_path))
+    page.locator("#load_upload").click()
+    expect(page.locator("#status")).to_contain_text(
+        "Upload imported through gpbiometricspy.",
+        timeout=60_000,
+    )
+    rows_text = page.locator("#row_count").inner_text()
+    cols_text = page.locator("#column_count").inner_text()
+    assert int(rows_text.replace(",", "")) == 1_920
     assert int(cols_text.replace(",", "")) > 0
 
 
@@ -90,6 +107,30 @@ def _run_event_alignment(page: Page) -> None:
     window_count = int(page.locator("#event_alignment-window_count").inner_text().replace(",", ""))
     assert event_count > 0
     assert window_count > 0
+
+
+def _run_multimodal_analysis(page: Page) -> None:
+    page.get_by_text("Multimodal Analysis", exact=True).click()
+    expect(page.get_by_text("Multimodal controls", exact=True)).to_be_visible()
+    expect(page.locator("#multimodal-event_status")).to_contain_text(
+        "Events & Alignment ready:",
+        timeout=60_000,
+    )
+    page.locator("#multimodal-trial_col").select_option("")
+    page.locator("#multimodal-cardiac_col").select_option("")
+    page.locator("#multimodal-pupil_col").select_option("")
+    page.locator("#multimodal-gaze_x_col").select_option("")
+    page.locator("#multimodal-gaze_y_col").select_option("")
+    page.locator("#multimodal-aoi_col").select_option("")
+    page.locator("#multimodal-run").click()
+    expect(page.locator("#multimodal-status")).to_contain_text(
+        "Multimodal Analysis complete:",
+        timeout=120_000,
+    )
+    modality_count = int(page.locator("#multimodal-modality_count").inner_text().replace(",", ""))
+    summary_count = int(page.locator("#multimodal-summary_count").inner_text().replace(",", ""))
+    assert modality_count == 1
+    assert summary_count > 0
 
 
 def test_studio_shell_loads_demo_and_exposes_reporting(page: Page, app: ShinyAppProc) -> None:
@@ -221,6 +262,27 @@ def test_event_alignment_tables_and_events_download(page: Page, app: ShinyAppPro
     expect(page.locator("#event_alignment-download_events")).to_be_visible()
     with page.expect_download(timeout=60_000) as download_info:
         page.locator("#event_alignment-download_events").click()
+    download = download_info.value
+    path = download.path()
+    assert path is not None
+    csv_text = Path(path).read_text(encoding="utf-8")
+    assert len(csv_text.splitlines()) > 1
+
+
+def test_multimodal_timeline_and_response_download(page: Page, app: ShinyAppProc) -> None:
+    _load_demo_participant(page, app)
+    _run_event_alignment(page)
+    _run_multimodal_analysis(page)
+
+    page.get_by_role("tab", name="Timeline", exact=True).click()
+    expect(page.get_by_text("Package-native multimodal timeline", exact=True)).to_be_visible()
+    expect(page.locator("#multimodal-timeline_plot img")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
+
+    page.locator('a[data-value="Export"]:visible').click()
+    expect(page.locator("#multimodal-download_response")).to_be_visible()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#multimodal-download_response").click()
     download = download_info.value
     path = download.path()
     assert path is not None
