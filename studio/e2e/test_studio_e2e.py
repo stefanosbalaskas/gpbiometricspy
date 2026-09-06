@@ -29,6 +29,18 @@ def _open_reporting(page: Page) -> None:
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
 
 
+def _run_gaze_analysis(page: Page) -> None:
+    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
+    page.locator("#gaze-run").click()
+    expect(page.locator("#gaze-status")).to_contain_text(
+        "Gaze workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+    saccade_count = int(page.locator("#gaze-saccade_count").inner_text().replace(",", ""))
+    assert saccade_count > 0
+
+
 def test_studio_shell_loads_demo_and_exposes_reporting(page: Page, app: ShinyAppProc) -> None:
     _load_demo(page, app)
     _open_reporting(page)
@@ -63,3 +75,23 @@ def test_reporting_build_and_recipe_download_preserve_privacy(page: Page, app: S
     assert len(recipe["dataset"]["sha256"]) == 64
     assert recipe["dataset"]["row_count"] > 0
     assert recipe["dataset"]["column_count"] > 0
+
+
+def test_gaze_main_sequence_renders_and_saccades_download(page: Page, app: ShinyAppProc) -> None:
+    _load_demo(page, app)
+    _run_gaze_analysis(page)
+
+    page.get_by_text("Fixations & saccades", exact=True).click()
+    expect(page.get_by_text("Saccade main-sequence diagnostic", exact=True)).to_be_visible()
+    expect(page.locator("#gaze-main_sequence_plot img")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
+
+    page.locator('#gaze-gaze_tabs [data-value="Export"]').click()
+    expect(page.locator("#gaze-download_saccades")).to_be_visible()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#gaze-download_saccades").click()
+    download = download_info.value
+    path = download.path()
+    assert path is not None
+    csv_text = Path(path).read_text(encoding="utf-8")
+    assert len(csv_text.splitlines()) > 1
