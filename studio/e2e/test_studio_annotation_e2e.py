@@ -39,11 +39,17 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
     assert int(page.locator("#row_count").inner_text().replace(",", "")) == 1_920
 
 
-def _plot_point(page: Page, x_fraction: float, y_fraction: float) -> tuple[float, float]:
+def _interactive_plot(page: Page):
     # Shiny binds plot click/brush handlers to the output container only after
     # the rendered image's load event, then marks the bound container crosshair.
     plot = page.locator("#annotation-signal_plot.crosshair")
     expect(plot).to_be_visible(timeout=60_000)
+    plot.scroll_into_view_if_needed()
+    return plot
+
+
+def _plot_point(page: Page, x_fraction: float, y_fraction: float) -> tuple[float, float]:
+    plot = _interactive_plot(page)
     box = plot.bounding_box()
     assert box is not None
     return (
@@ -87,8 +93,15 @@ def test_manual_annotation_export_and_provenance(page: Page, app: ShinyAppProc) 
     expect(page.locator("#annotation-signal_plot.crosshair")).to_be_visible(timeout=60_000)
 
     page.locator("#annotation-note").fill("reviewed peak")
-    peak_x, peak_y = _plot_point(page, 0.55, 0.50)
-    page.mouse.click(peak_x, peak_y)
+    plot = _interactive_plot(page)
+    box = plot.bounding_box()
+    assert box is not None
+    plot.click(
+        position={
+            "x": box["width"] * 0.55,
+            "y": box["height"] * 0.50,
+        }
+    )
     expect(page.locator("#annotation-selection_info")).to_contain_text("Click x=", timeout=30_000)
     page.locator("#annotation-add_peak").click()
     expect(page.locator("#annotation-status")).to_contain_text("Manual peak added.", timeout=30_000)
