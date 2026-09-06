@@ -207,13 +207,14 @@ def test_ppg_peak_detection_renders_and_peaks_download(page: Page, app: ShinyApp
     assert len(csv_text.splitlines()) > 1
 
 
-def test_event_alignment_renders_and_events_download(page: Page, app: ShinyAppProc) -> None:
+def test_event_alignment_tables_and_events_download(page: Page, app: ShinyAppProc) -> None:
     _load_demo(page, app)
     _run_event_alignment(page)
 
-    page.get_by_role("tab", name="Event windows", exact=True).click()
-    expect(page.get_by_text("Event-locked diagnostic", exact=True)).to_be_visible()
-    expect(page.locator("#event_alignment-event_plot img")).to_be_visible(timeout=60_000)
+    page.get_by_role("tab", name="TTL alignment", exact=True).click()
+    expect(page.get_by_text("TTL alignment overview", exact=True)).to_be_visible()
+    expect(page.get_by_text("TTL-aligned events", exact=True)).to_be_visible()
+    expect(page.locator("#event_alignment-ttl_overview")).to_be_visible(timeout=60_000)
     expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
 
     page.locator('a[data-value="Export"]:visible').click()
