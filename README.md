@@ -37,9 +37,8 @@
 
 | Status | Current state |
 |---|---|
-| Stable release | **0.1.3** |
-| Development head | **0.1.4** |
-| Release date | **2026-09-05** |
+| Stable release | **0.1.4** |
+| Release date | **2026-09-06** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
 | Validation | **557 tests · 100.00% statements · 99.6604% raw branches · 0 unaudited branch debt** |
@@ -83,7 +82,7 @@ Individual extras are available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `
 
 ## gpbiometricspy Studio
 
-Studio is a repository/application layer over the public package API. In stable `0.1.3`, it is included in the Python distribution with installed launch commands.
+Studio is a repository/application layer over the public package API. In stable `0.1.4`, it is included in the Python distribution with installed launch commands.
 
 From a source checkout:
 
@@ -192,10 +191,11 @@ Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and d
 <a id="citation"></a>
 ## Archival and citation
 
-`gpbiometricspy 0.1.3` is the current stable release. Its version-specific Zenodo DOI is **10.5281/zenodo.22313884**; the concept DOI identifies the evolving Python software record.
+`gpbiometricspy 0.1.4` is the current stable release. Its version-specific Zenodo DOI will be recorded after Zenodo ingests the immutable `v0.1.4` GitHub release; the concept DOI identifies the evolving Python software record.
 
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
-- **Previous version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
+- **Previous version DOI (0.1.3):** [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)
+- **Earlier version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
 - **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **Published gpbiometrics R-package paper:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
