@@ -40,7 +40,9 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
 
 
 def _plot_point(page: Page, x_fraction: float, y_fraction: float) -> tuple[float, float]:
-    plot = page.locator("#annotation-signal_plot img")
+    # Shiny binds plot click/brush handlers to the output container only after
+    # the rendered image's load event, then marks the bound container crosshair.
+    plot = page.locator("#annotation-signal_plot.crosshair")
     expect(plot).to_be_visible(timeout=60_000)
     box = plot.bounding_box()
     assert box is not None
@@ -82,6 +84,7 @@ def test_manual_annotation_export_and_provenance(page: Page, app: ShinyAppProc) 
     expect(page.locator("#annotation-signal_col")).to_have_value("GSR_US")
     expect(page.locator("#annotation-time_col")).to_have_value("TIME")
     expect(page.locator("#annotation-signal_plot img")).to_be_visible(timeout=60_000)
+    expect(page.locator("#annotation-signal_plot.crosshair")).to_be_visible(timeout=60_000)
 
     page.locator("#annotation-note").fill("reviewed peak")
     peak_x, peak_y = _plot_point(page, 0.55, 0.50)
