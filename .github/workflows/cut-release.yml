@@ -8,6 +8,7 @@ on:
       - CodeQL
       - deep-parity
       - interoperability
+      - branch-coverage
       - private-real-data-validation
       - studio
       - studio-e2e
@@ -97,6 +98,7 @@ jobs:
             codeql.yml \
             deep-parity.yml \
             interoperability.yml \
+            branch-coverage.yml \
             real-data-validation.yml \
             studio.yml \
             studio-e2e.yml \
