@@ -57,57 +57,15 @@ jobs:
           index = index.replace(old_grid, new_grid)
           start = index.index('!!! info "Stable 0.1.3 + validated 0.1.4 development line"')
           end = index.index('\n\n## Code or Studio', start)
-          info = '!!! info "Stable 0.1.4 release source"\n    This site is frozen from the validated `gpbiometricspy 0.1.4` release source (2026-09-06). The frozen scientific contract remains **406/406 exports with 0 pending**, with **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 version DOI will be added only after Zenodo ingests the immutable release; the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884).'
+          info = '\n'.join([
+              '!!! info "Stable 0.1.4 release source"',
+              '    This site is frozen from the validated `gpbiometricspy 0.1.4` release source (2026-09-06). The frozen scientific contract remains **406/406 exports with 0 pending**, with **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 version DOI will be added only after Zenodo ingests the immutable release; the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884).',
+          ])
           write('docs/index.md', index[:start] + info + index[end:])
 
           replace_required('docs/getting-started.md', '`0.1.3` is the stable public release; this documentation is frozen from the validated release source.', '`0.1.4` is the stable public release; this documentation is frozen from the validated release source.')
           replace_required('docs/plot-gallery.md', '<strong>Stable 0.1.3 documentation.</strong> This gallery is frozen from the validated <code>0.1.3</code> release source.', '<strong>Stable 0.1.4 documentation.</strong> This gallery is frozen from the validated <code>0.1.4</code> release source.')
           replace_required('docs/studio.md', 'The Studio application is included in the stable `0.1.3` distribution and requires the optional Shiny dependencies.', 'The Studio application is included in the stable `0.1.4` distribution and requires the optional Shiny dependencies.')
-
-          citation = """# Citation and archival
-
-`gpbiometricspy` is archived through the Zenodo GitHub integration.
-
-<div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.4</code> (2026-09-06). Its version-specific Zenodo DOI will be added after Zenodo ingests the immutable <code>v0.1.4</code> GitHub release; the software concept DOI remains the identifier for the evolving record.
-</div>
-
-## Cite the Python software
-
-For reproducibility, cite the exact software release used. During the pre-ingestion window for 0.1.4, use the release/version metadata and repository tag; replace that with the minted 0.1.4 version DOI once Zenodo publishes it.
-
-- **0.1.4 version DOI:** pending Zenodo ingestion — **not invented in release metadata**
-- **Previous 0.1.3 version DOI:** **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**
-- **Earlier 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
-- **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**
-
-Zenodo recommends the version DOI when citing a specific research artifact version. The concept DOI identifies the evolving software family.
-
-GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control. The 0.1.4 release freeze records the stable version and release date but intentionally omits a version DOI until Zenodo mints one.
-
-## Published gpbiometrics paper
-
-The peer-reviewed paper describing the original R package is:
-
-> Balaskas, S. **gpbiometrics: An R Package for Reproducible Analysis and Reporting of Gazepoint Biometrics Exports.** *Signals* **2026**, *7*, 86. [https://doi.org/10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
-
-This article documents the R `gpbiometrics` package that provides the scientific and software lineage for `gpbiometricspy`. When an analysis uses the Python package, cite the relevant `gpbiometricspy` software version as well.
-
-## R reference provenance
-
-The frozen semantic reference is **gpbiometrics 2.0.0**, independently archived at DOI **[10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)**. `.zenodo.json` preserves it with relation `isDerivedFrom`, so the Python and R software objects remain distinct.
-
-## Metadata files
-
-- `CITATION.cff` identifies stable Python release 0.1.4 and its release date; its version DOI is intentionally absent until Zenodo ingestion.
-- `.zenodo.json` provides Zenodo-specific archival metadata and the R-reference provenance relationship.
-- README and documentation use the Python concept DOI badge for the evolving software family while retaining prior version DOIs as historical identifiers.
-
-## Interpretation
-
-A Zenodo DOI provides a persistent identifier for a software archive. It does not replace the package's scientific validation evidence, which remains documented under [Parity & validation](parity.md) and [Deep validation](deep-validation.md).
-"""
-          write('docs/citation.md', citation)
 
           replace_required('CHANGELOG.md', 'refreshes repository-facing validation status for the 0.1.4 development freeze without changing the current public stable release identity (`0.1.3`) before the separate stable-version promotion.', 'promotes the fully qualified branch-validation line to stable **0.1.4** release metadata while preserving raw **99.6604%** branch reporting and the exact structural-debt contract.')
 
@@ -118,65 +76,23 @@ A Zenodo DOI provides a persistent identifier for a software archive. It does no
 
           validation = read('VALIDATION.md')
           if '## 0.1.4 stable release freeze — 2026-09-06' not in validation:
-              validation += """
-
-## 0.1.4 stable release freeze — 2026-09-06
-
-The 0.1.4 release source freezes the completed branch/path-validation campaign without changing the frozen 406-function scientific contract.
-
-- package/runtime identity: **0.1.4**;
-- frozen R semantic reference: **gpbiometrics 2.0.0**;
-- API contract: **406 / 406 implemented; 0 pending**;
-- scientific regression suite: **557 tests**;
-- whole-package statements: **10,316 / 10,316 = 100.000%** with a **100% statement CI floor**;
-- raw pure branches: **5,575 / 5,594 = 99.6604%** with a **99.6% raw branch CI floor**;
-- audited structural/caller-dominated residual arcs: **19**;
-- structural-debt contract: **0 unexpected, 0 stale, 0 unaudited branch debt**;
-- audited branch accounting: **5,594 / 5,594 = 100.0000%**, explicitly not substituted for the honest raw coverage metric;
-- stable tagging requires every exact-main release gate, including the branch/structural audit;
-- no 0.1.4 Zenodo version DOI is recorded before Zenodo actually ingests the immutable GitHub release.
-"""
+              section = '\n'.join([
+                  '', '', '## 0.1.4 stable release freeze — 2026-09-06', '',
+                  'The 0.1.4 release source freezes the completed branch/path-validation campaign without changing the frozen 406-function scientific contract.', '',
+                  '- package/runtime identity: **0.1.4**;',
+                  '- frozen R semantic reference: **gpbiometrics 2.0.0**;',
+                  '- API contract: **406 / 406 implemented; 0 pending**;',
+                  '- scientific regression suite: **557 tests**;',
+                  '- whole-package statements: **10,316 / 10,316 = 100.000%** with a **100% statement CI floor**;',
+                  '- raw pure branches: **5,575 / 5,594 = 99.6604%** with a **99.6% raw branch CI floor**;',
+                  '- audited structural/caller-dominated residual arcs: **19**;',
+                  '- structural-debt contract: **0 unexpected, 0 stale, 0 unaudited branch debt**;',
+                  '- audited branch accounting: **5,594 / 5,594 = 100.0000%**, explicitly not substituted for the honest raw coverage metric;',
+                  '- stable tagging requires every exact-main release gate, including the branch/structural audit;',
+                  '- no 0.1.4 Zenodo version DOI is recorded before Zenodo actually ingests the immutable GitHub release.',
+              ])
+              validation += section + '\n'
           write('VALIDATION.md', validation)
-
-          notes = """# gpbiometricspy 0.1.4 — branch-path validation and release hardening
-
-`gpbiometricspy 0.1.4` preserves the frozen **gpbiometrics 2.0.0** scientific contract while substantially strengthening executable path validation and release governance.
-
-## Scientific contract
-
-- **406 / 406** frozen R exports implemented; **0 pending**.
-- **557** scientific regression tests.
-- **10,316 / 10,316 statements = 100.00%** with a 100% statement CI floor.
-- No intended scientific API redesign in this release line.
-
-## Branch/path validation
-
-- Raw pure branch coverage increased from **4,815 / 5,594 = 86.0744%** to **5,575 / 5,594 = 99.6604%**.
-- **760** additional branch paths were validated through exported/public behavior where genuinely reachable.
-- The remaining **19** raw arcs are explicitly reviewed structural/caller-dominated or dominated defensive paths.
-- CI enforces **0 unexpected**, **0 stale**, and **0 unaudited branch debt**.
-- Audited accounting is **5,594 / 5,594**, while the release continues to report raw Coverage.py branch coverage as **99.6604%**.
-
-## Release integrity
-
-- Branch/structural coverage is an exact-commit stable-release gate alongside the OS×Python matrix, docs, CodeQL, deep parity, interoperability, private-data validation, and Studio gates.
-- `pyproject.toml` changes trigger the branch audit.
-- Release identity is synchronized across package metadata, runtime `__version__`, `.zenodo.json`, `CITATION.cff`, generated documentation metadata, README/site, changelog, and validation records.
-- `CITATION.cff` deliberately contains no 0.1.4 version DOI before Zenodo ingestion. The actual DOI will be recorded only after Zenodo mints it.
-
-## Studio and interoperability
-
-The packaged Shiny for Python Studio, synthetic-only public boundary, Chromium E2E checks, production/distribution checks, deep R/Python parity, and optional-backend interoperability gates remain part of the stable release contract.
-"""
-          write('RELEASE_NOTES_0.1.4.md', notes)
-          write('docs/release-0.1.4.md', """# gpbiometricspy 0.1.4
-
-Released **2026-09-06**.
-
-See the repository [0.1.4 release notes](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/RELEASE_NOTES_0.1.4.md) for the complete stable-release summary.
-
-The release preserves the frozen 406-export scientific contract while freezing **557 tests**, **100% statement coverage**, **99.6604% raw branch coverage**, and an exact structural-debt contract with **0 unaudited branch debt**. The 0.1.4 Zenodo version DOI is intentionally pending until Zenodo ingests the immutable release.
-""")
 
           assert 'Development head | **0.1.4**' not in read('README.md')
           assert 'development head</span>' not in read('docs/index.md')
@@ -192,6 +108,6 @@ The release preserves the frozen 406-export scientific contract while freezing *
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md CHANGELOG.md VALIDATION.md RELEASE_CHECKLIST.md docs RELEASE_NOTES_0.1.4.md
+          git add README.md CHANGELOG.md VALIDATION.md RELEASE_CHECKLIST.md docs/index.md docs/getting-started.md docs/plot-gallery.md docs/studio.md
           git commit -m "release: finalize gpbiometricspy 0.1.4 docs [release-docs-applied]"
           git push origin HEAD:release-0.1.4-freeze
