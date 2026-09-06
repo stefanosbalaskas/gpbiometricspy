@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "scope": "gpbiometricspy 0.1.4 branch-coverage structural debt",
+  "baseline_commit": "c4773890e0c7d4ea093561d22e0da195c74d37b9",
+  "coverage_denominator": 5594,
+  "raw_covered_branches": 5575,
+  "raw_branch_coverage_percent": 99.6604,
+  "structural_missing_count": 19,
+  "evidence": {
+    "workflow_artifact_id": 9985548249,
+    "workflow_artifact_digest": "sha256:d5e966143cebfb54ed35c73e3068c6e754af7a97709f998f391073a52e20bfb1"
+  },
+  "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
+  "entries": [
+    {
+      "file": "src/gpbiometricspy/advanced_physiology.py",
+      "from": 60,
+      "to": 65,
+      "kind": "caller_dominated",
+      "rationale": "Zero-iteration exit of private _simple_kmeans_1d(); exported production caller does not expose the iteration count and invokes the helper with its positive default."
+    },
+    {
+      "file": "src/gpbiometricspy/biosppy_style.py",
+      "from": 20,
+      "to": -18,
+      "kind": "caller_dominated",
+      "rationale": "Private _running_mean() short-window return; its production caller clamps the window to at least 3."
+    },
+    {
+      "file": "src/gpbiometricspy/biosppy_style.py",
+      "from": 85,
+      "to": -84,
+      "kind": "caller_dominated",
+      "rationale": "Private _peak_indices(peaks=None) guard; exported PPG callers normalize missing peaks before calling the helper."
+    },
+    {
+      "file": "src/gpbiometricspy/cluster_permutation.py",
+      "from": 37,
+      "to": -15,
+      "kind": "structural_invariant",
+      "rationale": "Duplicate-key rejection follows aggregation on the identical participant-condition-time keys, which has already reduced each key to one row."
+    },
+    {
+      "file": "src/gpbiometricspy/cluster_permutation.py",
+      "from": 48,
+      "to": -43,
+      "kind": "caller_dominated",
+      "rationale": "Matrix missingness guard is reached only after exported preparation enforces a complete unique two-condition participant-time grid."
+    },
+    {
+      "file": "src/gpbiometricspy/compatibility.py",
+      "from": 36,
+      "to": -35,
+      "kind": "caller_dominated",
+      "rationale": "Private _unique_name() target-absent return; production enters the helper only after confirming the target already conflicts with the same name set."
+    },
+    {
+      "file": "src/gpbiometricspy/endgame_science.py",
+      "from": 348,
+      "to": -347,
+      "kind": "caller_dominated",
+      "rationale": "Private _match_count() short-input guard; its sole production caller first requires coarse-grained length >= m + 2, satisfying both helper calls."
+    },
+    {
+      "file": "src/gpbiometricspy/event_frontdoor.py",
+      "from": 61,
+      "to": 58,
+      "kind": "structural_invariant",
+      "rationale": "Private SCR peak loop branch for an empty pre-peak slice is dominated by the candidate-index construction and loop bounds."
+    },
+    {
+      "file": "src/gpbiometricspy/heartpy_style.py",
+      "from": 134,
+      "to": -93,
+      "kind": "language_invariant",
+      "rationale": "Path('') normalizes to '.', so the subsequent str(path) == '' guard cannot be true."
+    },
+    {
+      "file": "src/gpbiometricspy/heartpy_style.py",
+      "from": 154,
+      "to": 156,
+      "kind": "dominated_guard",
+      "rationale": "The n > 1 false path follows an earlier n < 4 return, so every execution reaching this branch necessarily has n >= 4."
+    },
+    {
+      "file": "src/gpbiometricspy/heartpy_style.py",
+      "from": 399,
+      "to": -395,
+      "kind": "dominated_guard",
+      "rationale": "Datetime values are deduplicated and sorted; after the earlier len(t) >= 2 condition, at least one positive finite interval necessarily exists."
+    },
+    {
+      "file": "src/gpbiometricspy/pspm_style.py",
+      "from": 116,
+      "to": -114,
+      "kind": "caller_dominated",
+      "rationale": "Private kernel rejects a non-positive sampling interval, while the exported caller filters positive intervals and passes their positive median."
+    },
+    {
+      "file": "src/gpbiometricspy/pyhrv_style.py",
+      "from": 76,
+      "to": -74,
+      "kind": "caller_dominated",
+      "rationale": "Private _fft_psd() n < 4 guard is dominated by the exported caller, which returns before invoking it whenever n < 8."
+    },
+    {
+      "file": "src/gpbiometricspy/remaining_core.py",
+      "from": 126,
+      "to": 128,
+      "kind": "dominated_guard",
+      "rationale": "False branch after the final supported artifact_type alternative would require an unsupported type already rejected by earlier validation."
+    },
+    {
+      "file": "src/gpbiometricspy/roadmap_final_gaps.py",
+      "from": 445,
+      "to": 447,
+      "kind": "caller_dominated",
+      "rationale": "The BIDS wrapper's public exporter always returns a dict on success and raises on failure, so the non-dict continuation cannot occur through exported behavior."
+    },
+    {
+      "file": "src/gpbiometricspy/roadmap_helpers.py",
+      "from": 124,
+      "to": 126,
+      "kind": "caller_dominated",
+      "rationale": "Private event-standardization alternative requires event_label_col, but exported production callers never supply that private fourth argument."
+    },
+    {
+      "file": "src/gpbiometricspy/user_workflows.py",
+      "from": 278,
+      "to": 282,
+      "kind": "dominated_guard",
+      "rationale": "Signal-activity plotting raises when plot_data is empty and max_groups is validated positive, so the later len(plot_data) false branch cannot be reached."
+    },
+    {
+      "file": "src/gpbiometricspy/user_workflows.py",
+      "from": 582,
+      "to": 584,
+      "kind": "caller_dominated",
+      "rationale": "The public HRV feature extractor's fixed schema supplies mean_ibi_ms and does not supply mean_ibi_sec at this point, fixing the condition true."
+    },
+    {
+      "file": "src/gpbiometricspy/user_workflows.py",
+      "from": 673,
+      "to": 672,
+      "kind": "dominated_guard",
+      "rationale": "Requested factor/random columns are validated before the loop and inferred columns are selected only from existing data columns, so c not in data is impossible."
+    }
+  ]
+}
