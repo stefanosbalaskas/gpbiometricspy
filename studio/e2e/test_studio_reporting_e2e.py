@@ -265,6 +265,7 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     )
     expect(page.locator("#reporting-analysis_count")).to_have_text("0")
     expect(page.locator("#reporting-result_table_count")).to_have_text("0")
+    page.get_by_role("tab", name="Report", exact=True).click()
     expect(page.locator("#reporting-identity_summary")).to_contain_text(
         "Analyses: 0",
         timeout=30_000,
