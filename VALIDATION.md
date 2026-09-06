@@ -555,3 +555,19 @@ The twenty-eighth 0.1.4 branch/path tranche closes all remaining cluster-permuta
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the validating measured-head artifact is ID **9977852444** and is bound by digest `sha256:6c88cf2e31b62aee09d3df29347b18e21aff9eadeec7f8349d068f24b7b1bedc`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **98.9% to 99.0%**, retaining headroom below the measured **99.1062%** while preventing regression to the prior **98.9811%** tranche level.
+
+### Pupil and gaze branch tranche
+
+The twenty-ninth 0.1.4 branch/path tranche closes the complete remaining pupil/gaze cleaning and filtering control-flow debt through exported APIs while retaining the production scientific implementation unchanged.
+
+- pre-tranche measurement inherited from the cluster-permutation residual tranche: **5,544 / 5,594 branches = 99.1062%**;
+- post-tranche exact measured coverage: **5,550 / 5,594 branches = 99.2134%**;
+- missing branch paths reduced from **50 to 44** (**6 newly validated paths** in this tranche; **735 cumulatively** since the original 0.1.4 baseline);
+- `pupil_gaze.py`: **78 / 84 branches = 92.857% → 84 / 84 branches = 100.000%**;
+- public-API tests cover missing explicit pupil time and validity columns, numeric and boolean validity handling, a blink/invalid run shorter than `min_blink_samples`, non-finite screen-bound validation, and singleton gaze groups that intentionally skip pairwise velocity calculation;
+- all six pre-tranche residual `pupil_gaze.py` paths are closed through exported production behavior; no private-helper-only test is needed and no structural residual remains in this module;
+- no file under `src/gpbiometricspy/` is changed by this tranche;
+- whole-package statement coverage remains **10,316 / 10,316 = 100.000%**; the empirical branch run completed **531 tests** successfully;
+- exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the corrected validating measured-head artifact is ID **9979274448** and is bound by digest `sha256:f3127466f5a7281075b15eeb008cab23249a9d9b86cf450a753ca88f850274d6`;
+- the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
+- the persistent pure branch-coverage regression floor is raised conservatively from **99.0% to 99.2%**, retaining headroom below the measured **99.2134%** while preventing regression to the prior **99.1062%** tranche level.
