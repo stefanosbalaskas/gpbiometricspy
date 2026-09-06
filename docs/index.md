@@ -17,7 +17,7 @@
 
 <div class="gp-status-grid">
 <div><span class="gp-status-value">0.1.3</span><span class="gp-status-label">stable release</span></div>
-<div><span class="gp-status-value">0.1.4.dev0</span><span class="gp-status-label">development head</span></div>
+<div><span class="gp-status-value">0.1.4</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
 <div><span class="gp-status-value">99.6604%</span><span class="gp-status-label">raw branch coverage</span></div>
@@ -26,7 +26,7 @@
 </div>
 
 !!! info "Stable 0.1.3 + validated 0.1.4 development line"
-    The current public stable release remains `gpbiometricspy 0.1.3` (2026-09-05), with version DOI [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). Development `0.1.4.dev0` preserves the same frozen 406-export scientific contract while expanding validation to **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches**. The remaining **19** raw branch arcs are exact, reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw branch coverage remains reported honestly as **99.6604%**. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
+    The current public stable release remains `gpbiometricspy 0.1.3` (2026-09-05), with version DOI [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). Development `0.1.4` preserves the same frozen 406-export scientific contract while expanding validation to **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches**. The remaining **19** raw branch arcs are exact, reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw branch coverage remains reported honestly as **99.6604%**. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
 
 ## Code or Studio
 

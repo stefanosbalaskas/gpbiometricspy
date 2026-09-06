@@ -357,7 +357,7 @@ def test_reporting_optional_content_warning_and_validation_paths():
         event_audit=event,
         condition_audit=condition,
         decision_log=_report_log(include_stage=False),
-        package_version="0.1.4.dev0",
+        package_version="0.1.4",
         validation={"schema": "pass"},
         include_guardrails=False,
     )

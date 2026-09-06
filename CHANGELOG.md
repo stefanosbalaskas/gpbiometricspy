@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.4.dev0 — 2026-09-06 — branch-path validation and release hardening
+## 0.1.4 — 2026-09-06 — branch-path validation and release hardening
 
 - preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** and no scientific API redesign;
 - expands the scientific regression suite to **557 tests** while retaining literal **10,316 / 10,316 = 100.00% statement coverage**;

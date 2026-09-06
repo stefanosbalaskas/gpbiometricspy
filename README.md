@@ -38,7 +38,7 @@
 | Status | Current state |
 |---|---|
 | Stable release | **0.1.3** |
-| Development head | **0.1.4.dev0** |
+| Development head | **0.1.4** |
 | Release date | **2026-09-05** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
