@@ -497,12 +497,12 @@ def pupil_server(input, output, session, state, status_text):
     def script_preview():
         return pupil_reproducibility_script(_result())
 
-    @render.download(filename="gpbiometricspy_pupil_blink_intervals.csv")
+    @render.download_button(filename="gpbiometricspy_pupil_blink_intervals.csv")
     def download_blinks():
         table = pupil_analysis_tables(_result()).get("blink_intervals", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_pupil_processed.csv")
+    @render.download_button(filename="gpbiometricspy_pupil_processed.csv")
     def download_processed():
         result = _result()
         table = result.get("processed_data") if isinstance(result, dict) else None
@@ -510,11 +510,11 @@ def pupil_server(input, output, session, state, status_text):
             table = pd.DataFrame()
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_pupil_event_responses.csv")
+    @render.download_button(filename="gpbiometricspy_pupil_event_responses.csv")
     def download_events():
         table = pupil_analysis_tables(_result()).get("event_summary", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_pupil_reproduce.py")
+    @render.download_button(filename="gpbiometricspy_pupil_reproduce.py")
     def download_script():
         yield pupil_reproducibility_script(_result())
