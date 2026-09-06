@@ -87,7 +87,7 @@ def test_gaze_main_sequence_renders_and_saccades_download(page: Page, app: Shiny
     expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
 
     page.locator('#gaze-gaze_tabs [data-value="Export"]').click()
-    expect(page.get_by_text("Tabular exports", exact=True)).to_be_visible()
+    expect(page.locator("#gaze-download_saccades")).to_be_visible()
     with page.expect_download(timeout=60_000) as download_info:
         page.locator("#gaze-download_saccades").click()
     download = download_info.value
