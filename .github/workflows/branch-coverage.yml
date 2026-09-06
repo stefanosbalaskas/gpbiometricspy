@@ -6,6 +6,8 @@ on:
       - "src/gpbiometricspy/**"
       - "tests/**"
       - "scripts/report_branch_coverage.py"
+      - "scripts/audit_structural_branch_debt.py"
+      - "artifacts/branch-coverage-structural-debt.json"
       - ".github/workflows/branch-coverage.yml"
   push:
     branches: [main]
@@ -13,6 +15,8 @@ on:
       - "src/gpbiometricspy/**"
       - "tests/**"
       - "scripts/report_branch_coverage.py"
+      - "scripts/audit_structural_branch_debt.py"
+      - "artifacts/branch-coverage-structural-debt.json"
       - ".github/workflows/branch-coverage.yml"
   workflow_dispatch:
 
@@ -43,6 +47,12 @@ jobs:
             coverage-branch.json \
             --top 30 \
             --fail-under 99.6 | tee branch-coverage-audit.txt
+      - name: Enforce audited structural branch debt contract
+        run: |
+          python scripts/audit_structural_branch_debt.py \
+            coverage-branch.json \
+            artifacts/branch-coverage-structural-debt.json \
+            | tee structural-branch-debt-audit.txt
       - name: Upload branch-coverage evidence
         if: always()
         uses: actions/upload-artifact@v6
@@ -51,5 +61,6 @@ jobs:
           path: |
             coverage-branch.json
             branch-coverage-audit.txt
+            structural-branch-debt-audit.txt
           if-no-files-found: warn
           retention-days: 30
