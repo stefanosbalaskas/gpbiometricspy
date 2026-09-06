@@ -231,3 +231,37 @@ def test_studio_choice_and_annotation_helpers():
     )
     assert table.iloc[0]["row"] == 1
     assert table.iloc[0]["annotation_type"] == "manual_peak"
+
+
+def test_upload_is_imported_through_package(tmp_path: Path):
+    path = tmp_path / "example.csv"
+    path.write_text("CNT,GSR_US,HR\n1,1.0,70\n2,1.2,71\n", encoding="utf-8")
+    data, name = load_uploaded_dataset([
+        {"name": "example.csv", "datapath": str(path), "size": path.stat().st_size}
+    ])
+    assert name == "example.csv"
+    assert list(data.columns) == ["CNT", "GSR_US", "HR"]
+
+
+def test_upload_guardrails_reject_extension_and_size(tmp_path: Path):
+    path = tmp_path / "bad.exe"
+    path.write_text("not,data\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="Unsupported file type"):
+        load_uploaded_dataset([{"name": "bad.exe", "datapath": str(path), "size": 10}])
+
+    with pytest.raises(ValueError, match="100 MB"):
+        load_uploaded_dataset([
+            {"name": "large.csv", "datapath": str(path), "size": MAX_UPLOAD_BYTES + 1}
+        ])
+
+
+def test_studio_app_and_modules_import():
+    from studio.app import app
+    from studio.modules.annotation import annotation_server, annotation_ui
+    from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
+    from studio.modules.qc import qc_server, qc_ui
+
+    assert app is not None
+    assert annotation_ui is not None and annotation_server is not None
+    assert eda_scr_ui is not None and eda_scr_server is not None
+    assert qc_ui is not None and qc_server is not None
