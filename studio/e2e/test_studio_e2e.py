@@ -66,6 +66,18 @@ def _run_eda_scr_analysis(page: Page) -> None:
     assert event_count >= 0
 
 
+def _run_ppg_hr_hrv_analysis(page: Page) -> None:
+    page.get_by_text("PPG / HR / HRV Analysis", exact=True).click()
+    expect(page.get_by_text("PPG / HR / HRV analysis controls", exact=True)).to_be_visible()
+    page.locator("#ppg_hr_hrv-run").click()
+    expect(page.locator("#ppg_hr_hrv-status")).to_contain_text(
+        "PPG/HR/HRV workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+    peak_count = int(page.locator("#ppg_hr_hrv-peak_count").inner_text().replace(",", ""))
+    assert peak_count > 0
+
+
 def test_studio_shell_loads_demo_and_exposes_reporting(page: Page, app: ShinyAppProc) -> None:
     _load_demo(page, app)
     _open_reporting(page)
@@ -154,6 +166,26 @@ def test_eda_decomposition_renders_and_downloads(page: Page, app: ShinyAppProc) 
     expect(page.locator("#eda_scr-download_decomposition")).to_be_visible()
     with page.expect_download(timeout=60_000) as download_info:
         page.locator("#eda_scr-download_decomposition").click()
+    download = download_info.value
+    path = download.path()
+    assert path is not None
+    csv_text = Path(path).read_text(encoding="utf-8")
+    assert len(csv_text.splitlines()) > 1
+
+
+def test_ppg_peak_detection_renders_and_peaks_download(page: Page, app: ShinyAppProc) -> None:
+    _load_demo(page, app)
+    _run_ppg_hr_hrv_analysis(page)
+
+    page.get_by_role("tab", name="Pulse / PPG", exact=True).click()
+    expect(page.get_by_text("Pulse waveform and detected peaks", exact=True)).to_be_visible()
+    expect(page.locator("#ppg_hr_hrv-peak_plot img")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
+
+    page.locator('#ppg_hr_hrv-cardiac_tabs [data-value="Export"]').click()
+    expect(page.locator("#ppg_hr_hrv-download_peaks")).to_be_visible()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#ppg_hr_hrv-download_peaks").click()
     download = download_info.value
     path = download.path()
     assert path is not None
