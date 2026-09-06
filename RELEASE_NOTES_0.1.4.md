@@ -22,8 +22,18 @@
 - Branch/structural coverage is now a first-class exact-commit stable-release gate alongside the OS×Python matrix, docs, CodeQL, deep parity, interoperability, private-data validation, and Studio gates.
 - `pyproject.toml` changes trigger the branch audit so dependency/runtime metadata cannot bypass path validation.
 - Release identity is synchronized across package metadata, runtime `__version__`, `.zenodo.json`, `CITATION.cff`, generated documentation metadata, README/site, changelog, and validation records.
-- `CITATION.cff` deliberately contains no 0.1.4 version DOI before Zenodo ingestion. The actual DOI will be recorded only after Zenodo mints it.
+- `CITATION.cff` deliberately contained no 0.1.4 version DOI before Zenodo ingestion; the minted DOI is recorded in the post-release archival record below.
 
 ## Studio and interoperability
 
 The packaged Shiny for Python Studio, synthetic-only public boundary, Chromium E2E checks, production/distribution checks, deep R/Python parity, and optional-backend interoperability gates remain part of the stable release contract.
+
+## Post-release archival record
+
+- PyPI: `gpbiometricspy 0.1.4` published through protected Trusted Publishing with Sigstore attestations.
+- GitHub/PyPI wheel SHA-256: `88f84908f91bedf9e9ebef1a144e593dfc623bd1f65db757ec91858c0c966add`.
+- GitHub/PyPI sdist SHA-256: `78df06e7fd43c87b68351451e92368d9ccf6428cbb27bb09caaa0d253f66e1ab`.
+- Zenodo version DOI: **[10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)**.
+- Zenodo software concept DOI: **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**.
+- Previous 0.1.3 version DOI: **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**.
+- The immutable `v0.1.4` tag and released distributions remain unchanged; live repository development advances separately.

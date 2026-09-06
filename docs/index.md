@@ -17,6 +17,7 @@
 
 <div class="gp-status-grid">
 <div><span class="gp-status-value">0.1.4</span><span class="gp-status-label">stable release</span></div>
+<div><span class="gp-status-value">0.1.5.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">2026-09-06</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
@@ -25,8 +26,8 @@
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">Python CI matrix</span></div>
 </div>
 
-!!! info "Stable 0.1.4 release source"
-    This site is frozen from the validated `gpbiometricspy 0.1.4` release source (2026-09-06). The frozen scientific contract remains **406/406 exports with 0 pending**, with **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 version DOI will be added only after Zenodo ingests the immutable release; the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884).
+!!! info "Stable 0.1.4 release + live development"
+    Stable `gpbiometricspy 0.1.4` (2026-09-06) preserves **406/406 exports with 0 pending**, **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 Zenodo version DOI is [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782); the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). Live repository development proceeds as `0.1.5.dev0` without changing the immutable `v0.1.4` release.
 
 ## Code or Studio
 

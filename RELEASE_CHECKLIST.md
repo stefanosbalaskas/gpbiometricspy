@@ -90,8 +90,18 @@
 - [x] Refresh README/changelog/release-facing development validation status without changing the current public stable identity before the separate stable freeze.
 - [x] Promote the qualified 0.1.4 development identity to stable `0.1.4` only after the release-hardening tranche merged green.
 - [x] Synchronize stable package, runtime `__version__`, Zenodo metadata, CFF citation metadata, generated documentation metadata, README/site, changelog, release notes and checklist without inventing a pre-ingestion 0.1.4 Zenodo version DOI.
-- [ ] Require every stable-release gate—including the new branch/structural audit—to succeed on the exact stable `main` commit.
-- [ ] Create immutable annotated `v0.1.4` only from that exact fully validated stable commit.
-- [ ] Confirm release workflow builds/checks wheel and sdist, validates Studio inclusion, smoke-installs both distributions, and publishes SHA-256 manifest/GitHub Release assets.
-- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.4` and verify fresh public-index installs.
-- [ ] Wait for Zenodo ingestion, then record the actual 0.1.4 version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
+- [x] Require every stable-release gate—including the new branch/structural audit—to succeed on the exact stable `main` commit.
+- [x] Create immutable annotated `v0.1.4` only from that exact fully validated stable commit.
+- [x] Confirm release workflow builds/checks wheel and sdist, validates Studio inclusion, smoke-installs both distributions, and publishes SHA-256 manifest/GitHub Release assets.
+- [x] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.4`; both distributions returned HTTP 200 and Sigstore attestations were logged.
+- [x] Wait for Zenodo ingestion and record the actual 0.1.4 version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
+
+### 0.1.4 post-release closeout
+
+- [x] Immutable annotated `v0.1.4` resolves to exact qualified commit `3b45a4698d8c3accd989ced0513058ef5d11d3fb`.
+- [x] Protected PyPI Trusted Publishing completed successfully for `gpbiometricspy 0.1.4` with Sigstore/Rekor attestations.
+- [x] GitHub Release and PyPI wheel SHA-256 match: `88f84908f91bedf9e9ebef1a144e593dfc623bd1f65db757ec91858c0c966add`.
+- [x] GitHub Release and PyPI sdist SHA-256 match: `78df06e7fd43c87b68351451e92368d9ccf6428cbb27bb09caaa0d253f66e1ab`.
+- [x] Zenodo ingested `v0.1.4`; version DOI: `10.5281/zenodo.22515782`.
+- [x] Concept DOI remains `10.5281/zenodo.22150872`; previous 0.1.3 DOI remains `10.5281/zenodo.22313884`.
+- [x] Return live repository identity to development as `0.1.5.dev0` while keeping `CITATION.cff` pinned to stable `0.1.4` + DOI `10.5281/zenodo.22515782`.
