@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib
 
+import gpbiometricspy as gp
 import numpy as np
 import pandas as pd
 import pytest
@@ -73,6 +74,31 @@ def test_ttl_event_alignment_matches_windows_within_selected_group():
     assert "relative_time_s" in windows.columns
     assert "GSR_US_mean" in summary.columns
     assert not result["ttl_alignment"]["overview"].empty
+
+
+def test_imported_packaged_participant_alignment_is_concat_safe():
+    data = gp.import_gazepoint_biometrics(gp.kiosk_demo_files()[0])
+    assert len(data) == 1_920
+    assert isinstance(data.attrs.get("biometric_columns"), pd.DataFrame)
+
+    result = run_event_alignment(
+        data,
+        source_mode="ttl",
+        time_col="TIME",
+        ttl_col="TTL0",
+        validity_col="TTLV",
+        group_col="participant_id",
+        pre_s=1.0,
+        post_s=5.0,
+        summary_cols=["GSR_US"],
+    )
+
+    assert not result["events"].empty
+    assert not result["event_windows"].empty
+    assert not result["event_summary"].empty
+    assert isinstance(data.attrs.get("biometric_columns"), pd.DataFrame)
+    script = event_alignment_reproducibility_script(result)
+    assert "data.attrs =" in script
 
 
 def test_external_event_log_mode_is_group_safe():
