@@ -53,6 +53,19 @@ def _run_pupil_analysis(page: Page) -> None:
     assert blink_count >= 0
 
 
+def _run_eda_scr_analysis(page: Page) -> None:
+    page.get_by_text("EDA / SCR Analysis", exact=True).click()
+    expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
+    page.locator("#eda_scr-run").click()
+    expect(page.locator("#eda_scr-status")).to_contain_text(
+        "EDA/SCR workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+    expect(page.locator("#eda_scr-decomposition_method")).not_to_have_text("Not run")
+    event_count = int(page.locator("#eda_scr-event_count").inner_text().replace(",", ""))
+    assert event_count >= 0
+
+
 def test_studio_shell_loads_demo_and_exposes_reporting(page: Page, app: ShinyAppProc) -> None:
     _load_demo(page, app)
     _open_reporting(page)
@@ -121,6 +134,26 @@ def test_pupil_missingness_renders_and_processed_download(page: Page, app: Shiny
     expect(page.locator("#pupil-download_processed")).to_be_visible()
     with page.expect_download(timeout=60_000) as download_info:
         page.locator("#pupil-download_processed").click()
+    download = download_info.value
+    path = download.path()
+    assert path is not None
+    csv_text = Path(path).read_text(encoding="utf-8")
+    assert len(csv_text.splitlines()) > 1
+
+
+def test_eda_decomposition_renders_and_downloads(page: Page, app: ShinyAppProc) -> None:
+    _load_demo(page, app)
+    _run_eda_scr_analysis(page)
+
+    page.get_by_role("tab", name="Decomposition", exact=True).click()
+    expect(page.get_by_text("Observed, tonic, and phasic EDA", exact=True)).to_be_visible()
+    expect(page.locator("#eda_scr-decomposition_plot img")).to_be_visible(timeout=60_000)
+    expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
+
+    page.locator('#eda_scr-eda_tabs [data-value="Export"]').click()
+    expect(page.locator("#eda_scr-download_decomposition")).to_be_visible()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#eda_scr-download_decomposition").click()
     download = download_info.value
     path = download.path()
     assert path is not None
