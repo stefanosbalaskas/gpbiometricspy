@@ -61,6 +61,15 @@ def _open_reporting(page: Page) -> None:
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
 
 
+def _reset_session(page: Page) -> None:
+    page.locator("#reset").click()
+    expect(page.locator("#status")).to_contain_text(
+        "Session reset. No dataset is loaded.",
+        timeout=30_000,
+    )
+    expect(page.locator("#row_count")).to_have_text("0", timeout=30_000)
+
+
 def _download(page: Page, selector: str) -> Path:
     with page.expect_download(timeout=60_000) as download_info:
         page.locator(selector).click()
@@ -206,8 +215,7 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
 
     # A different loaded dataset must fail the fingerprint gate.
-    page.locator("#reset").click()
-    expect(page.locator("#row_count")).to_have_text("0")
+    _reset_session(page)
     page.locator("#load_demo").click()
     expect(page.locator("#dataset_name")).to_have_text(
         "Bundled synthetic kiosk demo",
@@ -231,8 +239,7 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     )
 
     # Reloading the exact original participant validates and restores metadata only.
-    page.locator("#reset").click()
-    expect(page.locator("#row_count")).to_have_text("0")
+    _reset_session(page)
     page.locator("#upload").set_input_files([])
     _upload_participant(page, participant_path)
     _open_reporting(page)
