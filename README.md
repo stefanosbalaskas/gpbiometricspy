@@ -13,6 +13,7 @@
   <a href="https://pypi.org/project/gpbiometricspy/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/gpbiometricspy.svg"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/v/release/stefanosbalaskas/gpbiometricspy"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml"><img alt="Tests" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/tests.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/branch-coverage.yml"><img alt="Branch audit" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/branch-coverage.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml"><img alt="Docs" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/docs.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio.yml"><img alt="Studio" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml"><img alt="Studio browser E2E" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml/badge.svg?branch=main"></a>
@@ -41,19 +42,20 @@
 | Release date | **2026-09-05** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Validation | **317 scientific tests · 100.00% statement coverage** |
+| Validation | **557 tests · 100.00% statements · 99.6604% raw branches · 0 unaudited branch debt** |
 | Studio | **11 application workflows · smoke + Chromium E2E + production CI** |
 | Supported Python | **3.11–3.14** |
 
 ## What you get
 
 - **Complete frozen API contract:** all **406 / 406** exported R functions are implemented and registered, with **0 pending exports**.
-- **Literal whole-package coverage:** **317 scientific tests**, **10,316 statements**, **0 missed**, and a CI floor of **100%**.
+- **Literal whole-package statement coverage:** **557 tests**, **10,316 statements**, **0 missed**, and a CI statement floor of **100%**.
+- **Audited branch accounting:** raw branch coverage is **5,575 / 5,594 = 99.6604%**; the remaining **19** arcs are frozen as structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** missing branches under CI.
 - **gpbiometricspy Studio:** a stateful Shiny interface for intake/QC, annotation, EDA/SCR, PPG/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility.
 - **Scientific-domain navigation:** the documentation groups the API into **8 research domains** while preserving the complete alphabetical 406-function reference.
 - **Executable learning material:** **26** frozen-R article/vignette companions are paired with Python workflows, examples, and generated figures.
 - **Reproducible public demo data:** a fully synthetic kiosk dataset with **36 participants and 69,120 rows** ships with the package.
-- **Deep validation layers:** independent R↔Python golden fixtures, optional-backend interoperability CI, privacy-preserving real-data validation, Studio browser/production CI, and frozen upstream provenance.
+- **Deep validation layers:** independent R↔Python golden fixtures, optional-backend interoperability CI, privacy-preserving real-data validation, structural branch-debt enforcement, Studio browser/production CI, and frozen upstream provenance.
 
 The project deliberately distinguishes **API completion** from an absolute claim that independent R and Python runtimes are numerically identical in every external-library/version combination. The frozen R implementation, tests, documentation, and article sources are retained in `reference/` so deeper parity can continue to be audited.
 
@@ -156,20 +158,30 @@ The frozen `gpbiometrics 2.0.0` parity surface covers, among other areas:
 
 ## Validation and parity
 
-Development on `main` goes beyond the 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, privacy-preserving real-data validation, and independent Studio unit/browser/production gates.
+Development on `main` goes beyond the 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, privacy-preserving real-data validation, branch-path auditing, and independent Studio unit/browser/production gates.
 
 The current scientific development validation baseline is:
 
 ```text
-R exports:             406
-Implemented exports:   406
-Explicit pending:        0
-Tests:                 317
-Statements:         10,316
-Missed:                   0
-Statement coverage: 100.00%
-CI coverage floor:      100%
+R exports:                  406
+Implemented exports:        406
+Explicit pending:             0
+Tests:                      557
+Statements:              10,316
+Missed statements:            0
+Statement coverage:      100.00%
+Statement CI floor:      100.00%
+Branches:             5,575/5,594
+Raw branch coverage:    99.6604%
+Raw branch CI floor:    99.6000%
+Audited structural arcs:       19
+Unexpected missing arcs:        0
+Stale structural entries:       0
+Unaudited branch debt:           0
+Audited branch accounting: 100.0000%
 ```
+
+Raw branch coverage remains the literal coverage.py result; the structural-debt contract does **not** relabel it as 100%. Instead, CI requires the exact remaining 19 missing arcs to match the reviewed structural/caller-dominated ledger, so any new or stale uncovered path fails independently of the raw percentage.
 
 Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
 
