@@ -5,6 +5,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
@@ -27,8 +28,18 @@ def _load_demo(page: Page, app: ShinyAppProc) -> None:
 def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
     page.goto(app.url)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    participant_path = gp.kiosk_demo_files()[0]
+    participant_path = Path(gp.kiosk_demo_files()[0])
     page.locator("#upload").set_input_files(str(participant_path))
+
+    def _participant_uploaded(value) -> bool:
+        return (
+            isinstance(value, list)
+            and len(value) == 1
+            and isinstance(value[0], dict)
+            and value[0].get("name") == participant_path.name
+        )
+
+    controller.AppTestValues(page).expect_input("upload", _participant_uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
