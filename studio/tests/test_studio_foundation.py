@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import gpbiometricspy as gp
 import pandas as pd
 import pytest
 
@@ -146,6 +147,19 @@ def test_advanced_qc_uses_time_physiology_and_gaze_contracts():
     assert set(qc) >= {"time_resets", "gsr_quality", "hr_quality", "gaze_validation"}
     assert qc["time_resets"]["overview"].iloc[0]["status"] == "pass"
     assert qc["gaze_validation"]["summary"].iloc[0]["status"] in {"pass", "warn"}
+
+
+def test_imported_packaged_participant_advanced_qc_is_concat_safe():
+    data = gp.import_gazepoint_biometrics(gp.kiosk_demo_files()[0])
+    assert len(data) == 1_920
+    assert isinstance(data.attrs.get("biometric_columns"), pd.DataFrame)
+
+    qc = run_advanced_qc(data, time_col="TIME", expected_sampling_rate_hz=60)
+
+    assert set(qc) >= {"time_resets", "gsr_quality", "hr_quality", "gaze_validation"}
+    assert not qc["time_resets"]["overview"].empty
+    assert not qc["time_resets"]["segment_summary"].empty
+    assert isinstance(data.attrs.get("biometric_columns"), pd.DataFrame)
 
 
 def test_eda_scr_analysis_uses_public_package_contracts():

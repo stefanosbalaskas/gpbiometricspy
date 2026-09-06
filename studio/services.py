@@ -106,6 +106,13 @@ def gaze_available(data: pd.DataFrame) -> bool:
     return bool(x.intersection(data.columns) and y.intersection(data.columns))
 
 
+def _analysis_frame(data: pd.DataFrame) -> pd.DataFrame:
+    """Copy data while dropping attrs that make pandas concat equality ambiguous."""
+    out = data.copy()
+    out.attrs = {key: value for key, value in data.attrs.items() if not isinstance(value, pd.DataFrame)}
+    return out
+
+
 def run_advanced_qc(
     data: pd.DataFrame,
     *,
@@ -124,27 +131,28 @@ def run_advanced_qc(
     if hr_min >= hr_max:
         raise ValueError("HR minimum must be lower than the HR maximum.")
 
+    analysis_data = _analysis_frame(data)
     result: dict[str, Any] = {}
 
     if time_col:
-        result["time_resets"] = gp.audit_gazepoint_time_resets(data, time_col=time_col)
+        result["time_resets"] = gp.audit_gazepoint_time_resets(analysis_data, time_col=time_col)
     else:
         result["time_resets_error"] = "No supported time column was detected."
 
-    if "GSR_US" in data.columns or "GSR" in data.columns:
+    if "GSR_US" in analysis_data.columns or "GSR" in analysis_data.columns:
         result["gsr_quality"] = gp.audit_gazepoint_gsr_quality(
-            data,
+            analysis_data,
             min_value=gsr_min,
             max_value=gsr_max,
         )
-    if "HR" in data.columns:
+    if "HR" in analysis_data.columns:
         result["hr_quality"] = gp.audit_gazepoint_hr_quality(
-            data,
+            analysis_data,
             min_value=hr_min,
             max_value=hr_max,
         )
 
-    if gaze_available(data) and time_col:
+    if gaze_available(analysis_data) and time_col:
         kwargs: dict[str, Any] = {
             "time_col": time_col,
             "expected_sampling_rate_hz": expected_sampling_rate_hz,
@@ -152,7 +160,7 @@ def run_advanced_qc(
         if str(time_col).lower() in {"cnt", "sample", "sample_index", "index"}:
             kwargs["sampling_rate_hz"] = expected_sampling_rate_hz
         try:
-            result["gaze_validation"] = gp.validate_gazepoint_gaze(data, **kwargs)
+            result["gaze_validation"] = gp.validate_gazepoint_gaze(analysis_data, **kwargs)
         except (TypeError, ValueError) as exc:
             result["gaze_validation_error"] = str(exc)
     else:
