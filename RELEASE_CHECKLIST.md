@@ -68,7 +68,6 @@
 - [ ] Confirm PyPI `gpbiometricspy==0.1.3` is public and fresh-index installable.
 - [ ] Wait for Zenodo ingestion; record the new `0.1.3` version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
 
-
 ### 0.1.3 post-release closeout
 
 - [x] Protected PyPI Trusted Publishing completed successfully.
@@ -77,3 +76,22 @@
 - [x] Zenodo ingested `v0.1.3`; version DOI: `10.5281/zenodo.22313884`.
 - [x] Concept DOI remains `10.5281/zenodo.22150872`.
 - [x] Move repository development identity to `0.1.4.dev0` after the immutable 0.1.3 release.
+
+## 0.1.4 — branch validation and stable-release preparation
+
+- [x] Preserve the frozen `gpbiometrics 2.0.0` semantic contract at **406/406 implemented exports, 0 pending**.
+- [x] Preserve literal statement coverage at **10,316/10,316 = 100.00%** with the statement CI floor remaining **100%**.
+- [x] Expand the scientific regression suite to **557 passing tests**.
+- [x] Complete the branch/path validation campaign from **4,815/5,594 = 86.0744%** to **5,575/5,594 = 99.6604%**, validating **760** additional paths through public behavior where reachable.
+- [x] Freeze the exact remaining **19** structural/caller-dominated arcs in a machine-readable contract rather than manufacturing private-helper tests or altering scientific semantics for nominal coverage.
+- [x] Enforce **0 unexpected**, **0 stale**, and **0 unaudited** missing branch debt in CI, with **5,594/5,594 = 100.0000% audited branch accounting** while retaining the honest raw metric.
+- [x] Keep the persistent pure branch regression floor at **99.6%**.
+- [x] Add `branch-coverage.yml` and its structural-debt audit as an exact-commit prerequisite in both the automatic stable tag cutter and the exact-tag release workflow.
+- [x] Refresh README/changelog/release-facing development validation status without changing the current public stable identity before the separate stable freeze.
+- [ ] Promote package identity from `0.1.4.dev0` to stable `0.1.4` only after this hardening PR is merged and exact-main development gates are green.
+- [ ] Synchronize stable package, runtime `__version__`, Zenodo metadata, CFF citation metadata, generated documentation metadata, README/site, changelog, release notes and checklist without inventing a pre-ingestion 0.1.4 Zenodo version DOI.
+- [ ] Require every stable-release gate—including the new branch/structural audit—to succeed on the exact stable `main` commit.
+- [ ] Create immutable annotated `v0.1.4` only from that exact fully validated stable commit.
+- [ ] Confirm release workflow builds/checks wheel and sdist, validates Studio inclusion, smoke-installs both distributions, and publishes SHA-256 manifest/GitHub Release assets.
+- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.4` and verify fresh public-index installs.
+- [ ] Wait for Zenodo ingestion, then record the actual 0.1.4 version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
