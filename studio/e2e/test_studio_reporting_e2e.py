@@ -96,7 +96,8 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     _run_eda(page)
     _open_reporting(page)
 
-    assert int(page.locator("#reporting-analysis_count").inner_text()) == 1
+    expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
+    expect(page.locator("#reporting-result_table_count")).not_to_have_text("", timeout=60_000)
     assert int(page.locator("#reporting-result_table_count").inner_text()) > 0
 
     title = "Studio reporting browser validation"
