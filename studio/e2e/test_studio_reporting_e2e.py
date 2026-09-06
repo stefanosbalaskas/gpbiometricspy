@@ -67,6 +67,7 @@ def _reset_session(page: Page) -> None:
         "Session reset. No dataset is loaded.",
         timeout=30_000,
     )
+    page.get_by_role("tab", name="Home", exact=True).click()
     expect(page.locator("#row_count")).to_have_text("0", timeout=30_000)
 
 
