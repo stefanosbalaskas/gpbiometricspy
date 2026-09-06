@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.4.dev0 — 2026-09-06 — branch-path validation and release hardening
+
+- preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** and no scientific API redesign;
+- expands the scientific regression suite to **557 tests** while retaining literal **10,316 / 10,316 = 100.00% statement coverage**;
+- adds a dedicated full-suite branch/path validation program and empirically closes **760** previously uncovered branch paths, moving raw branch coverage from the original **4,815 / 5,594 = 86.0744%** development baseline to **5,575 / 5,594 = 99.6604%**;
+- keeps the pure branch metric separate from pytest-cov's combined percentage and enforces a conservative **99.6% raw branch floor** in CI;
+- audits the final **19** raw missing arcs as structural, caller-dominated, language-invariant, or dominated defensive guards rather than manufacturing private-helper tests or changing scientific behavior solely for nominal 100% branch coverage;
+- freezes those exact Coverage.py arcs and rationales in `artifacts/branch-coverage-structural-debt.json`;
+- adds `scripts/audit_structural_branch_debt.py`, which requires exact equality between live missing arcs and the audited structural ledger and fails on unexpected debt, stale ledger entries, denominator drift, malformed entries, or inconsistent coverage totals;
+- establishes **0 unaudited branch debt** and **5,594 / 5,594 = 100.0000% audited branch accounting** while explicitly retaining the honest raw branch result of **99.6604%**;
+- adds the structural-debt audit report to retained branch-coverage CI evidence;
+- hardens stable release automation so both the automatic tag cutter and exact-tag release builder require a successful `branch-coverage.yml` run on the exact release commit, alongside the existing tests, docs, security, parity, interoperability, private-data and Studio gates;
+- refreshes repository-facing validation status for the 0.1.4 development freeze without changing the current public stable release identity (`0.1.3`) before the separate stable-version promotion.
+
 ## 0.1.3 — 2026-09-05 — gpbiometricspy Studio and production-ready application
 
 - completes literal 100% whole-package statement coverage with behavioral, validation, fallback, and error-path tests;

@@ -3,6 +3,7 @@ name: branch-coverage
 on:
   pull_request:
     paths:
+      - "pyproject.toml"
       - "src/gpbiometricspy/**"
       - "tests/**"
       - "scripts/report_branch_coverage.py"
@@ -12,6 +13,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "pyproject.toml"
       - "src/gpbiometricspy/**"
       - "tests/**"
       - "scripts/report_branch_coverage.py"
