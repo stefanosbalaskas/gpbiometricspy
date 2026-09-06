@@ -22,6 +22,7 @@ try:
         load_aoi_definitions,
         run_gaze_analysis,
     )
+    from studio.plotting import as_matplotlib_figure
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from gaze_services import (
         analysis_group_column_choices,
@@ -36,6 +37,7 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
         load_aoi_definitions,
         run_gaze_analysis,
     )
+    from plotting import as_matplotlib_figure
 
 
 def _placeholder(message: str):
@@ -519,7 +521,7 @@ def gaze_server(input, output, session, state, status_text):
         if not isinstance(table, pd.DataFrame) or table.empty:
             return _placeholder("No detected saccades are available for the main-sequence diagnostic.")
         try:
-            return gp.plot_gazepoint_saccade_main_sequence(table)
+            return as_matplotlib_figure(gp.plot_gazepoint_saccade_main_sequence(table))
         except Exception as exc:
             return _placeholder(f"Main-sequence plot unavailable: {exc}")
 
@@ -543,7 +545,7 @@ def gaze_server(input, output, session, state, status_text):
     def script_preview():
         return gaze_reproducibility_script(_result())
 
-    @render.download(filename="gpbiometricspy_gaze_processed.csv")
+    @render.download_button(filename="gpbiometricspy_gaze_processed.csv")
     def download_processed():
         result = _result()
         table = result.get("processed_data") if isinstance(result, dict) else None
@@ -551,26 +553,26 @@ def gaze_server(input, output, session, state, status_text):
             table = pd.DataFrame()
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_gaze_fixations.csv")
+    @render.download_button(filename="gpbiometricspy_gaze_fixations.csv")
     def download_fixations():
         table = gaze_analysis_tables(_result()).get("fixations", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_gaze_saccades.csv")
+    @render.download_button(filename="gpbiometricspy_gaze_saccades.csv")
     def download_saccades():
         table = gaze_analysis_tables(_result()).get("saccades", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_gaze_aoi_dwell.csv")
+    @render.download_button(filename="gpbiometricspy_gaze_aoi_dwell.csv")
     def download_aoi():
         table = gaze_analysis_tables(_result()).get("aoi_dwell", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_gaze_scanpath.csv")
+    @render.download_button(filename="gpbiometricspy_gaze_scanpath.csv")
     def download_scanpath():
         table = gaze_analysis_tables(_result()).get("scanpath", pd.DataFrame())
         yield table.to_csv(index=False)
 
-    @render.download(filename="gpbiometricspy_gaze_reproduce.py")
+    @render.download_button(filename="gpbiometricspy_gaze_reproduce.py")
     def download_script():
         yield gaze_reproducibility_script(_result())
