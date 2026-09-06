@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.4.dev0 — 2026-09-06 — branch-path validation and release hardening
+## 0.1.4 — 2026-09-06 — branch-path validation and release hardening
 
 - preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** and no scientific API redesign;
 - expands the scientific regression suite to **557 tests** while retaining literal **10,316 / 10,316 = 100.00% statement coverage**;
@@ -12,7 +12,7 @@
 - establishes **0 unaudited branch debt** and **5,594 / 5,594 = 100.0000% audited branch accounting** while explicitly retaining the honest raw branch result of **99.6604%**;
 - adds the structural-debt audit report to retained branch-coverage CI evidence;
 - hardens stable release automation so both the automatic tag cutter and exact-tag release builder require a successful `branch-coverage.yml` run on the exact release commit, alongside the existing tests, docs, security, parity, interoperability, private-data and Studio gates;
-- refreshes repository-facing validation status for the 0.1.4 development freeze without changing the current public stable release identity (`0.1.3`) before the separate stable-version promotion.
+- promotes the fully qualified branch-validation line to stable **0.1.4** release metadata while preserving raw **99.6604%** branch reporting and the exact structural-debt contract.
 
 ## 0.1.3 — 2026-09-05 — gpbiometricspy Studio and production-ready application
 

@@ -75,7 +75,7 @@
 - [x] Clean public-index installs passed on Python 3.11 and 3.14, including Studio launchers.
 - [x] Zenodo ingested `v0.1.3`; version DOI: `10.5281/zenodo.22313884`.
 - [x] Concept DOI remains `10.5281/zenodo.22150872`.
-- [x] Move repository development identity to `0.1.4.dev0` after the immutable 0.1.3 release.
+- [x] Move repository development identity to `0.1.4` after the immutable 0.1.3 release.
 
 ## 0.1.4 — branch validation and stable-release preparation
 
@@ -88,8 +88,8 @@
 - [x] Keep the persistent pure branch regression floor at **99.6%**.
 - [x] Add `branch-coverage.yml` and its structural-debt audit as an exact-commit prerequisite in both the automatic stable tag cutter and the exact-tag release workflow.
 - [x] Refresh README/changelog/release-facing development validation status without changing the current public stable identity before the separate stable freeze.
-- [ ] Promote package identity from `0.1.4.dev0` to stable `0.1.4` only after this hardening PR is merged and exact-main development gates are green.
-- [ ] Synchronize stable package, runtime `__version__`, Zenodo metadata, CFF citation metadata, generated documentation metadata, README/site, changelog, release notes and checklist without inventing a pre-ingestion 0.1.4 Zenodo version DOI.
+- [x] Promote the qualified 0.1.4 development identity to stable `0.1.4` only after the release-hardening tranche merged green.
+- [x] Synchronize stable package, runtime `__version__`, Zenodo metadata, CFF citation metadata, generated documentation metadata, README/site, changelog, release notes and checklist without inventing a pre-ingestion 0.1.4 Zenodo version DOI.
 - [ ] Require every stable-release gate—including the new branch/structural audit—to succeed on the exact stable `main` commit.
 - [ ] Create immutable annotated `v0.1.4` only from that exact fully validated stable commit.
 - [ ] Confirm release workflow builds/checks wheel and sdist, validates Studio inclusion, smoke-installs both distributions, and publishes SHA-256 manifest/GitHub Release assets.

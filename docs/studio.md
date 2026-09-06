@@ -18,7 +18,7 @@ The public boundary is fail-closed. It removes file-input affordances **and** re
 
 ## Install and launch
 
-The Studio application is included in the stable `0.1.3` distribution and requires the optional Shiny dependencies.
+The Studio application is included in the stable `0.1.4` distribution and requires the optional Shiny dependencies.
 
 === "Installed package / editable checkout"
 

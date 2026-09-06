@@ -94,8 +94,11 @@ jobs:
           project = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))['project']
           project_version = project['version']
           urls = project['urls']
-          version_doi = urls['VersionDOI'].removeprefix('https://doi.org/')
-          previous_doi = urls['PreviousVersionDOI'].removeprefix('https://doi.org/')
+          version_doi_url = urls.get('VersionDOI')
+          previous_doi_url = urls.get('PreviousVersionDOI')
+          version_doi = version_doi_url.removeprefix('https://doi.org/') if version_doi_url else None
+          previous_doi = previous_doi_url.removeprefix('https://doi.org/') if previous_doi_url else None
+          stable = re.fullmatch(r'\d+\.\d+\.\d+', project_version) is not None
 
           z = json.loads(Path('.zenodo.json').read_text(encoding='utf-8'))
           assert z['version'] == project_version
@@ -113,10 +116,21 @@ jobs:
           assert 'https://orcid.org/0000-0003-2444-9796' in cff
           cff_version = re.search(r'(?m)^version:\s*([^\s]+)\s*$', cff).group(1)
           assert re.fullmatch(r'\d+\.\d+\.\d+', cff_version)
-          if re.fullmatch(r'\d+\.\d+\.\d+', project_version):
+          cff_doi_match = re.search(r'(?m)^doi:\s*([^\s]+)\s*$', cff)
+          cff_doi = cff_doi_match.group(1) if cff_doi_match else None
+
+          if stable:
               assert cff_version == project_version
-          assert f'doi: {version_doi}' in cff
-          assert f'doi: {previous_doi}' not in cff
+              if version_doi is None:
+                  assert cff_doi is None
+              else:
+                  assert cff_doi == version_doi
+          else:
+              assert version_doi is not None
+              assert cff_doi == version_doi
+
+          if previous_doi is not None:
+              assert cff_doi != previous_doi
           PY
       - name: Audit package/release identity
         run: python scripts/audit_release_identity.py

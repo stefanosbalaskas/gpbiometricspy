@@ -3,20 +3,21 @@
 `gpbiometricspy` is archived through the Zenodo GitHub integration.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.3</code> (2026-09-05); its version-specific Zenodo DOI is <a href="https://doi.org/10.5281/zenodo.22313884">10.5281/zenodo.22313884</a>; the software concept DOI remains the identifier for the evolving record.
+<strong>Current citation state:</strong> stable Python release <code>0.1.4</code> (2026-09-06). Its version-specific Zenodo DOI will be added after Zenodo ingests the immutable <code>v0.1.4</code> GitHub release; the software concept DOI remains the identifier for the evolving record.
 </div>
 
 ## Cite the Python software
 
-For reproducibility, cite the exact software release used:
+For reproducibility, cite the exact software release used. During the pre-ingestion window for 0.1.4, use the release/version metadata and repository tag; replace that with the minted 0.1.4 version DOI once Zenodo publishes it.
 
-- **0.1.3 version DOI:** **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**
-- **Previous 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
+- **0.1.4 version DOI:** pending Zenodo ingestion — **not invented in release metadata**
+- **Previous 0.1.3 version DOI:** **[10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)**
+- **Earlier 0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
 - **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**
 
-Zenodo recommends the version DOI when citing a specific research artifact version. The concept DOI resolves to the latest version and is appropriate when referring to the evolving software family.
+Zenodo recommends the version DOI when citing a specific research artifact version. The concept DOI identifies the evolving software family.
 
-GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control; the release freeze records 0.1.3 identity and date, and its version DOI will be added after Zenodo mints it.
+GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control. The 0.1.4 release freeze records the stable version and release date but intentionally omits a version DOI until Zenodo mints one.
 
 ## Published gpbiometrics paper
 
@@ -34,9 +35,9 @@ That DOI identifies the R reference package. `.zenodo.json` preserves it with re
 
 ## Metadata files
 
-- `CITATION.cff` identifies the latest stable Python software version and release date, and records the published R-package paper as a related reference; the 0.1.3 version DOI is added after Zenodo ingestion.
+- `CITATION.cff` identifies stable Python release 0.1.4 and its release date; its version DOI is intentionally absent until Zenodo ingestion.
 - `.zenodo.json` provides Zenodo-specific archival metadata and the R-reference provenance relationship.
-- README and documentation use the Python concept DOI badge for the evolving software family.
+- README and documentation use the Python concept DOI badge for the evolving software family while retaining prior version DOIs as historical identifiers.
 
 ## Interpretation
 

@@ -571,3 +571,20 @@ The twenty-ninth 0.1.4 branch/path tranche closes the complete remaining pupil/g
 - exact evidence is retained as the 30-day `branch-coverage-python-3.13` artifact; the corrected validating measured-head artifact is ID **9979274448** and is bound by digest `sha256:f3127466f5a7281075b15eeb008cab23249a9d9b86cf450a753ca88f850274d6`;
 - the frozen 406-export semantic contract, deep R↔Python parity, optional-backend interoperability, and CodeQL requirements remain unchanged;
 - the persistent pure branch-coverage regression floor is raised conservatively from **99.0% to 99.2%**, retaining headroom below the measured **99.2134%** while preventing regression to the prior **99.1062%** tranche level.
+
+
+## 0.1.4 stable release freeze — 2026-09-06
+
+The 0.1.4 release source freezes the completed branch/path-validation campaign without changing the frozen 406-function scientific contract.
+
+- package/runtime identity: **0.1.4**;
+- frozen R semantic reference: **gpbiometrics 2.0.0**;
+- API contract: **406 / 406 implemented; 0 pending**;
+- scientific regression suite: **557 tests**;
+- whole-package statements: **10,316 / 10,316 = 100.000%** with a **100% statement CI floor**;
+- raw pure branches: **5,575 / 5,594 = 99.6604%** with a **99.6% raw branch CI floor**;
+- audited structural/caller-dominated residual arcs: **19**;
+- structural-debt contract: **0 unexpected, 0 stale, 0 unaudited branch debt**;
+- audited branch accounting: **5,594 / 5,594 = 100.0000%**, explicitly not substituted for the honest raw coverage metric;
+- stable tagging requires every exact-main release gate, including the branch/structural audit;
+- no 0.1.4 Zenodo version DOI is recorded before Zenodo actually ingests the immutable GitHub release.
