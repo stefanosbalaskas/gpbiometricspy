@@ -17,14 +17,16 @@
 
 <div class="gp-status-grid">
 <div><span class="gp-status-value">0.1.3</span><span class="gp-status-label">stable release</span></div>
-<div><span class="gp-status-value">2026-09-05</span><span class="gp-status-label">release date</span></div>
+<div><span class="gp-status-value">0.1.4.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
+<div><span class="gp-status-value">99.6604%</span><span class="gp-status-label">raw branch coverage</span></div>
+<div><span class="gp-status-value">0</span><span class="gp-status-label">unaudited branch debt</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">Python CI matrix</span></div>
 </div>
 
-!!! info "Stable 0.1.3 documentation"
-    This site is frozen for `gpbiometricspy 0.1.3` (2026-09-05). The 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872); the previous 0.1.2 version DOI is [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873).
+!!! info "Stable 0.1.3 + validated 0.1.4 development line"
+    The current public stable release remains `gpbiometricspy 0.1.3` (2026-09-05), with version DOI [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). Development `0.1.4.dev0` preserves the same frozen 406-export scientific contract while expanding validation to **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches**. The remaining **19** raw branch arcs are exact, reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw branch coverage remains reported honestly as **99.6604%**. The evolving software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
 
 ## Code or Studio
 
@@ -144,7 +146,7 @@ events = gp.extract_gazepoint_ttl_events(data)
 </div>
 <div class="gp-pillar">
 <h3>Validation as a first-class output</h3>
-<p>Current CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14, plus deep parity, interoperability, Studio smoke, Chromium E2E and production-deployment checks.</p>
+<p>Current CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14; a separate branch audit enforces a 99.6% raw floor plus exact equality to the reviewed structural-debt ledger, yielding zero unaudited missing paths. Deep parity, interoperability, Studio smoke, Chromium E2E and production-deployment checks remain independent gates.</p>
 <a href="deep-validation/">See validation →</a>
 </div>
 <div class="gp-pillar">
