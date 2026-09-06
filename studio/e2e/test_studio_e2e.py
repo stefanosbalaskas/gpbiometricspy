@@ -145,7 +145,7 @@ def test_eda_decomposition_renders_and_downloads(page: Page, app: ShinyAppProc) 
     _load_demo(page, app)
     _run_eda_scr_analysis(page)
 
-    page.get_by_text("Decomposition", exact=True).click()
+    page.get_by_role("tab", name="Decomposition", exact=True).click()
     expect(page.get_by_text("Observed, tonic, and phasic EDA", exact=True)).to_be_visible()
     expect(page.locator("#eda_scr-decomposition_plot img")).to_be_visible(timeout=60_000)
     expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
