@@ -143,9 +143,9 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     cff = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     assert 'orcid: "https://orcid.org/0000-0003-2444-9796"' in cff
     assert 'affiliation: "University of Patras"' in cff
-    assert "version: 0.1.3" in cff
-    assert "date-released: 2026-09-05" in cff
-    assert "doi: 10.5281/zenodo.22313884" in cff
+    assert "version: 0.1.4" in cff
+    assert "date-released: 2026-09-06" in cff
+    assert "doi: 10.5281/zenodo.22313884" not in cff
     assert "doi: 10.5281/zenodo.22150873" not in cff
     assert "10.5281/zenodo.21434608" not in cff  # R DOI is provenance, not Python identifier.
 
