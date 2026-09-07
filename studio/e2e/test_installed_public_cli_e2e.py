@@ -7,6 +7,7 @@ from playwright.sync_api import Page, expect
 
 
 INSTALLED_PUBLIC_URL = os.environ.get("GPBIOMETRICSPY_INSTALLED_PUBLIC_URL")
+INSTALLED_ARTIFACT_KIND = os.environ.get("GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND")
 
 pytestmark = pytest.mark.skipif(
     not INSTALLED_PUBLIC_URL,
@@ -16,6 +17,7 @@ pytestmark = pytest.mark.skipif(
 
 def test_installed_distribution_public_console_browser_path(page: Page) -> None:
     assert INSTALLED_PUBLIC_URL is not None
+    assert INSTALLED_ARTIFACT_KIND in {"wheel", "sdist"}
     page.goto(INSTALLED_PUBLIC_URL)
 
     expect(page.get_by_text("Public synthetic demonstration.", exact=False)).to_be_visible()
