@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 
 import gpbiometricspy as gp
+import numpy as np
 import pytest
 from playwright.sync_api import Page, expect
 from shiny.playwright import controller
@@ -23,35 +24,27 @@ pytestmark = pytest.mark.skipif(
 
 def _write_event_logs(participant_path: Path, tmp_path: Path) -> tuple[Path, Path]:
     data = gp.import_gazepoint_biometrics(participant_path)
-    alignment = gp.align_gazepoint_biometrics_to_ttl(
-        data,
-        ttl_cols=["TTL0"],
-        ttl_valid_col="TTLV",
-        time_col="TIME",
-        group_cols=["participant_id"],
-        event_edge="rising",
-        pre_window_ms=1_000.0,
-        post_window_ms=5_000.0,
-        require_valid_ttl=True,
-    )
-    events = alignment["events"]
-    assert len(events) >= 2
-    assert "event_time_ms" in events.columns
+    ttl = data["TTL0"].to_numpy(dtype=float)
+    valid = data["TTLV"].to_numpy(dtype=float)
+    time = data["TIME"].to_numpy(dtype=float)
+    active = np.isfinite(ttl) & (ttl != 0) & np.isfinite(valid) & (valid == 1)
+    rising = active & ~np.concatenate(([False], active[:-1]))
+    event_times = time[rising & np.isfinite(time)]
+    assert len(event_times) >= 2
     participant_id = str(data["participant_id"].iloc[0])
-    event_times = [float(value) / 1_000.0 for value in events["event_time_ms"].iloc[:2]]
 
     event_path = tmp_path / "installed-replay-events.csv"
     event_path.write_text(
         "trial,onset,condition,participant_id\n"
-        f"E1,{event_times[0]},stimulus,{participant_id}\n"
-        f"E2,{event_times[1]},stimulus,{participant_id}\n",
+        f"E1,{float(event_times[0])},stimulus,{participant_id}\n"
+        f"E2,{float(event_times[1])},stimulus,{participant_id}\n",
         encoding="utf-8",
     )
     wrong_event_path = tmp_path / "installed-replay-wrong-events.csv"
     wrong_event_path.write_text(
         "trial,onset,condition,participant_id\n"
-        f"E1,{event_times[0]},stimulus,{participant_id}\n"
-        f"E2,{event_times[1] + 0.25},stimulus,{participant_id}\n",
+        f"E1,{float(event_times[0])},stimulus,{participant_id}\n"
+        f"E2,{float(event_times[1]) + 0.25},stimulus,{participant_id}\n",
         encoding="utf-8",
     )
     return event_path, wrong_event_path
