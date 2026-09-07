@@ -191,6 +191,7 @@ jobs:
               else
                 GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
                   GPBIOMETRICSPY_INSTALLED_LOCAL_URL="http://127.0.0.1:${port}/" \
+                  GPBIOMETRICSPY_INSTALLED_PYTHON="$venv/bin/python" \
                   python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py --browser chromium
               fi
 
