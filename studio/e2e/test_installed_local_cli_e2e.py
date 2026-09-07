@@ -20,6 +20,29 @@ pytestmark = pytest.mark.skipif(
 )
 
 
+def _reset_session(page: Page) -> None:
+    page.locator("#reset").click()
+    expect(page.locator("#status")).to_contain_text(
+        "Session reset. No dataset is loaded.",
+        timeout=30_000,
+    )
+    page.get_by_role("tab", name="Home", exact=True).click()
+    expect(page.locator("#row_count")).to_have_text("0", timeout=30_000)
+
+
+def _open_reporting_recipe(page: Page) -> None:
+    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
+    page.get_by_role("tab", name="Project recipe", exact=True).click()
+
+
+def _upload_recipe(page: Page, recipe_path: Path) -> None:
+    controller.InputFile(page, "reporting-recipe_upload").set(
+        recipe_path,
+        expect_complete_timeout=30_000,
+    )
+
+
 def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     assert INSTALLED_LOCAL_URL is not None
     assert INSTALLED_ARTIFACT_KIND in {"wheel", "sdist"}
@@ -144,11 +167,76 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         page.locator("#reporting-download_recipe").click()
     download_path = download_info.value.path()
     assert download_path is not None
-    recipe = json.loads(Path(download_path).read_text(encoding="utf-8"))
+    recipe_path = Path(download_path)
+    recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
     operations = [event.get("operation") for event in recipe["provenance"]]
     assert "run_advanced_qc" in operations
+
+    # A different loaded dataset must fail the installed fingerprint gate.
+    _reset_session(page)
+    page.locator("#load_demo").click()
+    expect(page.locator("#dataset_name")).to_have_text(
+        "Bundled synthetic kiosk demo",
+        timeout=60_000,
+    )
+    _open_reporting_recipe(page)
+    _upload_recipe(page, recipe_path)
+    page.locator("#reporting-validate_recipe").click()
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "dataset_fingerprint_match",
+        timeout=30_000,
+    )
+    page.locator("#reporting-restore_recipe").click()
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "Project restore blocked:",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "dataset_fingerprint_match"
+    )
+
+    # The exact original participant validates and restores metadata only.
+    _reset_session(page)
+    page.locator("#upload").set_input_files([])
+    controller.InputFile(page, "upload").set(
+        participant_path,
+        expect_complete_timeout=30_000,
+    )
+    page.locator("#load_upload").click()
+    expect(page.locator("#status")).to_contain_text(
+        "Upload imported through gpbiometricspy.",
+        timeout=60_000,
+    )
+    expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
+
+    _open_reporting_recipe(page)
+    _upload_recipe(page, recipe_path)
+    page.locator("#reporting-validate_recipe").click()
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "Recipe valid and dataset fingerprint matches. Metadata can be restored.",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-recipe_checks")).to_contain_text(
+        "dataset_fingerprint_match",
+        timeout=30_000,
+    )
+    page.locator("#reporting-restore_recipe").click()
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "Project metadata restored. Analysis outputs were intentionally not restored",
+        timeout=30_000,
+    )
+    expect(page.locator("#status")).to_contain_text(
+        "Project recipe restored after exact dataset fingerprint verification."
+    )
+    expect(page.locator("#reporting-analysis_count")).to_have_text("0")
+    expect(page.locator("#reporting-result_table_count")).to_have_text("0")
+    page.get_by_role("tab", name="Report", exact=True).click()
+    expect(page.locator("#reporting-identity_summary")).to_contain_text(
+        "Analyses: 0",
+        timeout=30_000,
+    )
 
     expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
     expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
