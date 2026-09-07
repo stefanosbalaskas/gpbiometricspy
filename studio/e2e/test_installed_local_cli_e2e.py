@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import subprocess
 import zipfile
 
 import gpbiometricspy as gp
@@ -13,6 +14,7 @@ from shiny.playwright import controller
 
 INSTALLED_LOCAL_URL = os.environ.get("GPBIOMETRICSPY_INSTALLED_LOCAL_URL")
 INSTALLED_ARTIFACT_KIND = os.environ.get("GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND")
+INSTALLED_PYTHON = os.environ.get("GPBIOMETRICSPY_INSTALLED_PYTHON")
 
 pytestmark = pytest.mark.skipif(
     not INSTALLED_LOCAL_URL,
@@ -46,6 +48,7 @@ def _upload_recipe(page: Page, recipe_path: Path) -> None:
 def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     assert INSTALLED_LOCAL_URL is not None
     assert INSTALLED_ARTIFACT_KIND in {"wheel", "sdist"}
+    assert INSTALLED_PYTHON is not None
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
@@ -91,15 +94,24 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     expect(page.locator("#qc-gaze_summary")).to_be_visible(timeout=60_000)
     expect(page.locator("#qc-gaze_checks")).to_be_visible(timeout=60_000)
 
+    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
+    page.locator("#gaze-run").click()
+    expect(page.locator("#gaze-status")).to_contain_text(
+        "Gaze workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+    assert int(page.locator("#gaze-saccade_count").inner_text().replace(",", "")) > 0
+
     page.get_by_text("Reporting & Reproducibility", exact=True).click()
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
-    expect(page.locator("#reporting-analysis_count")).to_have_text("0", timeout=60_000)
+    expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
 
-    title = f"Installed {INSTALLED_ARTIFACT_KIND} local QC report"
+    title = f"Installed {INSTALLED_ARTIFACT_KIND} local gaze replay report"
     page.locator("#reporting-report_title").fill(title)
     page.locator("#reporting-report_subtitle").fill(
-        "Packaged participant; Foundation and Advanced QC"
+        "Packaged participant; Foundation QC, Advanced QC, and Gaze analysis"
     )
     page.locator("#reporting-build_report").click()
     expect(page.locator("#reporting-report_status")).to_contain_text(
@@ -149,6 +161,9 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         page.locator("#reporting-download_bundle").click()
     bundle_path = bundle_download.value.path()
     assert bundle_path is not None
+    replay_path = Path(bundle_path).with_name(
+        f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_replay.py"
+    )
     with zipfile.ZipFile(bundle_path, "r") as archive:
         names = set(archive.namelist())
         assert "gpbiometricspy_studio_report.md" in names
@@ -159,8 +174,40 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         bundled_recipe = json.loads(
             archive.read("gpbiometricspy_studio_project_recipe.json").decode("utf-8")
         )
+        replay_text = archive.read("gpbiometricspy_studio_replay.py").decode("utf-8")
         assert bundled_recipe["raw_data_included"] is False
         assert bundled_recipe["analysis_outputs_included"] is False
+        assert any(
+            item.get("analysis") == "gaze"
+            for item in bundled_recipe["analysis_inventory"]
+        )
+        assert "from studio.gaze_services import run_gaze_analysis" in replay_text
+        assert 'analyses["gaze"]' in replay_text
+
+    placeholder = 'DATA_PATH = Path("PATH/TO/SOURCE_DATA.csv")'
+    assert placeholder in replay_text
+    replay_path.write_text(
+        replay_text.replace(
+            placeholder,
+            f"DATA_PATH = Path({str(participant_path)!r})",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    replay_result = subprocess.run(
+        [INSTALLED_PYTHON, str(replay_path)],
+        cwd=replay_path.parent,
+        text=True,
+        capture_output=True,
+        timeout=120,
+        check=False,
+    )
+    assert replay_result.returncode == 0, (
+        "Installed replay script failed.\n"
+        f"stdout:\n{replay_result.stdout}\n"
+        f"stderr:\n{replay_result.stderr}"
+    )
+    assert replay_result.stdout.strip()
 
     page.get_by_role("tab", name="Project recipe", exact=True).click()
     with page.expect_download(timeout=60_000) as download_info:
@@ -173,6 +220,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
+    assert any(item.get("analysis") == "gaze" for item in recipe["analysis_inventory"])
     operations = [event.get("operation") for event in recipe["provenance"]]
     assert "run_advanced_qc" in operations
 
