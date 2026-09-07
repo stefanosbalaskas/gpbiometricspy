@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -65,6 +66,19 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     page.get_by_role("tab", name="Gaze", exact=True).click()
     expect(page.locator("#qc-gaze_summary")).to_be_visible(timeout=60_000)
     expect(page.locator("#qc-gaze_checks")).to_be_visible(timeout=60_000)
+
+    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
+    page.get_by_role("tab", name="Project recipe", exact=True).click()
+    with page.expect_download(timeout=60_000) as download_info:
+        page.locator("#reporting-download_recipe").click()
+    download_path = download_info.value.path()
+    assert download_path is not None
+    recipe = json.loads(Path(download_path).read_text(encoding="utf-8"))
+    assert recipe["raw_data_included"] is False
+    assert recipe["analysis_outputs_included"] is False
+    operations = [event.get("operation") for event in recipe["provenance"]]
+    assert "run_advanced_qc" in operations
 
     expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
     expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
