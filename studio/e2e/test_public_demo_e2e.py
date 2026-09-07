@@ -98,6 +98,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
         "Reporting artifacts built through public gpbiometricspy reporting APIs.",
         timeout=90_000,
     )
+    page.get_by_role("tab", name="Report", exact=True).click()
     expect(page.locator("#reporting-identity_summary")).to_contain_text(
         "Raw rows embedded in recipe: False",
         timeout=60_000,
