@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import zipfile
 
 import gpbiometricspy as gp
 import pytest
@@ -99,6 +100,44 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     expect(page.locator("#reporting-qc_supplement")).not_to_contain_text(
         "Build reporting artifacts first."
     )
+
+    page.get_by_role("tab", name="Manifest", exact=True).click()
+    expect(page.locator("#reporting-manifest_preview")).to_contain_text(
+        '"raw_data_included": false'
+    )
+    expect(page.locator("#reporting-manifest_preview")).to_contain_text(
+        '"analysis_outputs_included": false'
+    )
+    expect(page.locator("#reporting-replay_summary")).to_contain_text(
+        "Source data embedded: False"
+    )
+
+    page.get_by_role("tab", name="Downloads", exact=True).click()
+    with page.expect_download(timeout=60_000) as manifest_download:
+        page.locator("#reporting-download_manifest").click()
+    manifest_path = manifest_download.value.path()
+    assert manifest_path is not None
+    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    assert manifest["studio"]["raw_data_included"] is False
+    assert manifest["studio"]["analysis_outputs_included"] is False
+    assert len(manifest["studio"]["dataset_sha256"]) == 64
+
+    with page.expect_download(timeout=60_000) as bundle_download:
+        page.locator("#reporting-download_bundle").click()
+    bundle_path = bundle_download.value.path()
+    assert bundle_path is not None
+    with zipfile.ZipFile(bundle_path, "r") as archive:
+        names = set(archive.namelist())
+        assert "gpbiometricspy_studio_report.md" in names
+        assert "gpbiometricspy_studio_manifest.json" in names
+        assert "gpbiometricspy_studio_project_recipe.json" in names
+        assert "gpbiometricspy_studio_replay.py" in names
+        assert not any(name.endswith("raw.csv") or "raw_data" in name for name in names)
+        bundled_recipe = json.loads(
+            archive.read("gpbiometricspy_studio_project_recipe.json").decode("utf-8")
+        )
+        assert bundled_recipe["raw_data_included"] is False
+        assert bundled_recipe["analysis_outputs_included"] is False
 
     page.get_by_role("tab", name="Project recipe", exact=True).click()
     with page.expect_download(timeout=60_000) as download_info:
