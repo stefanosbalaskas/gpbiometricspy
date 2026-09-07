@@ -130,12 +130,14 @@ jobs:
           "$venv/bin/python" -m pip install --upgrade pip
           "$venv/bin/python" -m pip install "${wheel}[studio]"
 
-          installed_studio="$({ cd "$envdir"; "$venv/bin/python" - <<'PY'
+          installed_studio="$(
+            cd "$envdir"
+            "$venv/bin/python" - <<'PY'
           from pathlib import Path
           import studio
           print(Path(studio.__file__).resolve())
           PY
-          })"
+          )"
           case "$installed_studio" in
             "$venv"/*) ;;
             *) echo "Studio resolved outside isolated wheel environment: $installed_studio" >&2; exit 1 ;;
