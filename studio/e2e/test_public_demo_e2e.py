@@ -129,9 +129,8 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
     assert recipe["analysis_outputs_included"] is False
     assert recipe["analysis_inventory"][0]["analysis"] == "gaze"
     assert len(recipe["dataset"]["sha256"]) == 64
-    expect(
-        page.locator(".shiny-output-error:visible, .shiny-notification-error:visible")
-    ).to_have_count(0)
+    expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
+    expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
 
 
 def test_public_demo_has_keyboard_skip_link_and_mobile_no_horizontal_page_overflow(
