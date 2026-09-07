@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -8,9 +9,17 @@ import pandas as pd
 
 import gpbiometricspy as gp
 
+try:
+    from studio.reporting_services import dataset_fingerprint
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from reporting_services import dataset_fingerprint
+
+
 EVENT_UPLOAD_SUFFIXES = {".csv", ".txt", ".tsv"}
 MAX_EVENT_UPLOAD_BYTES = 10 * 1024 * 1024
 MAX_TARGET_UPLOAD_BYTES = 100 * 1024 * 1024
+REPLAY_EVENT_LOG_ENV = "GPBIOMETRICSPY_STUDIO_EVENT_LOG"
+REPLAY_TARGET_STREAM_ENV = "GPBIOMETRICSPY_STUDIO_TARGET_STREAM"
 
 
 def event_time_choices(data: pd.DataFrame | None) -> list[str]:
@@ -273,6 +282,7 @@ def run_event_alignment(
     validity_col: str | None = None,
     group_col: str | None = None,
     external_events: pd.DataFrame | None = None,
+    external_events_sha256: str | None = None,
     extraction_mode: str = "changes",
     event_edge: str = "rising",
     pre_s: float = 1.0,
@@ -281,6 +291,7 @@ def run_event_alignment(
     summary_cols: list[str] | None = None,
     target_stream: pd.DataFrame | None = None,
     target_stream_used: bool | None = None,
+    target_stream_sha256: str | None = None,
     target_time_col: str | None = None,
     target_ttl_col: str | None = None,
     target_validity_col: str | None = None,
@@ -307,10 +318,44 @@ def run_event_alignment(
         raise ValueError("Selected reference TTL validity column was not found.")
     if group_col and group_col not in data.columns:
         raise ValueError("Selected reference grouping column was not found.")
+
+    if source_mode == "event_log" and external_events is None and external_events_sha256:
+        replay_path = os.environ.get(REPLAY_EVENT_LOG_ENV)
+        if not replay_path:
+            raise ValueError(
+                "Recorded event-log replay requires the separately managed event log; "
+                f"set `{REPLAY_EVENT_LOG_ENV}` to its CSV/TXT/TSV path."
+            )
+        external_events = gp.import_gazepoint_event_log(replay_path)
+    if target_stream is None and target_stream_sha256:
+        replay_path = os.environ.get(REPLAY_TARGET_STREAM_ENV)
+        if not replay_path:
+            raise ValueError(
+                "Recorded cross-stream replay requires the separately managed target stream; "
+                f"set `{REPLAY_TARGET_STREAM_ENV}` to its CSV/TXT/TSV path."
+            )
+        target_stream = gp.import_gazepoint_biometrics(replay_path)
     if target_stream_used and target_stream is None:
         raise ValueError(
             "Recorded event-alignment workflow requires the separately managed target stream; "
-            "provide `target_stream` before replay."
+            f"provide `target_stream` or set `{REPLAY_TARGET_STREAM_ENV}` before replay."
+        )
+
+    external_resource_sha256 = (
+        dataset_fingerprint(external_events)
+        if source_mode == "event_log" and isinstance(external_events, pd.DataFrame)
+        else None
+    )
+    target_resource_sha256 = dataset_fingerprint(target_stream) if isinstance(target_stream, pd.DataFrame) else None
+    if external_events_sha256 and external_resource_sha256 != external_events_sha256:
+        raise ValueError(
+            "External event log fingerprint mismatch: "
+            f"expected {external_events_sha256}, observed {external_resource_sha256}."
+        )
+    if target_stream_sha256 and target_resource_sha256 != target_stream_sha256:
+        raise ValueError(
+            "Target stream fingerprint mismatch: "
+            f"expected {target_stream_sha256}, observed {target_resource_sha256}."
         )
 
     data = _analysis_frame(data)
@@ -417,6 +462,7 @@ def run_event_alignment(
         "ttl_col": ttl_col,
         "validity_col": validity_col,
         "group_col": group_col,
+        "external_events_sha256": external_resource_sha256,
         "extraction_mode": extraction_mode,
         "event_edge": event_edge,
         "pre_s": float(pre_s),
@@ -424,6 +470,7 @@ def run_event_alignment(
         "collapse_nearby_ms": float(collapse_nearby_ms),
         "summary_cols": summary_cols,
         "target_stream_used": target_stream is not None,
+        "target_stream_sha256": target_resource_sha256,
         "target_time_col": target_time_col,
         "target_ttl_col": target_ttl_col,
         "target_validity_col": target_validity_col,
