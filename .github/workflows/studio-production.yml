@@ -45,9 +45,9 @@ jobs:
       - name: Install test/build tools
         run: python -m pip install pytest ruff build pytest-playwright
       - name: Ruff production boundary
-        run: ruff check app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py
+        run: ruff check app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py
       - name: Compile production boundary
-        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py
+        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py
       - name: Verify installed distribution carries Studio
         run: |
           python - <<'PY'
@@ -98,7 +98,7 @@ jobs:
         run: python -m build --wheel
       - name: Install Chromium for installed-artifact browser smoke
         run: python -m playwright install --with-deps chromium
-      - name: Launch installed wheel and sdist public Studio in Chromium
+      - name: Launch installed wheel and sdist Studio entrypoints in Chromium
         shell: bash
         run: |
           set -euo pipefail
@@ -112,22 +112,28 @@ jobs:
             set -euo pipefail
             kind="$1"
             artifact="$2"
-            port="$3"
+            public_port="$3"
+            local_port="$4"
             envdir="$(mktemp -d)"
             venv="$envdir/venv"
-            server_log="$envdir/public-studio-${kind}.log"
             server_pid=""
+            server_log=""
 
-            cleanup() {
-              status=$?
-              trap - EXIT
+            stop_server() {
               if [[ -n "$server_pid" ]]; then
                 pkill -TERM -P "$server_pid" 2>/dev/null || true
                 kill "$server_pid" 2>/dev/null || true
                 wait "$server_pid" 2>/dev/null || true
+                server_pid=""
               fi
-              if [[ $status -ne 0 && -f "$server_log" ]]; then
-                echo "---- installed ${kind} public Studio log ----"
+            }
+
+            cleanup() {
+              status=$?
+              trap - EXIT
+              stop_server
+              if [[ $status -ne 0 && -n "$server_log" && -f "$server_log" ]]; then
+                echo "---- installed ${kind} Studio log ----"
                 cat "$server_log"
               fi
               rm -rf "$envdir"
@@ -152,33 +158,51 @@ jobs:
               *) echo "Studio resolved outside isolated ${kind} environment: $installed_studio" >&2; exit 1 ;;
             esac
 
-            (
-              cd "$envdir"
-              exec "$venv/bin/gpbiometricspy-studio-public" --host 127.0.0.1 --port "$port" >"$server_log" 2>&1
-            ) &
-            server_pid=$!
+            run_studio_mode() {
+              mode="$1"
+              launcher="$2"
+              port="$3"
+              server_log="$envdir/${mode}-studio-${kind}.log"
 
-            ready=0
-            for _ in $(seq 1 60); do
-              if curl --fail --silent --show-error "http://127.0.0.1:${port}/" >/dev/null 2>&1; then
-                ready=1
-                break
-              fi
-              if ! kill -0 "$server_pid" 2>/dev/null; then
-                echo "Installed ${kind} public Studio exited before becoming ready." >&2
-                exit 1
-              fi
-              sleep 1
-            done
-            test "$ready" -eq 1 || { echo "Installed ${kind} public Studio did not become ready." >&2; exit 1; }
+              (
+                cd "$envdir"
+                exec "$venv/bin/$launcher" --host 127.0.0.1 --port "$port" >"$server_log" 2>&1
+              ) &
+              server_pid=$!
 
-            GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
-              GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
-              python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium
+              ready=0
+              for _ in $(seq 1 60); do
+                if curl --fail --silent --show-error "http://127.0.0.1:${port}/" >/dev/null 2>&1; then
+                  ready=1
+                  break
+                fi
+                if ! kill -0 "$server_pid" 2>/dev/null; then
+                  echo "Installed ${kind} ${mode} Studio exited before becoming ready." >&2
+                  return 1
+                fi
+                sleep 1
+              done
+              test "$ready" -eq 1 || { echo "Installed ${kind} ${mode} Studio did not become ready." >&2; return 1; }
+
+              if [[ "$mode" == "public" ]]; then
+                GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
+                  GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
+                  python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium
+              else
+                GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
+                  GPBIOMETRICSPY_INSTALLED_LOCAL_URL="http://127.0.0.1:${port}/" \
+                  python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py --browser chromium
+              fi
+
+              stop_server
+            }
+
+            run_studio_mode public gpbiometricspy-studio-public "$public_port"
+            run_studio_mode local gpbiometricspy-studio "$local_port"
           )
 
-          exercise_artifact wheel "$wheel" 8765
-          exercise_artifact sdist "$sdist" 8766
+          exercise_artifact wheel "$wheel" 8765 8767
+          exercise_artifact sdist "$sdist" 8766 8768
       - name: Synthetic runtime smoke profile
         run: python -m studio.production --json studio-production-metrics.json
       - name: Upload runtime metrics
