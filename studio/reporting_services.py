@@ -505,11 +505,27 @@ def _latest_analysis_parameters(state: ProjectState) -> list[tuple[str, dict[str
     return [(analysis, latest[analysis]) for analysis in order]
 
 
+def replay_completion_summary(expected_analyses: Iterable[str], analyses: dict[str, Any]) -> dict[str, Any]:
+    """Fail closed unless replay output exactly matches the recorded analysis order."""
+    expected = [str(name) for name in expected_analyses]
+    completed = [str(name) for name in analyses]
+    if completed != expected:
+        raise RuntimeError(
+            "Studio replay analysis inventory mismatch: "
+            f"expected {expected!r}, completed {completed!r}."
+        )
+    return {
+        "analysis_count": len(completed),
+        "analysis_names": completed,
+    }
+
+
 def workflow_replay_script(state: ProjectState) -> str:
     if state.data is None:
         raise ValueError("Load a dataset before generating a replay script.")
     fingerprint = dataset_fingerprint(state.data)
     plans = _latest_analysis_parameters(state)
+    expected_analyses = [analysis for analysis, _ in plans]
     imports = {
         "eda_scr": "from studio.services import run_eda_scr_analysis",
         "ppg_hr_hrv": "from studio.ppg_services import run_ppg_hr_hrv_analysis",
@@ -529,15 +545,17 @@ def workflow_replay_script(state: ProjectState) -> str:
         "from __future__ import annotations",
         "",
         "import inspect",
+        "import json",
         "from pathlib import Path",
         "",
         "import gpbiometricspy as gp",
-        "from studio.reporting_services import dataset_fingerprint",
+        "from studio.reporting_services import dataset_fingerprint, replay_completion_summary",
         *selected_imports,
         "",
         "# Set this to the separately managed source Gazepoint CSV/TXT before running.",
         'DATA_PATH = Path("PATH/TO/SOURCE_DATA.csv")',
         f'EXPECTED_SHA256 = "{fingerprint}"',
+        f"EXPECTED_ANALYSES = {expected_analyses!r}",
         "",
         "def call_filtered(function, *args, **parameters):",
         "    allowed = inspect.signature(function).parameters",
@@ -585,6 +603,9 @@ def workflow_replay_script(state: ProjectState) -> str:
         else:
             lines.append(f'# No automatic Studio replay adapter is registered for "{analysis}"; rerun it explicitly.')
     lines += [
+        "",
+        "replay_summary = replay_completion_summary(EXPECTED_ANALYSES, analyses)",
+        'print("GPBIOMETRICSPY_STUDIO_REPLAY_SUMMARY=" + json.dumps(replay_summary, sort_keys=True, separators=(",", ":")))',
         "",
         "checklist = gp.create_gazepoint_biometrics_checklist(data, require_active_signal=False)",
         "methods = gp.create_gazepoint_biometrics_methods_text(checklist=checklist, include_cautions=True)",
