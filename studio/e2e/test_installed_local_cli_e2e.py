@@ -167,8 +167,10 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         page.locator("#reporting-download_recipe").click()
     download_path = download_info.value.path()
     assert download_path is not None
-    recipe_path = Path(download_path)
-    recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+    downloaded_recipe_path = Path(download_path)
+    recipe = json.loads(downloaded_recipe_path.read_text(encoding="utf-8"))
+    recipe_path = downloaded_recipe_path.with_suffix(".json")
+    recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
     operations = [event.get("operation") for event in recipe["provenance"]]
