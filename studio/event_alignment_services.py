@@ -280,6 +280,7 @@ def run_event_alignment(
     collapse_nearby_ms: float = 0.0,
     summary_cols: list[str] | None = None,
     target_stream: pd.DataFrame | None = None,
+    target_stream_used: bool | None = None,
     target_time_col: str | None = None,
     target_ttl_col: str | None = None,
     target_validity_col: str | None = None,
@@ -306,6 +307,11 @@ def run_event_alignment(
         raise ValueError("Selected reference TTL validity column was not found.")
     if group_col and group_col not in data.columns:
         raise ValueError("Selected reference grouping column was not found.")
+    if target_stream_used and target_stream is None:
+        raise ValueError(
+            "Recorded event-alignment workflow requires the separately managed target stream; "
+            "provide `target_stream` before replay."
+        )
 
     data = _analysis_frame(data)
     if target_stream is not None:
