@@ -26,7 +26,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
 
     assert page.get_by_text("Public synthetic demonstration.", exact=False).count() == 0
     expect(page.locator("#load_upload")).to_be_visible()
-    assert page.locator('input[type="file"]:visible').count() == 1
+    expect(page.locator("#upload")).to_be_attached()
 
     participant_path = Path(gp.kiosk_demo_files()[0])
     page.locator("#upload").set_input_files(str(participant_path))
