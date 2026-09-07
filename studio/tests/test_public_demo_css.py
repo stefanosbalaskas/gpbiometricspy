@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 CSS_PATH = Path(__file__).resolve().parents[1] / "www" / "public-demo.css"
