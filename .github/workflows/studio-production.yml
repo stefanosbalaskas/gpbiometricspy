@@ -172,7 +172,8 @@ jobs:
             done
             test "$ready" -eq 1 || { echo "Installed ${kind} public Studio did not become ready." >&2; exit 1; }
 
-            GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
+            GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
+              GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
               python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium
           )
 
