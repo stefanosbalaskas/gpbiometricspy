@@ -169,13 +169,21 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     assert manifest["studio"]["analysis_outputs_included"] is False
     assert len(manifest["studio"]["dataset_sha256"]) == 64
 
+    with page.expect_download(timeout=60_000) as standalone_replay_download:
+        page.locator("#reporting-download_replay").click()
+    standalone_download = standalone_replay_download.value
+    assert standalone_download.suggested_filename == "gpbiometricspy_studio_replay.py"
+    standalone_download_path = standalone_download.path()
+    assert standalone_download_path is not None
+    standalone_replay_text = Path(standalone_download_path).read_text(encoding="utf-8")
+    replay_path = Path(standalone_download_path).with_name(
+        f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_standalone_replay.py"
+    )
+
     with page.expect_download(timeout=60_000) as bundle_download:
         page.locator("#reporting-download_bundle").click()
     bundle_path = bundle_download.value.path()
     assert bundle_path is not None
-    replay_path = Path(bundle_path).with_name(
-        f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_replay.py"
-    )
     mismatch_replay_path = Path(bundle_path).with_name(
         f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_mismatch_replay.py"
     )
@@ -201,8 +209,9 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         assert 'analyses["gaze"]' in replay_text
         assert 'analyses["pupil"]' in replay_text
 
+    assert standalone_replay_text == replay_text
     placeholder = 'DATA_PATH = Path("PATH/TO/SOURCE_DATA.csv")'
-    assert placeholder in replay_text
+    assert placeholder in standalone_replay_text
 
     mismatch_replay_path.write_text(
         replay_text.replace(
@@ -225,7 +234,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     assert "Dataset fingerprint mismatch:" in mismatch_output
 
     replay_path.write_text(
-        replay_text.replace(
+        standalone_replay_text.replace(
             placeholder,
             f"DATA_PATH = Path({str(participant_path)!r})",
             1,
@@ -241,7 +250,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         check=False,
     )
     assert replay_result.returncode == 0, (
-        "Installed replay script failed.\n"
+        "Installed standalone replay script failed.\n"
         f"stdout:\n{replay_result.stdout}\n"
         f"stderr:\n{replay_result.stderr}"
     )
