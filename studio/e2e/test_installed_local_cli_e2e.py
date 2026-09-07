@@ -6,6 +6,7 @@ from pathlib import Path
 import gpbiometricspy as gp
 import pytest
 from playwright.sync_api import Page, expect
+from shiny.playwright import controller
 
 
 INSTALLED_LOCAL_URL = os.environ.get("GPBIOMETRICSPY_INSTALLED_LOCAL_URL")
@@ -30,6 +31,16 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
 
     participant_path = Path(gp.kiosk_demo_files()[0])
     page.locator("#upload").set_input_files(str(participant_path))
+
+    def _uploaded(value) -> bool:
+        return (
+            isinstance(value, list)
+            and len(value) == 1
+            and isinstance(value[0], dict)
+            and value[0].get("name") == participant_path.name
+        )
+
+    controller.AppTestValues(page).expect_input("upload", _uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
