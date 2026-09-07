@@ -106,15 +106,24 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     )
     assert int(page.locator("#gaze-saccade_count").inner_text().replace(",", "")) > 0
 
+    page.get_by_text("Pupil Analysis", exact=True).click()
+    expect(page.get_by_text("Pupil analysis controls", exact=True)).to_be_visible()
+    page.locator("#pupil-run").click()
+    expect(page.locator("#pupil-status")).to_contain_text(
+        "Pupil workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+    assert int(page.locator("#pupil-blink_count").inner_text().replace(",", "")) >= 0
+
     page.get_by_text("Reporting & Reproducibility", exact=True).click()
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
-    expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
+    expect(page.locator("#reporting-analysis_count")).to_have_text("2", timeout=60_000)
 
-    title = f"Installed {INSTALLED_ARTIFACT_KIND} local gaze replay report"
+    title = f"Installed {INSTALLED_ARTIFACT_KIND} local gaze + pupil replay report"
     page.locator("#reporting-report_title").fill(title)
     page.locator("#reporting-report_subtitle").fill(
-        "Packaged participant; Foundation QC, Advanced QC, and Gaze analysis"
+        "Packaged participant; Foundation QC, Advanced QC, Gaze, and Pupil analyses"
     )
     page.locator("#reporting-build_report").click()
     expect(page.locator("#reporting-report_status")).to_contain_text(
@@ -183,12 +192,14 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         replay_text = archive.read("gpbiometricspy_studio_replay.py").decode("utf-8")
         assert bundled_recipe["raw_data_included"] is False
         assert bundled_recipe["analysis_outputs_included"] is False
-        assert any(
-            item.get("analysis") == "gaze"
-            for item in bundled_recipe["analysis_inventory"]
-        )
+        bundled_analyses = {
+            item.get("analysis") for item in bundled_recipe["analysis_inventory"]
+        }
+        assert bundled_analyses == {"gaze", "pupil"}
         assert "from studio.gaze_services import run_gaze_analysis" in replay_text
+        assert "from studio.pupil_services import run_pupil_analysis" in replay_text
         assert 'analyses["gaze"]' in replay_text
+        assert 'analyses["pupil"]' in replay_text
 
     placeholder = 'DATA_PATH = Path("PATH/TO/SOURCE_DATA.csv")'
     assert placeholder in replay_text
@@ -247,7 +258,8 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
-    assert any(item.get("analysis") == "gaze" for item in recipe["analysis_inventory"])
+    recipe_analyses = {item.get("analysis") for item in recipe["analysis_inventory"]}
+    assert recipe_analyses == {"gaze", "pupil"}
     operations = [event.get("operation") for event in recipe["provenance"]]
     assert "run_advanced_qc" in operations
 
