@@ -30,17 +30,10 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     expect(page.locator("#upload")).to_be_attached()
 
     participant_path = Path(gp.kiosk_demo_files()[0])
-    page.locator("#upload").set_input_files(str(participant_path))
-
-    def _uploaded(value) -> bool:
-        return (
-            isinstance(value, list)
-            and len(value) == 1
-            and isinstance(value[0], dict)
-            and value[0].get("name") == participant_path.name
-        )
-
-    controller.AppTestValues(page).expect_input("upload", _uploaded, timeout=30.0)
+    controller.InputFile(page, "upload").set(
+        participant_path,
+        expect_complete_timeout=30_000,
+    )
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
