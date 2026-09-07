@@ -8,9 +8,9 @@
   display: none !important;
 }
 
-.card:has(#reporting-recipe_upload) {
-  display: none !important;
-}
+/* Do not hide ancestor cards based on a nested file input. In particular, a
+   `.card:has(#reporting-recipe_upload)` rule also matches the complete Reporting
+   navset card and suppresses all safe report/manifest/download functionality. */
 
 .studio-public-demo-note {
   margin-top: 0.75rem;
