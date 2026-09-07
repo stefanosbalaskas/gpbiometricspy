@@ -49,9 +49,10 @@ def inspect_dataset(data: pd.DataFrame) -> dict[str, Any]:
 
 def run_qc(data: pd.DataFrame) -> dict[str, Any]:
     """Run the foundation Studio QC tranche using public gpbiometricspy APIs."""
-    validation = gp.validate_gazepoint_biometrics(data, require_active_signal=True)
-    missingness = gp.audit_gazepoint_biometric_missingness(data)
-    activity = gp.audit_gazepoint_signal_activity(data)
+    analysis_data = _analysis_frame(data)
+    validation = gp.validate_gazepoint_biometrics(analysis_data, require_active_signal=True)
+    missingness = gp.audit_gazepoint_biometric_missingness(analysis_data)
+    activity = gp.audit_gazepoint_signal_activity(analysis_data)
     return {
         "validation": validation,
         "missingness": missingness,
