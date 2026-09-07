@@ -51,6 +51,23 @@ def _write_event_logs(participant_path: Path, tmp_path: Path) -> tuple[Path, Pat
     return event_path, wrong_event_path
 
 
+def _set_input_file_and_wait(page: Page, input_id: str, path: Path) -> None:
+    controller.InputFile(page, input_id).set(
+        path,
+        expect_complete_timeout=30_000,
+    )
+
+    def _uploaded(value) -> bool:
+        return (
+            isinstance(value, list)
+            and len(value) == 1
+            and isinstance(value[0], dict)
+            and value[0].get("name") == path.name
+        )
+
+    controller.AppTestValues(page).expect_input(input_id, _uploaded, timeout=30.0)
+
+
 def test_installed_external_event_log_replay_is_identity_bound(
     page: Page,
     tmp_path: Path,
@@ -64,10 +81,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    controller.InputFile(page, "upload").set(
-        participant_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "upload", participant_path)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
@@ -78,10 +92,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
-    controller.InputFile(page, "event_alignment-event_upload").set(
-        event_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "event_alignment-event_upload", event_path)
     page.locator("#event_alignment-run").click()
     expect(page.locator("#event_alignment-status")).to_contain_text(
         "Events & alignment complete:",
@@ -168,10 +179,7 @@ def test_installed_target_stream_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    controller.InputFile(page, "upload").set(
-        reference_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "upload", reference_path)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
@@ -181,10 +189,7 @@ def test_installed_target_stream_replay_is_identity_bound(
 
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
-    controller.InputFile(page, "event_alignment-target_upload").set(
-        target_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "event_alignment-target_upload", target_path)
     page.locator("#event_alignment-load_target").click()
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
         target_path.name,
@@ -283,10 +288,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    controller.InputFile(page, "upload").set(
-        reference_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "upload", reference_path)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
@@ -297,14 +299,8 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
-    controller.InputFile(page, "event_alignment-event_upload").set(
-        event_path,
-        expect_complete_timeout=30_000,
-    )
-    controller.InputFile(page, "event_alignment-target_upload").set(
-        target_path,
-        expect_complete_timeout=30_000,
-    )
+    _set_input_file_and_wait(page, "event_alignment-event_upload", event_path)
+    _set_input_file_and_wait(page, "event_alignment-target_upload", target_path)
     page.locator("#event_alignment-load_target").click()
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
         target_path.name,
