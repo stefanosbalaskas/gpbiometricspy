@@ -48,5 +48,23 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         timeout=90_000,
     )
 
+    page.get_by_text("Quality Control", exact=True).click()
+    expect(page.get_by_text("Advanced QC settings", exact=True)).to_be_visible()
+    page.locator("#qc-run").click()
+    expect(page.locator("#qc-status")).to_contain_text(
+        "Advanced QC complete using public gpbiometricspy APIs.",
+        timeout=120_000,
+    )
+    expect(page.locator("#qc-time_overview")).to_be_visible(timeout=60_000)
+    expect(page.locator("#qc-time_plot img")).to_be_visible(timeout=60_000)
+
+    page.get_by_role("tab", name="Physiology", exact=True).click()
+    expect(page.locator("#qc-physiology_quality")).to_be_visible(timeout=60_000)
+    expect(page.locator("#qc-physiology_plot img")).to_be_visible(timeout=60_000)
+
+    page.get_by_role("tab", name="Gaze", exact=True).click()
+    expect(page.locator("#qc-gaze_summary")).to_be_visible(timeout=60_000)
+    expect(page.locator("#qc-gaze_checks")).to_be_visible(timeout=60_000)
+
     expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
     expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
