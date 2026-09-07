@@ -57,7 +57,10 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     expect(page.locator("#load_upload")).to_be_visible()
     expect(page.locator("#upload")).to_be_attached()
 
-    participant_path = Path(gp.kiosk_demo_files()[0])
+    participant_files = gp.kiosk_demo_files()
+    assert len(participant_files) >= 2
+    participant_path = Path(participant_files[0])
+    mismatch_participant_path = Path(participant_files[1])
     controller.InputFile(page, "upload").set(
         participant_path,
         expect_complete_timeout=30_000,
@@ -164,6 +167,9 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     replay_path = Path(bundle_path).with_name(
         f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_replay.py"
     )
+    mismatch_replay_path = Path(bundle_path).with_name(
+        f"gpbiometricspy_studio_{INSTALLED_ARTIFACT_KIND}_mismatch_replay.py"
+    )
     with zipfile.ZipFile(bundle_path, "r") as archive:
         names = set(archive.namelist())
         assert "gpbiometricspy_studio_report.md" in names
@@ -186,6 +192,27 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
 
     placeholder = 'DATA_PATH = Path("PATH/TO/SOURCE_DATA.csv")'
     assert placeholder in replay_text
+
+    mismatch_replay_path.write_text(
+        replay_text.replace(
+            placeholder,
+            f"DATA_PATH = Path({str(mismatch_participant_path)!r})",
+            1,
+        ),
+        encoding="utf-8",
+    )
+    mismatch_result = subprocess.run(
+        [INSTALLED_PYTHON, str(mismatch_replay_path)],
+        cwd=mismatch_replay_path.parent,
+        text=True,
+        capture_output=True,
+        timeout=120,
+        check=False,
+    )
+    assert mismatch_result.returncode != 0
+    mismatch_output = f"{mismatch_result.stdout}\n{mismatch_result.stderr}"
+    assert "Dataset fingerprint mismatch:" in mismatch_output
+
     replay_path.write_text(
         replay_text.replace(
             placeholder,
