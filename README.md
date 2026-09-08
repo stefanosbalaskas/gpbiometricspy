@@ -42,16 +42,20 @@
 | Release date | **2026-09-06** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Validation | **557 tests · 100.00% statements · 99.6604% raw branches · 0 unaudited branch debt** |
-| Studio | **11 application workflows · smoke + Chromium E2E + production CI** |
+| Development validation | **567 tests · 100.00% statements · 99.6636% raw branches · 0 unaudited branch debt** |
+| Studio | **11 application workflows · source + installed wheel/sdist Chromium replay/production validation** |
 | Supported Python | **3.11–3.14** |
+
+Stable `0.1.4` remains immutable at its release evidence (**557 tests · 10,316/10,316 statements · 5,575/5,594 raw branches = 99.6604%**). The larger figures above describe the live `0.1.5.dev0` development line and do not rewrite historical release evidence.
 
 ## What you get
 
 - **Complete frozen API contract:** all **406 / 406** exported R functions are implemented and registered, with **0 pending exports**.
-- **Literal whole-package statement coverage:** **557 tests**, **10,316 statements**, **0 missed**, and a CI statement floor of **100%**.
-- **Audited branch accounting:** raw branch coverage is **5,575 / 5,594 = 99.6604%**; the remaining **19** arcs are frozen as structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** missing branches under CI.
+- **Current development validation:** **567 tests**, **10,456 statements**, **0 missed**, and a CI statement floor of **100%**.
+- **Audited branch accounting:** current raw branch coverage is **5,629 / 5,648 = 99.6636%**; the remaining **19** arcs are frozen as reviewed structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** missing branches under CI.
+- **Measurement accountability:** development `0.1.5.dev0` adds metric-specific HRV/PRV agreement, retention-first SCR responsivity sensitivity, a five-stage validation ladder, and experimental topology-aware PPG morphology with conservative interpretation boundaries.
 - **gpbiometricspy Studio:** a stateful Shiny interface for intake/QC, annotation, EDA/SCR, PPG/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility.
+- **Installed-artifact replay validation:** production browser tests exercise scientific replay from built wheel and sdist artifacts, including dataset/secondary-resource fingerprint guards, on Python 3.11 and 3.14.
 - **Scientific-domain navigation:** the documentation groups the API into **8 research domains** while preserving the complete alphabetical 406-function reference.
 - **Executable learning material:** **26** frozen-R article/vignette companions are paired with Python workflows, examples, and generated figures.
 - **Reproducible public demo data:** a fully synthetic kiosk dataset with **36 participants and 69,120 rows** ships with the package.
@@ -166,13 +170,13 @@ The current scientific development validation baseline is:
 R exports:                  406
 Implemented exports:        406
 Explicit pending:             0
-Tests:                      557
-Statements:              10,316
+Tests:                      567
+Statements:              10,456
 Missed statements:            0
 Statement coverage:      100.00%
 Statement CI floor:      100.00%
-Branches:             5,575/5,594
-Raw branch coverage:    99.6604%
+Branches:             5,629/5,648
+Raw branch coverage:    99.6636%
 Raw branch CI floor:    99.6000%
 Audited structural arcs:       19
 Unexpected missing arcs:        0
@@ -181,9 +185,9 @@ Unaudited branch debt:           0
 Audited branch accounting: 100.0000%
 ```
 
-Raw branch coverage remains the literal coverage.py result; the structural-debt contract does **not** relabel it as 100%. Instead, CI requires the exact remaining 19 missing arcs to match the reviewed structural/caller-dominated ledger, so any new or stale uncovered path fails independently of the raw percentage.
+Raw branch coverage remains the literal coverage.py result; the structural-debt contract does **not** relabel it as 100%. Instead, CI requires the exact remaining 19 missing arcs to match the reviewed structural/caller-dominated ledger, so any new or stale uncovered path fails independently of the raw percentage. The branch-audit workflow also propagates auditor failures through `tee`, so a non-zero coverage/debt auditor exit cannot be hidden by pipeline status.
 
-Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
+Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. Development `0.1.5.dev0` extends that evidence into installed wheel/sdist replay for high-value scientific paths and fail-closed input-fingerprint validation. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
 
 ## Interpretation guardrails
 
