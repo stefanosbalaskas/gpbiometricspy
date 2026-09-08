@@ -156,7 +156,7 @@ def test_topology_helpers_and_input_guards_cover_edge_paths():
         ppg_topology_features([0, 1], delay=1, dimension=2)
 
     out = ppg_topology_features(
-        [0, "bad", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        [0, "bad", math.nan, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         delay=1,
         dimension=2,
         max_points=3,
