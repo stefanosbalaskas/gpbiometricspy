@@ -29,6 +29,9 @@
 !!! info "Stable 0.1.4 release + live development"
     Stable `gpbiometricspy 0.1.4` (2026-09-06) preserves **406/406 exports with 0 pending**, **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; CI requires **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 Zenodo version DOI is [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782); the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884). Live repository development proceeds as `0.1.5.dev0` without changing the immutable `v0.1.4` release.
 
+!!! note "September 2026 measurement-accountability additions · development head"
+    The current `0.1.5.dev0` line adds metric-specific ECG-HRV/PPG-PRV agreement through `compare_hrv_prv_devices()`, retention-first SCR responsivity through `scr_responsivity_sensitivity()`, a five-stage `validation_ladder()`, and experimental topology-aware PPG morphology through `ppg_topology_features()`. Agreement is assessed **per derived metric and acquisition configuration**, low-reactive SCR participants are retained for sensitivity analysis rather than automatically deleted, generalization requires held-out-person evidence, and topology outputs remain structural descriptors rather than direct physiological surrogates. See [Measurement accountability](measurement-accountability.md).
+
 ## Code or Studio
 
 Use the Python API when you want scripts, notebooks, pipelines, or direct integration into a larger analysis stack. Use Studio when you want one stateful research interface over the same package functions.
@@ -197,6 +200,7 @@ Every gallery image is regenerated from the current Python API during the docume
 <a href="getting-started/">5-minute start</a>
 <a href="studio/">Studio application</a>
 <a href="workflows/">Workflow map</a>
+<a href="measurement-accountability/">Measurement accountability</a>
 <a href="articles/">26 articles</a>
 <a href="integrations/">Integrations</a>
 <a href="citation/">Citation + DOI</a>
