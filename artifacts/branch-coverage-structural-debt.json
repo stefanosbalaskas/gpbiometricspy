@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.5.dev0 branch-coverage structural debt",
-  "baseline_commit": "8e04fae5db0da04683d33cc87d399227a3e470e8",
+  "baseline_commit": "9ffb3fce157fd35851fdb11617c636ee9de32a33",
   "coverage_denominator": 5648,
   "raw_covered_branches": 5629,
   "raw_branch_coverage_percent": 99.6636,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10066767287,
-    "workflow_artifact_digest": "sha256:010e7043c2b263632c4268bbeabbce91fc3cfaf7f1d9020718b7fffcc1ed35d0"
+    "workflow_artifact_id": 10066871104,
+    "workflow_artifact_digest": "sha256:4a42bad6b344a85a24d4c9bde75d926a9d51f635404c0fb67528c16df3e14a96"
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
