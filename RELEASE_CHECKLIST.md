@@ -105,3 +105,21 @@
 - [x] Zenodo ingested `v0.1.4`; version DOI: `10.5281/zenodo.22515782`.
 - [x] Concept DOI remains `10.5281/zenodo.22150872`; previous 0.1.3 DOI remains `10.5281/zenodo.22313884`.
 - [x] Return live repository identity to development as `0.1.5.dev0` while keeping `CITATION.cff` pinned to stable `0.1.4` + DOI `10.5281/zenodo.22515782`.
+
+## 0.1.5.dev0 — reliability, measurement accountability, and release readiness
+
+- [x] Preserve the frozen `gpbiometrics 2.0.0` semantic contract at **406/406 implemented exports, 0 pending**.
+- [x] Add measurement-accountability methods for derived-metric HRV/PRV agreement, SCR responsivity sensitivity, validation-ladder evidence, and experimental topology-aware PPG morphology without changing the frozen export contract.
+- [x] Extend Studio browser validation into installed wheel/sdist scientific replay paths, including primary/secondary resource fingerprint guards and deterministic exact-status upload synchronization.
+- [x] Validate installed scientific replay across the high-value physiology, gaze/pupil, events/alignment, multimodal/modelling, and cluster-permutation paths on Python 3.11 and 3.14 production boundaries.
+- [x] Make branch-coverage enforcement fail closed through `tee` rather than allowing a non-zero auditor exit to be masked by the pipeline.
+- [x] Cover the newly reachable non-finite `ppg_topology_features()` branch rather than adding it to structural debt.
+- [x] Rebase current development branch evidence to **567 passing tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**.
+- [x] Preserve exactly **19** reviewed structural/caller-dominated arcs with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting remains **5,648/5,648 = 100.0000%** while raw branch coverage remains explicitly 99.6636%.
+- [x] Add unreleased `0.1.5.dev0` release notes/changelog material and keep stable citation metadata pinned to **0.1.4 / 10.5281/zenodo.22515782** until an intentional stable freeze and actual Zenodo ingestion occur.
+- [ ] Merge the 0.1.5.dev0 release-readiness documentation tranche and require its exact merged `main` SHA to pass every workflow actually triggered by the documentation-only change.
+- [ ] Intentionally promote `0.1.5.dev0` to stable `0.1.5` only in a separate stable-freeze tranche that synchronizes package/runtime/archival/generated metadata without inventing a pre-ingestion Zenodo version DOI.
+- [ ] Require every stable-release gate to succeed on the exact stable `main` commit before creating `v0.1.5`.
+- [ ] Create immutable annotated `v0.1.5`, let the protected release workflow build/check GitHub assets, and verify the SHA-256 manifest.
+- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.5` and fresh public-index installs succeed.
+- [ ] Wait for Zenodo to ingest the immutable GitHub release; record the actual 0.1.5 version DOI while retaining concept DOI `10.5281/zenodo.22150872` and R-reference `isDerivedFrom` provenance.
