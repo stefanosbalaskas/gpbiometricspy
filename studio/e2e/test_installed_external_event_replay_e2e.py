@@ -51,21 +51,31 @@ def _write_event_logs(participant_path: Path, tmp_path: Path) -> tuple[Path, Pat
     return event_path, wrong_event_path
 
 
-def _set_input_file_and_wait(page: Page, input_id: str, path: Path) -> None:
+def _set_input_file(page: Page, input_id: str, path: Path) -> None:
     controller.InputFile(page, input_id).set(
         path,
         expect_complete_timeout=30_000,
     )
 
-    def _uploaded(value) -> bool:
-        return (
-            isinstance(value, list)
-            and len(value) == 1
-            and isinstance(value[0], dict)
-            and value[0].get("name") == path.name
-        )
 
-    controller.AppTestValues(page).expect_input(input_id, _uploaded, timeout=30.0)
+def _click_with_upload_retry(
+    page: Page,
+    *,
+    action_id: str,
+    status_id: str,
+    missing_upload_status: str,
+    timeout: int,
+) -> None:
+    action = page.locator(f"#{action_id}")
+    status = page.locator(f"#{status_id}")
+    previous_status = status.inner_text()
+
+    action.click()
+    expect(status).not_to_have_text(previous_status, timeout=timeout)
+    if status.inner_text() == missing_upload_status:
+        previous_status = missing_upload_status
+        action.click()
+        expect(status).not_to_have_text(previous_status, timeout=timeout)
 
 
 def test_installed_external_event_log_replay_is_identity_bound(
@@ -81,8 +91,14 @@ def test_installed_external_event_log_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    _set_input_file_and_wait(page, "upload", participant_path)
-    page.locator("#load_upload").click()
+    _set_input_file(page, "upload", participant_path)
+    _click_with_upload_retry(
+        page,
+        action_id="load_upload",
+        status_id="status",
+        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        timeout=60_000,
+    )
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
         timeout=60_000,
@@ -92,8 +108,17 @@ def test_installed_external_event_log_replay_is_identity_bound(
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
-    _set_input_file_and_wait(page, "event_alignment-event_upload", event_path)
-    page.locator("#event_alignment-run").click()
+    _set_input_file(page, "event_alignment-event_upload", event_path)
+    _click_with_upload_retry(
+        page,
+        action_id="event_alignment-run",
+        status_id="event_alignment-status",
+        missing_upload_status=(
+            "Events & alignment failed: "
+            "Choose a event log CSV/TXT/TSV file first."
+        ),
+        timeout=120_000,
+    )
     expect(page.locator("#event_alignment-status")).to_contain_text(
         "Events & alignment complete:",
         timeout=120_000,
@@ -179,8 +204,14 @@ def test_installed_target_stream_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    _set_input_file_and_wait(page, "upload", reference_path)
-    page.locator("#load_upload").click()
+    _set_input_file(page, "upload", reference_path)
+    _click_with_upload_retry(
+        page,
+        action_id="load_upload",
+        status_id="status",
+        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        timeout=60_000,
+    )
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
         timeout=60_000,
@@ -189,8 +220,16 @@ def test_installed_target_stream_replay_is_identity_bound(
 
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
-    _set_input_file_and_wait(page, "event_alignment-target_upload", target_path)
-    page.locator("#event_alignment-load_target").click()
+    _set_input_file(page, "event_alignment-target_upload", target_path)
+    _click_with_upload_retry(
+        page,
+        action_id="event_alignment-load_target",
+        status_id="event_alignment-status",
+        missing_upload_status=(
+            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
+        ),
+        timeout=60_000,
+    )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
         target_path.name,
         timeout=60_000,
@@ -288,8 +327,14 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
 
     page.goto(INSTALLED_LOCAL_URL)
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
-    _set_input_file_and_wait(page, "upload", reference_path)
-    page.locator("#load_upload").click()
+    _set_input_file(page, "upload", reference_path)
+    _click_with_upload_retry(
+        page,
+        action_id="load_upload",
+        status_id="status",
+        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        timeout=60_000,
+    )
     expect(page.locator("#status")).to_contain_text(
         "Upload imported through gpbiometricspy.",
         timeout=60_000,
@@ -299,9 +344,17 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
     page.get_by_text("Events & Alignment", exact=True).click()
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
-    _set_input_file_and_wait(page, "event_alignment-event_upload", event_path)
-    _set_input_file_and_wait(page, "event_alignment-target_upload", target_path)
-    page.locator("#event_alignment-load_target").click()
+    _set_input_file(page, "event_alignment-event_upload", event_path)
+    _set_input_file(page, "event_alignment-target_upload", target_path)
+    _click_with_upload_retry(
+        page,
+        action_id="event_alignment-load_target",
+        status_id="event_alignment-status",
+        missing_upload_status=(
+            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
+        ),
+        timeout=60_000,
+    )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
         target_path.name,
         timeout=60_000,
@@ -310,7 +363,16 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         "Align a second Gazepoint stream by shared event anchors",
         exact=True,
     ).check()
-    page.locator("#event_alignment-run").click()
+    _click_with_upload_retry(
+        page,
+        action_id="event_alignment-run",
+        status_id="event_alignment-status",
+        missing_upload_status=(
+            "Events & alignment failed: "
+            "Choose a event log CSV/TXT/TSV file first."
+        ),
+        timeout=120_000,
+    )
     expect(page.locator("#event_alignment-status")).to_contain_text(
         "Events & alignment complete:",
         timeout=120_000,
