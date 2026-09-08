@@ -45,12 +45,14 @@ jobs:
             --cov-report=json:coverage-branch.json
       - name: Enforce pure branch coverage floor and report debt
         run: |
+          set -o pipefail
           python scripts/report_branch_coverage.py \
             coverage-branch.json \
             --top 30 \
             --fail-under 99.6 | tee branch-coverage-audit.txt
       - name: Enforce audited structural branch debt contract
         run: |
+          set -o pipefail
           python scripts/audit_structural_branch_debt.py \
             coverage-branch.json \
             artifacts/branch-coverage-structural-debt.json \
