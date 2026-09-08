@@ -16,27 +16,23 @@
 </div>
 
 <div class="gp-status-grid">
-<div><span class="gp-status-value">0.1.4</span><span class="gp-status-label">stable release</span></div>
-<div><span class="gp-status-value">0.1.5.dev0</span><span class="gp-status-label">development head</span></div>
-<div><span class="gp-status-value">2026-09-06</span><span class="gp-status-label">stable release date</span></div>
+<div><span class="gp-status-value">0.1.5</span><span class="gp-status-label">stable release</span></div>
+<div><span class="gp-status-value">2026-09-08</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
-<div><span class="gp-status-value">100%</span><span class="gp-status-label">development statement coverage</span></div>
-<div><span class="gp-status-value">99.6636%</span><span class="gp-status-label">development raw branch coverage</span></div>
+<div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
+<div><span class="gp-status-value">99.6636%</span><span class="gp-status-label">raw branch coverage</span></div>
 <div><span class="gp-status-value">0</span><span class="gp-status-label">unaudited branch debt</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">Python CI matrix</span></div>
 </div>
 
-!!! info "Stable 0.1.4 release"
-    Stable `gpbiometricspy 0.1.4` (2026-09-06) preserves **406/406 exports with 0 pending**, **557 tests**, **10,316/10,316 statements**, and **5,575/5,594 raw branches = 99.6604%**. The remaining **19** raw branch arcs are exact reviewed structural/caller-dominated entries; the frozen 0.1.4 evidence had **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Raw coverage is not relabelled as 100%. The 0.1.4 Zenodo version DOI is [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782); the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.3 version DOI is [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884).
+!!! success "Stable 0.1.5 release source"
+    Stable `gpbiometricspy 0.1.5` (2026-09-08) preserves **406/406 exports with 0 pending** and freezes the current validation baseline at **567 passing tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. The same **19 reviewed structural arcs** remain, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Audited branch accounting is **5,648/5,648 = 100.0000%** without relabelling the honest raw metric. The 0.1.5 Zenodo version DOI is intentionally absent until ingestion; the previous 0.1.4 DOI remains [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782), and the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
 
-!!! success "Current 0.1.5.dev0 qualification baseline"
-    Live repository development remains **unreleased** at `0.1.5.dev0`. The current audited scientific baseline is **567 passing tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%** with the same **19 reviewed structural arcs**, **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Audited branch accounting is **5,648/5,648 = 100.0000%** without substituting that value for the honest raw branch metric. The branch workflow now fails closed through `tee`, so a non-zero auditor exit cannot be masked by pipeline status.
+!!! note "0.1.5 measurement-accountability additions"
+    Version `0.1.5` adds metric-specific ECG-HRV/PPG-PRV agreement through `compare_hrv_prv_devices()`, retention-first SCR responsivity through `scr_responsivity_sensitivity()`, a five-stage `validation_ladder()`, and experimental topology-aware PPG morphology through `ppg_topology_features()`. Agreement is assessed **per derived metric and acquisition configuration**, low-reactive SCR participants are retained for sensitivity analysis rather than automatically deleted, generalization requires held-out-person evidence, and topology outputs remain structural descriptors rather than direct physiological surrogates. See [Measurement accountability](measurement-accountability.md).
 
-!!! note "September 2026 measurement-accountability additions · development head"
-    The current `0.1.5.dev0` line adds metric-specific ECG-HRV/PPG-PRV agreement through `compare_hrv_prv_devices()`, retention-first SCR responsivity through `scr_responsivity_sensitivity()`, a five-stage `validation_ladder()`, and experimental topology-aware PPG morphology through `ppg_topology_features()`. Agreement is assessed **per derived metric and acquisition configuration**, low-reactive SCR participants are retained for sensitivity analysis rather than automatically deleted, generalization requires held-out-person evidence, and topology outputs remain structural descriptors rather than direct physiological surrogates. See [Measurement accountability](measurement-accountability.md).
-
-!!! note "Installed Studio replay evidence · development head"
-    Development `0.1.5.dev0` also expands production browser validation from source-tree behavior into installed **wheel and sdist** replay paths on Python 3.11 and 3.14. High-value physiology, gaze/pupil, external event/alignment, multimodal/modelling, and cluster-permutation paths are exercised with deterministic replay completion checks and fail-closed dataset/secondary-resource fingerprint validation. The public synthetic deployment boundary remains upload-restricted and separate from full local/authenticated research-data use.
+!!! note "Installed Studio replay evidence"
+    Stable `0.1.5` expands production browser validation into installed **wheel and sdist** replay paths on Python 3.11 and 3.14. High-value physiology, gaze/pupil, external event/alignment, multimodal/modelling, and cluster-permutation paths are exercised with deterministic replay completion checks and fail-closed dataset/secondary-resource fingerprint validation. The public synthetic deployment boundary remains upload-restricted and separate from full local/authenticated research-data use.
 
 ## Code or Studio
 
@@ -156,7 +152,7 @@ events = gp.extract_gazepoint_ttl_events(data)
 </div>
 <div class="gp-pillar">
 <h3>Validation as a first-class output</h3>
-<p>Current development CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14; the branch audit reports 5,629/5,648 raw branches = 99.6636%, enforces a 99.6% raw floor, and requires exact equality to the reviewed 19-entry structural-debt ledger with zero unexpected, stale, or unaudited missing paths. Deep parity, interoperability, Studio smoke, Chromium E2E and installed production-deployment checks remain independent gates.</p>
+<p>Stable 0.1.5 CI enforces 100% statement coverage across Ubuntu, Windows, and macOS on Python 3.11–3.14; the branch audit reports 5,629/5,648 raw branches = 99.6636%, enforces a 99.6% raw floor, and requires exact equality to the reviewed 19-entry structural-debt ledger with zero unexpected, stale, or unaudited missing paths. Deep parity, interoperability, Studio smoke, Chromium E2E and installed production-deployment checks remain independent gates.</p>
 <a href="deep-validation/">See validation →</a>
 </div>
 <div class="gp-pillar">

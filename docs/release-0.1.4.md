@@ -8,4 +8,4 @@ The release preserves the frozen **406-export** scientific contract while freezi
 
 The Zenodo version DOI for 0.1.4 is **[10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)**. The previous 0.1.3 version DOI is **10.5281/zenodo.22313884**, and the software concept DOI remains **10.5281/zenodo.22150872**.
 
-The immutable `v0.1.4` release is unchanged by post-release development. Live `main` advances separately as `0.1.5.dev0` while `CITATION.cff` remains pinned to the stable 0.1.4 archival record.
+The immutable `v0.1.4` release remains unchanged. Stable `0.1.5` now supersedes it as the current release source, while DOI `10.5281/zenodo.22515782` remains the immutable version-specific identifier for 0.1.4.

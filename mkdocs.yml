@@ -133,6 +133,7 @@ nav:
       - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
   - Citation & archival: citation.md
+  - Release 0.1.5: release-0.1.5.md
   - Development: development.md
 
 markdown_extensions:
