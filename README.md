@@ -37,23 +37,22 @@
 
 | Status | Current state |
 |---|---|
-| Stable release | **0.1.4** |
-| Development head | **0.1.5.dev0** |
-| Release date | **2026-09-06** |
+| Stable release | **0.1.5** |
+| Release date | **2026-09-08** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Development validation | **567 tests · 100.00% statements · 99.6636% raw branches · 0 unaudited branch debt** |
+| Release validation | **567 tests · 100.00% statements · 99.6636% raw branches · 0 unaudited branch debt** |
 | Studio | **11 application workflows · source + installed wheel/sdist Chromium replay/production validation** |
 | Supported Python | **3.11–3.14** |
 
-Stable `0.1.4` remains immutable at its release evidence (**557 tests · 10,316/10,316 statements · 5,575/5,594 raw branches = 99.6604%**). The larger figures above describe the live `0.1.5.dev0` development line and do not rewrite historical release evidence.
+Stable `0.1.4` remains immutable at its historical release evidence (**557 tests · 10,316/10,316 statements · 5,575/5,594 raw branches = 99.6604%**). Stable `0.1.5` freezes the larger current evidence (**567 tests · 10,456/10,456 statements · 5,629/5,648 raw branches = 99.6636%**) without rewriting the 0.1.4 record.
 
 ## What you get
 
 - **Complete frozen API contract:** all **406 / 406** exported R functions are implemented and registered, with **0 pending exports**.
-- **Current development validation:** **567 tests**, **10,456 statements**, **0 missed**, and a CI statement floor of **100%**.
+- **Stable 0.1.5 validation:** **567 tests**, **10,456 statements**, **0 missed**, and a CI statement floor of **100%**.
 - **Audited branch accounting:** current raw branch coverage is **5,629 / 5,648 = 99.6636%**; the remaining **19** arcs are frozen as reviewed structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** missing branches under CI.
-- **Measurement accountability:** development `0.1.5.dev0` adds metric-specific HRV/PRV agreement, retention-first SCR responsivity sensitivity, a five-stage validation ladder, and experimental topology-aware PPG morphology with conservative interpretation boundaries.
+- **Measurement accountability:** stable `0.1.5` adds metric-specific HRV/PRV agreement, retention-first SCR responsivity sensitivity, a five-stage validation ladder, and experimental topology-aware PPG morphology with conservative interpretation boundaries.
 - **gpbiometricspy Studio:** a stateful Shiny interface for intake/QC, annotation, EDA/SCR, PPG/HRV, pupil, gaze/fixation/AOI, events/alignment, multimodal analysis, statistics/modelling, and reporting/reproducibility.
 - **Installed-artifact replay validation:** production browser tests exercise scientific replay from built wheel and sdist artifacts, including dataset/secondary-resource fingerprint guards, on Python 3.11 and 3.14.
 - **Scientific-domain navigation:** the documentation groups the API into **8 research domains** while preserving the complete alphabetical 406-function reference.
@@ -87,7 +86,7 @@ Individual extras are available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `
 
 ## gpbiometricspy Studio
 
-Studio is a repository/application layer over the public package API. In stable `0.1.4`, it is included in the Python distribution with installed launch commands.
+Studio is a repository/application layer over the public package API. In stable `0.1.5`, it is included in the Python distribution with installed launch commands.
 
 From a source checkout:
 
@@ -162,9 +161,9 @@ The frozen `gpbiometrics 2.0.0` parity surface covers, among other areas:
 
 ## Validation and parity
 
-Development on `main` goes beyond the 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, privacy-preserving real-data validation, branch-path auditing, and independent Studio unit/browser/production gates.
+Stable `0.1.5` goes beyond the original 406/406 export freeze. The repository includes independent R↔Python golden fixtures, floor/current optional-backend interoperability CI, executable article companions, platform/Python matrix testing, privacy-preserving real-data validation, branch-path auditing, and independent Studio unit/browser/production gates.
 
-The current scientific development validation baseline is:
+The stable 0.1.5 validation baseline is:
 
 ```text
 R exports:                  406
@@ -187,7 +186,7 @@ Audited branch accounting: 100.0000%
 
 Raw branch coverage remains the literal coverage.py result; the structural-debt contract does **not** relabel it as 100%. Instead, CI requires the exact remaining 19 missing arcs to match the reviewed structural/caller-dominated ledger, so any new or stale uncovered path fails independently of the raw percentage. The branch-audit workflow also propagates auditor failures through `tee`, so a non-zero coverage/debt auditor exit cannot be hidden by pipeline status.
 
-Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. Development `0.1.5.dev0` extends that evidence into installed wheel/sdist replay for high-value scientific paths and fail-closed input-fingerprint validation. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
+Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and deployment-style production/distribution checks. Stable `0.1.5` extends that evidence into installed wheel/sdist replay for high-value scientific paths and fail-closed input-fingerprint validation. See [`VALIDATION.md`](VALIDATION.md) and the documentation site's validation material for the distinction between API parity, executable contract coverage, application validation, and deeper cross-runtime/backend evidence.
 
 ## Interpretation guardrails
 
@@ -196,11 +195,12 @@ Studio additionally runs Python 3.11/3.14 smoke tests, Chromium E2E tests, and d
 <a id="citation"></a>
 ## Archival and citation
 
-`gpbiometricspy 0.1.4` is the current stable release. Its version-specific Zenodo DOI is **10.5281/zenodo.22515782**; live repository development proceeds as `0.1.5.dev0`, while the concept DOI identifies the evolving Python software record.
+`gpbiometricspy 0.1.5` is the current stable release source. Its version-specific Zenodo DOI will be recorded only after Zenodo ingests the immutable `v0.1.5` GitHub release; the concept DOI identifies the evolving Python software record.
 
-- **Version DOI (0.1.4):** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
+- **Version DOI (0.1.5):** pending Zenodo ingestion — not yet minted
+- **Previous version DOI (0.1.4):** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
-- **Previous version DOI (0.1.3):** [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)
+- **Earlier version DOI (0.1.3):** [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)
 - **Earlier version DOI (0.1.2):** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
 - **Frozen R reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **Published gpbiometrics R-package paper:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)

@@ -1,19 +1,19 @@
 # Changelog
 
-## 0.1.5.dev0 — unreleased — measurement accountability and installed-replay hardening
+## 0.1.5 — 2026-09-08 — measurement accountability and installed-replay hardening
 
-- preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** while keeping the live package/runtime identity at development version `0.1.5.dev0`;
+- preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** while promoting the qualified release line to stable **0.1.5**;
 - adds physiology measurement-accountability tools for **metric-specific ECG-HRV/PPG-PRV agreement**, retention-first **SCR responsivity sensitivity**, an explicit five-stage **validation ladder**, and clearly labelled **experimental PPG topology structural descriptors**;
 - expands the scientific regression suite to **567 tests** while retaining literal **10,456 / 10,456 = 100.00% statement coverage** and the **100% statement CI floor**;
 - expands the raw branch denominator to **5,648** and validates **5,629 / 5,648 = 99.6636%**, retaining the persistent **99.6000% raw branch floor**;
 - keeps the reviewed structural-debt ledger at exactly **19** arcs with **0 unexpected**, **0 stale**, and **0 unaudited** missing branch debt and **5,648 / 5,648 = 100.0000% audited branch accounting**;
 - fixes branch-coverage enforcement so Python auditor failures piped through `tee` propagate through Bash `pipefail` instead of producing a false-green workflow;
 - covers the one genuinely reachable new non-finite PPG-topology branch exposed by the repaired gate rather than adding an exemption to structural debt;
-- substantially expands Studio installed wheel/sdist Chromium replay on Python 3.11 and 3.14 across local/public CLI boundaries, physiology, external events, multimodal/model preparation, and cluster permutation workflows;
+- substantially expands Studio installed wheel/sdist Chromium replay on Python 3.11 and 3.14 across local/public CLI boundaries, gaze/pupil, physiology, external events, multimodal/model preparation, and cluster-permutation workflows;
 - binds replay-time external event logs and target streams to deterministic identities, rejects wrong or missing secondary resources before analysis, and avoids serializing raw secondary-resource paths;
 - replaces test-mode upload snapshots and arbitrary timing assumptions at the installed-production boundary with production-compatible rendered-server-state synchronization;
 - preserves the synthetic-only public Studio boundary and the public scientific API/plot-return contracts while hardening browser usability and rendering adapters;
-- adds `RELEASE_NOTES_0.1.5.md` as an explicit **development/unreleased** candidate summary; no stable `0.1.5` tag, PyPI release, or version-specific Zenodo DOI is claimed yet.
+- freezes stable release identity across package/runtime, archival, citation, generated-documentation, README/site, release notes and validation surfaces without inventing a pre-ingestion 0.1.5 Zenodo version DOI.
 
 ## 0.1.4 — 2026-09-06 — branch-path validation and release hardening
 

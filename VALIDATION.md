@@ -588,3 +588,20 @@ The 0.1.4 release source freezes the completed branch/path-validation campaign w
 - audited branch accounting: **5,594 / 5,594 = 100.0000%**, explicitly not substituted for the honest raw coverage metric;
 - stable tagging requires every exact-main release gate, including the branch/structural audit;
 - no 0.1.4 Zenodo version DOI is recorded before Zenodo actually ingests the immutable GitHub release.
+
+
+## 0.1.5 stable release freeze — 2026-09-08
+
+The 0.1.5 release source freezes the completed reliability and measurement-accountability line without changing the frozen 406-function R contract.
+
+- package/runtime identity: **0.1.5**;
+- frozen R semantic reference: **gpbiometrics 2.0.0**;
+- API contract: **406 / 406 implemented; 0 pending**;
+- scientific regression suite: **567 tests**;
+- statements: **10,456 / 10,456 = 100.000%**;
+- raw branches: **5,629 / 5,648 = 99.6636%** with a **99.6% raw branch CI floor**;
+- audited structural residual arcs: **19**, with **0 unexpected, 0 stale, 0 unaudited branch debt**;
+- audited branch accounting: **5,648 / 5,648 = 100.0000%**, explicitly not substituted for the raw metric;
+- installed Studio wheel/sdist replay qualification covers high-value scientific paths on Python 3.11 and 3.14;
+- stable tagging remains blocked until every exact-main release gate succeeds;
+- no 0.1.5 Zenodo version DOI is recorded before Zenodo actually ingests the immutable release.
