@@ -17,6 +17,7 @@
 
 <div class="gp-status-grid">
 <div><span class="gp-status-value">0.1.5</span><span class="gp-status-label">stable release</span></div>
+<div><span class="gp-status-value">0.1.6.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">2026-09-08</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
@@ -26,7 +27,7 @@
 </div>
 
 !!! success "Stable 0.1.5 release source"
-    Stable `gpbiometricspy 0.1.5` (2026-09-08) preserves **406/406 exports with 0 pending** and freezes the current validation baseline at **567 passing tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. The same **19 reviewed structural arcs** remain, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Audited branch accounting is **5,648/5,648 = 100.0000%** without relabelling the honest raw metric. The 0.1.5 Zenodo version DOI is intentionally absent until ingestion; the previous 0.1.4 DOI remains [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782), and the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).
+    Stable `gpbiometricspy 0.1.5` (2026-09-08) preserves **406/406 exports with 0 pending** and freezes the current validation baseline at **567 passing tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. The same **19 reviewed structural arcs** remain, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. Audited branch accounting is **5,648/5,648 = 100.0000%** without relabelling the honest raw metric. The 0.1.5 Zenodo version DOI remains intentionally absent until ingestion; the previous 0.1.4 DOI remains [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782), and the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872). The immutable 0.1.5 wheel and sdist are public on PyPI, while live repository development proceeds as `0.1.6.dev0`.
 
 !!! note "0.1.5 measurement-accountability additions"
     Version `0.1.5` adds metric-specific ECG-HRV/PPG-PRV agreement through `compare_hrv_prv_devices()`, retention-first SCR responsivity through `scr_responsivity_sensitivity()`, a five-stage `validation_ladder()`, and experimental topology-aware PPG morphology through `ppg_topology_features()`. Agreement is assessed **per derived metric and acquisition configuration**, low-reactive SCR participants are retained for sensitivity analysis rather than automatically deleted, generalization requires held-out-person evidence, and topology outputs remain structural descriptors rather than direct physiological surrogates. See [Measurement accountability](measurement-accountability.md).

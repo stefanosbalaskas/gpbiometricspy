@@ -3,7 +3,7 @@
 `gpbiometricspy` is archived through the Zenodo GitHub integration.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> stable Python release <code>0.1.5</code> (2026-09-08). Its version-specific Zenodo DOI will be added only after Zenodo ingests the immutable <code>v0.1.5</code> GitHub release; the software concept DOI remains the identifier for the evolving record.
+<strong>Current citation state:</strong> stable Python release <code>0.1.5</code> (2026-09-08). Its version-specific Zenodo DOI will be added only after Zenodo ingests the immutable <code>v0.1.5</code> GitHub release; live repository development proceeds as <code>0.1.6.dev0</code>, while the software concept DOI remains the identifier for the evolving record.
 </div>
 
 ## Cite the Python software
@@ -37,7 +37,7 @@ That DOI identifies the R reference package. `.zenodo.json` preserves it with re
 ## Metadata files
 
 - `CITATION.cff` identifies stable Python release 0.1.5 and release date 2026-09-08; its DOI is intentionally absent before Zenodo ingestion.
-- `.zenodo.json` identifies archival software version 0.1.5 and preserves the R-reference provenance relationship.
+- `.zenodo.json` preserves the R-reference provenance relationship and, on live development, tracks version 0.1.6.dev0 separately from the stable CFF citation record.
 - README and documentation use the Python concept DOI for the evolving software family while retaining earlier version DOIs for reproducible citation.
 
 ## Interpretation

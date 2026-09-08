@@ -116,8 +116,19 @@
 - [x] Merge and exact-main qualify the separate 0.1.5 release-readiness documentation tranche before beginning the stable freeze.
 - [x] Promote package/runtime/Zenodo/generated documentation identity to stable `0.1.5`, set `CITATION.cff` to **0.1.5 / 2026-09-08**, and deliberately omit a 0.1.5 version DOI before Zenodo ingestion.
 - [x] Retain software concept DOI `10.5281/zenodo.22150872`, previous 0.1.4 DOI `10.5281/zenodo.22515782`, and R-reference DOI `10.5281/zenodo.21434608` only in their correct roles.
-- [ ] Require every workflow family triggered by the exact stable-freeze PR head to pass before pinned-head squash merge.
-- [ ] Require all ten stable-release gate families to succeed on the exact merged stable `main` commit before creating `v0.1.5`.
-- [ ] Create immutable annotated `v0.1.5`, let the protected release workflow build/check GitHub assets, and verify the SHA-256 manifest.
-- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.5` and fresh public-index installs succeed.
+- [x] Require every workflow family triggered by the exact stable-freeze PR head to pass before pinned-head squash merge.
+- [x] Require all ten stable-release gate families to succeed on the exact merged stable `main` commit before creating `v0.1.5`.
+- [x] Create immutable annotated `v0.1.5`, let the protected release workflow build/check GitHub assets, and verify the SHA-256 manifest.
+- [x] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.5`; both distribution uploads returned HTTP 200 and Sigstore attestations were generated.
 - [ ] Wait for Zenodo to ingest the immutable GitHub release; record the actual 0.1.5 version DOI only after it exists.
+
+### 0.1.5 post-release publication evidence
+
+- [x] Immutable annotated `v0.1.5` resolves to exact qualified commit `294a9b6349aef93abae84bda6f2c89afce1001de`.
+- [x] GitHub Release `v0.1.5` published the exact wheel, sdist, and SHA-256 manifest after the ten exact-main release gates passed.
+- [x] GitHub Release and PyPI wheel SHA-256 match: `eb2474a7d3156b305c573a5327040038f6ec08ba7e5cf244952712b3d239c607`.
+- [x] GitHub Release and PyPI sdist SHA-256 match: `b8605ad8d402a948d0610dd40ff98985dedf6351b681b7e43294df38d10dc47e`.
+- [x] Protected PyPI Trusted Publishing generated Sigstore attestations; Rekor indexes: wheel `2762034607`, sdist `2762034601`.
+- [ ] Zenodo ingestion / 0.1.5 version DOI is still pending and must not be inferred.
+- [ ] After Zenodo mints the DOI, pin `CITATION.cff` to stable 0.1.5 + the actual DOI, add `VersionDOI` / update version-history links, and complete archival closeout.
+- [ ] Merge the completed closeout to return live repository identity to `0.1.6.dev0` while leaving immutable `v0.1.5`, GitHub Release, and PyPI artifacts unchanged.

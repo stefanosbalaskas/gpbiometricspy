@@ -73,6 +73,16 @@ The development evidence artifact used to prepare the stable freeze is GitHub Ac
 - `CITATION.cff` records stable `0.1.5` and the release date but intentionally contains **no 0.1.5 version DOI before Zenodo ingestion**.
 - The actual 0.1.5 version DOI is recorded only after Zenodo ingests the immutable GitHub release; it is not invented or inferred in the release freeze.
 
+
+## Post-release distribution record
+
+- Immutable annotated tag `v0.1.5` resolves to exact qualified commit `294a9b6349aef93abae84bda6f2c89afce1001de`.
+- GitHub Release and PyPI wheel SHA-256: `eb2474a7d3156b305c573a5327040038f6ec08ba7e5cf244952712b3d239c607`.
+- GitHub Release and PyPI sdist SHA-256: `b8605ad8d402a948d0610dd40ff98985dedf6351b681b7e43294df38d10dc47e`.
+- Protected PyPI Trusted Publishing completed with HTTP 200 uploads and Sigstore/Rekor attestations (wheel Rekor `2762034607`; sdist Rekor `2762034601`).
+- The 0.1.5 Zenodo version DOI remains pending ingestion and is deliberately not inferred.
+- Live repository development is prepared as `0.1.6.dev0`; the stable `CITATION.cff` record remains 0.1.5 / 2026-09-08 until the actual Zenodo version DOI exists.
+
 ## Release integrity
 
 The stable tag may be created only from the exact current `main` commit after all ten configured release-gate workflow families have succeeded on that same SHA: tests, docs, CodeQL, deep parity, interoperability, branch coverage/structural audit, private real-data validation, Studio smoke, Studio Chromium E2E, and Studio production/distribution validation. The release workflow independently rechecks those exact-commit gates before building or publishing artifacts.
