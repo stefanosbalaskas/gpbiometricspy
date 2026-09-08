@@ -22,6 +22,11 @@ jobs:
         run: python scripts/_post_release_015_prep.py
       - name: Audit identity and diff
         run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("RELEASE_CHECKLIST.md")
+          p.write_text(p.read_text(encoding="utf-8").rstrip() + "\n", encoding="utf-8")
+          PY
           python scripts/audit_release_identity.py
           git diff --check
       - name: Commit prepared branch without temporary editors
