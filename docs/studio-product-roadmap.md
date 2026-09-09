@@ -56,6 +56,8 @@ Status: **core tranche delivered; contextual module-level guidance remains**
 - a workflow-progress table exposes required, ready, optional and completed stages;
 - guided synthetic starts can open multimodal, eye-tracking or physiology workflows after foundation QC;
 - the session summary exposes first-session readiness as a percentage;
+- browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
+- grouped Analyze / Integrate navigation is covered through the same stable E2E contract;
 - remaining work: channel-aware recommendations, module-specific prerequisites and deeper contextual help.
 
 ## Phase 3 — project management
@@ -125,7 +127,9 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 
 ## Current validation checkpoint
 
-The guided-product tranche was applied through a fail-closed helper that committed only after all of the following succeeded:
+The guided-product tranche was applied through fail-closed helpers that committed only after their focused validation succeeded. The navigation-contract helper additionally migrated the Chromium suite from mutable display-label clicks to stable Shiny module IDs and removed itself after validation.
+
+The checkpoint therefore includes:
 
 - Studio source compilation;
 - focused product-services and Studio Doctor tests;
@@ -133,9 +137,11 @@ The guided-product tranche was applied through a fail-closed helper that committ
 - desktop-launcher and CLI regression tests;
 - production-hardening regression tests;
 - `studio.app` import validation;
-- strict MkDocs build.
+- strict MkDocs build;
+- static validation of the migrated E2E sources with Ruff, Python compilation and helper import checks;
+- zero stale label-based navigation calls after migration.
 
-The helper removed itself after the validated commit. Full pull-request CI is then required on a normal user-authored checkpoint before the tranche is considered merge-ready.
+Full pull-request CI is required on the normal user-authored checkpoint above the helper-produced commit before the tranche is considered merge-ready.
 
 ## 0.1.6 release criteria for Studio
 
