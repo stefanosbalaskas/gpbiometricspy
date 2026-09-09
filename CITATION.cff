@@ -24,7 +24,7 @@ keywords:
   - scientific Python
 version: 0.1.5
 date-released: 2026-09-08
-doi: "10.5281/zenodo.22672823"
+doi: 10.5281/zenodo.22672823
 license: MIT
 repository-code: "https://github.com/stefanosbalaskas/gpbiometricspy"
 url: "https://stefanosbalaskas.github.io/gpbiometricspy/"
