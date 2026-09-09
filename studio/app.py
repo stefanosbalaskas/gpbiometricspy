@@ -63,21 +63,43 @@ GUARDRAIL = (
 )
 
 
+def _safe_error(prefix: str, exc: Exception) -> str:
+    """Return a concise UI-safe local error without losing the actionable message."""
+    detail = str(exc).strip() or exc.__class__.__name__
+    if len(detail) > 220:
+        detail = f"{detail[:217]}..."
+    return f"{prefix} — {detail}"
+
+
+def _workflow_step(number: str, title: str, detail: str):
+    return ui.div(
+        ui.tags.span(number, class_="studio-step-number"),
+        ui.tags.strong(title),
+        ui.tags.small(detail),
+        class_="studio-workflow-step",
+    )
+
+
 def _project_sidebar():
     intake_items = [
-        ui.h5("Project intake"),
+        ui.div(
+            ui.tags.span("PROJECT", class_="studio-sidebar-kicker"),
+            ui.h5("Start with your data", class_="mb-1"),
+            ui.p("Load the synthetic demo first, or import a local Gazepoint export.", class_="small text-secondary mb-3"),
+        ),
         ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),
     ]
     if RUNTIME_CONFIG.allow_external_uploads:
         intake_items.extend(
             [
-                ui.hr(),
+                ui.div(class_="studio-sidebar-divider"),
                 ui.input_file(
                     "upload",
-                    "Upload Gazepoint CSV/TXT",
+                    "Gazepoint CSV/TXT",
                     accept=[".csv", ".txt", "text/csv", "text/plain"],
                     multiple=False,
                 ),
+                ui.p("Research files are processed in this local/private Studio session.", class_="small text-secondary"),
                 ui.input_action_button("load_upload", "Import uploaded file", class_="btn-outline-primary w-100"),
             ]
         )
@@ -86,7 +108,7 @@ def _project_sidebar():
             ui.div(
                 ui.tags.strong("Synthetic data only."),
                 ui.p(
-                    "External file uploads are disabled on this public deployment. Use the local or authenticated Studio for research data.",
+                    "External uploads are disabled on this public deployment. Use the local or authenticated Studio for research data.",
                     class_="mb-0 small",
                 ),
                 class_="studio-public-demo-note",
@@ -96,7 +118,12 @@ def _project_sidebar():
 
     intake_items.extend(
         [
-            ui.hr(),
+            ui.div(class_="studio-sidebar-divider"),
+            ui.div(
+                ui.tags.span("FOUNDATION", class_="studio-sidebar-kicker"),
+                ui.h5("Establish data quality", class_="mb-1"),
+                ui.p("Run the baseline checks before signal-specific analysis.", class_="small text-secondary mb-3"),
+            ),
             ui.input_task_button(
                 "run_qc",
                 "Run foundation QC",
@@ -104,24 +131,63 @@ def _project_sidebar():
                 type="success",
                 width="100%",
             ),
-            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
-            ui.hr(),
+            ui.div(class_="studio-sidebar-divider"),
+            ui.div(
+                ui.tags.span("SESSION", class_="studio-sidebar-kicker"),
+                ui.output_text("session_summary"),
+                class_="studio-session-summary",
+            ),
+            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-3"),
+            ui.div(class_="studio-sidebar-divider"),
             ui.tags.div(
-                {"role": "status", "aria-live": "polite", "aria-atomic": "true", "class": "small text-secondary"},
+                {"role": "status", "aria-live": "polite", "aria-atomic": "true", "class": "studio-status-line"},
                 ui.output_text("status"),
             ),
         ]
     )
-    return ui.sidebar(*intake_items, width=330)
+    return ui.sidebar(*intake_items, width=340)
 
 
 def _home_panel():
     return ui.div(
+        ui.div(
+            ui.tags.span(
+                "PUBLIC SYNTHETIC DEMO" if RUNTIME_CONFIG.is_public_demo else "LOCAL RESEARCH STUDIO",
+                class_="studio-runtime-chip",
+            ),
+            ui.h2("From raw data to a reproducible result", class_="studio-home-title"),
+            ui.p(
+                "Follow a visible research path instead of guessing which analysis comes next. "
+                "Studio uses the same tested gpbiometricspy functions available in Python.",
+                class_="studio-home-lead",
+            ),
+            ui.div(
+                _workflow_step("01", "Project", "Load data and inspect channels"),
+                _workflow_step("02", "Quality", "Run foundation and signal QC"),
+                _workflow_step("03", "Analyze", "EDA, HRV, pupil, gaze and AOIs"),
+                _workflow_step("04", "Align", "Events, TTL and secondary streams"),
+                _workflow_step("05", "Model", "Prepare and test defensible models"),
+                _workflow_step("06", "Report", "Export provenance and replay"),
+                class_="studio-workflow-strip",
+            ),
+            class_="studio-home-hero",
+        ),
+        ui.layout_columns(
+            ui.card(
+                ui.card_header("Next recommended step"),
+                ui.tags.div(ui.output_text("next_step"), class_="studio-next-step"),
+            ),
+            ui.card(
+                ui.card_header("Project readiness"),
+                ui.tags.div(ui.output_text("readiness_summary"), class_="studio-readiness"),
+            ),
+            col_widths=(7, 5),
+        ),
         ui.layout_column_wrap(
             ui.value_box("Dataset", ui.output_text("dataset_name"), theme="primary"),
             ui.value_box("Rows", ui.output_text("row_count")),
-            ui.value_box("Columns", ui.output_text("column_count")),
-            ui.value_box("Active biometric signals", ui.output_text("active_count")),
+            ui.value_box("QC", ui.output_text("qc_state")),
+            ui.value_box("Analyses", ui.output_text("analysis_count")),
             width=1 / 4,
         ),
         ui.layout_columns(
@@ -155,7 +221,13 @@ def _home_panel():
             ui.output_plot("activity_plot", height="420px"),
             full_screen=True,
         ),
-        ui.p(ui.tags.strong("Interpretation guardrail: "), GUARDRAIL, class_="text-secondary small"),
+        ui.div(
+            ui.tags.strong("Interpretation guardrail"),
+            ui.p(GUARDRAIL, class_="mb-0"),
+            class_="studio-guardrail",
+            role="note",
+        ),
+        class_="studio-home-panel",
     )
 
 
@@ -163,6 +235,7 @@ def _page_title():
     return ui.TagList(
         ui.tags.a("Skip to content", href="#studio-main", class_="studio-skip-link"),
         ui.tags.span("gpbiometricspy Studio"),
+        ui.tags.small("research workspace", class_="studio-brand-subtitle"),
     )
 
 
@@ -219,7 +292,7 @@ def server(input, output, session):
     initial_status = (
         "Public synthetic demonstration ready. Load the bundled demo to begin. External uploads are disabled."
         if RUNTIME_CONFIG.is_public_demo
-        else "Ready. Load the bundled demo or upload a Gazepoint export."
+        else "Ready. Load the synthetic demo or import a local Gazepoint export."
     )
     status_text = reactive.Value(initial_status)
 
@@ -240,9 +313,9 @@ def server(input, output, session):
         try:
             data, source_name = load_demo_dataset()
             set_dataset(data, source_name, "load_demo")
-            status_text.set("Synthetic kiosk demo loaded. Run QC or open an analysis workflow when ready.")
+            status_text.set("Synthetic kiosk demo loaded. Next: run foundation QC.")
         except Exception as exc:  # UI boundary: surface a concise error instead of crashing the session.
-            status_text.set(f"Load failed: {exc}")
+            status_text.set(_safe_error("Demo load failed", exc))
 
     @reactive.effect
     @reactive.event(input.load_upload)
@@ -250,9 +323,9 @@ def server(input, output, session):
         try:
             data, source_name = load_uploaded_dataset(input.upload())
             set_dataset(data, source_name, "load_upload")
-            status_text.set("Upload imported through gpbiometricspy. Run QC or analysis when ready.")
+            status_text.set("Research file imported. Next: run foundation QC before analysis.")
         except Exception as exc:
-            status_text.set(f"Import failed: {exc}")
+            status_text.set(_safe_error("Import failed", exc))
 
     @reactive.effect
     @reactive.event(input.run_qc)
@@ -264,9 +337,9 @@ def server(input, output, session):
         try:
             qc = run_qc(current.data)
             state.set(current.with_qc(qc))
-            status_text.set("Foundation QC complete. Open Quality Control for deeper diagnostics.")
+            status_text.set("Foundation QC complete. Review Quality Control, then choose a signal analysis workflow.")
         except Exception as exc:
-            status_text.set(f"QC failed: {exc}")
+            status_text.set(_safe_error("Foundation QC failed", exc))
 
     @reactive.effect
     @reactive.event(input.reset)
@@ -275,7 +348,7 @@ def server(input, output, session):
         status_text.set(
             "Session reset. Load the bundled synthetic demo to continue."
             if RUNTIME_CONFIG.is_public_demo
-            else "Session reset. No dataset is loaded."
+            else "Session reset. Load a dataset to begin a new project."
         )
 
     qc_server("qc", state, status_text)
@@ -294,6 +367,37 @@ def server(input, output, session):
         return status_text()
 
     @render.text
+    def session_summary():
+        current = state()
+        if not current.loaded:
+            return "No project data loaded"
+        qc_label = "QC complete" if current.qc is not None else "QC pending"
+        return f"{qc_label} · {len(current.analyses)} analyses · {len(current.annotations)} annotations"
+
+    @render.text
+    def next_step():
+        current = state()
+        if not current.loaded:
+            return "Load the synthetic demo to learn the workflow, or import a local Gazepoint CSV/TXT file."
+        if current.qc is None:
+            return "Run foundation QC. This establishes the baseline quality checks before signal-specific interpretation."
+        if not current.analyses:
+            return "Review Quality Control, then open EDA/SCR, PPG/HRV, Pupil, or Gaze/AOI based on the channels you recorded."
+        if len(current.analyses) == 1:
+            return "You have one saved analysis. Add another signal or alignment workflow, or review Reporting & Reproducibility."
+        return "Your project has multiple analyses. Review alignment/modelling as needed, then export provenance and replay outputs in Reporting & Reproducibility."
+
+    @render.text
+    def readiness_summary():
+        current = state()
+        if not current.loaded:
+            return "Project not started · dataset required"
+        quality = "QC ✓" if current.qc is not None else "QC pending"
+        analyses = f"{len(current.analyses)} analyses"
+        annotations = f"{len(current.annotations)} annotations"
+        return f"Dataset ✓ · {quality} · {analyses} · {annotations}"
+
+    @render.text
     def dataset_name():
         return state().source_name
 
@@ -304,6 +408,14 @@ def server(input, output, session):
     @render.text
     def column_count():
         return f"{state().n_columns:,}"
+
+    @render.text
+    def qc_state():
+        return "Complete" if state().qc is not None else "Pending"
+
+    @render.text
+    def analysis_count():
+        return str(len(state().analyses))
 
     @render.text
     def active_count():
@@ -317,16 +429,22 @@ def server(input, output, session):
     def preview():
         data = state().data
         if data is None:
-            return render.DataGrid(pd.DataFrame({"status": ["No dataset loaded"]}))
+            return render.DataGrid(pd.DataFrame({"status": ["No dataset loaded — start with the synthetic demo"]}))
         return render.DataGrid(data.head(250), filters=True, height="360px")
 
     @render.data_frame
     def active_channels():
-        return render.DataGrid(active_channels_table(state().validation), filters=True)
+        table = active_channels_table(state().validation)
+        if table.empty:
+            table = pd.DataFrame({"status": ["Load a dataset to detect channels"]})
+        return render.DataGrid(table, filters=True)
 
     @render.data_frame
     def missingness():
-        return render.DataGrid(missingness_table(state().qc), filters=True)
+        table = missingness_table(state().qc)
+        if table.empty:
+            table = pd.DataFrame({"status": ["Run foundation QC to audit missingness and zero values"]})
+        return render.DataGrid(table, filters=True)
 
     @render.data_frame
     def issues():
