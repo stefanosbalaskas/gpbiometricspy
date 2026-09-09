@@ -95,7 +95,10 @@ package-dir = {gpbiometricspy = "src/gpbiometricspy", studio = "studio"}
 
 [tool.setuptools.package-data]
 gpbiometricspy = ["data/**/*.csv", "data/**/*.txt"]
-studio = ["www/*.css"]
+# Keep all Studio Python modules explicit in the wheel as well as normal package
+# modules. This makes clean installed-artifact validation fail closed if a new
+# application module is added after the package map was established.
+studio = ["*.py", "modules/*.py", "www/*.css"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
