@@ -45,9 +45,9 @@ jobs:
       - name: Install test/build tools
         run: python -m pip install pytest ruff build pytest-playwright
       - name: Ruff production boundary
-        run: ruff check app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
+        run: ruff check app.py studio/config.py studio/cli.py studio/desktop.py studio/doctor.py studio/product_services.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_desktop.py studio/tests/test_doctor.py studio/tests/test_product_services.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
       - name: Compile production boundary
-        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
+        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/desktop.py studio/doctor.py studio/product_services.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
       - name: Verify installed distribution carries Studio
         run: |
           python - <<'PY'
@@ -59,7 +59,13 @@ jobs:
               "studio/__init__.py",
               "studio/app.py",
               "studio/cli.py",
+              "studio/desktop.py",
+              "studio/doctor.py",
+              "studio/product_services.py",
               "studio/public_demo.py",
+              "studio/reporting_services.py",
+              "studio/services.py",
+              "studio/state.py",
               "studio/modules/__init__.py",
               "studio/www/studio.css",
               "studio/www/public-demo.css",
@@ -69,9 +75,11 @@ jobs:
           scripts = {ep.name: ep.value for ep in dist.entry_points if ep.group == "console_scripts"}
           assert scripts.get("gpbiometricspy-studio") == "studio.cli:main"
           assert scripts.get("gpbiometricspy-studio-public") == "studio.cli:main_public"
+          assert scripts.get("gpbiometricspy-studio-desktop") == "studio.desktop:main"
+          assert scripts.get("gpbiometricspy-studio-doctor") == "studio.doctor:main"
           PY
       - name: Production policy and CLI tests
-        run: python -m pytest -q studio/tests/test_production_hardening.py studio/tests/test_cli.py
+        run: python -m pytest -q studio/tests/test_production_hardening.py studio/tests/test_cli.py studio/tests/test_desktop.py studio/tests/test_doctor.py studio/tests/test_product_services.py
       - name: Verify source distribution carries deployment assets
         run: |
           python -m build --sdist
@@ -88,6 +96,9 @@ jobs:
               f"{root}/requirements.txt",
               f"{root}/DEPLOYMENT.md",
               f"{root}/studio/app.py",
+              f"{root}/studio/desktop.py",
+              f"{root}/studio/doctor.py",
+              f"{root}/studio/product_services.py",
               f"{root}/studio/public_demo.py",
               f"{root}/studio/www/studio.css",
           }
