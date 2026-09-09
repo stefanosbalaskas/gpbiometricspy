@@ -1,0 +1,138 @@
+name: studio-e2e-nav-migration-helper
+
+on:
+  push:
+    branches:
+      - studio/product-polish-0.1.6
+    paths:
+      - .github/workflows/studio-e2e-nav-migration-helper.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate-and-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: studio/product-polish-0.1.6
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Migrate browser navigation contracts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          from textwrap import dedent
+
+          helper = Path("studio/e2e/navigation.py")
+          helper.write_text(dedent('''
+          from __future__ import annotations
+
+          from playwright.sync_api import Page, expect
+
+
+          def open_nav(page: Page, value: str, *, group: str | None = None) -> None:
+              """Open a Studio module by its stable Shiny data-value contract.
+
+              Human-facing labels are intentionally free to evolve. Dropdown modules first
+              open their product-level navigation group, then activate the stable module ID.
+              """
+              nav = page.locator("#main_nav")
+              link = nav.locator(f'a[data-value="{value}"]')
+              if group is not None and not link.is_visible():
+                  nav.get_by_text(group, exact=True).click()
+                  expect(link).to_be_visible(timeout=10_000)
+              expect(link).to_be_visible(timeout=10_000)
+              link.click()
+          '''), encoding="utf-8")
+
+          migrations = {
+              "Quality Control": ("qc", None),
+              "Annotation": ("annotation", "Analyze"),
+              "EDA / SCR Analysis": ("eda_scr", "Analyze"),
+              "PPG / HR / HRV Analysis": ("ppg_hr_hrv", "Analyze"),
+              "Pupil Analysis": ("pupil", "Analyze"),
+              "Gaze / Fixation / AOI Analysis": ("gaze", "Analyze"),
+              "Events & Alignment": ("event_alignment", "Integrate"),
+              "Multimodal Analysis": ("multimodal", "Integrate"),
+              "Statistics & Modelling": ("statistics_modelling", None),
+              "Reporting & Reproducibility": ("reporting", None),
+          }
+
+          changed = []
+          replacements = 0
+          for path in sorted(Path("studio/e2e").glob("test_*.py")):
+              original = path.read_text(encoding="utf-8")
+              text = original
+              for label, (value, group) in migrations.items():
+                  old = f'page.get_by_text("{label}", exact=True).click()'
+                  if group is None:
+                      new = f'open_nav(page, "{value}")'
+                  else:
+                      new = f'open_nav(page, "{value}", group="{group}")'
+                  count = text.count(old)
+                  if count:
+                      text = text.replace(old, new)
+                      replacements += count
+
+              if text != original:
+                  if "from studio.e2e.navigation import open_nav" not in text:
+                      matches = list(re.finditer(r"(?m)^from playwright\.sync_api import .+$", text))
+                      if len(matches) != 1:
+                          raise SystemExit(f"{path}: expected one playwright.sync_api import, found {len(matches)}")
+                      match = matches[0]
+                      text = (
+                          text[: match.end()]
+                          + "\nfrom studio.e2e.navigation import open_nav"
+                          + text[match.end() :]
+                      )
+                  path.write_text(text, encoding="utf-8")
+                  changed.append(str(path))
+
+          if replacements < 10:
+              raise SystemExit(f"Expected a broad navigation migration; only {replacements} replacements were made")
+
+          stale = []
+          for path in sorted(Path("studio/e2e").glob("test_*.py")):
+              text = path.read_text(encoding="utf-8")
+              for label in migrations:
+                  call = f'page.get_by_text("{label}", exact=True).click()'
+                  if call in text:
+                      stale.append(f"{path}: {label}")
+          if stale:
+              raise SystemExit("Stale display-label navigation remains:\n" + "\n".join(stale))
+
+          print(f"Migrated {replacements} navigation clicks across {len(changed)} E2E files")
+          for path in changed:
+              print(f"  - {path}")
+          PY
+
+      - name: Install E2E static validation dependencies
+        run: python -m pip install ruff pytest-playwright
+
+      - name: Validate migrated E2E sources
+        run: |
+          ruff check studio/e2e
+          python -m compileall -q studio/e2e
+          python - <<'PY'
+          from studio.e2e.navigation import open_nav
+          assert callable(open_nav)
+          PY
+
+      - name: Commit validated migration and remove helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/studio-e2e-nav-migration-helper.yml
+          git add studio/e2e .github/workflows/studio-e2e-nav-migration-helper.yml
+          git commit -m "test(studio): migrate E2E navigation to stable module IDs"
+          git push origin HEAD:studio/product-polish-0.1.6
