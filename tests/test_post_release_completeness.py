@@ -146,7 +146,7 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     assert 'affiliation: "University of Patras"' in cff
     assert "version: 0.1.5" in cff
     assert "date-released: 2026-09-08" in cff
-    assert 'doi: "10.5281/zenodo.22672823"' in cff
+    assert "doi: 10.5281/zenodo.22672823" in cff
     assert "doi: 10.5281/zenodo.22515782" not in cff
     assert "doi: 10.5281/zenodo.22313884" not in cff
     assert "doi: 10.5281/zenodo.22150873" not in cff
