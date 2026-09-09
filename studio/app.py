@@ -10,6 +10,7 @@ import gpbiometricspy as gp
 
 try:
     from studio.config import studio_runtime_config
+    from studio.product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table
     from studio.modules.annotation import annotation_server, annotation_ui
     from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
     from studio.modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -32,6 +33,7 @@ try:
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from config import studio_runtime_config
+    from product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table
     from modules.annotation import annotation_server, annotation_ui
     from modules.eda_scr import eda_scr_server, eda_scr_ui
     from modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -89,7 +91,20 @@ def _project_sidebar():
         ),
         ui.input_text("project_name_input", "Project name", value="Untitled project"),
         ui.input_action_button("apply_project_name", "Apply project name", class_="btn-outline-secondary w-100 mb-2"),
-        ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),
+        ui.div(class_="studio-sidebar-divider"),
+        ui.tags.span("GUIDED START", class_="studio-sidebar-kicker"),
+        ui.h5("Learn with a complete workflow", class_="mb-1"),
+        ui.input_select("guided_start", "Synthetic walkthrough", choices=guided_start_choices(), selected="multimodal"),
+        ui.tags.small(ui.output_text("guided_start_description"), class_="studio-sidebar-help"),
+        ui.input_task_button(
+            "start_guided",
+            "Start guided walkthrough",
+            label_busy="Preparing walkthrough...",
+            type="primary",
+            width="100%",
+        ),
+        ui.p("Guided starts load bundled synthetic data and run foundation QC automatically.", class_="small text-secondary mt-2 mb-2"),
+        ui.input_action_button("load_demo", "Load synthetic demo only", class_="btn-outline-primary w-100"),
     ]
     if RUNTIME_CONFIG.allow_external_uploads:
         intake_items.extend(
@@ -139,7 +154,8 @@ def _project_sidebar():
                 ui.output_text("session_summary"),
                 class_="studio-session-summary",
             ),
-            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-3"),
+            ui.input_action_button("open_reporting", "Save / reopen / report", class_="btn-outline-primary w-100 mt-3"),
+            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),
             ui.div(class_="studio-sidebar-divider"),
             ui.tags.div(
                 {"role": "status", "aria-live": "polite", "aria-atomic": "true", "class": "studio-status-line"},
@@ -186,11 +202,17 @@ def _home_panel():
             col_widths=(7, 5),
         ),
         ui.layout_column_wrap(
-            ui.value_box("Dataset", ui.output_text("dataset_name"), theme="primary"),
+            ui.value_box("Project", ui.output_text("project_name"), theme="primary"),
+            ui.value_box("Dataset", ui.output_text("dataset_name")),
             ui.value_box("Rows", ui.output_text("row_count")),
             ui.value_box("QC", ui.output_text("qc_state")),
             ui.value_box("Analyses", ui.output_text("analysis_count")),
-            width=1 / 4,
+            width=1 / 5,
+        ),
+        ui.card(
+            ui.card_header("Workflow progress"),
+            ui.output_data_frame("workflow_progress"),
+            class_="studio-progress-card",
         ),
         ui.layout_columns(
             ui.card(
@@ -268,16 +290,22 @@ def _page_header():
 
 app_ui = ui.page_navbar(
     ui.nav_panel("Home", _home_panel(), value="home"),
-    ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),
-    ui.nav_panel("Annotation", annotation_ui("annotation"), value="annotation"),
-    ui.nav_panel("EDA / SCR Analysis", eda_scr_ui("eda_scr"), value="eda_scr"),
-    ui.nav_panel("PPG / HR / HRV Analysis", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),
-    ui.nav_panel("Pupil Analysis", pupil_ui("pupil"), value="pupil"),
-    ui.nav_panel("Gaze / Fixation / AOI Analysis", gaze_ui("gaze"), value="gaze"),
-    ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),
-    ui.nav_panel("Multimodal Analysis", multimodal_ui("multimodal"), value="multimodal"),
-    ui.nav_panel("Statistics & Modelling", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),
-    ui.nav_panel("Reporting & Reproducibility", reporting_ui("reporting"), value="reporting"),
+    ui.nav_panel("Quality", qc_ui("qc"), value="qc"),
+    ui.nav_menu(
+        "Analyze",
+        ui.nav_panel("Annotations", annotation_ui("annotation"), value="annotation"),
+        ui.nav_panel("EDA / SCR", eda_scr_ui("eda_scr"), value="eda_scr"),
+        ui.nav_panel("PPG / HR / HRV", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),
+        ui.nav_panel("Pupil", pupil_ui("pupil"), value="pupil"),
+        ui.nav_panel("Gaze / Fixation / AOI", gaze_ui("gaze"), value="gaze"),
+    ),
+    ui.nav_menu(
+        "Integrate",
+        ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),
+        ui.nav_panel("Multimodal", multimodal_ui("multimodal"), value="multimodal"),
+    ),
+    ui.nav_panel("Model", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),
+    ui.nav_panel("Report", reporting_ui("reporting"), value="reporting"),
     title=_page_title(),
     id="main_nav",
     selected="home",
@@ -319,6 +347,32 @@ def server(input, output, session):
             status_text.set(_safe_error("Project name not updated", exc))
 
     @reactive.effect
+    @reactive.event(input.start_guided)
+    def _start_guided():
+        try:
+            preset = guided_start(input.guided_start())
+            data, source_name = load_demo_dataset()
+            validation = inspect_dataset(data)
+            guided_state = (
+                ProjectState()
+                .with_project_name(preset.project_name)
+                .with_dataset(data, source_name=source_name, validation=validation, operation="load_guided_demo")
+            )
+            if preset.run_foundation_qc:
+                guided_state = guided_state.with_qc(run_qc(data), operation="guided_foundation_qc")
+            guided_state = guided_state.with_operation(
+                "start_guided_walkthrough", preset=preset.key, target_nav=preset.target_nav
+            )
+            state.set(guided_state)
+            ui.update_text("project_name_input", value=guided_state.project_name, session=session)
+            ui.update_navs("main_nav", selected=preset.target_nav, session=session)
+            status_text.set(
+                f"{preset.label} ready. Foundation QC is complete; continue in the opened workflow and review QC evidence as needed."
+            )
+        except Exception as exc:
+            status_text.set(_safe_error("Guided walkthrough failed", exc))
+
+    @reactive.effect
     @reactive.event(input.load_demo)
     def _load_demo():
         try:
@@ -353,9 +407,17 @@ def server(input, output, session):
             status_text.set(_safe_error("Foundation QC failed", exc))
 
     @reactive.effect
+    @reactive.event(input.open_reporting)
+    def _open_reporting():
+        ui.update_navs("main_nav", selected="reporting", session=session)
+        status_text.set("Reporting opened. Save or restore a project recipe, build report artifacts, or export a bundle.")
+
+    @reactive.effect
     @reactive.event(input.reset)
     def _reset():
         state.set(ProjectState())
+        ui.update_text("project_name_input", value="Untitled project", session=session)
+        ui.update_navs("main_nav", selected="home", session=session)
         status_text.set(
             "Session reset. Load the bundled synthetic demo to continue."
             if RUNTIME_CONFIG.is_public_demo
@@ -376,6 +438,10 @@ def server(input, output, session):
     @render.text
     def status():
         return status_text()
+
+    @render.text
+    def guided_start_description():
+        return guided_start(input.guided_start()).summary
 
     @render.text
     def session_summary():
@@ -406,7 +472,11 @@ def server(input, output, session):
         quality = "QC ✓" if current.qc is not None else "QC pending"
         analyses = f"{len(current.analyses)} analyses"
         annotations = f"{len(current.annotations)} annotations"
-        return f"Dataset ✓ · {quality} · {analyses} · {annotations}"
+        return f"{readiness_percent(current)}% first-session path · Dataset ✓ · {quality} · {analyses} · {annotations}"
+
+    @render.text
+    def project_name():
+        return state().project_name
 
     @render.text
     def dataset_name():
@@ -435,6 +505,10 @@ def server(input, output, session):
             return "0"
         biological = table[table["signal"].isin(["gsr_eda", "heart_rate", "engagement_dial"])]
         return str(int(biological["active"].fillna(False).astype(bool).sum()))
+
+    @render.data_frame
+    def workflow_progress():
+        return render.DataGrid(workflow_progress_table(state()), height="255px")
 
     @render.data_frame
     def preview():

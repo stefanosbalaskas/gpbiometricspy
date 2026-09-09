@@ -67,6 +67,7 @@ nav:
   - Product & start:
       - gpbiometricspy Studio: studio.md
       - Studio 0.1.6 roadmap: studio-product-roadmap.md
+      - Deployment & support: studio-deployment.md
       - Getting started with Python: getting-started.md
       - Workflow map: workflows.md
       - Synthetic demo: demo.md

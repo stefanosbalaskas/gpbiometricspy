@@ -75,6 +75,7 @@ dev = [
 gpbiometricspy-studio = "studio.cli:main"
 gpbiometricspy-studio-public = "studio.cli:main_public"
 gpbiometricspy-studio-desktop = "studio.desktop:main"
+gpbiometricspy-studio-doctor = "studio.doctor:main"
 
 [project.urls]
 Homepage = "https://stefanosbalaskas.github.io/gpbiometricspy/"

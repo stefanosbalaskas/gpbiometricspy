@@ -6,6 +6,11 @@ import pandas as pd
 from shiny import module, reactive, render, ui
 
 try:
+    from studio.product_services import project_export_stem
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from product_services import project_export_stem
+
+try:
     from studio.reporting_services import (
         analysis_inventory as analysis_inventory_table,
         annotations_frame,
@@ -180,6 +185,7 @@ def reporting_ui():
                             "Download session metadata and analysis parameters without raw biometric samples. Analysis outputs are deliberately recomputed rather than restored from a cache."
                         ),
                         ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),
+                        ui.tags.small(ui.output_text("project_file_name"), class_="text-secondary d-block mt-2"),
                     ),
                     ui.card(
                         ui.card_header("Restore project recipe"),
@@ -316,7 +322,9 @@ def reporting_server(input, output, session, state, global_status):
             recipe_status_value.set(
                 "Project metadata restored. Analysis outputs were intentionally not restored; rerun analyses or use the replay script."
             )
-            global_status.set("Project recipe restored after exact dataset fingerprint verification.")
+            global_status.set(
+                f"Project {restored.project_name!r} restored after exact dataset fingerprint verification."
+            )
         except Exception as exc:
             recipe_status_value.set(f"Project restore blocked: {exc}")
 
@@ -347,6 +355,10 @@ def reporting_server(input, output, session, state, global_status):
     def recipe_status():
         return recipe_status_value()
 
+    @render.text
+    def project_file_name():
+        return f"Suggested file: {project_export_stem(state().project_name)}-project-recipe.json"
+
     @render.data_frame
     def package_report_overview():
         artifacts = artifacts_value()
@@ -361,6 +373,7 @@ def reporting_server(input, output, session, state, global_status):
         if current.data is None:
             return "No dataset loaded."
         return (
+            f"Project: {current.project_name}\n"
             f"Dataset: {current.source_name}\n"
             f"SHA-256: {dataset_fingerprint(current.data)}\n"
             f"Rows: {current.n_rows:,}\n"

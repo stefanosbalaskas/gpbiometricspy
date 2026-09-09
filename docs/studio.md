@@ -233,3 +233,19 @@ Studio has independent validation layers on Python 3.11 and 3.14:
 The scientific package continues to run its separate platform/Python matrix, deep R↔Python parity, optional-backend interoperability, private real-data validation and CodeQL layers.
 
 Automated accessibility checks are regression guards, not a claim of formal WCAG certification.
+
+## Guided walkthroughs and project continuity
+
+    Studio now offers guided synthetic starts for multimodal, eye-tracking and EDA/cardiovascular workflows. A guided start loads the bundled synthetic dataset, runs foundation QC, records the action in provenance and opens the relevant analysis family. It is a teaching/onboarding shortcut, not a different scientific engine.
+
+    The top navigation is grouped into **Home → Quality → Analyze → Integrate → Model → Report** while the established module identifiers remain unchanged underneath.
+
+    Project names persist in privacy-preserving project recipes. Use **Save / reopen / report** in the sidebar to move directly to the project recipe and reporting tools.
+
+    For installation or startup problems, run:
+
+    ```bash
+    gpbiometricspy-studio-doctor
+    ```
+
+    See [Studio deployment and support](studio-deployment.md) for local, desktop-style, public-demo and authenticated/private deployment boundaries.
