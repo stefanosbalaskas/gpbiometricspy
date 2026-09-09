@@ -177,6 +177,8 @@ Stable `gpbiometricspy 0.1.5` was released on **2026-09-08** from immutable tag 
 - **0.1.5 version DOI:** [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
 - **Previous 0.1.4 DOI:** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
+- **Earlier 0.1.3 DOI:** [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)
+- **Earlier 0.1.2 DOI:** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
 - **Frozen R semantic-reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **gpbiometrics article:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
