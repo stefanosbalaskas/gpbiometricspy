@@ -93,6 +93,7 @@ def test_project_recipe_excludes_raw_rows_and_analysis_outputs():
     recipe = project_recipe(state)
     text = project_recipe_json(state)
     assert recipe["schema"] == PROJECT_RECIPE_SCHEMA
+    assert recipe["project"]["name"] == state.project_name
     assert recipe["dataset"]["sha256"] == dataset_fingerprint(state.data)
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
@@ -105,7 +106,7 @@ def test_project_recipe_excludes_raw_rows_and_analysis_outputs():
 
 
 def test_project_recipe_restore_requires_exact_dataset_fingerprint():
-    original = _state()
+    original = _state().with_project_name("Synthetic reporting study")
     recipe = project_recipe(original)
     data = original.data.copy()
     fresh = ProjectState().with_dataset(
@@ -117,6 +118,7 @@ def test_project_recipe_restore_requires_exact_dataset_fingerprint():
     checks = recipe_validation_table(recipe, fresh.data)
     assert checks["passed"].all()
     restored = restore_project_recipe(fresh, recipe)
+    assert restored.project_name == "Synthetic reporting study"
     assert len(restored.annotations) == 1
     assert restored.analyses == {}
     assert restored.provenance[-1]["operation"] == "restore_project_recipe"
@@ -211,6 +213,11 @@ def test_report_bundle_zip_is_metadata_and_reporting_only():
 def test_state_operation_and_restored_metadata_guards():
     state = _state()
     before = len(state.provenance)
+    named = state.with_project_name("Pilot project")
+    assert named.project_name == "Pilot project"
+    assert named.provenance[-1]["operation"] == "set_project_name"
+    with pytest.raises(ValueError, match="non-empty"):
+        state.with_project_name("   ")
     updated = state.with_operation("report_checkpoint", purpose="test")
     assert len(updated.provenance) == before + 1
     assert updated.provenance[-1]["purpose"] == "test"

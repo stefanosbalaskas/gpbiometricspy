@@ -87,6 +87,8 @@ def _project_sidebar():
             ui.h5("Start with your data", class_="mb-1"),
             ui.p("Load the synthetic demo first, or import a local Gazepoint export.", class_="small text-secondary mb-3"),
         ),
+        ui.input_text("project_name_input", "Project name", value="Untitled project"),
+        ui.input_action_button("apply_project_name", "Apply project name", class_="btn-outline-secondary w-100 mb-2"),
         ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),
     ]
     if RUNTIME_CONFIG.allow_external_uploads:
@@ -308,6 +310,15 @@ def server(input, output, session):
         )
 
     @reactive.effect
+    @reactive.event(input.apply_project_name)
+    def _apply_project_name():
+        try:
+            state.set(state().with_project_name(input.project_name_input()))
+            status_text.set(f"Project name set to {state().project_name!r}.")
+        except Exception as exc:
+            status_text.set(_safe_error("Project name not updated", exc))
+
+    @reactive.effect
     @reactive.event(input.load_demo)
     def _load_demo():
         try:
@@ -372,7 +383,7 @@ def server(input, output, session):
         if not current.loaded:
             return "No project data loaded"
         qc_label = "QC complete" if current.qc is not None else "QC pending"
-        return f"{qc_label} · {len(current.analyses)} analyses · {len(current.annotations)} annotations"
+        return f"{current.project_name} · {qc_label} · {len(current.analyses)} analyses · {len(current.annotations)} annotations"
 
     @render.text
     def next_step():
