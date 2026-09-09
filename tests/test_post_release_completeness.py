@@ -120,6 +120,8 @@ def test_reference_docs_generator_preserves_curated_articles():
 
 
 def test_archival_metadata_is_zenodo_ready_and_unambiguous():
+    import tomllib
+
     zenodo = json.loads((ROOT / ".zenodo.json").read_text(encoding="utf-8"))
     assert zenodo["version"] == "0.1.6.dev0"
     assert zenodo["upload_type"] == "software"
@@ -144,16 +146,26 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     assert 'affiliation: "University of Patras"' in cff
     assert "version: 0.1.5" in cff
     assert "date-released: 2026-09-08" in cff
+    assert 'doi: "10.5281/zenodo.22672823"' in cff
     assert "doi: 10.5281/zenodo.22515782" not in cff
     assert "doi: 10.5281/zenodo.22313884" not in cff
     assert "doi: 10.5281/zenodo.22150873" not in cff
     assert "10.5281/zenodo.21434608" not in cff  # R DOI is provenance, not Python identifier.
 
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    urls = project["project"]["urls"]
+    assert urls["DOI"] == "https://doi.org/10.5281/zenodo.22150872"
+    assert urls["VersionDOI"] == "https://doi.org/10.5281/zenodo.22672823"
+    assert urls["PreviousVersionDOI"] == "https://doi.org/10.5281/zenodo.22515782"
+    assert urls["RReferenceDOI"] == "https://doi.org/10.5281/zenodo.21434608"
+
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "10.5281/zenodo.22672823" in readme
     assert "10.5281/zenodo.22515782" in readme
     assert "10.5281/zenodo.22150872" in readme and "10.5281/zenodo.22313884" in readme and "10.5281/zenodo.22150873" in readme
     assert "10.5281/zenodo.21434608" in readme
-    assert (ROOT / "docs/citation.md").exists()
+    citation = (ROOT / "docs/citation.md").read_text(encoding="utf-8")
+    assert "10.5281/zenodo.22672823" in citation
     assert "Citation & archival: citation.md" in (ROOT / "mkdocs.yml").read_text(encoding="utf-8")
 
 
