@@ -1,0 +1,772 @@
+name: studio-product-tranche-helper
+
+on:
+  push:
+    branches:
+      - studio/product-polish-0.1.6
+    paths:
+      - .github/workflows/studio-product-tranche-helper.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: studio/product-polish-0.1.6
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apply product workflow tranche
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from textwrap import dedent
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected exactly one match, found {count}\nTARGET:\n{old}")
+              p.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          def append_once(path, marker, addition):
+              p = Path(path)
+              text = p.read_text(encoding="utf-8")
+              if marker in text:
+                  return
+              p.write_text(text.rstrip() + "\n\n" + addition.strip() + "\n", encoding="utf-8")
+
+          Path("studio/product_services.py").write_text(dedent(r'''
+          from __future__ import annotations
+
+          from dataclasses import dataclass
+          from pathlib import Path
+          import platform
+          import re
+          import unicodedata
+          from typing import Any
+
+          import pandas as pd
+
+          try:
+              from studio.state import ProjectState
+          except ModuleNotFoundError:  # Direct execution from inside studio/.
+              from state import ProjectState
+
+
+          @dataclass(frozen=True)
+          class GuidedStart:
+              key: str
+              label: str
+              project_name: str
+              summary: str
+              target_nav: str
+              run_foundation_qc: bool = True
+
+
+          _GUIDED_STARTS = (
+              GuidedStart(
+                  key="multimodal",
+                  label="Multimodal research walkthrough",
+                  project_name="Synthetic multimodal walkthrough",
+                  summary="Load the bundled multimodal demo, run foundation QC, then continue through alignment and multimodal analysis.",
+                  target_nav="multimodal",
+              ),
+              GuidedStart(
+                  key="eye_tracking",
+                  label="Eye-tracking walkthrough",
+                  project_name="Synthetic eye-tracking walkthrough",
+                  summary="Load the bundled demo, run foundation QC, then begin with pupil and gaze/AOI workflows.",
+                  target_nav="pupil",
+              ),
+              GuidedStart(
+                  key="physiology",
+                  label="EDA and cardiovascular walkthrough",
+                  project_name="Synthetic physiology walkthrough",
+                  summary="Load the bundled demo, run foundation QC, then begin with EDA/SCR before PPG/HR/HRV.",
+                  target_nav="eda_scr",
+              ),
+          )
+
+
+          def guided_start_choices() -> dict[str, str]:
+              """Return stable value-to-label choices for the Studio guided-start control."""
+              return {preset.key: preset.label for preset in _GUIDED_STARTS}
+
+
+          def guided_start(value: Any) -> GuidedStart:
+              """Resolve one guided-start preset and reject unknown values explicitly."""
+              key = str(value or "").strip()
+              for preset in _GUIDED_STARTS:
+                  if preset.key == key:
+                      return preset
+              allowed = ", ".join(preset.key for preset in _GUIDED_STARTS)
+              raise ValueError(f"Unknown guided-start preset {key!r}. Allowed values: {allowed}.")
+
+
+          def _analysis_names(state: ProjectState) -> set[str]:
+              return {str(name).strip().lower() for name in state.analyses if str(name).strip()}
+
+
+          def _operation_names(state: ProjectState) -> set[str]:
+              return {
+                  str(event.get("operation") or "").strip().lower()
+                  for event in state.provenance
+                  if isinstance(event, dict)
+              }
+
+
+          def workflow_progress(state: ProjectState) -> pd.DataFrame:
+              """Summarize the six-stage Studio journey without changing scientific state."""
+              names = _analysis_names(state)
+              operations = _operation_names(state)
+              alignment_done = any("align" in name or "multimodal" in name for name in names)
+              modelling_done = any("model" in name or "statistic" in name for name in names)
+              core_analysis_done = bool(
+                  names
+                  - {name for name in names if "align" in name or "multimodal" in name or "model" in name or "statistic" in name}
+              )
+              report_done = "build_reporting_artifacts" in operations
+
+              def blocked_or_ready(ready: bool, *, optional: bool = False) -> str:
+                  if optional:
+                      return "Optional"
+                  return "Ready" if ready else "Blocked"
+
+              rows = [
+                  {
+                      "stage": "Project",
+                      "status": "Complete" if state.loaded else "Start here",
+                      "next_action": "Inspect the loaded dataset" if state.loaded else "Load data or start a guided demo",
+                      "destination": "Home",
+                  },
+                  {
+                      "stage": "Quality",
+                      "status": "Complete" if state.qc is not None else blocked_or_ready(state.loaded),
+                      "next_action": "Review QC evidence" if state.qc is not None else "Run foundation QC",
+                      "destination": "Quality",
+                  },
+                  {
+                      "stage": "Analyze",
+                      "status": "Complete" if core_analysis_done else blocked_or_ready(state.qc is not None),
+                      "next_action": "Review stored analyses" if core_analysis_done else "Choose a signal workflow",
+                      "destination": "Analyze",
+                  },
+                  {
+                      "stage": "Align",
+                      "status": "Complete" if alignment_done else blocked_or_ready(state.qc is not None, optional=True),
+                      "next_action": "Review alignment outputs" if alignment_done else "Use when events or streams require alignment",
+                      "destination": "Integrate",
+                  },
+                  {
+                      "stage": "Model",
+                      "status": "Complete" if modelling_done else blocked_or_ready(core_analysis_done, optional=True),
+                      "next_action": "Review model outputs" if modelling_done else "Use when inferential modelling is required",
+                      "destination": "Model",
+                  },
+                  {
+                      "stage": "Report",
+                      "status": "Complete" if report_done else blocked_or_ready(state.loaded and state.qc is not None),
+                      "next_action": "Export or replay" if report_done else "Build reporting artifacts and save a project recipe",
+                      "destination": "Report",
+                  },
+              ]
+              return pd.DataFrame(rows, columns=["stage", "status", "next_action", "destination"])
+
+
+          def readiness_percent(state: ProjectState) -> int:
+              """Return a simple first-session completion score for the required product journey."""
+              names = _analysis_names(state)
+              operations = _operation_names(state)
+              core_analysis_done = bool(
+                  names
+                  - {name for name in names if "align" in name or "multimodal" in name or "model" in name or "statistic" in name}
+              )
+              milestones = (
+                  state.loaded,
+                  state.qc is not None,
+                  core_analysis_done,
+                  "build_reporting_artifacts" in operations,
+              )
+              return int(round(100 * sum(bool(value) for value in milestones) / len(milestones)))
+
+
+          _WINDOWS_RESERVED = {
+              "CON", "PRN", "AUX", "NUL",
+              *(f"COM{i}" for i in range(1, 10)),
+              *(f"LPT{i}" for i in range(1, 10)),
+          }
+
+
+          def project_export_stem(name: Any) -> str:
+              """Return a cross-platform, Unicode-preserving project stem for exported artifacts."""
+              text = unicodedata.normalize("NFKC", str(name or "")).strip()
+              text = re.sub(r"[^\w.-]+", "-", text, flags=re.UNICODE)
+              text = re.sub(r"-{2,}", "-", text).strip(" ._-")
+              if not text:
+                  text = "gpbiometricspy-studio-project"
+              if text.upper() in _WINDOWS_RESERVED:
+                  text = f"project-{text}"
+              return text[:72].rstrip(" .") or "gpbiometricspy-studio-project"
+
+
+          def support_snapshot(
+              state: ProjectState,
+              *,
+              runtime_mode: str,
+              package_version: str,
+          ) -> dict[str, Any]:
+              """Return privacy-safe support metadata without raw samples or the source filename."""
+              source_suffix = Path(state.source_name).suffix.lower() if state.loaded else ""
+              return {
+                  "product": "gpbiometricspy Studio",
+                  "package_version": str(package_version),
+                  "python_version": platform.python_version(),
+                  "runtime_mode": str(runtime_mode),
+                  "project_name": state.project_name,
+                  "dataset_loaded": state.loaded,
+                  "source_type": source_suffix or None,
+                  "row_count": state.n_rows,
+                  "column_count": state.n_columns,
+                  "foundation_qc_complete": state.qc is not None,
+                  "analysis_names": sorted(map(str, state.analyses)),
+                  "annotation_count": len(state.annotations),
+                  "provenance_events": len(state.provenance),
+                  "raw_data_included": False,
+                  "source_filename_included": False,
+              }
+          '''), encoding="utf-8")
+
+          Path("studio/doctor.py").write_text(dedent(r'''
+          from __future__ import annotations
+
+          import argparse
+          from dataclasses import asdict, dataclass
+          import importlib.util
+          import json
+          from pathlib import Path
+          import platform
+          import socket
+          from typing import Any
+
+          import gpbiometricspy as gp
+
+          try:
+              from studio.config import studio_runtime_config
+          except ModuleNotFoundError:  # Direct execution from inside studio/.
+              from config import studio_runtime_config
+
+
+          @dataclass(frozen=True)
+          class DoctorCheck:
+              name: str
+              passed: bool
+              detail: str
+              required: bool = True
+
+
+          def _localhost_bind_check() -> DoctorCheck:
+              try:
+                  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+                      probe.bind(("127.0.0.1", 0))
+                      port = int(probe.getsockname()[1])
+                  return DoctorCheck("localhost_bind", True, f"loopback bind available on test port {port}")
+              except OSError as exc:
+                  return DoctorCheck("localhost_bind", False, f"loopback bind failed: {exc}")
+
+
+          def run_doctor() -> tuple[DoctorCheck, ...]:
+              """Run local, privacy-safe preflight checks for Studio startup and support."""
+              studio_dir = Path(__file__).resolve().parent
+              runtime = studio_runtime_config()
+              shiny_available = importlib.util.find_spec("shiny") is not None
+              return (
+                  DoctorCheck(
+                      "shiny_dependency",
+                      shiny_available,
+                      "Shiny for Python is importable" if shiny_available else 'install with: python -m pip install "gpbiometricspy[studio]"',
+                  ),
+                  DoctorCheck("studio_app", (studio_dir / "app.py").is_file(), str(studio_dir / "app.py")),
+                  DoctorCheck("studio_css", (studio_dir / "www" / "studio.css").is_file(), str(studio_dir / "www" / "studio.css")),
+                  DoctorCheck("runtime_mode", True, runtime.mode),
+                  _localhost_bind_check(),
+              )
+
+
+          def doctor_payload() -> dict[str, Any]:
+              checks = run_doctor()
+              return {
+                  "product": "gpbiometricspy Studio",
+                  "package_version": gp.__version__,
+                  "python_version": platform.python_version(),
+                  "platform": platform.platform(),
+                  "ok": all(check.passed for check in checks if check.required),
+                  "checks": [asdict(check) for check in checks],
+              }
+
+
+          def format_doctor(payload: dict[str, Any] | None = None) -> str:
+              data = doctor_payload() if payload is None else payload
+              lines = [
+                  f"gpbiometricspy Studio doctor — package {data['package_version']}",
+                  f"Python {data['python_version']} · {data['platform']}",
+              ]
+              for check in data["checks"]:
+                  marker = "PASS" if check["passed"] else "FAIL"
+                  lines.append(f"[{marker}] {check['name']}: {check['detail']}")
+              lines.append("Overall: READY" if data["ok"] else "Overall: ACTION REQUIRED")
+              return "\n".join(lines)
+
+
+          def _parser() -> argparse.ArgumentParser:
+              parser = argparse.ArgumentParser(
+                  prog="gpbiometricspy-studio-doctor",
+                  description="Run privacy-safe gpbiometricspy Studio installation and launch diagnostics.",
+              )
+              parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON diagnostics.")
+              return parser
+
+
+          def main(argv: list[str] | None = None) -> int:
+              args = _parser().parse_args(argv)
+              payload = doctor_payload()
+              print(json.dumps(payload, indent=2, sort_keys=True) if args.json else format_doctor(payload))
+              return 0 if payload["ok"] else 1
+
+
+          if __name__ == "__main__":
+              raise SystemExit(main())
+          '''), encoding="utf-8")
+
+          Path("studio/tests/test_product_services.py").write_text(dedent(r'''
+          from __future__ import annotations
+
+          import pandas as pd
+          import pytest
+
+          from studio.product_services import (
+              guided_start,
+              guided_start_choices,
+              project_export_stem,
+              readiness_percent,
+              support_snapshot,
+              workflow_progress,
+          )
+          from studio.state import ProjectState
+
+
+          def _loaded_state() -> ProjectState:
+              data = pd.DataFrame({"TIME": [0.0, 0.1, 0.2], "BPOGV": [0.5, 0.6, 0.7]})
+              return (
+                  ProjectState()
+                  .with_project_name("Pilot study")
+                  .with_dataset(data, source_name="participant_001.csv", validation={"valid": True}, operation="test_load")
+              )
+
+
+          def test_guided_start_catalog_is_stable_and_unknown_values_fail_closed():
+              choices = guided_start_choices()
+              assert set(choices) == {"multimodal", "eye_tracking", "physiology"}
+              assert guided_start("eye_tracking").target_nav == "pupil"
+              with pytest.raises(ValueError, match="Unknown guided-start preset"):
+                  guided_start("mystery")
+
+
+          def test_workflow_progress_and_readiness_follow_required_first_session_path():
+              state = _loaded_state()
+              progress = workflow_progress(state)
+              assert progress.loc[progress["stage"] == "Project", "status"].iloc[0] == "Complete"
+              assert progress.loc[progress["stage"] == "Quality", "status"].iloc[0] == "Ready"
+              assert readiness_percent(state) == 25
+
+              state = state.with_qc({"validation": {"valid": True}})
+              state = state.with_analysis("eda_scr", {"status": "ok"})
+              state = state.with_operation("build_reporting_artifacts", raw_data_embedded=False)
+              assert readiness_percent(state) == 100
+              complete = workflow_progress(state)
+              assert complete.loc[complete["stage"] == "Analyze", "status"].iloc[0] == "Complete"
+              assert complete.loc[complete["stage"] == "Report", "status"].iloc[0] == "Complete"
+
+
+          def test_project_export_stem_preserves_unicode_and_avoids_reserved_windows_names():
+              assert project_export_stem("Μελέτη pupil / pilot") == "Μελέτη-pupil-pilot"
+              assert project_export_stem("CON") == "project-CON"
+              assert project_export_stem("   ") == "gpbiometricspy-studio-project"
+
+
+          def test_support_snapshot_excludes_source_filename_and_raw_samples():
+              state = _loaded_state().with_qc({"validation": {"valid": True}})
+              snapshot = support_snapshot(state, runtime_mode="local", package_version="0.1.6.dev0")
+              assert snapshot["project_name"] == "Pilot study"
+              assert snapshot["source_type"] == ".csv"
+              assert snapshot["raw_data_included"] is False
+              assert snapshot["source_filename_included"] is False
+              assert "participant_001" not in repr(snapshot)
+          '''), encoding="utf-8")
+
+          Path("studio/tests/test_doctor.py").write_text(dedent(r'''
+          from __future__ import annotations
+
+          import json
+
+          from studio.doctor import doctor_payload, format_doctor, main, run_doctor
+
+
+          def test_doctor_reports_required_local_product_surfaces():
+              checks = {check.name: check for check in run_doctor()}
+              assert checks["shiny_dependency"].passed is True
+              assert checks["studio_app"].passed is True
+              assert checks["studio_css"].passed is True
+              assert checks["localhost_bind"].passed is True
+
+
+          def test_doctor_payload_and_text_are_privacy_safe_and_actionable():
+              payload = doctor_payload()
+              assert payload["product"] == "gpbiometricspy Studio"
+              assert isinstance(payload["checks"], list)
+              text = format_doctor(payload)
+              assert "Studio doctor" in text
+              assert "Overall: READY" in text
+
+
+          def test_doctor_json_cli(capsys):
+              assert main(["--json"]) == 0
+              parsed = json.loads(capsys.readouterr().out)
+              assert parsed["ok"] is True
+          '''), encoding="utf-8")
+
+          replace_once(
+              "studio/app.py",
+              "    from studio.config import studio_runtime_config\n",
+              "    from studio.config import studio_runtime_config\n    from studio.product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress\n",
+          )
+          replace_once(
+              "studio/app.py",
+              "    from config import studio_runtime_config\n",
+              "    from config import studio_runtime_config\n    from product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress\n",
+          )
+          replace_once(
+              "studio/app.py",
+              '        ui.input_text("project_name_input", "Project name", value="Untitled project"),\n        ui.input_action_button("apply_project_name", "Apply project name", class_="btn-outline-secondary w-100 mb-2"),\n        ui.input_action_button("load_demo", "Load synthetic demo", class_="btn-primary w-100"),',
+              '        ui.input_text("project_name_input", "Project name", value="Untitled project"),\n        ui.input_action_button("apply_project_name", "Apply project name", class_="btn-outline-secondary w-100 mb-2"),\n        ui.div(class_="studio-sidebar-divider"),\n        ui.tags.span("GUIDED START", class_="studio-sidebar-kicker"),\n        ui.h5("Learn with a complete workflow", class_="mb-1"),\n        ui.input_select("guided_start", "Synthetic walkthrough", choices=guided_start_choices(), selected="multimodal"),\n        ui.tags.small(ui.output_text("guided_start_description"), class_="studio-sidebar-help"),\n        ui.input_task_button(\n            "start_guided",\n            "Start guided walkthrough",\n            label_busy="Preparing walkthrough...",\n            type="primary",\n            width="100%",\n        ),\n        ui.p("Guided starts load bundled synthetic data and run foundation QC automatically.", class_="small text-secondary mt-2 mb-2"),\n        ui.input_action_button("load_demo", "Load synthetic demo only", class_="btn-outline-primary w-100"),',
+          )
+          replace_once(
+              "studio/app.py",
+              '                ui.tags.span("SESSION", class_="studio-sidebar-kicker"),\n                ui.output_text("session_summary"),\n                class_="studio-session-summary",\n            ),\n            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-3"),',
+              '                ui.tags.span("SESSION", class_="studio-sidebar-kicker"),\n                ui.output_text("session_summary"),\n                class_="studio-session-summary",\n            ),\n            ui.input_action_button("open_reporting", "Save / reopen / report", class_="btn-outline-primary w-100 mt-3"),\n            ui.input_action_button("reset", "Reset session", class_="btn-outline-secondary w-100 mt-2"),',
+          )
+          replace_once(
+              "studio/app.py",
+              '        ui.layout_column_wrap(\n            ui.value_box("Dataset", ui.output_text("dataset_name"), theme="primary"),\n            ui.value_box("Rows", ui.output_text("row_count")),\n            ui.value_box("QC", ui.output_text("qc_state")),\n            ui.value_box("Analyses", ui.output_text("analysis_count")),\n            width=1 / 4,\n        ),',
+              '        ui.layout_column_wrap(\n            ui.value_box("Project", ui.output_text("project_name"), theme="primary"),\n            ui.value_box("Dataset", ui.output_text("dataset_name")),\n            ui.value_box("Rows", ui.output_text("row_count")),\n            ui.value_box("QC", ui.output_text("qc_state")),\n            ui.value_box("Analyses", ui.output_text("analysis_count")),\n            width=1 / 5,\n        ),\n        ui.card(\n            ui.card_header("Workflow progress"),\n            ui.output_data_frame("workflow_progress"),\n            class_="studio-progress-card",\n        ),',
+          )
+          replace_once(
+              "studio/app.py",
+              'app_ui = ui.page_navbar(\n    ui.nav_panel("Home", _home_panel(), value="home"),\n    ui.nav_panel("Quality Control", qc_ui("qc"), value="qc"),\n    ui.nav_panel("Annotation", annotation_ui("annotation"), value="annotation"),\n    ui.nav_panel("EDA / SCR Analysis", eda_scr_ui("eda_scr"), value="eda_scr"),\n    ui.nav_panel("PPG / HR / HRV Analysis", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),\n    ui.nav_panel("Pupil Analysis", pupil_ui("pupil"), value="pupil"),\n    ui.nav_panel("Gaze / Fixation / AOI Analysis", gaze_ui("gaze"), value="gaze"),\n    ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),\n    ui.nav_panel("Multimodal Analysis", multimodal_ui("multimodal"), value="multimodal"),\n    ui.nav_panel("Statistics & Modelling", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),\n    ui.nav_panel("Reporting & Reproducibility", reporting_ui("reporting"), value="reporting"),',
+              'app_ui = ui.page_navbar(\n    ui.nav_panel("Home", _home_panel(), value="home"),\n    ui.nav_panel("Quality", qc_ui("qc"), value="qc"),\n    ui.nav_menu(\n        "Analyze",\n        ui.nav_panel("Annotations", annotation_ui("annotation"), value="annotation"),\n        ui.nav_panel("EDA / SCR", eda_scr_ui("eda_scr"), value="eda_scr"),\n        ui.nav_panel("PPG / HR / HRV", ppg_hr_hrv_ui("ppg_hr_hrv"), value="ppg_hr_hrv"),\n        ui.nav_panel("Pupil", pupil_ui("pupil"), value="pupil"),\n        ui.nav_panel("Gaze / Fixation / AOI", gaze_ui("gaze"), value="gaze"),\n    ),\n    ui.nav_menu(\n        "Integrate",\n        ui.nav_panel("Events & Alignment", event_alignment_ui("event_alignment"), value="event_alignment"),\n        ui.nav_panel("Multimodal", multimodal_ui("multimodal"), value="multimodal"),\n    ),\n    ui.nav_panel("Model", statistics_modelling_ui("statistics_modelling"), value="statistics_modelling"),\n    ui.nav_panel("Report", reporting_ui("reporting"), value="reporting"),',
+          )
+          replace_once(
+              "studio/app.py",
+              '    @reactive.effect\n    @reactive.event(input.load_demo)\n    def _load_demo():',
+              '    @reactive.effect\n    @reactive.event(input.start_guided)\n    def _start_guided():\n        try:\n            preset = guided_start(input.guided_start())\n            data, source_name = load_demo_dataset()\n            validation = inspect_dataset(data)\n            guided_state = (\n                ProjectState()\n                .with_project_name(preset.project_name)\n                .with_dataset(data, source_name=source_name, validation=validation, operation="load_guided_demo")\n            )\n            if preset.run_foundation_qc:\n                guided_state = guided_state.with_qc(run_qc(data), operation="guided_foundation_qc")\n            guided_state = guided_state.with_operation(\n                "start_guided_walkthrough", preset=preset.key, target_nav=preset.target_nav\n            )\n            state.set(guided_state)\n            ui.update_text("project_name_input", value=guided_state.project_name, session=session)\n            ui.update_navs("main_nav", selected=preset.target_nav, session=session)\n            status_text.set(\n                f"{preset.label} ready. Foundation QC is complete; continue in the opened workflow and review QC evidence as needed."\n            )\n        except Exception as exc:\n            status_text.set(_safe_error("Guided walkthrough failed", exc))\n\n    @reactive.effect\n    @reactive.event(input.load_demo)\n    def _load_demo():',
+          )
+          replace_once(
+              "studio/app.py",
+              '    @reactive.effect\n    @reactive.event(input.reset)\n    def _reset():\n        state.set(ProjectState())',
+              '    @reactive.effect\n    @reactive.event(input.open_reporting)\n    def _open_reporting():\n        ui.update_navs("main_nav", selected="reporting", session=session)\n        status_text.set("Reporting opened. Save or restore a project recipe, build report artifacts, or export a bundle.")\n\n    @reactive.effect\n    @reactive.event(input.reset)\n    def _reset():\n        state.set(ProjectState())\n        ui.update_text("project_name_input", value="Untitled project", session=session)\n        ui.update_navs("main_nav", selected="home", session=session)',
+          )
+          replace_once(
+              "studio/app.py",
+              '    @render.text\n    def status():\n        return status_text()\n',
+              '    @render.text\n    def status():\n        return status_text()\n\n    @render.text\n    def guided_start_description():\n        return guided_start(input.guided_start()).summary\n',
+          )
+          replace_once(
+              "studio/app.py",
+              '        return f"Dataset ✓ · {quality} · {analyses} · {annotations}"',
+              '        return f"{readiness_percent(current)}% first-session path · Dataset ✓ · {quality} · {analyses} · {annotations}"',
+          )
+          replace_once(
+              "studio/app.py",
+              '    @render.text\n    def dataset_name():\n        return state().source_name\n',
+              '    @render.text\n    def project_name():\n        return state().project_name\n\n    @render.text\n    def dataset_name():\n        return state().source_name\n',
+          )
+          replace_once(
+              "studio/app.py",
+              '    @render.data_frame\n    def preview():',
+              '    @render.data_frame\n    def workflow_progress():\n        return render.DataGrid(workflow_progress_table := workflow_progress(state()), height="255px")\n\n    @render.data_frame\n    def preview():',
+          )
+          # Avoid name shadowing between the imported helper and Shiny output function.
+          replace_once(
+              "studio/app.py",
+              '    from studio.product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress\n',
+              '    from studio.product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table\n',
+          )
+          replace_once(
+              "studio/app.py",
+              '    from product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress\n',
+              '    from product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table\n',
+          )
+          replace_once(
+              "studio/app.py",
+              '        return render.DataGrid(workflow_progress_table := workflow_progress(state()), height="255px")',
+              '        return render.DataGrid(workflow_progress_table(state()), height="255px")',
+          )
+
+          replace_once(
+              "studio/modules/reporting.py",
+              "import pandas as pd\nfrom shiny import module, reactive, render, ui\n",
+              "import pandas as pd\nfrom shiny import module, reactive, render, ui\n\ntry:\n    from studio.product_services import project_export_stem\nexcept ModuleNotFoundError:  # Direct execution from inside studio/.\n    from product_services import project_export_stem\n",
+          )
+          replace_once(
+              "studio/modules/reporting.py",
+              '                        ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),',
+              '                        ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),\n                        ui.tags.small(ui.output_text("project_file_name"), class_="text-secondary d-block mt-2"),',
+          )
+          replace_once(
+              "studio/modules/reporting.py",
+              '            global_status.set("Project recipe restored after exact dataset fingerprint verification.")',
+              '            global_status.set(\n                f"Project {restored.project_name!r} restored after exact dataset fingerprint verification."\n            )',
+          )
+          replace_once(
+              "studio/modules/reporting.py",
+              '        return (\n            f"Dataset: {current.source_name}\\n"',
+              '        return (\n            f"Project: {current.project_name}\\n"\n            f"Dataset: {current.source_name}\\n"',
+          )
+          replace_once(
+              "studio/modules/reporting.py",
+              '    @render.data_frame\n    def package_report_overview():',
+              '    @render.text\n    def project_file_name():\n        return f"Suggested file: {project_export_stem(state().project_name)}-project-recipe.json"\n\n    @render.data_frame\n    def package_report_overview():',
+          )
+
+          replace_once(
+              "pyproject.toml",
+              'gpbiometricspy-studio-desktop = "studio.desktop:main"\n',
+              'gpbiometricspy-studio-desktop = "studio.desktop:main"\ngpbiometricspy-studio-doctor = "studio.doctor:main"\n',
+          )
+
+          append_once(
+              "studio/www/studio.css",
+              ".studio-sidebar-help",
+              r'''
+              .studio-sidebar-help {
+                display: block;
+                min-height: 3.2rem;
+                margin: 0.35rem 0 0.7rem;
+                line-height: 1.45;
+                color: var(--bs-secondary-color, #6c757d);
+              }
+
+              .studio-progress-card {
+                margin-bottom: 1rem;
+              }
+
+              .studio-progress-card .card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              }
+
+              .navbar .dropdown-menu {
+                min-width: 15rem;
+                border-color: var(--studio-soft-border);
+                border-radius: var(--studio-radius-sm);
+                box-shadow: var(--studio-shadow);
+              }
+
+              .navbar .dropdown-item {
+                padding-block: 0.55rem;
+                font-size: 0.88rem;
+              }
+              ''',
+          )
+
+          Path("docs/studio-deployment.md").write_text(dedent(r'''
+          # Studio deployment and support
+
+          gpbiometricspy Studio has three deliberately different product surfaces: a local research workspace, a desktop-style local launcher, and a synthetic-only public demonstration. They share one scientific backend but **do not share the same data boundary**.
+
+          ## Preflight: run Studio Doctor
+
+          After installing the Studio extra, run:
+
+          ```bash
+          python -m pip install "gpbiometricspy[studio]"
+          gpbiometricspy-studio-doctor
+          ```
+
+          The doctor checks the installed Shiny dependency, packaged Studio application/CSS assets, runtime mode and ability to bind a loopback port. It does not inspect raw biometric samples and does not transmit diagnostics.
+
+          Machine-readable output is available for support and deployment probes:
+
+          ```bash
+          gpbiometricspy-studio-doctor --json
+          ```
+
+          ## Local research workspace
+
+          Use the full Studio when files remain on the researcher's controlled machine:
+
+          ```bash
+          gpbiometricspy-studio
+          ```
+
+          Or use the desktop-style launcher, which chooses an available loopback port and opens the browser automatically:
+
+          ```bash
+          gpbiometricspy-studio-desktop
+          ```
+
+          The browser is only the interface. The Shiny process and analysis run locally through the installed Python environment.
+
+          ## Public demonstration
+
+          The public boundary is intentionally synthetic-only:
+
+          ```bash
+          gpbiometricspy-studio-public
+          ```
+
+          In this mode, external uploads are disabled and application errors are sanitized. A public anonymous deployment should never be converted into a participant-data upload service merely by adding a file control.
+
+          A public deployment should preserve these invariants:
+
+          - `GPBIOMETRICSPY_STUDIO_MODE=public-demo`;
+          - no external research-data upload path;
+          - sanitized application errors;
+          - HTTPS at the hosting layer;
+          - dependency and image updates under version control;
+          - synthetic browser regression tests before deployment;
+          - resource limits appropriate for an anonymous demonstration.
+
+          ## Authenticated/private deployment
+
+          A private institutional deployment is possible, but authentication is not supplied by Studio itself. Put the application behind an institution-approved identity/access layer or a managed Shiny platform with authentication.
+
+          Before enabling research-data uploads, define all of the following outside the scientific package:
+
+          1. who is authorized to access the service;
+          2. where uploaded files and temporary files reside;
+          3. retention and deletion timing;
+          4. encryption and backup policy;
+          5. request and audit logging policy;
+          6. file-size and resource limits;
+          7. incident response and recovery ownership.
+
+          Do not advertise a private deployment as suitable for identifiable or sensitive research data until those institutional controls are actually in place.
+
+          ## Project continuity
+
+          Studio project recipes are deliberately metadata-only. They persist project identity, dataset fingerprint, annotations, provenance and analysis inventory without embedding raw biometric rows or cached result tables.
+
+          The restore sequence is:
+
+          ```text
+          reopen Studio
+            → load the source dataset
+            → open Report → Project recipe
+            → validate the recipe
+            → exact SHA-256 fingerprint match
+            → restore metadata
+            → recompute analyses or use the replay script
+          ```
+
+          The project name is restored with the recipe. Studio also suggests a project-derived export filename to make multi-project work easier to organize.
+
+          ## Troubleshooting startup
+
+          Start with:
+
+          ```bash
+          gpbiometricspy-studio-doctor
+          ```
+
+          If the doctor is green but the browser does not open, run:
+
+          ```bash
+          gpbiometricspy-studio-desktop --no-browser
+          ```
+
+          and open the printed loopback URL manually. If port `8765` is busy, the launcher automatically selects another available port.
+
+          For reproducible support requests, share the doctor output and the package version. Do **not** attach participant data merely to demonstrate an installation problem.
+          '''), encoding="utf-8")
+
+          replace_once(
+              "mkdocs.yml",
+              '      - Studio 0.1.6 roadmap: studio-product-roadmap.md\n      - Getting started with Python: getting-started.md',
+              '      - Studio 0.1.6 roadmap: studio-product-roadmap.md\n      - Deployment & support: studio-deployment.md\n      - Getting started with Python: getting-started.md',
+          )
+
+          append_once(
+              "docs/studio.md",
+              "## Guided walkthroughs and project continuity",
+              r'''
+              ## Guided walkthroughs and project continuity
+
+              Studio now offers guided synthetic starts for multimodal, eye-tracking and EDA/cardiovascular workflows. A guided start loads the bundled synthetic dataset, runs foundation QC, records the action in provenance and opens the relevant analysis family. It is a teaching/onboarding shortcut, not a different scientific engine.
+
+              The top navigation is grouped into **Home → Quality → Analyze → Integrate → Model → Report** while the established module identifiers remain unchanged underneath.
+
+              Project names persist in privacy-preserving project recipes. Use **Save / reopen / report** in the sidebar to move directly to the project recipe and reporting tools.
+
+              For installation or startup problems, run:
+
+              ```bash
+              gpbiometricspy-studio-doctor
+              ```
+
+              See [Studio deployment and support](studio-deployment.md) for local, desktop-style, public-demo and authenticated/private deployment boundaries.
+              ''',
+          )
+          PY
+
+      - name: Install focused product validation dependencies
+        run: python -m pip install -e ".[studio,dev,docs]"
+
+      - name: Validate product services and continuity
+        run: |
+          python -m compileall -q studio
+          python -m pytest -q \
+            studio/tests/test_product_services.py \
+            studio/tests/test_doctor.py \
+            studio/tests/test_reporting_reproducibility.py \
+            studio/tests/test_desktop.py \
+            studio/tests/test_cli.py \
+            studio/tests/test_production_hardening.py
+
+      - name: Validate Studio import and documentation
+        run: |
+          python -c "import studio.app; assert studio.app.app is not None"
+          mkdocs build --strict
+
+      - name: Commit validated tranche and remove helper
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm .github/workflows/studio-product-tranche-helper.yml
+          git add \
+            .github/workflows/studio-product-tranche-helper.yml \
+            studio/product_services.py \
+            studio/doctor.py \
+            studio/app.py \
+            studio/modules/reporting.py \
+            studio/www/studio.css \
+            studio/tests/test_product_services.py \
+            studio/tests/test_doctor.py \
+            pyproject.toml \
+            docs/studio.md \
+            docs/studio-deployment.md \
+            mkdocs.yml
+          git commit -m "feat(studio): add guided workflows and product diagnostics"
+          git push origin HEAD:studio/product-polish-0.1.6
