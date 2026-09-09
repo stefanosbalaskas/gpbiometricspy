@@ -35,7 +35,7 @@ Studio should become easier to use without becoming scientifically opaque.
 
 ## Phase 1 — product shell and onboarding
 
-Status: **in progress**
+Status: **delivered in the current 0.1.6 development branch**
 
 - product-first GitHub landing page;
 - product-first documentation home;
@@ -49,72 +49,93 @@ Status: **in progress**
 
 ## Phase 2 — navigation and workflow guidance
 
-- reduce cognitive load from the large analysis navigation surface;
-- add clearer workflow grouping while preserving stable module identifiers;
-- expose channel-aware recommendations after dataset inspection;
-- show which prerequisites are complete or missing for each analysis family;
-- add contextual “why this matters” and “what to do next” help;
-- make Guided versus Expert mode visually consistent across modules.
+Status: **core tranche delivered; contextual module-level guidance remains**
+
+- top navigation is grouped as Home → Quality → Analyze → Integrate → Model → Report;
+- established module identifiers remain unchanged underneath the grouped navigation;
+- a workflow-progress table exposes required, ready, optional and completed stages;
+- guided synthetic starts can open multimodal, eye-tracking or physiology workflows after foundation QC;
+- the session summary exposes first-session readiness as a percentage;
+- remaining work: channel-aware recommendations, module-specific prerequisites and deeper contextual help.
 
 ## Phase 3 — project management
 
+Status: **substantial foundation delivered**
+
 - first-class project name and project metadata;
-- explicit save/export project action;
-- reopen project recipe with source-resource fingerprint validation;
-- visible dirty/saved state;
-- recent-project convenience for local desktop-style use without embedding raw research data in repository artifacts;
-- clearer separation between raw source files, derived results, recipes and report bundles;
-- project-level provenance timeline.
+- project names persist in privacy-preserving project recipes and manifests;
+- exact SHA-256 source-resource fingerprint validation remains mandatory on restore;
+- the sidebar provides a direct Save / reopen / report action;
+- Reporting exposes the restored project identity and suggests a project-derived recipe filename;
+- raw biometric rows and cached analysis tables remain outside project recipes;
+- remaining work: explicit dirty/saved state, local recent-project convenience and a richer project-level provenance timeline.
 
 ## Phase 4 — examples and presets
 
-- guided synthetic walkthroughs for EDA/SCR, PPG/HRV, pupil/gaze/AOI and multimodal workflows;
-- analysis presets tied to documented assumptions rather than opaque “magic” settings;
-- example result interpretation that stays inside the package's conservative guardrails;
-- reusable teaching/demo projects;
-- downloadable reproducibility bundles.
+Status: **guided-start foundation delivered**
+
+- bundled synthetic multimodal walkthrough;
+- bundled synthetic eye-tracking walkthrough;
+- bundled synthetic EDA/cardiovascular walkthrough;
+- guided starts load synthetic data, run foundation QC, record provenance and open the relevant analysis family;
+- remaining work: documented analysis presets, teaching/demo project narratives, interpretation examples and one-click reproducibility bundles.
 
 ## Phase 5 — errors, diagnostics and supportability
 
-- consistent user-facing error taxonomy;
-- concise primary message plus optional technical detail for local/private use;
-- actionable remediation suggestions for missing channels, bad schemas, unavailable optional backends and fingerprint mismatches;
-- runtime diagnostics page suitable for support requests;
-- version/environment copy button;
-- safer reset/new-project flow.
+Status: **diagnostic foundation delivered**
+
+- a privacy-safe Studio Doctor checks the Shiny dependency, packaged application/CSS assets, runtime mode and loopback binding;
+- `gpbiometricspy-studio-doctor` provides concise human-readable diagnostics;
+- `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
+- diagnostics do not inspect raw biometric samples or transmit support information;
+- public-demo error sanitization remains fail-closed;
+- remaining work: module-level remediation suggestions, a richer error taxonomy and optional local/private technical-detail disclosure.
 
 ## Phase 6 — desktop-style local experience
 
-Candidate path:
+Status: **browser-backed local launcher delivered as the intermediate product surface**
 
-- retain Shiny for Python as the application engine;
-- provide a launcher that starts the local server, chooses an available loopback port and opens the application automatically;
-- evaluate packaging approaches such as PyInstaller/Nuitka plus a lightweight local webview only after installed-wheel behavior is stable;
-- avoid introducing a second scientific runtime;
-- sign/package desktop installers only after reproducible build and update policies are defined.
-
-A browser-backed local launcher is acceptable as an intermediate product step; a native-window wrapper should be treated as packaging, not as a rewrite of the application.
+- Shiny for Python remains the single application engine;
+- `gpbiometricspy-studio-desktop` chooses an available loopback port and opens Studio automatically;
+- `--no-browser` supports manual/browser-managed startup and troubleshooting;
+- next packaging evaluation: PyInstaller/Nuitka and, only if justified, a lightweight local webview;
+- a native-window wrapper remains packaging rather than a scientific-runtime rewrite;
+- signed installers wait until reproducible build/update policies are defined.
 
 ## Phase 7 — hosted deployment
+
+Status: **deployment boundary documented; production hosting remains future work**
 
 ### Public demonstration
 
 - synthetic-only;
 - no participant-data upload controls;
 - sanitized error details;
-- clear demo banner and privacy boundary;
+- clear demo/privacy boundary;
 - representative guided workflows;
-- production health checks and browser regression tests.
+- production health checks, resource limits and browser regression tests remain release/deployment gates.
 
 ### Authenticated/private research deployment
 
-- authentication and authorization;
-- explicit storage and retention policy;
-- logging/audit controls;
-- upload-size and file-type controls;
-- secrets/configuration management;
-- backup and disaster-recovery policy;
-- institution-appropriate data governance.
+- authentication and authorization are deployment-layer responsibilities, not implicit Studio features;
+- storage, retention, encryption, logging/audit, upload limits, secrets and disaster recovery must be defined before research-data upload is enabled;
+- the documentation explicitly warns against presenting an anonymous public deployment as a participant-data service.
+
+See [Studio deployment and support](studio-deployment.md) for the current operational boundary.
+
+## Current validation checkpoint
+
+The guided-product tranche was applied through a fail-closed helper that committed only after all of the following succeeded:
+
+- Studio source compilation;
+- focused product-services and Studio Doctor tests;
+- reporting/reproducibility regression tests;
+- desktop-launcher and CLI regression tests;
+- production-hardening regression tests;
+- `studio.app` import validation;
+- strict MkDocs build.
+
+The helper removed itself after the validated commit. Full pull-request CI is then required on a normal user-authored checkpoint before the tranche is considered merge-ready.
 
 ## 0.1.6 release criteria for Studio
 
@@ -124,7 +145,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 - Studio smoke, Chromium E2E and production/distribution gates remain green;
 - no regression in public synthetic fail-closed behavior;
 - Windows local launch instructions tested on a clean environment;
-- onboarding path tested by a human from install → demo → QC → analysis → report;
+- onboarding path tested by a human from install → guided demo → QC → analysis → report;
 - keyboard and narrow-viewport browser checks remain green;
 - project/replay fingerprint guards remain fail-closed;
 - documentation reflects the actual installed behavior;
@@ -132,17 +153,18 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is the **first-session experience**:
+The immediate target is now the **guided first-session experience**:
 
 ```text
 install
+  → run Studio Doctor
   → launch
-  → load synthetic demo
-  → understand project readiness
-  → run foundation QC
-  → choose a signal workflow
+  → choose a guided synthetic walkthrough
+  → see foundation QC complete
+  → continue in the relevant analysis family
   → inspect a result
-  → reach Reporting & Reproducibility
+  → Save / reopen / report
+  → export a privacy-preserving project recipe
 ```
 
-Usability findings from that path should drive the next tranche before desktop packaging or broader deployment work expands further.
+Usability findings from that path should drive the remaining presets, project-state polish and packaging work before a non-development `0.1.6` release.
