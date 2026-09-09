@@ -67,12 +67,12 @@ The development evidence artifact used to prepare the stable freeze is GitHub Ac
 
 ## Archival boundary
 
+- The 0.1.5 version DOI is **10.5281/zenodo.22672823**.
 - The software concept DOI remains **10.5281/zenodo.22150872**.
 - The previous 0.1.4 version DOI is **10.5281/zenodo.22515782**.
 - The frozen R reference remains separate `isDerivedFrom` provenance at **10.5281/zenodo.21434608**.
-- `CITATION.cff` records stable `0.1.5` and the release date but intentionally contains **no 0.1.5 version DOI before Zenodo ingestion**.
-- The actual 0.1.5 version DOI is recorded only after Zenodo ingests the immutable GitHub release; it is not invented or inferred in the release freeze.
-
+- `CITATION.cff` records stable `0.1.5`, release date **2026-09-08**, and the 0.1.5 version DOI.
+- `pyproject.toml` records the current 0.1.5 version DOI separately from the concept DOI, previous-version DOI, and R-reference DOI.
 
 ## Post-release distribution record
 
@@ -80,8 +80,8 @@ The development evidence artifact used to prepare the stable freeze is GitHub Ac
 - GitHub Release and PyPI wheel SHA-256: `eb2474a7d3156b305c573a5327040038f6ec08ba7e5cf244952712b3d239c607`.
 - GitHub Release and PyPI sdist SHA-256: `b8605ad8d402a948d0610dd40ff98985dedf6351b681b7e43294df38d10dc47e`.
 - Protected PyPI Trusted Publishing completed with HTTP 200 uploads and Sigstore/Rekor attestations (wheel Rekor `2762034607`; sdist Rekor `2762034601`).
-- The 0.1.5 Zenodo version DOI remains pending ingestion and is deliberately not inferred.
-- Live repository development is prepared as `0.1.6.dev0`; the stable `CITATION.cff` record remains 0.1.5 / 2026-09-08 until the actual Zenodo version DOI exists.
+- Zenodo archives version 0.1.5 at DOI `10.5281/zenodo.22672823` in the existing concept/version chain.
+- Live repository development is `0.1.6.dev0`; the stable `CITATION.cff` record remains pinned to 0.1.5 / 2026-09-08 / `10.5281/zenodo.22672823`.
 
 ## Release integrity
 
