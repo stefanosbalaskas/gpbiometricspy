@@ -1,5 +1,5 @@
 site_name: gpbiometricspy
-site_description: Scientific Python workflows for Gazepoint EDA/SCR, PPG/HRV, pupil, gaze, AOI and multimodal research.
+site_description: Scientific Python workflows and gpbiometricspy Studio for Gazepoint EDA/SCR, PPG/HRV, pupil, gaze, AOI and multimodal research.
 site_url: https://stefanosbalaskas.github.io/gpbiometricspy/
 site_author: Stefanos Balaskas
 repo_url: https://github.com/stefanosbalaskas/gpbiometricspy
@@ -63,9 +63,10 @@ extra_javascript:
 
 nav:
   - Home: index.md
-  - Start here:
-      - Getting started: getting-started.md
+  - Product & start:
       - gpbiometricspy Studio: studio.md
+      - Studio 0.1.6 roadmap: studio-product-roadmap.md
+      - Getting started with Python: getting-started.md
       - Workflow map: workflows.md
       - Synthetic demo: demo.md
   - Workflows:
