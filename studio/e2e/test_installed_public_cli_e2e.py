@@ -4,6 +4,7 @@ import os
 
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 
 
 INSTALLED_PUBLIC_URL = os.environ.get("GPBIOMETRICSPY_INSTALLED_PUBLIC_URL")
@@ -32,7 +33,7 @@ def test_installed_distribution_public_console_browser_path(page: Page) -> None:
     )
     expect(page.get_by_role("status")).to_contain_text("Synthetic kiosk demo loaded")
 
-    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    open_nav(page, "gaze", group="Analyze")
     expect(page.locator("#gaze-aoi_upload")).to_be_hidden()
     page.locator("#gaze-run").click()
     expect(page.locator("#gaze-status")).to_contain_text(
@@ -41,7 +42,7 @@ def test_installed_distribution_public_console_browser_path(page: Page) -> None:
     )
     assert int(page.locator("#gaze-saccade_count").inner_text().replace(",", "")) > 0
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.locator("#reporting-build_report").click()

@@ -9,6 +9,7 @@ import zipfile
 import gpbiometricspy as gp
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 
 
@@ -33,7 +34,7 @@ def _reset_session(page: Page) -> None:
 
 
 def _open_reporting_recipe(page: Page) -> None:
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     page.get_by_role("tab", name="Project recipe", exact=True).click()
 
@@ -79,7 +80,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         timeout=90_000,
     )
 
-    page.get_by_text("Quality Control", exact=True).click()
+    open_nav(page, "qc")
     expect(page.get_by_text("Advanced QC settings", exact=True)).to_be_visible()
     page.locator("#qc-run").click()
     expect(page.locator("#qc-status")).to_contain_text(
@@ -97,7 +98,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     expect(page.locator("#qc-gaze_summary")).to_be_visible(timeout=60_000)
     expect(page.locator("#qc-gaze_checks")).to_be_visible(timeout=60_000)
 
-    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    open_nav(page, "gaze", group="Analyze")
     expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
     page.locator("#gaze-run").click()
     expect(page.locator("#gaze-status")).to_contain_text(
@@ -106,7 +107,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     )
     assert int(page.locator("#gaze-saccade_count").inner_text().replace(",", "")) > 0
 
-    page.get_by_text("Pupil Analysis", exact=True).click()
+    open_nav(page, "pupil", group="Analyze")
     expect(page.get_by_text("Pupil analysis controls", exact=True)).to_be_visible()
     page.locator("#pupil-run").click()
     expect(page.locator("#pupil-status")).to_contain_text(
@@ -115,7 +116,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     )
     assert int(page.locator("#pupil-blink_count").inner_text().replace(",", "")) >= 0
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
     expect(page.locator("#reporting-analysis_count")).to_have_text("2", timeout=60_000)

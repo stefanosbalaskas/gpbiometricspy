@@ -6,6 +6,7 @@ import zipfile
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -45,7 +46,7 @@ def _load_participant(page: Page, app: ShinyAppProc) -> Path:
 
 
 def _run_eda(page: Page) -> None:
-    page.get_by_text("EDA / SCR Analysis", exact=True).click()
+    open_nav(page, "eda_scr", group="Analyze")
     expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
     page.locator("#eda_scr-run").click()
     expect(page.locator("#eda_scr-status")).to_contain_text(
@@ -56,7 +57,7 @@ def _run_eda(page: Page) -> None:
 
 
 def _open_reporting(page: Page) -> None:
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
 

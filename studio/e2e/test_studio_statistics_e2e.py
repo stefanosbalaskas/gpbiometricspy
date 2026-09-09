@@ -4,6 +4,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -37,7 +38,7 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
 
 
 def _run_event_alignment(page: Page) -> None:
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.locator("#event_alignment-run").click()
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -48,7 +49,7 @@ def _run_event_alignment(page: Page) -> None:
 
 
 def _run_multimodal_analysis(page: Page) -> None:
-    page.get_by_text("Multimodal Analysis", exact=True).click()
+    open_nav(page, "multimodal", group="Integrate")
     expect(page.get_by_text("Multimodal controls", exact=True)).to_be_visible()
     expect(page.locator("#multimodal-event_status")).to_contain_text(
         "Events & Alignment ready:",
@@ -74,7 +75,7 @@ def test_statistics_model_preparation_from_multimodal_samples(page: Page, app: S
     _run_event_alignment(page)
     _run_multimodal_analysis(page)
 
-    page.get_by_text("Statistics & Modelling", exact=True).click()
+    open_nav(page, "statistics_modelling")
     expect(page.get_by_text("Model controls", exact=True)).to_be_visible()
 
     source = page.locator("#statistics_modelling-model_source")

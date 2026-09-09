@@ -7,6 +7,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -59,7 +60,7 @@ def _plot_point(page: Page, x_fraction: float, y_fraction: float) -> tuple[float
 
 
 def _download_recipe(page: Page) -> dict:
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     page.locator("#reporting-build_report").click()
     expect(page.locator("#reporting-report_status")).to_contain_text(
@@ -79,7 +80,7 @@ def _download_recipe(page: Page) -> dict:
 def test_manual_annotation_export_and_provenance(page: Page, app: ShinyAppProc) -> None:
     _load_demo_participant(page, app)
 
-    page.get_by_text("Annotation", exact=True).click()
+    open_nav(page, "annotation", group="Analyze")
     expect(page.get_by_text("Annotation controls", exact=True)).to_be_visible()
     expect(
         page.get_by_text(

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -43,7 +44,7 @@ def test_advanced_qc_renders_all_domains_and_records_provenance(
 ) -> None:
     _load_demo_participant(page, app)
 
-    page.get_by_text("Quality Control", exact=True).click()
+    open_nav(page, "qc")
     expect(page.get_by_text("Advanced QC settings", exact=True)).to_be_visible()
     expect(
         page.get_by_text(
@@ -81,7 +82,7 @@ def test_advanced_qc_renders_all_domains_and_records_provenance(
     expect(page.locator("#qc-gaze_groups")).to_be_visible(timeout=60_000)
     expect(page.get_by_text("Application error", exact=False)).to_have_count(0)
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     page.get_by_text("Project recipe", exact=True).click()
     expect(page.get_by_text("Save project recipe", exact=True)).to_be_visible()

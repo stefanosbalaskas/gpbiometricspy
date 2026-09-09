@@ -5,6 +5,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -52,13 +53,13 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
 
 
 def _open_reporting(page: Page) -> None:
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
 
 
 def _run_gaze_analysis(page: Page) -> None:
-    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    open_nav(page, "gaze", group="Analyze")
     expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
     page.locator("#gaze-run").click()
     expect(page.locator("#gaze-status")).to_contain_text(
@@ -70,7 +71,7 @@ def _run_gaze_analysis(page: Page) -> None:
 
 
 def _run_pupil_analysis(page: Page) -> None:
-    page.get_by_text("Pupil Analysis", exact=True).click()
+    open_nav(page, "pupil", group="Analyze")
     expect(page.get_by_text("Pupil analysis controls", exact=True)).to_be_visible()
     page.locator("#pupil-run").click()
     expect(page.locator("#pupil-status")).to_contain_text(
@@ -82,7 +83,7 @@ def _run_pupil_analysis(page: Page) -> None:
 
 
 def _run_eda_scr_analysis(page: Page) -> None:
-    page.get_by_text("EDA / SCR Analysis", exact=True).click()
+    open_nav(page, "eda_scr", group="Analyze")
     expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
     page.locator("#eda_scr-run").click()
     expect(page.locator("#eda_scr-status")).to_contain_text(
@@ -95,7 +96,7 @@ def _run_eda_scr_analysis(page: Page) -> None:
 
 
 def _run_ppg_hr_hrv_analysis(page: Page) -> None:
-    page.get_by_text("PPG / HR / HRV Analysis", exact=True).click()
+    open_nav(page, "ppg_hr_hrv", group="Analyze")
     expect(page.get_by_text("PPG / HR / HRV analysis controls", exact=True)).to_be_visible()
     page.locator("#ppg_hr_hrv-run").click()
     expect(page.locator("#ppg_hr_hrv-status")).to_contain_text(
@@ -107,7 +108,7 @@ def _run_ppg_hr_hrv_analysis(page: Page) -> None:
 
 
 def _run_event_alignment(page: Page) -> None:
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.locator("#event_alignment-run").click()
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -121,7 +122,7 @@ def _run_event_alignment(page: Page) -> None:
 
 
 def _run_multimodal_analysis(page: Page) -> None:
-    page.get_by_text("Multimodal Analysis", exact=True).click()
+    open_nav(page, "multimodal", group="Integrate")
     expect(page.get_by_text("Multimodal controls", exact=True)).to_be_visible()
     expect(page.locator("#multimodal-event_status")).to_contain_text(
         "Events & Alignment ready:",

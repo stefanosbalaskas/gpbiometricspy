@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
@@ -59,7 +60,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # The deployed root entrypoint must keep external AOI uploads non-visible while
     # preserving the package-backed synthetic Gaze workflow and its downloads.
-    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    open_nav(page, "gaze", group="Analyze")
     expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
     expect(page.locator("#gaze-aoi_upload")).to_be_hidden()
     assert page.locator('input[type="file"]:visible').count() == 0
@@ -81,7 +82,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # Event-log and secondary-stream inputs are present in the full Studio contract
     # but must remain non-visible in the public synthetic deployment.
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     expect(page.locator("#event_alignment-event_upload")).to_be_hidden()
     expect(page.locator("#event_alignment-target_upload")).to_be_hidden()
@@ -90,7 +91,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # Reporting remains usable for the synthetic analysis, while restore controls
     # that could consume an external project recipe stay hidden.
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.locator("#reporting-build_report").click()
