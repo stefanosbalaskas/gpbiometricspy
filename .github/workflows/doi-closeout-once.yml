@@ -1,0 +1,87 @@
+name: One-shot DOI closeout
+
+on:
+  push:
+    branches:
+      - post-release-0.1.5-closeout
+    paths:
+      - .github/workflows/doi-closeout-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  closeout:
+    if: github.event.head_commit.message == 'chore: run one-shot DOI closeout'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: post-release-0.1.5-closeout
+          fetch-depth: 0
+
+      - name: Apply exact DOI closeout replacements
+        shell: python
+        run: |
+          from pathlib import Path
+
+          replacements = {
+              "README.md": [
+                  (
+                      "`gpbiometricspy 0.1.5` is the current stable release and is published on PyPI from immutable tag `v0.1.5`; live repository development proceeds as `0.1.6.dev0`. Its version-specific Zenodo DOI will be recorded only after Zenodo ingests the immutable GitHub release; the concept DOI identifies the evolving Python software record.",
+                      "`gpbiometricspy 0.1.5` is the current stable release and is published on PyPI from immutable tag `v0.1.5`; live repository development proceeds as `0.1.6.dev0`. Zenodo archives this exact release at version DOI [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823); the concept DOI identifies the evolving Python software record.",
+                  ),
+                  (
+                      "- **Version DOI (0.1.5):** pending Zenodo ingestion — not yet minted",
+                      "- **Version DOI (0.1.5):** [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)",
+                  ),
+              ],
+              "docs/index.md": [
+                  (
+                      "The 0.1.5 Zenodo version DOI remains intentionally absent until ingestion; the previous 0.1.4 DOI remains [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782), and the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).",
+                      "The 0.1.5 Zenodo version DOI is [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823); the previous 0.1.4 DOI remains [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782), and the software concept DOI remains [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872).",
+                  ),
+              ],
+              "RELEASE_CHECKLIST.md": [
+                  (
+                      "- [ ] Wait for Zenodo to ingest the immutable GitHub release; record the actual 0.1.5 version DOI only after it exists.",
+                      "- [x] Archive stable 0.1.5 in the existing Zenodo version chain and record version DOI `10.5281/zenodo.22672823` without altering the immutable GitHub/PyPI release.",
+                  ),
+                  (
+                      "- [ ] Zenodo ingestion / 0.1.5 version DOI is still pending and must not be inferred.",
+                      "- [x] Zenodo 0.1.5 version DOI is `10.5281/zenodo.22672823`; software concept DOI remains `10.5281/zenodo.22150872`.",
+                  ),
+                  (
+                      "- [ ] After Zenodo mints the DOI, pin `CITATION.cff` to stable 0.1.5 + the actual DOI, add `VersionDOI` / update version-history links, and complete archival closeout.",
+                      "- [x] Pin `CITATION.cff` to stable 0.1.5 + `10.5281/zenodo.22672823`, add `VersionDOI`, and update version-history/release-facing links.",
+                  ),
+                  (
+                      "- [ ] Merge the completed closeout to return live repository identity to `0.1.6.dev0` while leaving immutable `v0.1.5`, GitHub Release, and PyPI artifacts unchanged.",
+                      "- [x] Prepare the completed closeout branch with live repository identity `0.1.6.dev0`, leaving immutable `v0.1.5`, GitHub Release, and PyPI artifacts unchanged and ready for exact-head merge.",
+                  ),
+              ],
+          }
+
+          for filename, pairs in replacements.items():
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              for old, new in pairs:
+                  count = text.count(old)
+                  if count != 1:
+                      raise SystemExit(f"{filename}: expected exactly one match, found {count}: {old[:80]!r}")
+                  text = text.replace(old, new)
+              path.write_text(text, encoding="utf-8")
+
+      - name: Validate DOI closeout contract
+        run: |
+          python -m pip install -e .
+          python -m pytest tests/test_post_release_completeness.py -q
+
+      - name: Remove one-shot workflow and commit
+        run: |
+          rm .github/workflows/doi-closeout-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/index.md RELEASE_CHECKLIST.md .github/workflows/doi-closeout-once.yml
+          git commit -m "chore: complete 0.1.5 DOI archival closeout"
+          git push origin HEAD:post-release-0.1.5-closeout
