@@ -120,7 +120,7 @@
 - [x] Require all ten stable-release gate families to succeed on the exact merged stable `main` commit before creating `v0.1.5`.
 - [x] Create immutable annotated `v0.1.5`, let the protected release workflow build/check GitHub assets, and verify the SHA-256 manifest.
 - [x] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.5`; both distribution uploads returned HTTP 200 and Sigstore attestations were generated.
-- [ ] Wait for Zenodo to ingest the immutable GitHub release; record the actual 0.1.5 version DOI only after it exists.
+- [x] Archive stable 0.1.5 in the existing Zenodo version chain and record version DOI `10.5281/zenodo.22672823` without altering the immutable GitHub/PyPI release.
 
 ### 0.1.5 post-release publication evidence
 
@@ -129,6 +129,6 @@
 - [x] GitHub Release and PyPI wheel SHA-256 match: `eb2474a7d3156b305c573a5327040038f6ec08ba7e5cf244952712b3d239c607`.
 - [x] GitHub Release and PyPI sdist SHA-256 match: `b8605ad8d402a948d0610dd40ff98985dedf6351b681b7e43294df38d10dc47e`.
 - [x] Protected PyPI Trusted Publishing generated Sigstore attestations; Rekor indexes: wheel `2762034607`, sdist `2762034601`.
-- [ ] Zenodo ingestion / 0.1.5 version DOI is still pending and must not be inferred.
-- [ ] After Zenodo mints the DOI, pin `CITATION.cff` to stable 0.1.5 + the actual DOI, add `VersionDOI` / update version-history links, and complete archival closeout.
-- [ ] Merge the completed closeout to return live repository identity to `0.1.6.dev0` while leaving immutable `v0.1.5`, GitHub Release, and PyPI artifacts unchanged.
+- [x] Zenodo 0.1.5 version DOI is `10.5281/zenodo.22672823`; software concept DOI remains `10.5281/zenodo.22150872`.
+- [x] Pin `CITATION.cff` to stable 0.1.5 + `10.5281/zenodo.22672823`, add `VersionDOI`, and update version-history/release-facing links.
+- [x] Prepare the completed closeout branch with live repository identity `0.1.6.dev0`, leaving immutable `v0.1.5`, GitHub Release, and PyPI artifacts unchanged and ready for exact-head merge.
