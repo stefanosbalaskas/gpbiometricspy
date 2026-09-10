@@ -1,9 +1,8 @@
 """Reusable Shiny modules for gpbiometricspy Studio.
 
-The product shell adds a compact readiness banner to the major Analyze and
-Integrate workflows at this package boundary. Scientific module files remain
-unchanged; readiness is advisory and is derived from their existing service
-helpers and shared ProjectState.
+The product shell adds compact readiness and teaching-preset guidance at this
+package boundary. Scientific module files remain unchanged; both layers are
+advisory and reuse established Studio capability/default contracts.
 """
 
 from __future__ import annotations
@@ -15,9 +14,11 @@ from typing import Any, Callable
 from shiny import ui
 
 try:
+    from studio.analysis_preset_ui import analysis_preset_ui
     from studio.module_prerequisite_runtime import module_readiness_runtime_server
     from studio.module_prerequisite_ui import module_readiness_ui
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from analysis_preset_ui import analysis_preset_ui
     from module_prerequisite_runtime import module_readiness_runtime_server
     from module_prerequisite_ui import module_readiness_ui
 
@@ -63,15 +64,42 @@ def _wrap_with_readiness(
     setattr(module_obj, marker, True)
 
 
-# Import and wrap only the workflows whose prerequisites can be resolved from
-# existing Studio capability services. QC, annotation, statistics/modelling and
-# reporting retain their native interfaces.
+def _wrap_with_preset_guidance(
+    module_obj: ModuleType,
+    *,
+    ui_name: str,
+    module_key: str,
+) -> None:
+    """Attach static teaching guidance without changing controls or server state."""
+
+    marker = f"_studio_preset_wrapped_{module_key}"
+    if getattr(module_obj, marker, False):
+        return
+
+    original_ui: Callable[..., Any] = getattr(module_obj, ui_name)
+
+    @wraps(original_ui)
+    def wrapped_ui(module_id: str, *args: Any, **kwargs: Any):
+        return ui.TagList(
+            analysis_preset_ui(f"{module_id}_preset", module_key=module_key),
+            original_ui(module_id, *args, **kwargs),
+        )
+
+    setattr(module_obj, ui_name, wrapped_ui)
+    setattr(module_obj, marker, True)
+
+
+# Import and wrap only workflows with documented product guidance. Readiness is
+# attached to modules whose prerequisites can be resolved from existing Studio
+# capability services. Preset guidance is static and may also document the Model
+# workspace without adding a readiness or scientific execution path.
 from . import eda_scr as _eda_scr  # noqa: E402
 from . import event_alignment as _event_alignment  # noqa: E402
 from . import gaze as _gaze  # noqa: E402
 from . import multimodal as _multimodal  # noqa: E402
 from . import ppg_hr_hrv as _ppg_hr_hrv  # noqa: E402
 from . import pupil as _pupil  # noqa: E402
+from . import statistics_modelling as _statistics_modelling  # noqa: E402
 
 _wrap_with_readiness(
     _eda_scr,
@@ -109,3 +137,14 @@ _wrap_with_readiness(
     server_name="multimodal_server",
     module_key="multimodal",
 )
+
+for _module, _ui_name, _module_key in (
+    (_eda_scr, "eda_scr_ui", "eda_scr"),
+    (_ppg_hr_hrv, "ppg_hr_hrv_ui", "ppg_hr_hrv"),
+    (_pupil, "pupil_ui", "pupil"),
+    (_gaze, "gaze_ui", "gaze"),
+    (_event_alignment, "event_alignment_ui", "event_alignment"),
+    (_multimodal, "multimodal_ui", "multimodal"),
+    (_statistics_modelling, "statistics_modelling_ui", "statistics_modelling"),
+):
+    _wrap_with_preset_guidance(_module, ui_name=_ui_name, module_key=_module_key)
