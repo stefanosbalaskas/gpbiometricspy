@@ -149,6 +149,8 @@ def classify_failure(message: str, *, context: str = "") -> ErrorGuidance:
         " column",
         "numeric",
         "must be positive",
+        "must be non-empty",
+        "characters or fewer",
         "sampling rate",
         "window size",
         "threshold",
