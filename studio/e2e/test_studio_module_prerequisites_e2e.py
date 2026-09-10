@@ -24,14 +24,16 @@ def test_module_readiness_progresses_through_real_project_state(
         timeout=60_000,
     )
 
+    eda_readiness = page.locator("#eda_scr_readiness-module_readiness")
+    event_readiness = page.locator("#event_alignment_readiness-module_readiness")
+    multimodal_readiness = page.locator("#multimodal_readiness-module_readiness")
+
     open_nav(page, "eda_scr", group="Analyze")
-    expect(page.locator("#eda_scr-module_readiness")).to_contain_text(
+    expect(eda_readiness).to_contain_text(
         "Foundation QC pending",
         timeout=30_000,
     )
-    expect(page.locator("#eda_scr-module_readiness")).to_contain_text(
-        "Expert controls remain available"
-    )
+    expect(eda_readiness).to_contain_text("Expert controls remain available")
 
     page.get_by_role("tab", name="Home", exact=True).click()
     page.locator("#run_qc").click()
@@ -41,7 +43,7 @@ def test_module_readiness_progresses_through_real_project_state(
     )
 
     open_nav(page, "eda_scr", group="Analyze")
-    expect(page.locator("#eda_scr-module_readiness")).to_contain_text(
+    expect(eda_readiness).to_contain_text(
         "Ready for guided analysis",
         timeout=30_000,
     )
@@ -50,28 +52,24 @@ def test_module_readiness_progresses_through_real_project_state(
         "EDA/SCR workflow complete using public gpbiometricspy APIs.",
         timeout=90_000,
     )
-    expect(page.locator("#eda_scr-module_readiness")).to_contain_text(
+    expect(eda_readiness).to_contain_text(
         "EDA / SCR result stored",
         timeout=30_000,
     )
 
     open_nav(page, "event_alignment", group="Integrate")
-    expect(page.locator("#event_alignment-module_readiness")).to_contain_text(
+    expect(event_readiness).to_contain_text(
         "Ready for guided analysis",
         timeout=30_000,
     )
-    expect(page.locator("#event_alignment-module_readiness")).to_contain_text(
-        "TTL/marker source"
-    )
+    expect(event_readiness).to_contain_text("TTL/marker source")
 
     open_nav(page, "multimodal", group="Integrate")
-    expect(page.locator("#multimodal-module_readiness")).to_contain_text(
+    expect(multimodal_readiness).to_contain_text(
         "Events & Alignment required",
         timeout=30_000,
     )
-    expect(page.locator("#multimodal-module_readiness")).to_contain_text(
-        "Complete Events & Alignment"
-    )
+    expect(multimodal_readiness).to_contain_text("Complete Events & Alignment")
 
     expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
     expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
