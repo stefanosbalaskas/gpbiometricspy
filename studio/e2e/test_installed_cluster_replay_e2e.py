@@ -54,10 +54,11 @@ def _load_uploaded_dataset(page: Page, path: Path) -> None:
     page.locator("#load_upload").click()
     expect(status).not_to_have_text(previous_status, timeout=60_000)
 
-    missing = "Import failed: Choose a Gazepoint CSV or TXT file first."
-    if status.inner_text() == missing:
+    missing_upload_message = "Choose a Gazepoint CSV or TXT file first."
+    if missing_upload_message in status.inner_text():
+        missing_status = status.inner_text()
         page.locator("#load_upload").click()
-        expect(status).not_to_have_text(missing, timeout=60_000)
+        expect(status).not_to_have_text(missing_status, timeout=60_000)
 
     expect(status).to_contain_text(
         "Research file imported.",
