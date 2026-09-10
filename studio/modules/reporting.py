@@ -53,7 +53,7 @@ def _grid(table: pd.DataFrame | None, message: str, *, height: str = "360px"):
 
 
 def _report_state_identity(current) -> tuple[Any, ...]:
-    """Return the project-state identity that a built report must represent."""
+    """Return the project-state identity that a built report or saved recipe represents."""
     return (
         current.project_name,
         current.source_name,
@@ -198,6 +198,14 @@ def reporting_ui():
                         ui.p(
                             "Download session metadata and analysis parameters without raw biometric samples. Analysis outputs are deliberately recomputed rather than restored from a cache."
                         ),
+                        ui.div(
+                            ui.tags.strong(ui.output_text("project_save_state")),
+                            ui.tags.small(
+                                ui.output_text("project_save_detail"),
+                                class_="text-secondary d-block",
+                            ),
+                            class_="mb-3",
+                        ),
                         ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),
                         ui.tags.small(ui.output_text("project_file_name"), class_="text-secondary d-block mt-2"),
                     ),
@@ -253,6 +261,8 @@ def reporting_server(input, output, session, state, global_status):
     report_status_value = reactive.Value("Ready. Load data, run the desired workflows, then build reporting artifacts.")
     recipe_status_value = reactive.Value("No project recipe loaded.")
     dataset_identity_value: reactive.Value[Any] = reactive.Value(None)
+    saved_recipe_identity_value: reactive.Value[Any] = reactive.Value(None)
+    saved_recipe_source_value: reactive.Value[Any] = reactive.Value(None)
 
     @reactive.effect
     def _invalidate_when_dataset_changes():
@@ -264,6 +274,8 @@ def reporting_server(input, output, session, state, global_status):
             artifact_identity_value.set(None)
             recipe_value.set(None)
             recipe_checks_value.set(None)
+            saved_recipe_identity_value.set(None)
+            saved_recipe_source_value.set(None)
 
     @reactive.effect
     def _invalidate_reporting_when_project_changes():
@@ -350,6 +362,8 @@ def reporting_server(input, output, session, state, global_status):
             artifact_identity_value.set(None)
             recipe_value.set(recipe)
             recipe_checks_value.set(checks)
+            saved_recipe_identity_value.set(_report_state_identity(restored))
+            saved_recipe_source_value.set("restored")
             recipe_status_value.set(
                 "Project metadata restored. Analysis outputs were intentionally not restored; rerun analyses or use the replay script."
             )
@@ -385,6 +399,32 @@ def reporting_server(input, output, session, state, global_status):
     @render.text
     def recipe_status():
         return recipe_status_value()
+
+    @render.text
+    def project_save_state():
+        current = state()
+        if not current.loaded:
+            return "No project loaded"
+        saved_identity = saved_recipe_identity_value()
+        if saved_identity is None:
+            return "Unsaved"
+        if saved_identity == _report_state_identity(current):
+            return "Saved"
+        return "Unsaved changes"
+
+    @render.text
+    def project_save_detail():
+        current = state()
+        if not current.loaded:
+            return "Load a dataset before creating a project recipe."
+        saved_identity = saved_recipe_identity_value()
+        if saved_identity is None:
+            return "Download a project recipe to capture the current metadata checkpoint."
+        if saved_identity != _report_state_identity(current):
+            return "Project metadata changed after the last recipe checkpoint. Download again before closing the session."
+        if saved_recipe_source_value() == "restored":
+            return "The restored recipe is the current metadata checkpoint."
+        return "Current metadata matches the last downloaded project recipe."
 
     @render.text
     def project_file_name():
@@ -481,7 +521,12 @@ def reporting_server(input, output, session, state, global_status):
 
     @render.download_button(filename="gpbiometricspy_studio_project_recipe.json")
     def download_recipe():
-        yield project_recipe_json(state())
+        current = state()
+        payload = project_recipe_json(current)
+        saved_recipe_identity_value.set(_report_state_identity(current))
+        saved_recipe_source_value.set("downloaded")
+        recipe_status_value.set("Project recipe downloaded. Current project metadata is saved.")
+        yield payload
 
     @render.download_button(filename="gpbiometricspy_studio_report_bundle.zip")
     def download_bundle():
