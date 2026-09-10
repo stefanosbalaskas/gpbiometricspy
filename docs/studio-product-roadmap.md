@@ -95,7 +95,7 @@ Status: **project identity, restore integrity, saved/dirty state and readable pr
 - timeline entries group actions into Project, Quality, Analyze, Integrate, Model and Report stages and use human-facing action/detail labels;
 - the timeline intentionally does not repeat source filenames, raw samples or recorded parameter payloads; the original full provenance table remains available unchanged for auditability;
 - raw biometric rows and cached analysis tables remain outside project recipes;
-- remaining work: local recent-project convenience.
+- remaining work: local recent-project convenience that stores metadata/recipe identity only and never creates a hidden biometric-data store.
 
 ## Phase 4 — examples and presets
 
@@ -109,18 +109,27 @@ Status: **guided-start foundation delivered**
 
 ## Phase 5 — errors, diagnostics and supportability
 
-Status: **diagnostic, semantic retry and production-browser evidence foundation delivered**
+Status: **structured remediation taxonomy, semantic retry hardening and production-browser evidence delivered**
 
 - a privacy-safe Studio Doctor checks the Shiny dependency, packaged application/CSS assets, runtime mode and loopback binding;
 - `gpbiometricspy-studio-doctor` provides concise human-readable diagnostics;
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
 - installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
-- installed upload retries now match substantive missing-resource conditions rather than presentation punctuation for the main Gazepoint upload, external event log and target stream;
+- installed upload retries match substantive missing-resource conditions rather than presentation punctuation for the main Gazepoint upload, external event log and target stream;
 - the external-event replay retry matcher is case-insensitive and uses resource-specific message fragments rather than exact complete status strings;
 - all existing external-event and target-stream replay identity checks, resource-fingerprint failures, pair/event counts, path non-disclosure assertions and exact-resource replay assertions remain unchanged;
-- public-demo error sanitization remains fail-closed;
-- remaining work: a richer structured error taxonomy, module-level remediation mapping and optional local/private technical-detail disclosure.
+- a shared researcher-facing presentation taxonomy now classifies caught failures as input, prerequisite, identity, external-resource, analysis or unknown and assigns stable `GP-STUDIO-*` support codes plus a concrete next action;
+- app-level and module-level caught failures use the same formatter without changing or swallowing scientific backend exceptions;
+- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment, Multimodal, QC, Annotation, Statistics/Modelling and Reporting catch boundaries now expose consistent recovery guidance;
+- local/private Studio retains bounded diagnostic detail alongside the stable recovery code;
+- public-demo Studio suppresses caught exception detail and exposes only the operation prefix, stable support code and safe recovery guidance;
+- deferred QC diagnostic strings and caught plot-rendering exceptions also pass through the sanitizer before being shown to the researcher;
+- project-recipe validation and restore continue to fail closed on fingerprint/identity mismatches and explicitly instruct researchers not to bypass fingerprint validation;
+- classifier precedence distinguishes genuine selection/numeric validation from incidental parameter names embedded in internal diagnostic payloads;
+- Chromium regression coverage deliberately triggers a public-demo project-name validation failure and verifies that the `GP-STUDIO-INPUT` recovery code is shown while the underlying exception detail remains hidden;
+- public-demo error sanitization remains fail-closed at both the Shiny application boundary and the manual-catch presentation layer;
+- remaining work: optional local/private technical-detail affordances and broader support documentation only where they improve recovery without exposing research data.
 
 ## Phase 6 — desktop-style local experience
 
@@ -159,20 +168,20 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-5ae5f8d2c8340d85724ae36a79ff57d3cfebe8a8
+e2b075d89deccad48ec5eb3c638eb6a77dff1575
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #423;
-- `studio` run #208 on Python 3.11 and 3.14;
-- `studio-e2e` run #179, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #180 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage` run #221;
-- `deep-parity` run #412;
-- `interoperability` run #411;
-- `docs` run #193;
-- `CodeQL` run #414.
+- `tests` run #426;
+- `studio` run #211 on Python 3.11 and 3.14;
+- `studio-e2e` run #182, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #183 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage` run #224;
+- `deep-parity` run #415;
+- `interoperability` run #414;
+- `docs` run #196;
+- `CodeQL` run #417.
 
 The checkpoint additionally certifies:
 
@@ -191,7 +200,11 @@ The checkpoint additionally certifies:
 - a readable metadata-only project timeline while preserving the original provenance audit table;
 - privacy-preserving recipes that exclude raw biometric rows and cached analysis-result tables;
 - installed-browser diagnostics and semantic upload-race retry guards across main, event-log and target-stream uploads;
-- installed external-event, target-stream and dual-resource replay identity checks on both supported CI interpreters.
+- installed external-event, target-stream and dual-resource replay identity checks on both supported CI interpreters;
+- stable researcher-facing `GP-STUDIO-*` error/remediation codes across the major Studio catch boundaries;
+- public-demo caught-exception detail suppression in both unit and Chromium browser contracts;
+- local/private bounded technical detail retained for troubleshooting;
+- fail-closed recipe/resource identity guidance that never recommends bypassing fingerprint verification.
 
 Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
@@ -211,7 +224,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware and module-level guidance plus project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware and module-level guidance, actionable recovery and project continuity**:
 
 ```text
 install
@@ -223,6 +236,7 @@ install
   → see affected modules become ready
   → run a signal analysis and see its readiness state become complete
   → follow Events & Alignment prerequisites before Multimodal
+  → verify a safe `GP-STUDIO-*` recovery message for an invalid action
   → Save / reopen / report
   → review the readable project Timeline and full Provenance audit table
   → export a privacy-preserving project recipe
@@ -230,4 +244,4 @@ install
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining presets, teaching/interpretation examples, local recent-project convenience and packaging work before a non-development `0.1.6` release. The next supportability target is a structured error/remediation taxonomy that improves researcher-facing recovery guidance without exposing raw data or weakening public-demo sanitization.
+Usability findings from that path should drive the remaining local recent-project convenience, presets, teaching/interpretation examples and packaging work before a non-development `0.1.6` release. The next project-continuity target is a local recent-project convenience layer that records only privacy-safe metadata/recipe identity and never stores raw biometric rows or cached analysis tables.
