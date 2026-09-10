@@ -2,6 +2,29 @@
 
 This document records the **0.1.6 development-line packaging experiment** for gpbiometricspy Studio. It is not a release installer specification and it does not change the scientific engine.
 
+## Status
+
+**Baseline certified on Windows Python 3.11 and 3.14.**
+
+The certified product-code checkpoint is:
+
+```text
+a4e8e9ad1abfd2f6d47cba4039f411f5ce6f1c44
+```
+
+At that exact head, the new `studio-packaging` workflow run **#1** passed on both Windows Python 3.11 and 3.14. The original nine pull-request workflow families also passed at the same SHA, so the standalone proof did not replace or weaken the scientific, Studio, browser, distribution, interoperability, coverage, documentation or CodeQL gates.
+
+Measured standalone results:
+
+| Build interpreter | Bundle files | Bundle bytes | Approx. MiB | Startup to HTTP 200 | External Python required |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Python 3.11.9 | 1,892 | 235,369,466 | 224.5 | 3.563 s | No |
+| Python 3.14.7 | 1,887 | 239,684,216 | 228.6 | 3.447 s | No |
+
+Both frozen server logs show normal Uvicorn startup on `127.0.0.1:8875` and a successful `GET /` response. The smoke deliberately removed external Python from `PATH` and cleared `PYTHONHOME` / `PYTHONPATH` before launching the frozen executable.
+
+These measurements are CI evidence for the **diagnosable onedir baseline**, not size or startup guarantees for a future signed release installer.
+
 ## Decision for the first experiment
 
 The first standalone proof uses **PyInstaller 6.22.2** with **pyinstaller-hooks-contrib 2026.7** in **onedir** mode on Windows.
@@ -100,7 +123,7 @@ The generated bundle is an evaluation artifact only. Do not redistribute it as a
 
 ## Acceptance criteria
 
-The PyInstaller candidate is acceptable for the next packaging stage only if all of the following hold on both Python 3.11 and 3.14 Windows builds:
+The first PyInstaller baseline has satisfied the following criteria on both Python 3.11 and 3.14 Windows builds:
 
 - frozen launcher unit contract passes;
 - PyInstaller build completes;
@@ -110,12 +133,12 @@ The PyInstaller candidate is acceptable for the next packaging stage only if all
 - the ordinary scientific, Studio, E2E, production, interoperability, branch-coverage, docs and CodeQL gates remain green;
 - no public/private runtime or fingerprint safeguard is weakened.
 
-Only after that baseline is stable should we evaluate Chromium interaction against the frozen bundle, onefile mode, icon/native-window presentation, code signing and installer technology.
+The next packaging stage should add **Chromium interaction against the frozen bundle itself** so the standalone executable is exercised beyond its HTTP landing page. Only after that should we decide whether onefile mode, icon/native-window presentation, code signing or installer technology materially improves the user experience.
 
 ## Nuitka status
 
-Nuitka 4.2 also officially supports Python 3.14 and remains a credible secondary candidate. It is deferred until the PyInstaller onedir baseline is measured because Nuitka introduces a different compilation/toolchain cost profile. A later comparison should use the same acceptance contract and compare at least build reproducibility, build time, startup time, bundle size, diagnostic quality and Windows distribution ergonomics.
+Nuitka 4.2 also officially supports Python 3.14 and remains a credible secondary candidate. It is deferred until the PyInstaller onedir baseline is stable because Nuitka introduces a different compilation/toolchain cost profile. A later comparison should use the same acceptance contract and compare at least build reproducibility, build time, startup time, bundle size, diagnostic quality and Windows distribution ergonomics.
 
 ## Release boundary
 
-A successful packaging evaluation does not itself make `0.1.6` releasable. Human first-session usability, installer/update policy, signing strategy and reproducible release-build rules remain separate release decisions.
+A successful packaging baseline does not itself make `0.1.6` releasable. Human first-session usability, frozen-bundle interaction coverage, installer/update policy, signing strategy and reproducible release-build rules remain separate release decisions.
