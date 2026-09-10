@@ -52,6 +52,20 @@ def _grid(table: pd.DataFrame | None, message: str, *, height: str = "360px"):
     return render.DataGrid(table, filters=True, height=height)
 
 
+def _report_state_identity(current) -> tuple[Any, ...]:
+    """Return the project-state identity that a built report must represent."""
+    return (
+        current.project_name,
+        current.source_name,
+        current.loaded_at,
+        current.n_rows,
+        current.n_columns,
+        len(current.annotations),
+        tuple(sorted(map(str, current.analyses))),
+        len(current.provenance),
+    )
+
+
 @module.ui
 def reporting_ui():
     return ui.div(
@@ -233,6 +247,7 @@ def reporting_ui():
 @module.server
 def reporting_server(input, output, session, state, global_status):
     artifacts_value: reactive.Value[Any] = reactive.Value(None)
+    artifact_identity_value: reactive.Value[Any] = reactive.Value(None)
     recipe_value: reactive.Value[Any] = reactive.Value(None)
     recipe_checks_value: reactive.Value[Any] = reactive.Value(None)
     report_status_value = reactive.Value("Ready. Load data, run the desired workflows, then build reporting artifacts.")
@@ -246,8 +261,22 @@ def reporting_server(input, output, session, state, global_status):
         if dataset_identity_value() != identity:
             dataset_identity_value.set(identity)
             artifacts_value.set(None)
+            artifact_identity_value.set(None)
             recipe_value.set(None)
             recipe_checks_value.set(None)
+
+    @reactive.effect
+    def _invalidate_reporting_when_project_changes():
+        built_identity = artifact_identity_value()
+        if built_identity is None:
+            return
+        current_identity = _report_state_identity(state())
+        if built_identity != current_identity:
+            artifacts_value.set(None)
+            artifact_identity_value.set(None)
+            report_status_value.set(
+                "Project state changed. Rebuild reporting artifacts before export."
+            )
 
     def _artifact_or_build() -> dict[str, Any]:
         current = state()
@@ -281,6 +310,7 @@ def reporting_server(input, output, session, state, global_status):
             )
             state.set(recorded)
             artifacts_value.set(artifacts)
+            artifact_identity_value.set(_report_state_identity(recorded))
             report_status_value.set("Reporting artifacts built through public gpbiometricspy reporting APIs.")
             global_status.set("Reporting artifacts complete. Review methods, manifest, project recipe, and downloads.")
         except Exception as exc:
@@ -317,6 +347,7 @@ def reporting_server(input, output, session, state, global_status):
             checks = recipe_validation_table(recipe, restored.data)
             state.set(restored)
             artifacts_value.set(None)
+            artifact_identity_value.set(None)
             recipe_value.set(recipe)
             recipe_checks_value.set(checks)
             recipe_status_value.set(

@@ -10,7 +10,15 @@ import gpbiometricspy as gp
 
 try:
     from studio.config import studio_runtime_config
-    from studio.product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table
+    from studio.product_services import (
+        active_guided_start,
+        guided_next_step,
+        guided_progress_text,
+        guided_start,
+        guided_start_choices,
+        readiness_percent,
+        workflow_progress as workflow_progress_table,
+    )
     from studio.modules.annotation import annotation_server, annotation_ui
     from studio.modules.eda_scr import eda_scr_server, eda_scr_ui
     from studio.modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -33,7 +41,15 @@ try:
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from config import studio_runtime_config
-    from product_services import guided_start, guided_start_choices, readiness_percent, workflow_progress as workflow_progress_table
+    from product_services import (
+        active_guided_start,
+        guided_next_step,
+        guided_progress_text,
+        guided_start,
+        guided_start_choices,
+        readiness_percent,
+        workflow_progress as workflow_progress_table,
+    )
     from modules.annotation import annotation_server, annotation_ui
     from modules.eda_scr import eda_scr_server, eda_scr_ui
     from modules.event_alignment import event_alignment_server, event_alignment_ui
@@ -194,6 +210,8 @@ def _home_panel():
             ui.card(
                 ui.card_header("Next recommended step"),
                 ui.tags.div(ui.output_text("next_step"), class_="studio-next-step"),
+                ui.tags.div(ui.output_text("guided_progress"), class_="studio-guided-progress"),
+                ui.output_ui("guided_continue"),
             ),
             ui.card(
                 ui.card_header("Project readiness"),
@@ -367,10 +385,26 @@ def server(input, output, session):
             ui.update_text("project_name_input", value=guided_state.project_name, session=session)
             ui.update_navs("main_nav", selected=preset.target_nav, session=session)
             status_text.set(
-                f"{preset.label} ready. Foundation QC is complete; continue in the opened workflow and review QC evidence as needed."
+                f"{preset.label} ready. Foundation QC is complete. First step: {preset.steps[0].label}."
             )
         except Exception as exc:
             status_text.set(_safe_error("Guided walkthrough failed", exc))
+
+    @reactive.effect
+    @reactive.event(input.continue_guided)
+    def _continue_guided():
+        current = state()
+        preset = active_guided_start(current)
+        step = guided_next_step(current)
+        if preset is None:
+            status_text.set("No guided walkthrough is active. Choose one from Guided Start.")
+            return
+        if step is None:
+            status_text.set(f"{preset.label} is complete. Review or export the project from Reporting.")
+            ui.update_navs("main_nav", selected="reporting", session=session)
+            return
+        ui.update_navs("main_nav", selected=step.target_nav, session=session)
+        status_text.set(f"Guided next step: {step.label}. {step.detail}")
 
     @reactive.effect
     @reactive.event(input.load_demo)
@@ -441,7 +475,9 @@ def server(input, output, session):
 
     @render.text
     def guided_start_description():
-        return guided_start(input.guided_start()).summary
+        preset = guided_start(input.guided_start())
+        route = " → ".join(step.label for step in preset.steps)
+        return f"{preset.summary} Route: {route}."
 
     @render.text
     def session_summary():
@@ -458,11 +494,40 @@ def server(input, output, session):
             return "Load the synthetic demo to learn the workflow, or import a local Gazepoint CSV/TXT file."
         if current.qc is None:
             return "Run foundation QC. This establishes the baseline quality checks before signal-specific interpretation."
+        preset = active_guided_start(current)
+        if preset is not None:
+            step = guided_next_step(current)
+            if step is None:
+                return f"{preset.label} is complete. Review the report, project recipe and replay artifacts before closing the project."
+            return f"Guided walkthrough — next: {step.label}. {step.detail}"
         if not current.analyses:
             return "Review Quality Control, then open EDA/SCR, PPG/HRV, Pupil, or Gaze/AOI based on the channels you recorded."
         if len(current.analyses) == 1:
             return "You have one saved analysis. Add another signal or alignment workflow, or review Reporting & Reproducibility."
         return "Your project has multiple analyses. Review alignment/modelling as needed, then export provenance and replay outputs in Reporting & Reproducibility."
+
+    @render.text
+    def guided_progress():
+        return guided_progress_text(state()) or ""
+
+    @render.ui
+    def guided_continue():
+        current = state()
+        preset = active_guided_start(current)
+        if preset is None:
+            return None
+        step = guided_next_step(current)
+        if step is None:
+            return ui.input_action_button(
+                "continue_guided",
+                "Open completed project report",
+                class_="btn-outline-primary mt-3",
+            )
+        return ui.input_action_button(
+            "continue_guided",
+            f"Continue: {step.label}",
+            class_="btn-primary mt-3",
+        )
 
     @render.text
     def readiness_summary():
