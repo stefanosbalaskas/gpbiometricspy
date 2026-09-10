@@ -7,6 +7,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.services import (
         analysis_group_column_choices,
         eda_analysis_tables,
@@ -16,6 +17,7 @@ try:
         time_column_choices,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from services import (
         analysis_group_column_choices,
         eda_analysis_tables,
@@ -224,7 +226,9 @@ def eda_scr_server(input, output, session, state, status_text):
             local_status.set("EDA/SCR workflow complete using public gpbiometricspy APIs.")
             status_text.set("EDA/SCR analysis complete. Review the Analysis tab and export reproducible outputs.")
         except Exception as exc:
-            local_status.set(f"EDA/SCR analysis failed: {exc}")
+            failure = format_failure("EDA/SCR analysis failed", exc, context="eda_scr")
+            local_status.set(failure)
+            status_text.set(failure)
 
     @render.text
     def status():
