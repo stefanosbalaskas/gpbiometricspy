@@ -7,8 +7,10 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.services import physiology_quality_table, run_advanced_qc, time_column_choices
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from services import physiology_quality_table, run_advanced_qc, time_column_choices
 
 
@@ -121,7 +123,9 @@ def qc_server(input, output, session, state, status_text):
             local_status.set("Advanced QC complete using public gpbiometricspy APIs.")
             status_text.set("Advanced QC complete. Review the Quality Control tab.")
         except Exception as exc:
-            local_status.set(f"Advanced QC failed: {exc}")
+            message = format_failure("Advanced QC failed", exc, context="quality control")
+            local_status.set(message)
+            status_text.set(message)
 
     @render.text
     def status():
@@ -132,7 +136,13 @@ def qc_server(input, output, session, state, status_text):
         audit = (state().qc or {}).get("time_resets")
         table = audit.get("overview") if isinstance(audit, dict) else None
         if not isinstance(table, pd.DataFrame):
-            table = pd.DataFrame({"status": [(state().qc or {}).get("time_resets_error", "Run advanced QC to populate this table.")]})
+            detail = (state().qc or {}).get("time_resets_error")
+            message = (
+                format_failure("Time-reset diagnostic unavailable", detail, context="advanced QC timing")
+                if detail
+                else "Run advanced QC to populate this table."
+            )
+            table = pd.DataFrame({"status": [message]})
         return render.DataGrid(table, filters=True)
 
     @render.data_frame
@@ -186,7 +196,13 @@ def qc_server(input, output, session, state, status_text):
         result = _gaze_result()
         table = result.get("summary") if isinstance(result, dict) else None
         if not isinstance(table, pd.DataFrame):
-            table = pd.DataFrame({"status": [(state().qc or {}).get("gaze_validation_error", "Run advanced QC to populate gaze checks.")]})
+            detail = (state().qc or {}).get("gaze_validation_error")
+            message = (
+                format_failure("Gaze QC diagnostic unavailable", detail, context="advanced QC gaze")
+                if detail
+                else "Run advanced QC to populate gaze checks."
+            )
+            table = pd.DataFrame({"status": [message]})
         return render.DataGrid(table, filters=True)
 
     @render.data_frame
