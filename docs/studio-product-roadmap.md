@@ -108,7 +108,7 @@ Status: **project identity, restore integrity, saved/dirty state, readable prove
 
 ## Phase 4 — examples and presets
 
-Status: **guided starts, documented analysis presets and teaching routes delivered**
+Status: **guided starts, documented analysis presets, teaching routes and an end-to-end first-session browser contract delivered**
 
 - bundled synthetic multimodal walkthrough;
 - bundled synthetic eye-tracking walkthrough;
@@ -125,7 +125,9 @@ Status: **guided starts, documented analysis presets and teaching routes deliver
 - the Model guidance distinguishes auditable model-data preparation from model fitting;
 - the cluster-permutation teaching preset explicitly preserves the validated two-condition, within-subject, one-dimensional time-course boundary, package-native design diagnostics, 1000-permutation Guided starting point and descriptive interpretation of cluster boundaries;
 - Chromium coverage verifies the Home teaching routes, EDA and modelling preset cards, matching live Guided controls, and that merely viewing the guidance leaves the analysis count at zero;
-- remaining work: richer teaching/demo examples and optional one-click reproducibility conveniences only where they reuse the existing scientific/reporting contracts rather than create a second analysis engine.
+- a dedicated first-session golden-path Chromium contract now follows the actual physiology journey from Home teaching context through the guided synthetic start, automatic foundation QC, EDA/SCR, guided Continue to PPG/HR/HRV, Reporting, report build, 3/3 guided completion, Timeline review, recipe save and visible dirty-state transition after a project-name edit;
+- the first-session contract uses the same live controls and stable navigation identifiers as the product, does not add a parallel tutorial engine, and passed on Python 3.11 and 3.14;
+- remaining work: human subjective usability review, richer teaching/demo examples and optional one-click reproducibility conveniences only where they reuse the existing scientific/reporting contracts rather than create a second analysis engine.
 
 ## Phase 5 — errors, diagnostics and supportability
 
@@ -192,25 +194,27 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-cb0924b85143f9ec6239e372bb5974fe0c9e43f2
+299e3beb0a0545ed59270bbdff2359454a77582e
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #432;
-- `studio` run #217 on Python 3.11 and 3.14;
-- `studio-e2e` run #188, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #189: Linux Python 3.11 and 3.14 installed wheel/source-distribution Chromium replay plus synthetic runtime smoke, and clean Windows local-install/Doctor/launch smoke on Python 3.11 and 3.14;
-- `branch-coverage` run #230;
-- `deep-parity` run #421;
-- `interoperability` run #420;
-- `docs` run #202;
-- `CodeQL` run #423.
+- `tests` run #435;
+- `studio` run #220 on Python 3.11 and 3.14;
+- `studio-e2e` run #191, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #192: Linux Python 3.11 and 3.14 installed wheel/source-distribution Chromium replay plus synthetic runtime smoke, and clean Windows local-install/Doctor/launch smoke on Python 3.11 and 3.14;
+- `branch-coverage` run #233;
+- `deep-parity` run #424;
+- `interoperability` run #423;
+- `docs` run #205;
+- `CodeQL` run #426.
 
-The first Linux Python 3.14 production attempt had a single target-stream upload acknowledgement timeout during installed sdist Chromium replay. The failed job was rerun **unchanged** at the same commit and passed the complete production sequence, while Linux 3.11, the Python 3.14 wheel path, source Chromium, and both Windows jobs were already successful. No product code or browser assertion was weakened in response.
+The candidate first exposed a deterministic test-contract error in the newly added first-session journey: the EDA Guided-mode control is a Shiny radio-group container, so the first version incorrectly asserted a value on the group node. The correction changed only that E2E selector to target the existing `input[value="guided"]`, matching the already-certified analysis-preset test. No application or scientific implementation changed, and the corrected exact head passed the complete nine-family matrix.
 
 The checkpoint additionally certifies:
 
+- a cohesive first-session Chromium journey from Home teaching routes through physiology guided start, automatic foundation QC, EDA/SCR, PPG/HR/HRV, Reporting, report build, 3/3 completion, project Timeline, recipe Saved state and `Unsaved changes` after a metadata edit;
+- the first-session journey on source Chromium for Python 3.11 and 3.14;
 - stepwise guided walkthrough continuation and dynamic Continue-label updates;
 - dataset-boundary retirement of stale guided state;
 - channel-aware Home recommendations based on existing validated channel/capability state, including fail-closed behavior for malformed validation tables;
@@ -255,7 +259,8 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 - Studio smoke, Chromium E2E and production/distribution gates remain green;
 - no regression in public synthetic fail-closed behavior;
 - clean Windows install → Studio Doctor → launch remains CI-green on Python 3.11 and 3.14;
-- onboarding path tested by a human from install → guided demo → QC → analysis → report;
+- the researcher-facing launch → guided demo → QC → analysis → report/save path remains browser-certified on Python 3.11 and 3.14;
+- the full onboarding path is still tested by a human for comprehension, friction and visual usability rather than scientific correctness alone;
 - keyboard and narrow-viewport browser checks remain green;
 - project/replay fingerprint guards remain fail-closed;
 - documentation reflects the actual installed behavior;
@@ -263,7 +268,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery, teaching context and privacy-safe project continuity**. Automated clean-install/Doctor/launch coverage is now in place on Windows, so human validation should focus on the researcher-facing workflow after launch:
+The automated browser contract now covers the central researcher-facing physiology first session after launch. Human validation should therefore focus on **comprehension, visual hierarchy, perceived friction and packaging/install experience**, while still replaying the complete path:
 
 ```text
 install
@@ -276,7 +281,8 @@ install
   → see affected modules become ready
   → review the teaching preset and its Guided baseline before analysis
   → run a signal analysis and see its readiness state become complete
-  → follow Events & Alignment prerequisites before Multimodal
+  → follow the guided Continue action into the next signal family
+  → complete the guided route and build the report
   → verify a safe `GP-STUDIO-*` recovery message for an invalid action
   → Save / reopen / report
   → review the readable project Timeline and full Provenance audit table
@@ -287,4 +293,4 @@ install
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining teaching examples and packaging work before a non-development `0.1.6` release. The next product work should prioritize **human first-session validation and packaging evaluation**, with any additional one-click convenience constrained to existing reporting/replay contracts and the same privacy/fingerprint guardrails.
+The next product work should prioritize **human subjective first-session validation and packaging evaluation**, with PyInstaller/Nuitka or a lightweight webview treated as optional downstream packaging experiments. Any additional one-click convenience must remain constrained to existing reporting/replay contracts and the same privacy/fingerprint guardrails.
