@@ -15,11 +15,11 @@ from typing import Any, Callable
 from shiny import ui
 
 try:
+    from studio.module_prerequisite_runtime import module_readiness_runtime_server
     from studio.module_prerequisite_ui import module_readiness_ui
-    from studio.module_prerequisites import module_readiness_server
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from module_prerequisite_runtime import module_readiness_runtime_server
     from module_prerequisite_ui import module_readiness_ui
-    from module_prerequisites import module_readiness_server
 
 
 def _wrap_with_readiness(
@@ -55,7 +55,7 @@ def _wrap_with_readiness(
         **kwargs: Any,
     ):
         result = original_server(module_id, state, status_text, *args, **kwargs)
-        module_readiness_server(f"{module_id}_readiness", state, module_key)
+        module_readiness_runtime_server(f"{module_id}_readiness", state, module_key)
         return result
 
     setattr(module_obj, ui_name, wrapped_ui)
