@@ -175,6 +175,9 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
     expect(page.locator("#reporting-recipe_upload")).to_be_hidden()
     expect(page.locator("#reporting-validate_recipe")).to_be_hidden()
     expect(page.locator("#reporting-restore_recipe")).to_be_hidden()
+    assert page.locator("#reporting-remember_recent").count() == 0
+    assert page.locator("#reporting-recent_projects-table").count() == 0
+    assert page.get_by_text("Recent projects on this device", exact=True).count() == 0
     assert page.locator('input[type="file"]:visible').count() == 0
 
     recipe = json.loads(
