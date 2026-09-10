@@ -9,6 +9,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.statistics_services import (
         categorical_column_choices,
         cluster_report_text,
@@ -29,6 +30,7 @@ try:
         unsupported_cluster_guardrails,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from statistics_services import (
         categorical_column_choices,
         cluster_report_text,
@@ -474,8 +476,9 @@ def statistics_modelling_server(input, output, session, state, global_status):
             model_status_value.set(f"Model-data preparation complete: {rows:,} rows available for modelling.")
             global_status.set("Statistical model-data preparation complete. Review the formula, complete cases, and variable roles before fitting a model externally.")
         except Exception as exc:
-            model_status_value.set(f"Model preparation failed: {exc}")
-            global_status.set(f"Model preparation failed: {exc}")
+            message = format_failure("Model preparation failed", exc, context="analysis failed statistics modelling")
+            model_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.run_cluster)
@@ -537,8 +540,9 @@ def statistics_modelling_server(input, output, session, state, global_status):
                 cluster_status_value.set(f"Cluster permutation complete: {n_clusters} observed cluster(s).")
                 global_status.set("Cluster permutation complete. Interpret cluster-level evidence and timing guardrails together.")
         except Exception as exc:
-            cluster_status_value.set(f"Cluster permutation failed: {exc}")
-            global_status.set(f"Cluster permutation failed: {exc}")
+            message = format_failure("Cluster permutation failed", exc, context="analysis failed cluster permutation")
+            cluster_status_value.set(message)
+            global_status.set(message)
 
     @reactive.calc
     def _model_result():
@@ -702,7 +706,13 @@ def statistics_modelling_server(input, output, session, state, global_status):
         try:
             return gp.plot_gazepoint_cluster_null_distribution(cluster)
         except (ValueError, TypeError) as exc:
-            return _placeholder(f"Null-distribution plot unavailable: {exc}")
+            return _placeholder(
+                format_failure(
+                    "Null-distribution plot unavailable",
+                    exc,
+                    context="analysis failed cluster plotting",
+                )
+            )
 
     @render.download_button(filename="gpbiometricspy_model_data.csv")
     def download_model_data():
