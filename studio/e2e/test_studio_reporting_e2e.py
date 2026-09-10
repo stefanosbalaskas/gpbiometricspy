@@ -207,7 +207,24 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
         assert bundled_recipe["analysis_inventory"][0]["analysis"] == "eda_scr"
 
     page.get_by_role("tab", name="Project recipe", exact=True).click()
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Unsaved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "Download a project recipe"
+    )
     recipe_download = _download(page, "#reporting-download_recipe")
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Saved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "last downloaded project recipe"
+    )
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "Current project metadata is saved."
+    )
     recipe = json.loads(recipe_download.read_text(encoding="utf-8"))
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
@@ -215,6 +232,17 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     assert len(recipe["dataset"]["sha256"]) == 64
     recipe_path = tmp_path / "reporting-project-recipe.json"
     recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
+
+    page.locator("#project_name_input").fill("Reporting browser validation changed")
+    page.locator("#apply_project_name").click()
+    expect(page.locator("#status")).to_contain_text("Project name set to", timeout=30_000)
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Unsaved changes",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "changed after the last recipe checkpoint"
+    )
 
     # A different loaded dataset must fail the fingerprint gate.
     _reset_session(page)
@@ -263,6 +291,13 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     )
     expect(page.locator("#status")).to_contain_text(
         "restored after exact dataset fingerprint verification."
+    )
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Saved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "restored recipe is the current metadata checkpoint"
     )
     expect(page.locator("#reporting-analysis_count")).to_have_text("0")
     expect(page.locator("#reporting-result_table_count")).to_have_text("0")
