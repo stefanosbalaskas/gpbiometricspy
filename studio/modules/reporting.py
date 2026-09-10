@@ -11,6 +11,11 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from product_services import project_export_stem
 
 try:
+    from studio.project_timeline import project_timeline as project_timeline_table
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from project_timeline import project_timeline as project_timeline_table
+
+try:
     from studio.reporting_services import (
         analysis_inventory as analysis_inventory_table,
         annotations_frame,
@@ -164,6 +169,14 @@ def reporting_ui():
                     col_widths=(5, 7),
                 ),
                 ui.navset_card_tab(
+                    ui.nav_panel(
+                        "Timeline",
+                        ui.p(
+                            "A readable metadata-only journey derived from the full provenance log. Source filenames, raw samples, and recorded parameter payloads are not repeated here.",
+                            class_="small text-secondary",
+                        ),
+                        ui.output_data_frame("project_timeline"),
+                    ),
                     ui.nav_panel("Provenance", ui.output_data_frame("provenance")),
                     ui.nav_panel("Annotations", ui.output_data_frame("annotations")),
                 ),
@@ -503,6 +516,14 @@ def reporting_server(input, output, session, state, global_status):
     @render.data_frame
     def result_catalog():
         return _grid(result_table_catalog(state().analyses), "No analysis result tables are stored in this session.")
+
+    @render.data_frame
+    def project_timeline():
+        return _grid(
+            project_timeline_table(state()),
+            "No project operations have been recorded yet.",
+            height="430px",
+        )
 
     @render.data_frame
     def provenance():
