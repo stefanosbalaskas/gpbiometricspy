@@ -30,7 +30,7 @@ function Stop-ProcessTree {
     if ($null -eq $Process -or $Process.HasExited) {
         return
     }
-    & taskkill.exe /PID $Process.Id /T /F 2>$null | Out-Null
+    & taskkill.exe /PID $($Process.Id) /T /F 2>$null | Out-Null
 }
 
 function Wait-StudioReady {
@@ -79,9 +79,9 @@ function Test-StudioLaunch {
     )
 
     $port = Get-FreeLoopbackPort
-    $args = @($ArgumentList + @("--host", "127.0.0.1", "--port", "$port"))
+    $launchArgs = @($ArgumentList + @("--host", "127.0.0.1", "--port", "$port"))
     Remove-Item $stdoutLog, $stderrLog -Force -ErrorAction SilentlyContinue
-    $process = Start-Process -FilePath $FilePath -ArgumentList $args -WorkingDirectory $outsideRepo -PassThru -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
+    $process = Start-Process -FilePath $FilePath -ArgumentList $launchArgs -WorkingDirectory $outsideRepo -PassThru -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
     try {
         Wait-StudioReady -Process $process -Port $port -Label $Label
         Write-Host "PASS: $Label launched on loopback port $port"
