@@ -119,6 +119,9 @@ jobs:
           test -n "$wheel"
           test -n "$sdist"
 
+          diagnostics_root="$RUNNER_TEMP/gpbiometricspy-studio-production-diagnostics"
+          mkdir -p "$diagnostics_root"
+
           exercise_artifact() (
             set -euo pipefail
             kind="$1"
@@ -127,8 +130,10 @@ jobs:
             local_port="$4"
             envdir="$(mktemp -d)"
             venv="$envdir/venv"
+            diagdir="$diagnostics_root/$kind"
             server_pid=""
             server_log=""
+            mkdir -p "$diagdir"
 
             stop_server() {
               if [[ -n "$server_pid" ]]; then
@@ -173,7 +178,7 @@ jobs:
               mode="$1"
               launcher="$2"
               port="$3"
-              server_log="$envdir/${mode}-studio-${kind}.log"
+              server_log="$diagdir/${mode}-studio-${kind}.log"
 
               (
                 cd "$envdir"
@@ -198,12 +203,14 @@ jobs:
               if [[ "$mode" == "public" ]]; then
                 GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
                   GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
-                  python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium
+                  python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium \
+                    --junitxml="$diagdir/${mode}-pytest.xml"
               else
                 GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
                   GPBIOMETRICSPY_INSTALLED_LOCAL_URL="http://127.0.0.1:${port}/" \
                   GPBIOMETRICSPY_INSTALLED_PYTHON="$venv/bin/python" \
-                  python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py --browser chromium
+                  python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py --browser chromium \
+                    --junitxml="$diagdir/${mode}-pytest.xml"
               fi
 
               stop_server
@@ -215,6 +222,13 @@ jobs:
 
           exercise_artifact wheel "$wheel" 8765 8767
           exercise_artifact sdist "$sdist" 8766 8768
+      - name: Upload installed browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-production-browser-diagnostics-py${{ matrix.python-version }}
+          path: ${{ runner.temp }}/gpbiometricspy-studio-production-diagnostics
+          if-no-files-found: warn
       - name: Synthetic runtime smoke profile
         run: python -m studio.production --json studio-production-metrics.json
       - name: Upload runtime metrics
