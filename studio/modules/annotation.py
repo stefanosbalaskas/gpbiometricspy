@@ -7,8 +7,10 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.services import annotation_signal_choices, annotations_frame, time_column_choices
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from services import annotation_signal_choices, annotations_frame, time_column_choices
 
 
@@ -132,7 +134,9 @@ def annotation_server(input, output, session, state, status_text):
             state.set(current.without_annotation(row_number))
             local_status.set(f"Annotation row {row_number} removed.")
         except (TypeError, ValueError) as exc:
-            local_status.set(f"Remove failed: {exc}")
+            message = format_failure("Remove annotation failed", exc, context="annotation row selection")
+            local_status.set(message)
+            status_text.set(message)
 
     @reactive.effect
     @reactive.event(input.clear)
