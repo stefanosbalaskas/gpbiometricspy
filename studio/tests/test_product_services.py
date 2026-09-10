@@ -106,7 +106,7 @@ def test_report_completion_is_invalidated_by_later_project_state_changes():
     assert readiness_percent(replaced) == 25
     assert workflow_progress(replaced).loc[
         lambda table: table["stage"] == "Report", "status"
-    ].iloc[0] == "Ready"
+    ].iloc[0] == "Blocked"
 
 
 def test_unknown_restored_guided_preset_fails_closed_to_no_active_walkthrough():
