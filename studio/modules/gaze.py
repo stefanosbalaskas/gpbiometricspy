@@ -9,6 +9,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.gaze_services import (
         analysis_group_column_choices,
         aoi_column_choices,
@@ -24,6 +25,7 @@ try:
     )
     from studio.plotting import as_matplotlib_figure
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from gaze_services import (
         analysis_group_column_choices,
         aoi_column_choices,
@@ -384,7 +386,9 @@ def gaze_server(input, output, session, state, status_text):
             local_status.set("Gaze workflow complete using public gpbiometricspy APIs.")
             status_text.set("Gaze analysis complete. Review validation, events, AOIs, scanpaths, and exports.")
         except Exception as exc:
-            local_status.set(f"Gaze analysis failed: {exc}")
+            failure = format_failure("Gaze analysis failed", exc, context="gaze")
+            local_status.set(failure)
+            status_text.set(failure)
 
     @render.text
     def status():
@@ -523,7 +527,7 @@ def gaze_server(input, output, session, state, status_text):
         try:
             return as_matplotlib_figure(gp.plot_gazepoint_saccade_main_sequence(table))
         except Exception as exc:
-            return _placeholder(f"Main-sequence plot unavailable: {exc}")
+            return _placeholder(format_failure("Main-sequence plot unavailable", exc, context="gaze_plot"))
 
     @render.plot(alt="AOI dwell-time diagnostic")
     def aoi_dwell_plot():
