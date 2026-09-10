@@ -34,6 +34,15 @@ class GuidedStart:
     run_foundation_qc: bool = True
 
 
+@dataclass(frozen=True)
+class WorkflowRecommendation:
+    key: str
+    label: str
+    target_nav: str
+    reason: str
+    kind: str = "analysis"
+
+
 _GUIDED_STARTS = (
     GuidedStart(
         key="multimodal",
@@ -192,6 +201,158 @@ def guided_progress_text(state: ProjectState) -> str | None:
         return None
     complete = sum(_guided_step_complete(step, state) for step in preset.steps)
     return f"{preset.label}: {complete}/{len(preset.steps)} guided steps complete"
+
+
+def _active_channel_names(active_channels: pd.DataFrame | None) -> set[str]:
+    """Read package-native active-channel rows without re-detecting signals."""
+    if not isinstance(active_channels, pd.DataFrame) or active_channels.empty:
+        return set()
+    if not {"signal", "active"}.issubset(active_channels.columns):
+        return set()
+    mask = active_channels["active"].fillna(False).eq(True)
+    return {
+        str(value).strip().lower()
+        for value in active_channels.loc[mask, "signal"]
+        if str(value).strip()
+    }
+
+
+def workflow_recommendations(
+    state: ProjectState,
+    active_channels: pd.DataFrame | None,
+    *,
+    pupil_available: bool = False,
+    gaze_available: bool = False,
+) -> tuple[WorkflowRecommendation, ...]:
+    """Map validated channel capabilities to advisory Studio workflow destinations."""
+    if not state.loaded or state.qc is None:
+        return ()
+
+    active = _active_channel_names(active_channels)
+    completed = _analysis_names(state)
+    recommendations: list[WorkflowRecommendation] = []
+
+    if "gsr_eda" in active and "eda_scr" not in completed:
+        recommendations.append(
+            WorkflowRecommendation(
+                key="eda_scr",
+                label="EDA / SCR",
+                target_nav="eda_scr",
+                reason="foundation validation confirmed an active EDA/GSR channel",
+            )
+        )
+    if "heart_rate" in active and "ppg_hr_hrv" not in completed:
+        recommendations.append(
+            WorkflowRecommendation(
+                key="ppg_hr_hrv",
+                label="PPG / HR / HRV",
+                target_nav="ppg_hr_hrv",
+                reason="foundation validation confirmed an active cardiac channel",
+            )
+        )
+    if pupil_available and "pupil" not in completed:
+        recommendations.append(
+            WorkflowRecommendation(
+                key="pupil",
+                label="Pupil",
+                target_nav="pupil",
+                reason="the dataset exposes pupil inputs supported by the Pupil workspace",
+            )
+        )
+    if gaze_available and "gaze" not in completed:
+        recommendations.append(
+            WorkflowRecommendation(
+                key="gaze",
+                label="Gaze / Fixation / AOI",
+                target_nav="gaze",
+                reason="the dataset exposes gaze coordinates supported by the Gaze/AOI workspace",
+            )
+        )
+
+    signal_level_pending = any(item.kind == "analysis" for item in recommendations)
+    if "ttl_marker" in active and "event_alignment" not in completed and not signal_level_pending:
+        recommendations.append(
+            WorkflowRecommendation(
+                key="event_alignment",
+                label="Events & Alignment",
+                target_nav="event_alignment",
+                reason="active TTL markers are available for event-aware alignment",
+                kind="integration",
+            )
+        )
+
+    detected_modalities = sum(
+        (
+            "gsr_eda" in active,
+            "heart_rate" in active,
+            "engagement_dial" in active,
+            bool(pupil_available),
+            bool(gaze_available),
+        )
+    )
+    if (
+        detected_modalities >= 2
+        and "event_alignment" in completed
+        and "multimodal" not in completed
+        and not recommendations
+    ):
+        recommendations.append(
+            WorkflowRecommendation(
+                key="multimodal",
+                label="Multimodal",
+                target_nav="multimodal",
+                reason="multiple detected modalities are available and event alignment is already recorded",
+                kind="integration",
+            )
+        )
+
+    return tuple(recommendations)
+
+
+def channel_guidance_text(
+    state: ProjectState,
+    active_channels: pd.DataFrame | None,
+    *,
+    pupil_available: bool = False,
+    gaze_available: bool = False,
+) -> str | None:
+    """Return concise, channel-aware Home guidance without changing scientific state."""
+    recommendations = workflow_recommendations(
+        state,
+        active_channels,
+        pupil_available=pupil_available,
+        gaze_available=gaze_available,
+    )
+    if not recommendations:
+        if state.loaded and state.qc is not None and state.analyses:
+            return (
+                "Detected signal workflows currently have no unfinished channel-specific recommendation. "
+                "Review stored analyses, then use Reporting or an optional modelling workflow as required by the research question."
+            )
+        return None
+
+    analysis_items = [item for item in recommendations if item.kind == "analysis"]
+    if analysis_items:
+        labels = [item.label for item in analysis_items]
+        if len(labels) == 1:
+            choices = labels[0]
+        elif len(labels) == 2:
+            choices = f"{labels[0]} or {labels[1]}"
+        else:
+            choices = f"{', '.join(labels[:-1])}, or {labels[-1]}"
+        active = _active_channel_names(active_channels)
+        ttl_note = (
+            " Active TTL markers are also available; use Events & Alignment before downstream multimodal integration."
+            if "ttl_marker" in active
+            else ""
+        )
+        return (
+            f"Channel-aware recommendation: start with {choices}; choose the signal family that matches the research question."
+            f"{ttl_note}"
+        )
+
+    first = recommendations[0]
+    return f"Channel-aware recommendation: {first.label}. {first.reason.capitalize()}."
 
 
 def workflow_progress(state: ProjectState) -> pd.DataFrame:
