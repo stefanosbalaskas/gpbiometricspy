@@ -15,8 +15,10 @@ from typing import Any, Callable
 from shiny import ui
 
 try:
+    from studio.module_prerequisite_ui import module_readiness_ui
     from studio.module_prerequisites import module_readiness_server
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from module_prerequisite_ui import module_readiness_ui
     from module_prerequisites import module_readiness_server
 
 
@@ -27,7 +29,7 @@ def _wrap_with_readiness(
     server_name: str,
     module_key: str,
 ) -> None:
-    """Attach one advisory readiness output without altering scientific logic."""
+    """Attach one advisory readiness module without altering scientific logic."""
 
     marker = f"_studio_readiness_wrapped_{module_key}"
     if getattr(module_obj, marker, False):
@@ -38,8 +40,9 @@ def _wrap_with_readiness(
 
     @wraps(original_ui)
     def wrapped_ui(module_id: str, *args: Any, **kwargs: Any):
+        readiness_id = f"{module_id}_readiness"
         return ui.TagList(
-            ui.output_ui(f"{module_id}-module_readiness"),
+            module_readiness_ui(readiness_id),
             original_ui(module_id, *args, **kwargs),
         )
 
@@ -52,7 +55,7 @@ def _wrap_with_readiness(
         **kwargs: Any,
     ):
         result = original_server(module_id, state, status_text, *args, **kwargs)
-        module_readiness_server(module_id, state, module_key)
+        module_readiness_server(f"{module_id}_readiness", state, module_key)
         return result
 
     setattr(module_obj, ui_name, wrapped_ui)
