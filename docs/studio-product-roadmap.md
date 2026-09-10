@@ -49,7 +49,7 @@ Status: **delivered in the current 0.1.6 development branch**
 
 ## Phase 2 — navigation and workflow guidance
 
-Status: **guided starts and channel-aware Home recommendations delivered; module-level contextual help remains**
+Status: **guided starts, channel-aware Home recommendations and module-level prerequisite guidance delivered**
 
 - top navigation is grouped as Home → Quality → Analyze → Integrate → Model → Report;
 - established module identifiers remain unchanged underneath the grouped navigation;
@@ -61,14 +61,20 @@ Status: **guided starts and channel-aware Home recommendations delivered; module
 - physiology guidance advances EDA/SCR → PPG/HR/HRV → Reporting;
 - Home exposes live guided progress and a next-step Continue action;
 - replacing the dataset retires a stale guided walkthrough so guidance cannot leak across projects;
-- outside an active guided walkthrough, Home now derives advisory next-step recommendations from package-native foundation-QC channel validation plus the existing pupil/gaze capability helpers;
+- outside an active guided walkthrough, Home derives advisory next-step recommendations from package-native foundation-QC channel validation plus the existing pupil/gaze capability helpers;
 - active EDA, heart-rate, pupil and gaze capabilities are surfaced as defensible signal-level next steps without auto-running or interpreting analyses;
 - active TTL markers are deferred until signal-level work is recorded, then Events & Alignment is recommended before Multimodal integration;
 - malformed or incomplete channel-validation metadata fails closed rather than manufacturing biosignal recommendations;
+- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment and Multimodal now expose a compact reactive readiness banner before their normal scientific controls;
+- readiness states explain whether data are absent, foundation QC is still pending, the workflow is ready, the corresponding result is already stored, or a prerequisite such as Events & Alignment remains incomplete;
+- readiness remains advisory: foundation-QC pending does not newly disable expert controls, and no scientific analysis is auto-run or interpreted;
+- readiness reuses the modules' established signal/capability helpers rather than introducing a second raw-column inference system;
+- Events & Alignment cross-module readiness uses shared project/capability state rather than attempting to read another Shiny module's namespaced inputs; TTL-capable datasets can be identified as ready through the normal bundled/default path, while no-TTL datasets explicitly point to an external event log as the alternative;
+- module readiness is attached through separate sibling Shiny modules so scientific module sessions and namespaces remain unchanged;
 - the session summary exposes first-session readiness as a percentage;
 - browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
-- grouped Analyze / Integrate navigation is covered through the same stable E2E contract;
-- remaining work: module-specific prerequisites and deeper contextual help.
+- grouped Analyze / Integrate navigation and the EDA → QC → analysis → alignment → multimodal prerequisite progression are covered through the same stable E2E contract;
+- remaining work: deeper contextual interpretation/help examples after the core readiness contract is stable.
 
 ## Phase 3 — project management
 
@@ -85,7 +91,7 @@ Status: **project identity, restore integrity, saved/dirty state and readable pr
 - replacing the dataset clears the prior save checkpoint;
 - an exact-fingerprint recipe restore establishes the restored metadata as the current saved checkpoint;
 - stale report artifacts are invalidated after report-relevant project changes rather than being served with outdated project identity;
-- Reporting now exposes a researcher-readable metadata-only Timeline derived from the existing provenance log;
+- Reporting exposes a researcher-readable metadata-only Timeline derived from the existing provenance log;
 - timeline entries group actions into Project, Quality, Analyze, Integrate, Model and Report stages and use human-facing action/detail labels;
 - the timeline intentionally does not repeat source filenames, raw samples or recorded parameter payloads; the original full provenance table remains available unchanged for auditability;
 - raw biometric rows and cached analysis tables remain outside project recipes;
@@ -103,16 +109,16 @@ Status: **guided-start foundation delivered**
 
 ## Phase 5 — errors, diagnostics and supportability
 
-Status: **diagnostic and production-browser evidence foundation delivered**
+Status: **diagnostic, semantic retry and production-browser evidence foundation delivered**
 
 - a privacy-safe Studio Doctor checks the Shiny dependency, packaged application/CSS assets, runtime mode and loopback binding;
 - `gpbiometricspy-studio-doctor` provides concise human-readable diagnostics;
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
 - installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
-- installed upload retries match the substantive missing-upload condition rather than presentation punctuation;
+- main installed upload retries match substantive missing-upload conditions rather than presentation punctuation;
 - public-demo error sanitization remains fail-closed;
-- remaining work: module-level remediation suggestions, a richer error taxonomy and optional local/private technical-detail disclosure.
+- remaining work: harden the remaining external-event replay upload retry strings against formatting-only UI changes, then expand the error taxonomy and optional local/private technical-detail disclosure.
 
 ## Phase 6 — desktop-style local experience
 
@@ -151,26 +157,31 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-e96ad24c5c7dc18b1266f8b335d64f5b690523ea
+f1bf8324e4a4e6190956b60388c438c55135ab10
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests`;
-- `studio` on Python 3.11 and 3.14;
-- `studio-e2e` Chromium on Python 3.11 and 3.14;
-- `studio-production` on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage`;
-- `deep-parity`;
-- `interoperability`;
-- `docs`;
-- `CodeQL`.
+- `tests` run #421;
+- `studio` run #206 on Python 3.11 and 3.14;
+- `studio-e2e` run #177, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #178 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage` run #219;
+- `deep-parity` run #410;
+- `interoperability` run #409;
+- `docs` run #191;
+- `CodeQL` run #412.
 
 The checkpoint additionally certifies:
 
 - stepwise guided walkthrough continuation and dynamic Continue-label updates;
 - dataset-boundary retirement of stale guided state;
 - channel-aware Home recommendations based on existing validated channel/capability state, including fail-closed behavior for malformed validation tables;
+- reactive module-level readiness guidance for EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment and Multimodal;
+- advisory QC-pending guidance that preserves expert controls instead of silently changing scientific access rules;
+- Shiny-safe sibling readiness namespaces that do not modify the scientific modules' own sessions;
+- shared-state Event Alignment readiness that avoids cross-module input leakage and distinguishes TTL/default-path readiness from the external-event-log alternative;
+- browser-certified progression from EDA QC pending → ready → completed, Events & Alignment ready on the bundled TTL-capable demo, and Multimodal blocked until alignment is stored;
 - project identity propagation through recipes, manifests, reports and bundles;
 - report-cache invalidation after report-relevant project changes;
 - explicit recipe `Unsaved` → `Saved` → `Unsaved changes` lifecycle in Chromium;
@@ -197,16 +208,18 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware guidance and project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware and module-level guidance plus project continuity**:
 
 ```text
 install
   → run Studio Doctor
   → launch
   → choose a guided synthetic walkthrough or load the synthetic demo only
-  → see foundation QC complete
-  → follow guided or channel-aware next-step guidance
-  → inspect a result
+  → inspect module readiness before QC
+  → run foundation QC
+  → see affected modules become ready
+  → run a signal analysis and see its readiness state become complete
+  → follow Events & Alignment prerequisites before Multimodal
   → Save / reopen / report
   → review the readable project Timeline and full Provenance audit table
   → export a privacy-preserving project recipe
@@ -214,4 +227,4 @@ install
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining module-level contextual help, presets, local recent-project convenience and packaging work before a non-development `0.1.6` release.
+Usability findings from that path should drive the remaining presets, teaching/interpretation examples, local recent-project convenience and packaging work before a non-development `0.1.6` release. The next code-hardening target is the remaining formatting-sensitive upload retry contract in installed external-event replay.
