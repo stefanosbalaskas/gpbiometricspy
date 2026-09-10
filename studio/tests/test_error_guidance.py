@@ -34,6 +34,15 @@ def test_identity_guidance_never_recommends_bypassing_fingerprint_guards():
     assert "do not bypass fingerprint validation" in text
 
 
+def test_parameter_payload_terms_do_not_override_analysis_failure_context():
+    guidance = classify_failure(
+        "parameters={'threshold': 0.05, 'participant': 'P001'}",
+        context="EDA/SCR analysis failed",
+    )
+    assert guidance.category == "analysis"
+    assert guidance.code == "GP-STUDIO-ANALYSIS"
+
+
 def test_public_safe_failure_does_not_echo_private_exception_detail():
     private_detail = (
         "/home/research/private_participant_001.csv failed with GSR_US=0.123456; "
