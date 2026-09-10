@@ -61,5 +61,8 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: studio-pyinstaller-diagnostics-py${{ matrix.python-version }}
-          path: ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stderr.log
           if-no-files-found: warn
