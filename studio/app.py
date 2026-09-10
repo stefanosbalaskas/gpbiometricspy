@@ -529,6 +529,24 @@ def server(input, output, session):
             class_="btn-primary mt-3",
         )
 
+    @reactive.effect
+    def _sync_guided_continue_label():
+        current = state()
+        preset = active_guided_start(current)
+        if preset is None:
+            return
+        step = guided_next_step(current)
+        label = (
+            "Open completed project report"
+            if step is None
+            else f"Continue: {step.label}"
+        )
+        ui.update_action_button(
+            "continue_guided",
+            label=label,
+            session=session,
+        )
+
     @render.text
     def readiness_summary():
         current = state()
