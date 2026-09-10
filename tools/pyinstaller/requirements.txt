@@ -1,0 +1,4 @@
+# Standalone Studio packaging evaluation only.
+# Keep these build-tool pins out of gpbiometricspy runtime dependencies.
+pyinstaller==6.22.2
+pyinstaller-hooks-contrib==2026.7
