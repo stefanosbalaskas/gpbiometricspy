@@ -21,9 +21,9 @@ def _load_demo(page: Page, app: ShinyAppProc) -> None:
     page.locator("#load_demo").click()
     expect(page.locator("#dataset_name")).to_have_text("Bundled synthetic kiosk demo", timeout=60_000)
     rows_text = page.locator("#row_count").inner_text()
-    cols_text = page.locator("#column_count").inner_text()
     assert int(rows_text.replace(",", "")) > 0
-    assert int(cols_text.replace(",", "")) > 0
+    expect(page.locator("#qc_state")).to_have_text("Pending")
+    expect(page.locator("#analysis_count")).to_have_text("0")
 
 
 def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
@@ -43,13 +43,13 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
     controller.AppTestValues(page).expect_input("upload", _participant_uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     rows_text = page.locator("#row_count").inner_text()
-    cols_text = page.locator("#column_count").inner_text()
     assert int(rows_text.replace(",", "")) == 1_920
-    assert int(cols_text.replace(",", "")) > 0
+    expect(page.locator("#qc_state")).to_have_text("Pending")
+    expect(page.locator("#analysis_count")).to_have_text("0")
 
 
 def _open_reporting(page: Page) -> None:

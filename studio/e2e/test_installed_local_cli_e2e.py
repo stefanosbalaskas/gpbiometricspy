@@ -26,7 +26,7 @@ pytestmark = pytest.mark.skipif(
 def _reset_session(page: Page) -> None:
     page.locator("#reset").click()
     expect(page.locator("#status")).to_contain_text(
-        "Session reset. No dataset is loaded.",
+        "Session reset. Load a dataset to begin a new project.",
         timeout=30_000,
     )
     page.get_by_role("tab", name="Home", exact=True).click()
@@ -68,7 +68,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     )
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -305,7 +305,7 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
     )
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -327,11 +327,11 @@ def test_installed_distribution_local_console_browser_path(page: Page) -> None:
         timeout=30_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Project recipe restored after exact dataset fingerprint verification."
+        "restored after exact dataset fingerprint verification."
     )
     expect(page.locator("#reporting-analysis_count")).to_have_text("0")
     expect(page.locator("#reporting-result_table_count")).to_have_text("0")
-    page.get_by_role("tab", name="Report", exact=True).click()
+    page.locator('a[data-value="Report"]:visible').click()
     expect(page.locator("#reporting-identity_summary")).to_contain_text(
         "Analyses: 0",
         timeout=30_000,

@@ -34,7 +34,7 @@ def _load_demo_participant(page: Page, app: ShinyAppProc) -> None:
     controller.AppTestValues(page).expect_input("upload", _participant_uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     assert int(page.locator("#row_count").inner_text().replace(",", "")) == 1_920

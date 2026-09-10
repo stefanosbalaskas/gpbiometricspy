@@ -101,7 +101,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -214,7 +214,7 @@ def test_installed_target_stream_replay_is_identity_bound(
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -337,7 +337,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)

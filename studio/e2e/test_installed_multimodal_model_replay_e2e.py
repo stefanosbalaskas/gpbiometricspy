@@ -42,7 +42,7 @@ def _load_uploaded_dataset(page: Page, path: Path) -> None:
         expect(status).not_to_have_text(missing, timeout=60_000)
 
     expect(status).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
