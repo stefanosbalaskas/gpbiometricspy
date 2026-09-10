@@ -12,6 +12,7 @@ try:
     from studio.config import studio_runtime_config
     from studio.product_services import (
         active_guided_start,
+        channel_guidance_text,
         guided_next_step,
         guided_progress_text,
         guided_start,
@@ -29,8 +30,10 @@ try:
     from studio.modules.qc import qc_server, qc_ui
     from studio.modules.reporting import reporting_server, reporting_ui
     from studio.modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
+    from studio.pupil_services import pupil_signal_choices
     from studio.services import (
         active_channels_table,
+        gaze_available,
         inspect_dataset,
         issues_table,
         load_demo_dataset,
@@ -43,6 +46,7 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from config import studio_runtime_config
     from product_services import (
         active_guided_start,
+        channel_guidance_text,
         guided_next_step,
         guided_progress_text,
         guided_start,
@@ -60,8 +64,10 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     from modules.qc import qc_server, qc_ui
     from modules.reporting import reporting_server, reporting_ui
     from modules.statistics_modelling import statistics_modelling_server, statistics_modelling_ui
+    from pupil_services import pupil_signal_choices
     from services import (
         active_channels_table,
+        gaze_available,
         inspect_dataset,
         issues_table,
         load_demo_dataset,
@@ -500,10 +506,23 @@ def server(input, output, session):
             if step is None:
                 return f"{preset.label} is complete. Review the report, project recipe and replay artifacts before closing the project."
             return f"Guided walkthrough — next: {step.label}. {step.detail}"
+
+        qc_validation = current.qc.get("validation") if isinstance(current.qc, dict) else None
+        guidance = channel_guidance_text(
+            current,
+            active_channels_table(qc_validation),
+            pupil_available=bool(pupil_signal_choices(current.data)),
+            gaze_available=gaze_available(current.data),
+        )
+        if guidance:
+            return guidance
         if not current.analyses:
-            return "Review Quality Control, then open EDA/SCR, PPG/HRV, Pupil, or Gaze/AOI based on the channels you recorded."
+            return (
+                "Foundation QC is complete, but no supported channel-specific workflow was detected automatically. "
+                "Review Quality Control and choose a module only when its required inputs are present."
+            )
         if len(current.analyses) == 1:
-            return "You have one saved analysis. Add another signal or alignment workflow, or review Reporting & Reproducibility."
+            return "You have one saved analysis. Add another defensible signal or alignment workflow, or review Reporting & Reproducibility."
         return "Your project has multiple analyses. Review alignment/modelling as needed, then export provenance and replay outputs in Reporting & Reproducibility."
 
     @render.text
