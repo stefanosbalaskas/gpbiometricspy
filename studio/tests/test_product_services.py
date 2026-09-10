@@ -5,6 +5,7 @@ import pytest
 
 from studio.product_services import (
     active_guided_start,
+    channel_guidance_text,
     guided_next_step,
     guided_progress_text,
     guided_start,
@@ -13,6 +14,7 @@ from studio.product_services import (
     readiness_percent,
     support_snapshot,
     workflow_progress,
+    workflow_recommendations,
 )
 from studio.state import ProjectState
 
@@ -23,6 +25,15 @@ def _loaded_state() -> ProjectState:
         ProjectState()
         .with_project_name("Pilot study")
         .with_dataset(data, source_name="participant_001.csv", validation={"valid": True}, operation="test_load")
+    )
+
+
+def _active_channels() -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "signal": ["gsr_eda", "heart_rate", "engagement_dial", "ttl_marker"],
+            "active": [True, True, True, True],
+        }
     )
 
 
@@ -79,6 +90,92 @@ def test_manual_dataset_replacement_retires_the_previous_guided_walkthrough():
     assert active_guided_start(state) is None
     assert guided_next_step(state) is None
     assert guided_progress_text(state) is None
+
+
+def test_channel_recommendations_use_validated_channels_and_defer_alignment_until_signal_work_is_recorded():
+    state = _loaded_state()
+    assert workflow_recommendations(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    ) == ()
+
+    state = state.with_qc({"validation": {"valid": True}})
+    recommendations = workflow_recommendations(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+    assert [item.key for item in recommendations] == [
+        "eda_scr",
+        "ppg_hr_hrv",
+        "pupil",
+        "gaze",
+    ]
+    text = channel_guidance_text(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+    assert "EDA / SCR" in text
+    assert "PPG / HR / HRV" in text
+    assert "Pupil" in text
+    assert "Gaze / Fixation / AOI" in text
+    assert "Active TTL markers" in text
+
+    for name in ["eda_scr", "ppg_hr_hrv", "pupil", "gaze"]:
+        state = state.with_analysis(name, {"status": "ok"})
+    recommendations = workflow_recommendations(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+    assert [item.key for item in recommendations] == ["event_alignment"]
+    assert "Events & Alignment" in channel_guidance_text(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+
+    state = state.with_analysis("event_alignment", {"status": "ok"})
+    recommendations = workflow_recommendations(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+    assert [item.key for item in recommendations] == ["multimodal"]
+
+    state = state.with_analysis("multimodal", {"status": "ok"})
+    assert workflow_recommendations(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    ) == ()
+    assert "Reporting" in channel_guidance_text(
+        state,
+        _active_channels(),
+        pupil_available=True,
+        gaze_available=True,
+    )
+
+
+def test_channel_recommendations_fail_closed_on_malformed_validation_table_but_keep_explicit_eye_capabilities():
+    state = _loaded_state().with_qc({"validation": {"valid": True}})
+    malformed = pd.DataFrame({"channel": ["GSR"], "ready": [True]})
+    recommendations = workflow_recommendations(
+        state,
+        malformed,
+        pupil_available=True,
+        gaze_available=False,
+    )
+    assert [item.key for item in recommendations] == ["pupil"]
 
 
 def test_report_completion_is_invalidated_by_later_project_state_changes():
