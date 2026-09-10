@@ -74,7 +74,7 @@ Status: **guided starts, channel-aware Home recommendations and module-level pre
 - the session summary exposes first-session readiness as a percentage;
 - browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
 - grouped Analyze / Integrate navigation and the EDA → QC → analysis → alignment → multimodal prerequisite progression are covered through the same stable E2E contract;
-- remaining work: deeper contextual interpretation/help examples after the core readiness contract is stable.
+- remaining work: deeper contextual interpretation/help examples where they preserve the measurement guardrails.
 
 ## Phase 3 — project management
 
@@ -107,13 +107,24 @@ Status: **project identity, restore integrity, saved/dirty state, readable prove
 
 ## Phase 4 — examples and presets
 
-Status: **guided-start foundation delivered**
+Status: **guided starts, documented analysis presets and teaching routes delivered**
 
 - bundled synthetic multimodal walkthrough;
 - bundled synthetic eye-tracking walkthrough;
 - bundled synthetic EDA/cardiovascular walkthrough;
 - guided starts load synthetic data, run foundation QC, record provenance and open the relevant analysis family;
-- remaining work: documented analysis presets, teaching/demo project narratives, interpretation examples and one-click reproducibility bundles.
+- Home exposes four non-executing teaching narratives: physiology foundations, eye-tracking foundations, event-linked multimodal workflow, and modelling;
+- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment, Multimodal and Statistics/Modelling expose researcher-facing preset guidance documenting the current Guided-mode baseline, prerequisites, checks before inference, interpretation guardrails and next step;
+- preset guidance is attached at the Studio package boundary and does not modify scientific module implementation, mutate controls, run analyses, fit models or create psychological interpretations;
+- EDA guidance documents the existing 31-sample tonic window, automatic SCR threshold and 10-sample minimum peak distance;
+- cardiac guidance documents the existing 40–180 bpm bounds, 0.30 RR rejection tolerance, 300–2000 ms IBI limits and 500 ms maximum jump;
+- pupil guidance documents the existing conservative default of blink-gap detection without automatic interpolation, smoothing, baseline correction or event summaries;
+- gaze guidance documents screen-bound filtering, event detection, 100 ms minimum fixation, 10 ms minimum saccade and 100 ms maximum event gap as the current Guided starting point;
+- event-alignment and multimodal guidance document their existing event/baseline/summary windows and require event-clock review before integration;
+- the Model guidance distinguishes auditable model-data preparation from model fitting;
+- the cluster-permutation teaching preset explicitly preserves the validated two-condition, within-subject, one-dimensional time-course boundary, package-native design diagnostics, 1000-permutation Guided starting point and descriptive interpretation of cluster boundaries;
+- Chromium coverage verifies the Home teaching routes, EDA and modelling preset cards, matching live Guided controls, and that merely viewing the guidance leaves the analysis count at zero;
+- remaining work: richer teaching/demo examples and optional one-click reproducibility conveniences only where they reuse the existing scientific/reporting contracts rather than create a second analysis engine.
 
 ## Phase 5 — errors, diagnostics and supportability
 
@@ -176,20 +187,20 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-3fee5aed2c263846b4daac0e69cc07253754747c
+3363151ae2ff819e8c294096cdf7cc7b6e0afb70
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #428;
-- `studio` run #213 on Python 3.11 and 3.14;
-- `studio-e2e` run #184, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #185 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage` run #226;
-- `deep-parity` run #417;
-- `interoperability` run #416;
-- `docs` run #198;
-- `CodeQL` run #419.
+- `tests` run #430;
+- `studio` run #215 on Python 3.11 and 3.14;
+- `studio-e2e` run #186, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #187 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage` run #228;
+- `deep-parity` run #419;
+- `interoperability` run #418;
+- `docs` run #200;
+- `CodeQL` run #421.
 
 The checkpoint additionally certifies:
 
@@ -217,7 +228,12 @@ The checkpoint additionally certifies:
 - strict recent-history field minimization, bounds, deduplication, atomic persistence and clear-history behavior;
 - browser-verified current-dataset fingerprint matching while source identity, full fingerprints and research-detail fields remain absent from the recent-project table;
 - complete public-demo exclusion of recent-project controls plus server-side public-demo disk-access rejection;
-- installed wheel/sdist operation with the recent-project service/module present on both supported CI interpreters.
+- installed wheel/sdist operation with the recent-project service/module present on both supported CI interpreters;
+- immutable, presentation-only analysis-preset definitions for EDA/SCR, cardiac, pupil, gaze, event alignment, multimodal, model preparation and cluster permutation;
+- Home teaching routes for physiology, eye tracking, event-linked multimodal work and modelling;
+- browser-verified agreement between documented Guided defaults and the corresponding live EDA/model/cluster controls;
+- browser-verified non-execution: navigating through preset guidance does not run an analysis or increment the project analysis count;
+- preservation of the validated cluster-permutation design boundary and measurement/interpretation guardrails.
 
 Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
@@ -237,16 +253,18 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery and privacy-safe project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery, teaching context and privacy-safe project continuity**:
 
 ```text
 install
   → run Studio Doctor
   → launch
+  → review the Home teaching routes
   → choose a guided synthetic walkthrough or load the synthetic demo only
   → inspect module readiness before QC
   → run foundation QC
   → see affected modules become ready
+  → review the teaching preset and its Guided baseline before analysis
   → run a signal analysis and see its readiness state become complete
   → follow Events & Alignment prerequisites before Multimodal
   → verify a safe `GP-STUDIO-*` recovery message for an invalid action
@@ -259,4 +277,4 @@ install
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining presets, teaching/interpretation examples and packaging work before a non-development `0.1.6` release. The next product tranche is the **documented analysis-preset and teaching/demo narrative layer**: approachable defaults and explanatory routes must reuse the existing scientific functions and controls, never manufacture interpretation, and remain explicit about QC and model assumptions.
+Usability findings from that path should drive the remaining teaching examples and packaging work before a non-development `0.1.6` release. The next product work should prioritize **human first-session validation and packaging evaluation**, with any additional one-click convenience constrained to existing reporting/replay contracts and the same privacy/fingerprint guardrails.
