@@ -52,6 +52,26 @@ def test_public_demo_is_synthetic_only_and_sanitized_in_browser(page: Page, publ
     expect(status).to_contain_text("Synthetic kiosk demo loaded")
 
 
+def test_public_demo_caught_failure_uses_safe_remediation_code_without_exception_detail(
+    page: Page,
+    public_app: ShinyAppProc,
+) -> None:
+    page.goto(public_app.url)
+    expect(page.locator("#project_name")).to_have_text("Untitled project")
+
+    page.locator("#project_name_input").fill("")
+    page.locator("#apply_project_name").click()
+
+    status = page.get_by_role("status")
+    expect(status).to_contain_text("Project name not updated.", timeout=30_000)
+    expect(status).to_contain_text("GP-STUDIO-INPUT")
+    expect(status).to_contain_text("Next:")
+    expect(status).not_to_contain_text("Project name must be non-empty")
+    expect(page.locator("#project_name")).to_have_text("Untitled project")
+    expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
+    expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
+
+
 def test_public_demo_home_guidance_tracks_validated_channels_and_completed_workflows(
     page: Page,
     public_app: ShinyAppProc,
