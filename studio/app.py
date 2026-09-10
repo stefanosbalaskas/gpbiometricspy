@@ -9,6 +9,7 @@ from shiny import App, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.analysis_preset_ui import teaching_routes_ui
     from studio.config import studio_runtime_config
     from studio.error_guidance import format_failure
     from studio.product_services import (
@@ -44,6 +45,7 @@ try:
     )
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from analysis_preset_ui import teaching_routes_ui
     from config import studio_runtime_config
     from error_guidance import format_failure
     from product_services import (
@@ -237,6 +239,7 @@ def _home_panel():
             ui.output_data_frame("workflow_progress"),
             class_="studio-progress-card",
         ),
+        teaching_routes_ui(),
         ui.layout_columns(
             ui.card(
                 ui.card_header("Data preview"),
