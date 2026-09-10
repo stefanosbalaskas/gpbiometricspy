@@ -64,7 +64,7 @@ def _click_with_upload_retry(
     *,
     action_id: str,
     status_id: str,
-    missing_upload_status: str,
+    missing_upload_fragment: str,
     timeout: int,
 ) -> None:
     action = page.locator(f"#{action_id}")
@@ -73,8 +73,9 @@ def _click_with_upload_retry(
 
     action.click()
     expect(status).not_to_have_text(previous_status, timeout=timeout)
-    if status.inner_text() == missing_upload_status:
-        previous_status = missing_upload_status
+    current_status = status.inner_text()
+    if missing_upload_fragment.casefold() in current_status.casefold():
+        previous_status = current_status
         action.click()
         expect(status).not_to_have_text(previous_status, timeout=timeout)
 
@@ -97,7 +98,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
@@ -114,10 +115,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
         page,
         action_id="event_alignment-run",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Events & alignment failed: "
-            "Choose a event log CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="event log CSV/TXT/TSV file first",
         timeout=120_000,
     )
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -210,7 +208,7 @@ def test_installed_target_stream_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
@@ -226,9 +224,7 @@ def test_installed_target_stream_replay_is_identity_bound(
         page,
         action_id="event_alignment-load_target",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="target stream CSV/TXT/TSV file first",
         timeout=60_000,
     )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
@@ -333,7 +329,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
@@ -351,9 +347,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="event_alignment-load_target",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="target stream CSV/TXT/TSV file first",
         timeout=60_000,
     )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
@@ -368,10 +362,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="event_alignment-run",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Events & alignment failed: "
-            "Choose a event log CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="event log CSV/TXT/TSV file first",
         timeout=120_000,
     )
     expect(page.locator("#event_alignment-status")).to_contain_text(
