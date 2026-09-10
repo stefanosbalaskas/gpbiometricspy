@@ -69,51 +69,42 @@ Status: **guided starts, channel-aware Home recommendations and module-level pre
 - readiness states explain whether data are absent, foundation QC is still pending, the workflow is ready, the corresponding result is already stored, or a prerequisite such as Events & Alignment remains incomplete;
 - readiness remains advisory: foundation-QC pending does not newly disable expert controls, and no scientific analysis is auto-run or interpreted;
 - readiness reuses the modules' established signal/capability helpers rather than introducing a second raw-column inference system;
-- Events & Alignment cross-module readiness uses shared project/capability state rather than attempting to read another Shiny module's namespaced inputs; TTL-capable datasets can be identified as ready through the normal bundled/default path, while no-TTL datasets explicitly point to an external event log as the alternative;
-- module readiness is attached through separate sibling Shiny modules so scientific module sessions and namespaces remain unchanged;
-- the session summary exposes first-session readiness as a percentage;
-- browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
-- grouped Analyze / Integrate navigation and the EDA → QC → analysis → alignment → multimodal prerequisite progression are covered through the same stable E2E contract;
-- remaining work: deeper contextual interpretation/help examples after the core readiness contract is stable.
+- Events & Alignment cross-module readiness uses shared project state rather than another Shiny module's namespaced inputs;
+- browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels.
 
 ## Phase 3 — project management
 
-Status: **project identity, restore integrity, saved/dirty state, readable provenance timeline and privacy-safe recent history delivered**
+Status: **project identity, restore integrity, saved/dirty state, readable provenance timeline and privacy-safe recent-project convenience delivered**
 
 - first-class project name and project metadata;
 - project names persist in privacy-preserving project recipes, manifests, reports and report bundles;
 - exact SHA-256 source-resource fingerprint validation remains mandatory on restore;
-- the sidebar provides a direct Save / reopen / report action;
-- Reporting exposes the restored project identity and suggests a project-derived recipe filename;
 - project recipes expose explicit `Unsaved`, `Saved`, and `Unsaved changes` state;
-- a successful recipe download records the current metadata checkpoint through the normal Shiny websocket event path, while the download handler remains pure file generation;
 - any later project-state mutation marks that checkpoint dirty;
 - replacing the dataset clears the prior save checkpoint;
 - an exact-fingerprint recipe restore establishes the restored metadata as the current saved checkpoint;
-- stale report artifacts are invalidated after report-relevant project changes rather than being served with outdated project identity;
 - Reporting exposes a researcher-readable metadata-only Timeline derived from the existing provenance log;
-- timeline entries group actions into Project, Quality, Analyze, Integrate, Model and Report stages and use human-facing action/detail labels;
-- the timeline intentionally does not repeat source filenames, raw samples or recorded parameter payloads; the original full provenance table remains available unchanged for auditability;
 - raw biometric rows and cached analysis tables remain outside project recipes;
-- local/private Reporting now offers an **opt-in** “Remember this project” choice at recipe-save time; it is off by default and does not alter the existing Saved/dirty lifecycle;
-- the recent-project index stores only project name, save timestamp, full dataset fingerprint, row/column counts, analysis/annotation counts and the suggested recipe filename;
-- source filenames/paths, directory paths, column names, annotation content, provenance payloads, analysis parameters/parameter keys, cached result tables, raw biometric rows and credentials are explicitly excluded;
-- recent entries are strict-schema validated, deduplicated by project name plus dataset fingerprint, bounded to 12 entries and a 256 KB file, and written through an atomic local replace with restrictive permissions where supported;
-- the researcher-facing recent-project table shows only a shortened fingerprint and whether the current loaded dataset matches; recent history remains a locator rather than a restore source;
-- reopening still requires explicit source dataset and project-recipe selection and the existing exact fingerprint gate;
-- local users can clear the metadata index without changing the in-memory project or recipe Saved state;
-- public-demo markup contains no recent-project opt-in/history controls, while the persistence service independently rejects public-demo disk access;
-- browser validation uses a process-specific temporary recent-project store so tests cannot modify a developer's real local history.
+- local/private Reporting provides an opt-in, default-off recent-project locator tied to successful recipe saves;
+- the recent-project index stores only project name, save timestamp, dataset SHA-256, row/column counts, analysis/annotation counts and suggested recipe filename;
+- source filenames/paths, column names, raw rows, annotation content, provenance payloads, parameters, cached results and credentials are excluded;
+- public-demo markup contains no recent-project controls and the service rejects public-demo disk access;
+- recent history is only a locator: reopen still requires explicit source data + recipe and exact fingerprint validation.
 
 ## Phase 4 — examples and presets
 
-Status: **guided-start foundation delivered**
+Status: **guided-start foundation delivered; documented analysis presets and teaching routes staged for certification**
 
 - bundled synthetic multimodal walkthrough;
 - bundled synthetic eye-tracking walkthrough;
 - bundled synthetic EDA/cardiovascular walkthrough;
 - guided starts load synthetic data, run foundation QC, record provenance and open the relevant analysis family;
-- remaining work: documented analysis presets, teaching/demo project narratives, interpretation examples and one-click reproducibility bundles.
+- Home now stages four non-executing teaching narratives: physiology foundations, eye-tracking foundations, event-linked multimodal workflow, and modelling;
+- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment, Multimodal and Statistics/Modelling stage researcher-facing preset guidance documenting the current Guided-mode baseline, prerequisites, checks before inference, interpretation guardrails and next step;
+- preset guidance is attached at the Studio package boundary and does not modify scientific module implementation, mutate controls, run analyses, fit models or create psychological interpretations;
+- the cluster-permutation teaching preset explicitly preserves the validated two-condition, within-subject, one-dimensional time-course boundary and package-native design diagnostics;
+- Chromium coverage is staged to verify that preset cards match live Guided controls while merely viewing them leaves the project analysis count unchanged;
+- remaining work after certification: richer teaching/demo narratives, interpretation examples that preserve measurement guardrails, and one-click reproducibility bundles where scientifically justified.
 
 ## Phase 5 — errors, diagnostics and supportability
 
@@ -124,20 +115,11 @@ Status: **structured remediation taxonomy, semantic retry hardening and producti
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
 - installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
-- installed upload retries match substantive missing-resource conditions rather than presentation punctuation for the main Gazepoint upload, external event log and target stream;
-- the external-event replay retry matcher is case-insensitive and uses resource-specific message fragments rather than exact complete status strings;
-- all existing external-event and target-stream replay identity checks, resource-fingerprint failures, pair/event counts, path non-disclosure assertions and exact-resource replay assertions remain unchanged;
-- a shared researcher-facing presentation taxonomy now classifies caught failures as input, prerequisite, identity, external-resource, analysis or unknown and assigns stable `GP-STUDIO-*` support codes plus a concrete next action;
-- app-level and module-level caught failures use the same formatter without changing or swallowing scientific backend exceptions;
-- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment, Multimodal, QC, Annotation, Statistics/Modelling and Reporting catch boundaries now expose consistent recovery guidance;
+- installed upload retries match substantive missing-resource conditions rather than presentation punctuation;
+- a shared researcher-facing presentation taxonomy classifies caught failures as input, prerequisite, identity, external-resource, analysis or unknown and assigns stable `GP-STUDIO-*` support codes plus a concrete next action;
 - local/private Studio retains bounded diagnostic detail alongside the stable recovery code;
 - public-demo Studio suppresses caught exception detail and exposes only the operation prefix, stable support code and safe recovery guidance;
-- deferred QC diagnostic strings and caught plot-rendering exceptions also pass through the sanitizer before being shown to the researcher;
-- project-recipe validation and restore continue to fail closed on fingerprint/identity mismatches and explicitly instruct researchers not to bypass fingerprint validation;
-- classifier precedence distinguishes genuine selection/numeric validation from incidental parameter names embedded in internal diagnostic payloads;
-- Chromium regression coverage deliberately triggers a public-demo project-name validation failure and verifies that the `GP-STUDIO-INPUT` recovery code is shown while the underlying exception detail remains hidden;
-- public-demo error sanitization remains fail-closed at both the Shiny application boundary and the manual-catch presentation layer;
-- remaining work: optional local/private technical-detail affordances and broader support documentation only where they improve recovery without exposing research data.
+- project-recipe validation and restore continue to fail closed on fingerprint/identity mismatches and explicitly instruct researchers not to bypass fingerprint validation.
 
 ## Phase 6 — desktop-style local experience
 
@@ -173,7 +155,7 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 
 ## Current validation checkpoint
 
-The current certified product-code checkpoint is:
+The current certified product-code checkpoint remains:
 
 ```text
 3fee5aed2c263846b4daac0e69cc07253754747c
@@ -191,35 +173,7 @@ At that exact head, the complete pull-request workflow set passed:
 - `docs` run #198;
 - `CodeQL` run #419.
 
-The checkpoint additionally certifies:
-
-- stepwise guided walkthrough continuation and dynamic Continue-label updates;
-- dataset-boundary retirement of stale guided state;
-- channel-aware Home recommendations based on existing validated channel/capability state, including fail-closed behavior for malformed validation tables;
-- reactive module-level readiness guidance for EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment and Multimodal;
-- advisory QC-pending guidance that preserves expert controls instead of silently changing scientific access rules;
-- Shiny-safe sibling readiness namespaces that do not modify the scientific modules' own sessions;
-- shared-state Event Alignment readiness that avoids cross-module input leakage and distinguishes TTL/default-path readiness from the external-event-log alternative;
-- browser-certified progression from EDA QC pending → ready → completed, Events & Alignment ready on the bundled TTL-capable demo, and Multimodal blocked until alignment is stored;
-- project identity propagation through recipes, manifests, reports and bundles;
-- report-cache invalidation after report-relevant project changes;
-- explicit recipe `Unsaved` → `Saved` → `Unsaved changes` lifecycle in Chromium;
-- exact-fingerprint restore returning the restored project to a saved metadata checkpoint;
-- a readable metadata-only project timeline while preserving the original provenance audit table;
-- privacy-preserving recipes that exclude raw biometric rows and cached analysis-result tables;
-- installed-browser diagnostics and semantic upload-race retry guards across main, event-log and target-stream uploads;
-- installed external-event, target-stream and dual-resource replay identity checks on both supported CI interpreters;
-- stable researcher-facing `GP-STUDIO-*` error/remediation codes across the major Studio catch boundaries;
-- public-demo caught-exception detail suppression in both unit and Chromium browser contracts;
-- local/private bounded technical detail retained for troubleshooting;
-- fail-closed recipe/resource identity guidance that never recommends bypassing fingerprint verification;
-- opt-in local recent-project metadata recording on the existing recipe-save checkpoint without changing Saved/dirty semantics;
-- strict recent-history field minimization, bounds, deduplication, atomic persistence and clear-history behavior;
-- browser-verified current-dataset fingerprint matching while source identity, full fingerprints and research-detail fields remain absent from the recent-project table;
-- complete public-demo exclusion of recent-project controls plus server-side public-demo disk-access rejection;
-- installed wheel/sdist operation with the recent-project service/module present on both supported CI interpreters.
-
-Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
+The preset/teaching tranche is staged on a separate branch and must pass the same nine normal pull-request gates before it supersedes this certified checkpoint.
 
 ## 0.1.6 release criteria for Studio
 
@@ -234,29 +188,3 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 - project/replay fingerprint guards remain fail-closed;
 - documentation reflects the actual installed behavior;
 - the 0.1.5 backup/release boundary remains untouched.
-
-## Current human-testing target
-
-The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery and privacy-safe project continuity**:
-
-```text
-install
-  → run Studio Doctor
-  → launch
-  → choose a guided synthetic walkthrough or load the synthetic demo only
-  → inspect module readiness before QC
-  → run foundation QC
-  → see affected modules become ready
-  → run a signal analysis and see its readiness state become complete
-  → follow Events & Alignment prerequisites before Multimodal
-  → verify a safe `GP-STUDIO-*` recovery message for an invalid action
-  → Save / reopen / report
-  → review the readable project Timeline and full Provenance audit table
-  → export a privacy-preserving project recipe
-  → verify Saved / Unsaved changes state after project edits
-  → optionally remember the project in the local metadata-only recent-project list
-  → verify the current dataset match indicator and clear recent history independently
-  → restore against the exact source fingerprint
-```
-
-Usability findings from that path should drive the remaining presets, teaching/interpretation examples and packaging work before a non-development `0.1.6` release. The next product tranche is the **documented analysis-preset and teaching/demo narrative layer**: approachable defaults and explanatory routes must reuse the existing scientific functions and controls, never manufacture interpretation, and remain explicit about QC and model assumptions.
