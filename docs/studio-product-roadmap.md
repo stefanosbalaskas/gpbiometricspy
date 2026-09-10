@@ -65,7 +65,7 @@ Status: **guided starts, channel-aware Home recommendations and module-level pre
 - active EDA, heart-rate, pupil and gaze capabilities are surfaced as defensible signal-level next steps without auto-running or interpreting analyses;
 - active TTL markers are deferred until signal-level work is recorded, then Events & Alignment is recommended before Multimodal integration;
 - malformed or incomplete channel-validation metadata fails closed rather than manufacturing biosignal recommendations;
-- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment and Multimodal now expose a compact reactive readiness banner before their normal scientific controls;
+- EDA/SCR, PPG/HR/HRV, Pupil, Gaze/AOI, Events & Alignment and Multimodal expose a compact reactive readiness banner before their normal scientific controls;
 - readiness states explain whether data are absent, foundation QC is still pending, the workflow is ready, the corresponding result is already stored, or a prerequisite such as Events & Alignment remains incomplete;
 - readiness remains advisory: foundation-QC pending does not newly disable expert controls, and no scientific analysis is auto-run or interpreted;
 - readiness reuses the modules' established signal/capability helpers rather than introducing a second raw-column inference system;
@@ -116,9 +116,11 @@ Status: **diagnostic, semantic retry and production-browser evidence foundation 
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
 - installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
-- main installed upload retries match substantive missing-upload conditions rather than presentation punctuation;
+- installed upload retries now match substantive missing-resource conditions rather than presentation punctuation for the main Gazepoint upload, external event log and target stream;
+- the external-event replay retry matcher is case-insensitive and uses resource-specific message fragments rather than exact complete status strings;
+- all existing external-event and target-stream replay identity checks, resource-fingerprint failures, pair/event counts, path non-disclosure assertions and exact-resource replay assertions remain unchanged;
 - public-demo error sanitization remains fail-closed;
-- remaining work: harden the remaining external-event replay upload retry strings against formatting-only UI changes, then expand the error taxonomy and optional local/private technical-detail disclosure.
+- remaining work: a richer structured error taxonomy, module-level remediation mapping and optional local/private technical-detail disclosure.
 
 ## Phase 6 — desktop-style local experience
 
@@ -157,20 +159,20 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-f1bf8324e4a4e6190956b60388c438c55135ab10
+5ae5f8d2c8340d85724ae36a79ff57d3cfebe8a8
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #421;
-- `studio` run #206 on Python 3.11 and 3.14;
-- `studio-e2e` run #177, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #178 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage` run #219;
-- `deep-parity` run #410;
-- `interoperability` run #409;
-- `docs` run #191;
-- `CodeQL` run #412.
+- `tests` run #423;
+- `studio` run #208 on Python 3.11 and 3.14;
+- `studio-e2e` run #179, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #180 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage` run #221;
+- `deep-parity` run #412;
+- `interoperability` run #411;
+- `docs` run #193;
+- `CodeQL` run #414.
 
 The checkpoint additionally certifies:
 
@@ -188,7 +190,8 @@ The checkpoint additionally certifies:
 - exact-fingerprint restore returning the restored project to a saved metadata checkpoint;
 - a readable metadata-only project timeline while preserving the original provenance audit table;
 - privacy-preserving recipes that exclude raw biometric rows and cached analysis-result tables;
-- installed-browser diagnostics and semantic upload-race retry guards.
+- installed-browser diagnostics and semantic upload-race retry guards across main, event-log and target-stream uploads;
+- installed external-event, target-stream and dual-resource replay identity checks on both supported CI interpreters.
 
 Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
@@ -227,4 +230,4 @@ install
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining presets, teaching/interpretation examples, local recent-project convenience and packaging work before a non-development `0.1.6` release. The next code-hardening target is the remaining formatting-sensitive upload retry contract in installed external-event replay.
+Usability findings from that path should drive the remaining presets, teaching/interpretation examples, local recent-project convenience and packaging work before a non-development `0.1.6` release. The next supportability target is a structured error/remediation taxonomy that improves researcher-facing recovery guidance without exposing raw data or weakening public-demo sanitization.
