@@ -55,7 +55,7 @@ def test_first_session_physiology_walkthrough_reaches_saved_reporting_checkpoint
     expect(eda_preset).to_be_visible()
     expect(eda_preset).to_contain_text("Tonic window: 31 samples")
     expect(eda_preset).to_contain_text("Automatic SCR threshold")
-    expect(page.locator("#eda_scr-mode")).to_have_value("guided")
+    expect(page.locator('#eda_scr-mode input[value="guided"]')).to_be_checked()
     expect(page.locator("#eda_scr-window_size")).to_have_value("31")
     expect(page.locator("#eda_scr-auto_threshold")).to_be_checked()
 
