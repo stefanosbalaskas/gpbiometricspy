@@ -61,7 +61,7 @@ def test_preset_guidance_matches_controls_without_running_analysis(
     expect(eda_preset).to_contain_text("Automatic SCR threshold")
     expect(eda_preset).to_contain_text("Minimum peak distance: 10 samples")
     expect(eda_preset).to_contain_text("do not by themselves identify emotion, stress, trust")
-    expect(page.get_by_text("Advisory only.", exact=False)).to_be_visible()
+    expect(page.locator(".studio-preset-guidance").first).to_contain_text("Advisory only.")
 
     expect(page.locator('#eda_scr-mode input[value="guided"]')).to_be_checked()
     expect(page.locator("#eda_scr-window_size")).to_have_value("31")
