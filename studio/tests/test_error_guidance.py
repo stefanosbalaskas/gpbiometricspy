@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from studio.config import STUDIO_MODE_ENV
 from studio.error_guidance import classify_failure, format_failure, recovery_guidance
 
 
@@ -52,6 +53,29 @@ def test_public_safe_failure_does_not_echo_private_exception_detail():
     assert "0.123456" not in rendered
     assert "threshold" not in rendered
     assert "P001" not in rendered
+
+
+def test_runtime_public_demo_policy_sanitizes_without_explicit_override(monkeypatch):
+    monkeypatch.setenv(STUDIO_MODE_ENV, "public-demo")
+    rendered = format_failure(
+        "Project restore blocked",
+        ValueError("fingerprint mismatch for /private/P007.json"),
+        context="project recipe source fingerprint",
+    )
+    assert "GP-STUDIO-IDENTITY" in rendered
+    assert "/private/P007.json" not in rendered
+    assert "fingerprint mismatch for" not in rendered
+
+
+def test_runtime_local_policy_retains_bounded_detail_without_explicit_override(monkeypatch):
+    monkeypatch.setenv(STUDIO_MODE_ENV, "local")
+    rendered = format_failure(
+        "Import failed",
+        ValueError("Selected Gazepoint CSV is unreadable."),
+        context="Gazepoint import",
+    )
+    assert "Selected Gazepoint CSV is unreadable." in rendered
+    assert "GP-STUDIO-INPUT" in rendered
 
 
 def test_local_failure_preserves_concise_detail_and_adds_recovery_code():
