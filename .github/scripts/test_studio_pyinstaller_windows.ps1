@@ -64,6 +64,7 @@ $OriginalPythonPath = $env:PYTHONPATH
 $Process = $null
 $Started = Get-Date
 $Ready = $false
+$Failure = $null
 
 try {
     # Prove the frozen launcher does not depend on an externally discoverable Python.
@@ -76,13 +77,15 @@ try {
     }
 
     Write-Host "Launching frozen Studio with external Python removed from PATH..."
-    $Process = Start-Process \
-        -FilePath $Executable \
-        -ArgumentList @("--host", "127.0.0.1", "--port", "$Port", "--no-browser") \
-        -WorkingDirectory $ArtifactsDir \
-        -RedirectStandardOutput $StdoutLog \
-        -RedirectStandardError $StderrLog \
-        -PassThru
+    $StartProcessArgs = @{
+        FilePath = $Executable
+        ArgumentList = @("--host", "127.0.0.1", "--port", "$Port", "--no-browser")
+        WorkingDirectory = $ArtifactsDir
+        RedirectStandardOutput = $StdoutLog
+        RedirectStandardError = $StderrLog
+        PassThru = $true
+    }
+    $Process = Start-Process @StartProcessArgs
 
     $Deadline = (Get-Date).AddSeconds(90)
     while ((Get-Date) -lt $Deadline) {
@@ -126,6 +129,9 @@ try {
     }
     $Metrics | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $MetricsPath -Encoding UTF8
 }
+catch {
+    $Failure = $_
+}
 finally {
     if ($null -ne $Process -and -not $Process.HasExited) {
         Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
@@ -137,7 +143,7 @@ finally {
     if ($null -eq $OriginalPythonPath) { Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue } else { $env:PYTHONPATH = $OriginalPythonPath }
 }
 
-if (-not $Ready) {
+if ($null -ne $Failure) {
     if (Test-Path -LiteralPath $StdoutLog) {
         Write-Host "---- frozen Studio stdout ----"
         Get-Content -LiteralPath $StdoutLog
@@ -146,6 +152,10 @@ if (-not $Ready) {
         Write-Host "---- frozen Studio stderr ----"
         Get-Content -LiteralPath $StderrLog
     }
+    throw $Failure
+}
+
+if (-not $Ready) {
     throw "Frozen Studio smoke did not complete successfully."
 }
 
