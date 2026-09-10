@@ -49,12 +49,18 @@ Status: **delivered in the current 0.1.6 development branch**
 
 ## Phase 2 — navigation and workflow guidance
 
-Status: **core tranche delivered; contextual module-level guidance remains**
+Status: **core and stepwise guided-start tranches delivered; contextual module-level guidance remains**
 
 - top navigation is grouped as Home → Quality → Analyze → Integrate → Model → Report;
 - established module identifiers remain unchanged underneath the grouped navigation;
 - a workflow-progress table exposes required, ready, optional and completed stages;
-- guided synthetic starts can open multimodal, eye-tracking or physiology workflows after foundation QC;
+- guided synthetic starts open multimodal, eye-tracking or physiology workflows after foundation QC;
+- guided starts now advance stepwise rather than jumping directly to a downstream module;
+- multimodal guidance begins at Events & Alignment before Multimodal and Reporting;
+- eye-tracking guidance advances Pupil → Gaze/AOI → Reporting;
+- physiology guidance advances EDA/SCR → PPG/HR/HRV → Reporting;
+- Home exposes live guided progress and a next-step Continue action;
+- replacing the dataset retires a stale guided walkthrough so guidance cannot leak across projects;
 - the session summary exposes first-session readiness as a percentage;
 - browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
 - grouped Analyze / Integrate navigation is covered through the same stable E2E contract;
@@ -62,15 +68,21 @@ Status: **core tranche delivered; contextual module-level guidance remains**
 
 ## Phase 3 — project management
 
-Status: **substantial foundation delivered**
+Status: **project identity, restore integrity and explicit saved/dirty state delivered**
 
 - first-class project name and project metadata;
-- project names persist in privacy-preserving project recipes and manifests;
+- project names persist in privacy-preserving project recipes, manifests, reports and report bundles;
 - exact SHA-256 source-resource fingerprint validation remains mandatory on restore;
 - the sidebar provides a direct Save / reopen / report action;
 - Reporting exposes the restored project identity and suggests a project-derived recipe filename;
+- project recipes expose explicit `Unsaved`, `Saved`, and `Unsaved changes` state;
+- a successful recipe download records the current metadata checkpoint through the normal Shiny websocket event path, while the download handler remains pure file generation;
+- any later project-state mutation marks that checkpoint dirty;
+- replacing the dataset clears the prior save checkpoint;
+- an exact-fingerprint recipe restore establishes the restored metadata as the current saved checkpoint;
+- stale report artifacts are invalidated after report-relevant project changes rather than being served with outdated project identity;
 - raw biometric rows and cached analysis tables remain outside project recipes;
-- remaining work: explicit dirty/saved state, local recent-project convenience and a richer project-level provenance timeline.
+- remaining work: local recent-project convenience and a richer project-level provenance timeline.
 
 ## Phase 4 — examples and presets
 
@@ -84,12 +96,14 @@ Status: **guided-start foundation delivered**
 
 ## Phase 5 — errors, diagnostics and supportability
 
-Status: **diagnostic foundation delivered**
+Status: **diagnostic and production-browser evidence foundation delivered**
 
 - a privacy-safe Studio Doctor checks the Shiny dependency, packaged application/CSS assets, runtime mode and loopback binding;
 - `gpbiometricspy-studio-doctor` provides concise human-readable diagnostics;
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
+- installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
+- installed upload retries match the substantive missing-upload condition rather than presentation punctuation;
 - public-demo error sanitization remains fail-closed;
 - remaining work: module-level remediation suggestions, a richer error taxonomy and optional local/private technical-detail disclosure.
 
@@ -127,21 +141,36 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 
 ## Current validation checkpoint
 
-The guided-product tranche was applied through fail-closed helpers that committed only after their focused validation succeeded. The navigation-contract helper additionally migrated the Chromium suite from mutable display-label clicks to stable Shiny module IDs and removed itself after validation.
+The current certified product-code checkpoint is:
 
-The checkpoint therefore includes:
+```text
+febb6646aeb30ca56b31791b971309868dd0b8d4
+```
 
-- Studio source compilation;
-- focused product-services and Studio Doctor tests;
-- reporting/reproducibility regression tests;
-- desktop-launcher and CLI regression tests;
-- production-hardening regression tests;
-- `studio.app` import validation;
-- strict MkDocs build;
-- static validation of the migrated E2E sources with Ruff, Python compilation and helper import checks;
-- zero stale label-based navigation calls after migration.
+At that exact head, the complete pull-request workflow set passed:
 
-Full pull-request CI is required on the normal user-authored checkpoint above the helper-produced commit before the tranche is considered merge-ready.
+- `tests`;
+- `studio` on Python 3.11 and 3.14;
+- `studio-e2e` Chromium on Python 3.11 and 3.14;
+- `studio-production` on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage`;
+- `deep-parity`;
+- `interoperability`;
+- `docs`;
+- `CodeQL`.
+
+The checkpoint additionally certifies:
+
+- stepwise guided walkthrough continuation and dynamic Continue-label updates;
+- dataset-boundary retirement of stale guided state;
+- project identity propagation through recipes, manifests, reports and bundles;
+- report-cache invalidation after report-relevant project changes;
+- explicit recipe `Unsaved` → `Saved` → `Unsaved changes` lifecycle in Chromium;
+- exact-fingerprint restore returning the restored project to a saved metadata checkpoint;
+- privacy-preserving recipes that exclude raw biometric rows and cached analysis-result tables;
+- installed-browser diagnostics and semantic upload-race retry guards.
+
+Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
 ## 0.1.6 release criteria for Studio
 
@@ -159,7 +188,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience**:
+The immediate target is now the **guided first-session experience with project continuity**:
 
 ```text
 install
@@ -167,10 +196,12 @@ install
   → launch
   → choose a guided synthetic walkthrough
   → see foundation QC complete
-  → continue in the relevant analysis family
+  → continue stepwise through the relevant analysis family
   → inspect a result
   → Save / reopen / report
   → export a privacy-preserving project recipe
+  → verify Saved / Unsaved changes state after project edits
+  → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining presets, project-state polish and packaging work before a non-development `0.1.6` release.
+Usability findings from that path should drive the remaining contextual guidance, presets, project-history convenience and packaging work before a non-development `0.1.6` release.
