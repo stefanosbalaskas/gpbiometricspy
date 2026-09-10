@@ -52,6 +52,40 @@ def test_public_demo_is_synthetic_only_and_sanitized_in_browser(page: Page, publ
     expect(status).to_contain_text("Synthetic kiosk demo loaded")
 
 
+def test_public_demo_home_guidance_tracks_validated_channels_and_completed_workflows(
+    page: Page,
+    public_app: ShinyAppProc,
+) -> None:
+    _load_public_demo(page, public_app)
+
+    expect(page.locator("#next_step")).to_contain_text("Run foundation QC")
+    page.locator("#run_qc").click()
+    expect(page.get_by_role("status")).to_contain_text(
+        "Foundation QC complete",
+        timeout=90_000,
+    )
+
+    guidance = page.locator("#next_step")
+    expect(guidance).to_contain_text("Channel-aware recommendation:", timeout=60_000)
+    expect(guidance).to_contain_text("EDA / SCR")
+    expect(guidance).to_contain_text("PPG / HR / HRV")
+
+    open_nav(page, "eda_scr", group="Analyze")
+    expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
+    page.locator("#eda_scr-run").click()
+    expect(page.locator("#eda_scr-status")).to_contain_text(
+        "EDA/SCR workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+
+    open_nav(page, "home")
+    expect(guidance).to_contain_text("Channel-aware recommendation:", timeout=60_000)
+    expect(guidance).not_to_contain_text("EDA / SCR")
+    expect(guidance).to_contain_text("PPG / HR / HRV")
+    expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
+    expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
+
+
 def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hidden(
     page: Page,
     public_app: ShinyAppProc,
