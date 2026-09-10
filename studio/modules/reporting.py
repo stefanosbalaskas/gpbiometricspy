@@ -6,9 +6,15 @@ import pandas as pd
 from shiny import module, reactive, render, ui
 
 try:
+    from studio.config import studio_runtime_config
     from studio.error_guidance import format_failure, recovery_guidance
+    from studio.recent_projects import record_recent_project
+    from studio.recent_projects_module import recent_projects_server, recent_projects_ui
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from config import studio_runtime_config
     from error_guidance import format_failure, recovery_guidance
+    from recent_projects import record_recent_project
+    from recent_projects_module import recent_projects_server, recent_projects_ui
 
 try:
     from studio.product_services import project_export_stem
@@ -56,6 +62,9 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     )
 
 
+RECENT_PROJECTS_ENABLED = not studio_runtime_config().is_public_demo
+
+
 def _grid(table: pd.DataFrame | None, message: str, *, height: str = "360px"):
     if not isinstance(table, pd.DataFrame) or table.empty:
         table = pd.DataFrame({"status": [message]})
@@ -74,6 +83,28 @@ def _report_state_identity(current) -> tuple[Any, ...]:
         tuple(sorted(map(str, current.analyses))),
         len(current.provenance),
     )
+
+
+def _recent_project_opt_in_ui():
+    if not RECENT_PROJECTS_ENABLED:
+        return ui.TagList()
+    return ui.TagList(
+        ui.input_checkbox(
+            "remember_recent",
+            "Remember this project in Recent projects on this device",
+            value=False,
+        ),
+        ui.tags.small(
+            "Optional. Stores only project name, save time, dataset fingerprint, coarse counts and the suggested recipe filename; never source paths, raw rows, column names, annotations, provenance payloads, parameters or analysis tables.",
+            class_="text-secondary d-block mb-3",
+        ),
+    )
+
+
+def _recent_projects_ui():
+    if not RECENT_PROJECTS_ENABLED:
+        return ui.TagList()
+    return recent_projects_ui("recent_projects")
 
 
 @module.ui
@@ -224,6 +255,7 @@ def reporting_ui():
                             ),
                             class_="mb-3",
                         ),
+                        _recent_project_opt_in_ui(),
                         ui.download_button(
                             "download_recipe",
                             "Download Project Recipe JSON",
@@ -257,6 +289,7 @@ def reporting_ui():
                     ui.output_data_frame("recipe_checks"),
                     full_screen=True,
                 ),
+                _recent_projects_ui(),
             ),
             ui.nav_panel(
                 "Downloads",
@@ -289,6 +322,10 @@ def reporting_server(input, output, session, state, global_status):
     dataset_identity_value: reactive.Value[Any] = reactive.Value(None)
     saved_recipe_identity_value: reactive.Value[Any] = reactive.Value(None)
     saved_recipe_source_value: reactive.Value[Any] = reactive.Value(None)
+    recent_refresh_value = reactive.Value(0)
+
+    if RECENT_PROJECTS_ENABLED:
+        recent_projects_server("recent_projects", state, recent_refresh_value)
 
     @reactive.effect
     def _invalidate_when_dataset_changes():
@@ -425,7 +462,24 @@ def reporting_server(input, output, session, state, global_status):
             return
         saved_recipe_identity_value.set(_report_state_identity(current))
         saved_recipe_source_value.set("downloaded")
-        recipe_status_value.set("Project recipe downloaded. Current project metadata is saved.")
+        saved_message = "Project recipe downloaded. Current project metadata is saved."
+        if RECENT_PROJECTS_ENABLED and bool(input.remember_recent()):
+            try:
+                record_recent_project(current)
+                recent_refresh_value.set(recent_refresh_value() + 1)
+                recipe_status_value.set(
+                    f"{saved_message} Recent-project metadata was remembered on this device."
+                )
+            except Exception as exc:
+                recent_failure = format_failure(
+                    "Project recipe saved, but recent-project metadata was not recorded",
+                    exc,
+                    context="external resource recent-project metadata",
+                )
+                recipe_status_value.set(f"{saved_message} {recent_failure}")
+                global_status.set(recent_failure)
+            return
+        recipe_status_value.set(saved_message)
 
     @render.text
     def fingerprint():
