@@ -9,6 +9,7 @@ on:
       - "pyproject.toml"
       - "MANIFEST.in"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
+      - ".github/scripts/test_studio_frozen_browser_windows.ps1"
       - ".github/workflows/studio-packaging.yml"
   push:
     branches:
@@ -20,6 +21,7 @@ on:
       - "pyproject.toml"
       - "MANIFEST.in"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
+      - ".github/scripts/test_studio_frozen_browser_windows.ps1"
       - ".github/workflows/studio-packaging.yml"
 
 permissions:
@@ -29,7 +31,7 @@ jobs:
   pyinstaller-windows:
     name: pyinstaller-windows (${{ matrix.python-version }})
     runs-on: windows-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -56,6 +58,22 @@ jobs:
           $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}"
           ./.github/scripts/test_studio_pyinstaller_windows.ps1 -Python python -ArtifactsDir $Artifacts
 
+      - name: Install Chromium interaction harness
+        shell: pwsh
+        run: |
+          python -m pip install "pytest-playwright>=0.9,<1"
+          python -m playwright install chromium
+
+      - name: Exercise frozen local and public Studio in Chromium
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}"
+          $Executable = Join-Path $Artifacts "dist/gpbiometricspy-studio/gpbiometricspy-studio.exe"
+          ./.github/scripts/test_studio_frozen_browser_windows.ps1 `
+            -Python python `
+            -Executable $Executable `
+            -ArtifactsDir $Artifacts
+
       - name: Upload packaging diagnostics
         if: always()
         uses: actions/upload-artifact@v6
@@ -65,4 +83,7 @@ jobs:
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/metrics.json
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stdout.log
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-pytest.xml
           if-no-files-found: warn
