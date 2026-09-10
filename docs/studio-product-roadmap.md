@@ -120,7 +120,7 @@ Status: **delivered for the current product surface**
 
 ## Phase 6 — desktop-style local and standalone packaging
 
-Status: **browser-backed launcher plus PyInstaller onedir standalone baseline certified**
+Status: **browser-backed launcher plus PyInstaller onedir standalone and frozen-browser baseline certified**
 
 - Shiny for Python remains the single application engine;
 - `gpbiometricspy-studio-desktop` chooses an available loopback port and opens Studio automatically;
@@ -128,17 +128,20 @@ Status: **browser-backed launcher plus PyInstaller onedir standalone baseline ce
 - clean Windows CI verifies the ordinary installed launch path on Python 3.11 and 3.14;
 - a separate frozen adapter uses Shiny's in-process runner for standalone packaging and leaves the normal pip launchers unchanged;
 - PyInstaller **6.22.2** with pyinstaller-hooks-contrib **2026.7** is pinned as the first standalone evaluation toolchain;
-- the first build is deliberately **onedir**, console-enabled and UPX-disabled for diagnosability;
-- Windows Python 3.11 and 3.14 each build and launch the frozen Studio successfully with external Python removed from `PATH` and `PYTHONHOME` / `PYTHONPATH` cleared;
-- Python 3.11 measurement: 1,892 files, 235,369,466 bytes (~224.5 MiB), 3.563 s to HTTP 200;
-- Python 3.14 measurement: 1,887 files, 239,684,216 bytes (~228.6 MiB), 3.447 s to HTTP 200;
-- CI uploads only small metrics/server logs, not the generated binary bundle, build tree or virtual environment;
+- the build is deliberately **onedir**, console-enabled and UPX-disabled for diagnosability;
+- Windows Python 3.11 and 3.14 each build and launch frozen Studio successfully with external Python removed from `PATH` and `PYTHONHOME` / `PYTHONPATH` cleared;
+- baseline measurement on Python 3.11: 1,892 files, 235,369,466 bytes (~224.5 MiB), 3.563 s to HTTP 200;
+- baseline measurement on Python 3.14: 1,887 files, 239,684,216 bytes (~228.6 MiB), 3.447 s to HTTP 200;
+- CI now drives **meaningful Chromium interaction against the frozen executable itself** on both supported Windows interpreters;
+- frozen local-mode Chromium follows Home teaching context → physiology guided start → foundation QC → EDA/SCR → PPG/HR/HRV → Reporting → report build → 3/3 guided completion;
+- frozen public-mode Chromium launches the same executable with `--public-demo`, verifies synthetic-only messaging, absence of visible external upload controls, a successful synthetic gaze workflow and unavailable project-recipe upload/restore controls;
+- the frozen browser harness connects to the URL served by the `.exe` and does not use Shiny's source-app fixture;
+- CI uploads only bounded metrics, JUnit and server logs, not the generated binary bundle, build tree or virtual environment;
 - the frozen bundle remains an evaluation artifact, not a redistributable or signed release installer;
-- next packaging gate: run meaningful Chromium interaction against the frozen bundle itself;
-- only after that should onefile mode, Nuitka comparison, icon/native-window presentation, signing and installer/update technology be evaluated;
-- a native-window wrapper remains packaging rather than a scientific-runtime rewrite.
+- remaining packaging decisions: onefile tradeoffs, Nuitka comparison, icon/version metadata, optional native-window/webview presentation, signing, installer/update technology and reproducible release-build provenance;
+- a native-window wrapper, if adopted, remains packaging rather than a scientific-runtime rewrite.
 
-See [Studio standalone packaging evaluation](studio-packaging-evaluation.md) for the frozen-build contract and measurements.
+See [Studio standalone packaging evaluation](studio-packaging-evaluation.md) for the frozen-build and browser contracts.
 
 ## Phase 7 — hosted deployment
 
@@ -166,32 +169,33 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified **product-code** checkpoint is:
 
 ```text
-a4e8e9ad1abfd2f6d47cba4039f411f5ce6f1c44
+943e86c5f0f2a358e423ebf1abd32bebcfa15553
 ```
 
 At that exact head, **all ten pull-request workflow families passed**:
 
-- `tests` run #437;
-- `studio` run #222 on Python 3.11 and 3.14;
-- `studio-e2e` run #193, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #194: Linux Python 3.11 and 3.14 installed wheel/source-distribution Chromium replay plus synthetic runtime smoke, and clean Windows local-install/Doctor/launch smoke on Python 3.11 and 3.14;
-- `studio-packaging` run #1: Windows Python 3.11 and 3.14 frozen-launcher unit contract, PyInstaller onedir build and standalone loopback launch with no external Python on `PATH`;
-- `branch-coverage` run #235;
-- `deep-parity` run #426;
-- `interoperability` run #425;
-- `docs` run #207;
-- `CodeQL` run #428.
+- `tests` run #440;
+- `studio` run #225 on Python 3.11 and 3.14;
+- `studio-e2e` run #196, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #197: Linux Python 3.11 and 3.14 installed wheel/source-distribution Chromium replay plus synthetic runtime smoke, and clean Windows local-install/Doctor/launch smoke on Python 3.11 and 3.14;
+- `studio-packaging` run #4: Windows Python 3.11 and 3.14 frozen-launcher unit contract, PyInstaller onedir build, standalone launch without external Python, and local/public frozen Chromium interaction;
+- `branch-coverage` run #238;
+- `deep-parity` run #429;
+- `interoperability` run #428;
+- `docs` run #210;
+- `CodeQL` run #431.
 
-This checkpoint supersedes the previous first-session code checkpoint `299e3beb0a0545ed59270bbdff2359454a77582e`. The standalone work adds a downstream packaging adapter and CI/build infrastructure only; it does not modify `src/gpbiometricspy`, scientific workflow implementations, normal pip launchers, runtime privacy policy, project fingerprints or replay rules.
+This checkpoint supersedes the previous standalone-startup checkpoint `a4e8e9ad1abfd2f6d47cba4039f411f5ce6f1c44`. The new tranche changes only frozen-browser tests, the Windows frozen-browser harness and packaging CI; it does not modify `src/gpbiometricspy`, scientific workflow implementations, normal pip launchers, runtime privacy policy, project fingerprints or replay rules.
 
 The checkpoint additionally certifies:
 
-- the previously certified first-session physiology journey and all project/reproducibility safeguards;
-- package-native guidance/readiness, teaching presets and measurement guardrails;
+- all previously certified first-session, project/reproducibility, guidance and measurement safeguards;
 - clean Windows pip-style install → Doctor → launch on Python 3.11 and 3.14;
 - Linux installed wheel/source-distribution Chromium replay on Python 3.11 and 3.14;
-- a Windows standalone PyInstaller baseline that starts the same Studio application without an externally installed Python interpreter;
-- frozen-build metrics and minimal CI diagnostics without publishing the binary bundle.
+- Windows standalone PyInstaller launch without externally installed Python;
+- real frozen local-mode Shiny/WebSocket/reactive interaction through guided physiology analysis and Reporting on Windows Python 3.11 and 3.14;
+- real frozen public-mode interaction preserving the synthetic-only/no-upload boundary on both Windows interpreters;
+- bounded frozen-browser diagnostics without publishing the binary bundle.
 
 Further product-polish code commits must pass the same ten-family matrix before they supersede this checkpoint.
 
@@ -200,12 +204,12 @@ Further product-polish code commits must pass the same ten-family matrix before 
 Before calling Studio `0.1.6` product-polished, require at minimum:
 
 - all scientific package gates remain green;
-- Studio unit/smoke, Chromium E2E, production/distribution and standalone-packaging gates remain green;
+- Studio unit/smoke, source Chromium E2E, production/distribution and standalone-packaging gates remain green;
 - no regression in public synthetic fail-closed behavior;
 - clean Windows pip install → Studio Doctor → launch remains green on Python 3.11 and 3.14;
 - standalone Windows build → launch without external Python remains green on Python 3.11 and 3.14;
 - the researcher-facing launch → guided demo → QC → analysis → report/save path remains browser-certified;
-- meaningful Chromium interaction against the frozen standalone bundle is added before treating that bundle as a release candidate;
+- frozen standalone local and public browser interaction remains green on both supported Windows interpreters;
 - the complete onboarding path is still tested by a human for comprehension, visual hierarchy, friction and install/launch usability;
 - keyboard and narrow-viewport browser checks remain green;
 - project/replay fingerprint guards remain fail-closed;
@@ -215,7 +219,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-Automated coverage now spans both the ordinary pip-installed launcher and a standalone Windows PyInstaller baseline. Human validation should focus on **comprehension, visual hierarchy, perceived friction and install/launch experience** while replaying the research path:
+Automated coverage now spans both the ordinary pip-installed launcher and a standalone Windows PyInstaller application with real browser interaction. Human validation should focus on **comprehension, visual hierarchy, perceived friction and install/launch experience** while replaying the research path:
 
 ```text
 install or open the standalone evaluation build
@@ -236,4 +240,4 @@ install or open the standalone evaluation build
   → restore only against the exact source fingerprint
 ```
 
-The next automated product tranche should prioritize **frozen-bundle Chromium interaction**. The next human tranche remains **subjective first-session validation**. Onefile, Nuitka, webview/native-window presentation, signing and installer technology should remain downstream decisions unless their measured user benefit justifies the added build/update complexity.
+The next engineering decision should compare **distribution ergonomics rather than scientific behavior**: onefile vs onedir, PyInstaller vs Nuitka, optional native-window/webview presentation, signing, installer/uninstaller behavior and update policy. The next human tranche remains **subjective first-session validation**.
