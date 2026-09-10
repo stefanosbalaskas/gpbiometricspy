@@ -206,7 +206,15 @@ def reporting_ui():
                             ),
                             class_="mb-3",
                         ),
-                        ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),
+                        ui.download_button(
+                            "download_recipe",
+                            "Download Project Recipe JSON",
+                            class_="btn-primary w-100",
+                            onclick=(
+                                "window.Shiny.setInputValue(this.id + '_checkpoint', "
+                                "Date.now(), {priority: 'event'});"
+                            ),
+                        ),
                         ui.tags.small(ui.output_text("project_file_name"), class_="text-secondary d-block mt-2"),
                     ),
                     ui.card(
@@ -373,6 +381,16 @@ def reporting_server(input, output, session, state, global_status):
         except Exception as exc:
             recipe_status_value.set(f"Project restore blocked: {exc}")
 
+    @reactive.effect
+    @reactive.event(input.download_recipe_checkpoint)
+    def _record_recipe_download_checkpoint():
+        current = state()
+        if current.data is None:
+            return
+        saved_recipe_identity_value.set(_report_state_identity(current))
+        saved_recipe_source_value.set("downloaded")
+        recipe_status_value.set("Project recipe downloaded. Current project metadata is saved.")
+
     @render.text
     def fingerprint():
         data = state().data
@@ -521,12 +539,7 @@ def reporting_server(input, output, session, state, global_status):
 
     @render.download_button(filename="gpbiometricspy_studio_project_recipe.json")
     def download_recipe():
-        current = state()
-        payload = project_recipe_json(current)
-        saved_recipe_identity_value.set(_report_state_identity(current))
-        saved_recipe_source_value.set("downloaded")
-        recipe_status_value.set("Project recipe downloaded. Current project metadata is saved.")
-        yield payload
+        yield project_recipe_json(state())
 
     @render.download_button(filename="gpbiometricspy_studio_report_bundle.zip")
     def download_bundle():
