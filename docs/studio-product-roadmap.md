@@ -78,7 +78,7 @@ Status: **guided starts, channel-aware Home recommendations and module-level pre
 
 ## Phase 3 — project management
 
-Status: **project identity, restore integrity, saved/dirty state and readable provenance timeline delivered**
+Status: **project identity, restore integrity, saved/dirty state, readable provenance timeline and privacy-safe recent history delivered**
 
 - first-class project name and project metadata;
 - project names persist in privacy-preserving project recipes, manifests, reports and report bundles;
@@ -95,7 +95,15 @@ Status: **project identity, restore integrity, saved/dirty state and readable pr
 - timeline entries group actions into Project, Quality, Analyze, Integrate, Model and Report stages and use human-facing action/detail labels;
 - the timeline intentionally does not repeat source filenames, raw samples or recorded parameter payloads; the original full provenance table remains available unchanged for auditability;
 - raw biometric rows and cached analysis tables remain outside project recipes;
-- remaining work: local recent-project convenience that stores metadata/recipe identity only and never creates a hidden biometric-data store.
+- local/private Reporting now offers an **opt-in** “Remember this project” choice at recipe-save time; it is off by default and does not alter the existing Saved/dirty lifecycle;
+- the recent-project index stores only project name, save timestamp, full dataset fingerprint, row/column counts, analysis/annotation counts and the suggested recipe filename;
+- source filenames/paths, directory paths, column names, annotation content, provenance payloads, analysis parameters/parameter keys, cached result tables, raw biometric rows and credentials are explicitly excluded;
+- recent entries are strict-schema validated, deduplicated by project name plus dataset fingerprint, bounded to 12 entries and a 256 KB file, and written through an atomic local replace with restrictive permissions where supported;
+- the researcher-facing recent-project table shows only a shortened fingerprint and whether the current loaded dataset matches; recent history remains a locator rather than a restore source;
+- reopening still requires explicit source dataset and project-recipe selection and the existing exact fingerprint gate;
+- local users can clear the metadata index without changing the in-memory project or recipe Saved state;
+- public-demo markup contains no recent-project opt-in/history controls, while the persistence service independently rejects public-demo disk access;
+- browser validation uses a process-specific temporary recent-project store so tests cannot modify a developer's real local history.
 
 ## Phase 4 — examples and presets
 
@@ -168,20 +176,20 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-e2b075d89deccad48ec5eb3c638eb6a77dff1575
+3fee5aed2c263846b4daac0e69cc07253754747c
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #426;
-- `studio` run #211 on Python 3.11 and 3.14;
-- `studio-e2e` run #182, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #183 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage` run #224;
-- `deep-parity` run #415;
-- `interoperability` run #414;
-- `docs` run #196;
-- `CodeQL` run #417.
+- `tests` run #428;
+- `studio` run #213 on Python 3.11 and 3.14;
+- `studio-e2e` run #184, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #185 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
+- `branch-coverage` run #226;
+- `deep-parity` run #417;
+- `interoperability` run #416;
+- `docs` run #198;
+- `CodeQL` run #419.
 
 The checkpoint additionally certifies:
 
@@ -204,7 +212,12 @@ The checkpoint additionally certifies:
 - stable researcher-facing `GP-STUDIO-*` error/remediation codes across the major Studio catch boundaries;
 - public-demo caught-exception detail suppression in both unit and Chromium browser contracts;
 - local/private bounded technical detail retained for troubleshooting;
-- fail-closed recipe/resource identity guidance that never recommends bypassing fingerprint verification.
+- fail-closed recipe/resource identity guidance that never recommends bypassing fingerprint verification;
+- opt-in local recent-project metadata recording on the existing recipe-save checkpoint without changing Saved/dirty semantics;
+- strict recent-history field minimization, bounds, deduplication, atomic persistence and clear-history behavior;
+- browser-verified current-dataset fingerprint matching while source identity, full fingerprints and research-detail fields remain absent from the recent-project table;
+- complete public-demo exclusion of recent-project controls plus server-side public-demo disk-access rejection;
+- installed wheel/sdist operation with the recent-project service/module present on both supported CI interpreters.
 
 Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
@@ -224,7 +237,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware and module-level guidance, actionable recovery and project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery and privacy-safe project continuity**:
 
 ```text
 install
@@ -241,7 +254,9 @@ install
   → review the readable project Timeline and full Provenance audit table
   → export a privacy-preserving project recipe
   → verify Saved / Unsaved changes state after project edits
+  → optionally remember the project in the local metadata-only recent-project list
+  → verify the current dataset match indicator and clear recent history independently
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining local recent-project convenience, presets, teaching/interpretation examples and packaging work before a non-development `0.1.6` release. The next project-continuity target is a local recent-project convenience layer that records only privacy-safe metadata/recipe identity and never stores raw biometric rows or cached analysis tables.
+Usability findings from that path should drive the remaining presets, teaching/interpretation examples and packaging work before a non-development `0.1.6` release. The next product tranche is the **documented analysis-preset and teaching/demo narrative layer**: approachable defaults and explanatory routes must reuse the existing scientific functions and controls, never manufacture interpretation, and remain explicit about QC and model assumptions.
