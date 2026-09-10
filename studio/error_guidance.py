@@ -142,6 +142,9 @@ def classify_failure(message: str, *, context: str = "") -> ErrorGuidance:
     if any(term in text for term in prerequisite_terms):
         return _GUIDANCE["prerequisite"]
 
+    # Input classification requires validation/selection language. Bare parameter
+    # names such as "threshold" may appear inside diagnostic payloads and must not
+    # override an explicit analysis-failure context.
     input_terms = (
         "select ",
         "selected ",
@@ -153,7 +156,6 @@ def classify_failure(message: str, *, context: str = "") -> ErrorGuidance:
         "characters or fewer",
         "sampling rate",
         "window size",
-        "threshold",
         "formula",
         "grouping",
         "unsupported",
