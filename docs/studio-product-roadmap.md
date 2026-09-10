@@ -41,6 +41,7 @@ Status: **delivered in the current 0.1.6 development branch**
 - product-first documentation home;
 - end-user Studio installation and first-session guide;
 - PATH-independent Windows launch instructions;
+- clean Windows installed-launch smoke is now CI-certified on Python 3.11 and 3.14;
 - guided Home screen with a visible Project → Quality → Analyze → Align → Model → Report path;
 - project-readiness and next-step summaries;
 - clearer sidebar hierarchy and session status;
@@ -128,13 +129,15 @@ Status: **guided starts, documented analysis presets and teaching routes deliver
 
 ## Phase 5 — errors, diagnostics and supportability
 
-Status: **structured remediation taxonomy, semantic retry hardening and production-browser evidence delivered**
+Status: **structured remediation, production-browser evidence and clean Windows installed-launch diagnostics delivered**
 
 - a privacy-safe Studio Doctor checks the Shiny dependency, packaged application/CSS assets, runtime mode and loopback binding;
 - `gpbiometricspy-studio-doctor` provides concise human-readable diagnostics;
 - `gpbiometricspy-studio-doctor --json` provides machine-readable support output;
 - diagnostics do not inspect raw biometric samples or transmit support information;
 - installed wheel/sdist production-browser failures preserve JUnit and Studio server diagnostics for both supported CI interpreters;
+- clean Windows CI creates a fresh isolated virtual environment, installs Studio non-editably, then verifies imports from outside the repository so the checkout cannot mask packaging defects;
+- Windows CI exercises Studio Doctor plus both the installed `gpbiometricspy-studio.exe` launcher and the PATH-independent `python -m studio.cli` launch path on Python 3.11 and 3.14;
 - installed upload retries match substantive missing-resource conditions rather than presentation punctuation for the main Gazepoint upload, external event log and target stream;
 - the external-event replay retry matcher is case-insensitive and uses resource-specific message fragments rather than exact complete status strings;
 - all existing external-event and target-stream replay identity checks, resource-fingerprint failures, pair/event counts, path non-disclosure assertions and exact-resource replay assertions remain unchanged;
@@ -152,11 +155,13 @@ Status: **structured remediation taxonomy, semantic retry hardening and producti
 
 ## Phase 6 — desktop-style local experience
 
-Status: **browser-backed local launcher delivered as the intermediate product surface**
+Status: **browser-backed local launcher and clean Windows installed-launch certification delivered as the intermediate product surface**
 
 - Shiny for Python remains the single application engine;
 - `gpbiometricspy-studio-desktop` chooses an available loopback port and opens Studio automatically;
 - `--no-browser` supports manual/browser-managed startup and troubleshooting;
+- clean Windows CI verifies installed launch behavior on Python 3.11 and 3.14 from outside the repository;
+- the PATH-independent `python -m studio.cli` route is now an executable CI contract rather than documentation-only guidance;
 - next packaging evaluation: PyInstaller/Nuitka and, only if justified, a lightweight local webview;
 - a native-window wrapper remains packaging rather than a scientific-runtime rewrite;
 - signed installers wait until reproducible build/update policies are defined.
@@ -187,20 +192,22 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-3363151ae2ff819e8c294096cdf7cc7b6e0afb70
+cb0924b85143f9ec6239e372bb5974fe0c9e43f2
 ```
 
 At that exact head, the complete pull-request workflow set passed:
 
-- `tests` run #430;
-- `studio` run #215 on Python 3.11 and 3.14;
-- `studio-e2e` run #186, Chromium on Python 3.11 and 3.14;
-- `studio-production` run #187 on Python 3.11 and 3.14, including installed wheel and source-distribution Chromium replay plus synthetic runtime smoke;
-- `branch-coverage` run #228;
-- `deep-parity` run #419;
-- `interoperability` run #418;
-- `docs` run #200;
-- `CodeQL` run #421.
+- `tests` run #432;
+- `studio` run #217 on Python 3.11 and 3.14;
+- `studio-e2e` run #188, Chromium on Python 3.11 and 3.14;
+- `studio-production` run #189: Linux Python 3.11 and 3.14 installed wheel/source-distribution Chromium replay plus synthetic runtime smoke, and clean Windows local-install/Doctor/launch smoke on Python 3.11 and 3.14;
+- `branch-coverage` run #230;
+- `deep-parity` run #421;
+- `interoperability` run #420;
+- `docs` run #202;
+- `CodeQL` run #423.
+
+The first Linux Python 3.14 production attempt had a single target-stream upload acknowledgement timeout during installed sdist Chromium replay. The failed job was rerun **unchanged** at the same commit and passed the complete production sequence, while Linux 3.11, the Python 3.14 wheel path, source Chromium, and both Windows jobs were already successful. No product code or browser assertion was weakened in response.
 
 The checkpoint additionally certifies:
 
@@ -233,7 +240,10 @@ The checkpoint additionally certifies:
 - Home teaching routes for physiology, eye tracking, event-linked multimodal work and modelling;
 - browser-verified agreement between documented Guided defaults and the corresponding live EDA/model/cluster controls;
 - browser-verified non-execution: navigating through preset guidance does not run an analysis or increment the project analysis count;
-- preservation of the validated cluster-permutation design boundary and measurement/interpretation guardrails.
+- preservation of the validated cluster-permutation design boundary and measurement/interpretation guardrails;
+- a clean Windows virtual-environment install on Python 3.11 and 3.14 with import resolution verified from outside the repository checkout;
+- successful Windows Studio Doctor execution through the installed diagnostic entry point and module route;
+- successful loopback startup through both `gpbiometricspy-studio.exe` and `python -m studio.cli` on both Windows interpreters.
 
 Further product-polish commits must pass the same normal pull-request gates before they supersede this checkpoint.
 
@@ -244,7 +254,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 - all existing scientific package gates remain green;
 - Studio smoke, Chromium E2E and production/distribution gates remain green;
 - no regression in public synthetic fail-closed behavior;
-- Windows local launch instructions tested on a clean environment;
+- clean Windows install → Studio Doctor → launch remains CI-green on Python 3.11 and 3.14;
 - onboarding path tested by a human from install → guided demo → QC → analysis → report;
 - keyboard and narrow-viewport browser checks remain green;
 - project/replay fingerprint guards remain fail-closed;
@@ -253,7 +263,7 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery, teaching context and privacy-safe project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware guidance, actionable recovery, teaching context and privacy-safe project continuity**. Automated clean-install/Doctor/launch coverage is now in place on Windows, so human validation should focus on the researcher-facing workflow after launch:
 
 ```text
 install
