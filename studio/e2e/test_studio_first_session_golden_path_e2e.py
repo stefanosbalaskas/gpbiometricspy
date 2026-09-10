@@ -122,6 +122,19 @@ def test_first_session_physiology_walkthrough_reaches_saved_reporting_checkpoint
         timeout=90_000,
     )
 
+    # Completing the report must close the three-step guided loop and keep Reporting
+    # directly reopenable from the first-session Continue affordance.
+    page.get_by_role("tab", name="Home", exact=True).click()
+    expect(page.locator("#guided_progress")).to_have_text(
+        "EDA and cardiovascular walkthrough: 3/3 guided steps complete",
+        timeout=30_000,
+    )
+    expect(page.locator("#continue_guided")).to_have_text("Open completed project report")
+    page.locator("#continue_guided").click()
+    expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible(
+        timeout=30_000
+    )
+
     page.get_by_role("tab", name="Inventory", exact=True).click()
     page.get_by_role("tab", name="Timeline", exact=True).click()
     timeline = page.locator("#reporting-project_timeline")
