@@ -49,7 +49,7 @@ Status: **delivered in the current 0.1.6 development branch**
 
 ## Phase 2 — navigation and workflow guidance
 
-Status: **core and stepwise guided-start tranches delivered; contextual module-level guidance remains**
+Status: **guided starts and channel-aware Home recommendations delivered; module-level contextual help remains**
 
 - top navigation is grouped as Home → Quality → Analyze → Integrate → Model → Report;
 - established module identifiers remain unchanged underneath the grouped navigation;
@@ -61,14 +61,18 @@ Status: **core and stepwise guided-start tranches delivered; contextual module-l
 - physiology guidance advances EDA/SCR → PPG/HR/HRV → Reporting;
 - Home exposes live guided progress and a next-step Continue action;
 - replacing the dataset retires a stale guided walkthrough so guidance cannot leak across projects;
+- outside an active guided walkthrough, Home now derives advisory next-step recommendations from package-native foundation-QC channel validation plus the existing pupil/gaze capability helpers;
+- active EDA, heart-rate, pupil and gaze capabilities are surfaced as defensible signal-level next steps without auto-running or interpreting analyses;
+- active TTL markers are deferred until signal-level work is recorded, then Events & Alignment is recommended before Multimodal integration;
+- malformed or incomplete channel-validation metadata fails closed rather than manufacturing biosignal recommendations;
 - the session summary exposes first-session readiness as a percentage;
 - browser regression tests navigate by stable Shiny `data-value` module identifiers rather than mutable display labels;
 - grouped Analyze / Integrate navigation is covered through the same stable E2E contract;
-- remaining work: channel-aware recommendations, module-specific prerequisites and deeper contextual help.
+- remaining work: module-specific prerequisites and deeper contextual help.
 
 ## Phase 3 — project management
 
-Status: **project identity, restore integrity and explicit saved/dirty state delivered**
+Status: **project identity, restore integrity, saved/dirty state and readable provenance timeline delivered**
 
 - first-class project name and project metadata;
 - project names persist in privacy-preserving project recipes, manifests, reports and report bundles;
@@ -81,8 +85,11 @@ Status: **project identity, restore integrity and explicit saved/dirty state del
 - replacing the dataset clears the prior save checkpoint;
 - an exact-fingerprint recipe restore establishes the restored metadata as the current saved checkpoint;
 - stale report artifacts are invalidated after report-relevant project changes rather than being served with outdated project identity;
+- Reporting now exposes a researcher-readable metadata-only Timeline derived from the existing provenance log;
+- timeline entries group actions into Project, Quality, Analyze, Integrate, Model and Report stages and use human-facing action/detail labels;
+- the timeline intentionally does not repeat source filenames, raw samples or recorded parameter payloads; the original full provenance table remains available unchanged for auditability;
 - raw biometric rows and cached analysis tables remain outside project recipes;
-- remaining work: local recent-project convenience and a richer project-level provenance timeline.
+- remaining work: local recent-project convenience.
 
 ## Phase 4 — examples and presets
 
@@ -144,7 +151,7 @@ See [Studio deployment and support](studio-deployment.md) for the current operat
 The current certified product-code checkpoint is:
 
 ```text
-febb6646aeb30ca56b31791b971309868dd0b8d4
+e96ad24c5c7dc18b1266f8b335d64f5b690523ea
 ```
 
 At that exact head, the complete pull-request workflow set passed:
@@ -163,10 +170,12 @@ The checkpoint additionally certifies:
 
 - stepwise guided walkthrough continuation and dynamic Continue-label updates;
 - dataset-boundary retirement of stale guided state;
+- channel-aware Home recommendations based on existing validated channel/capability state, including fail-closed behavior for malformed validation tables;
 - project identity propagation through recipes, manifests, reports and bundles;
 - report-cache invalidation after report-relevant project changes;
 - explicit recipe `Unsaved` → `Saved` → `Unsaved changes` lifecycle in Chromium;
 - exact-fingerprint restore returning the restored project to a saved metadata checkpoint;
+- a readable metadata-only project timeline while preserving the original provenance audit table;
 - privacy-preserving recipes that exclude raw biometric rows and cached analysis-result tables;
 - installed-browser diagnostics and semantic upload-race retry guards.
 
@@ -188,20 +197,21 @@ Before calling Studio `0.1.6` product-polished, require at minimum:
 
 ## Current human-testing target
 
-The immediate target is now the **guided first-session experience with project continuity**:
+The immediate target is now the **guided first-session experience with channel-aware guidance and project continuity**:
 
 ```text
 install
   → run Studio Doctor
   → launch
-  → choose a guided synthetic walkthrough
+  → choose a guided synthetic walkthrough or load the synthetic demo only
   → see foundation QC complete
-  → continue stepwise through the relevant analysis family
+  → follow guided or channel-aware next-step guidance
   → inspect a result
   → Save / reopen / report
+  → review the readable project Timeline and full Provenance audit table
   → export a privacy-preserving project recipe
   → verify Saved / Unsaved changes state after project edits
   → restore against the exact source fingerprint
 ```
 
-Usability findings from that path should drive the remaining contextual guidance, presets, project-history convenience and packaging work before a non-development `0.1.6` release.
+Usability findings from that path should drive the remaining module-level contextual help, presets, local recent-project convenience and packaging work before a non-development `0.1.6` release.
