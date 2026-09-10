@@ -6,6 +6,11 @@ import pandas as pd
 from shiny import module, reactive, render, ui
 
 try:
+    from studio.error_guidance import format_failure, recovery_guidance
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure, recovery_guidance
+
+try:
     from studio.product_services import project_export_stem
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from product_services import project_export_stem
@@ -347,7 +352,9 @@ def reporting_server(input, output, session, state, global_status):
             report_status_value.set("Reporting artifacts built through public gpbiometricspy reporting APIs.")
             global_status.set("Reporting artifacts complete. Review methods, manifest, project recipe, and downloads.")
         except Exception as exc:
-            report_status_value.set(f"Reporting failed: {exc}")
+            message = format_failure("Reporting failed", exc, context="analysis failed reporting")
+            report_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.validate_recipe)
@@ -361,11 +368,21 @@ def reporting_server(input, output, session, state, global_status):
                 recipe_status_value.set("Recipe valid and dataset fingerprint matches. Metadata can be restored.")
             else:
                 failed = ", ".join(checks.loc[~checks["passed"], "check"].astype(str))
-                recipe_status_value.set(f"Recipe validation did not pass: {failed}.")
+                guidance = recovery_guidance(
+                    failed,
+                    context="project recipe source fingerprint validation",
+                )
+                recipe_status_value.set(f"Recipe validation did not pass: {failed}. {guidance}")
         except Exception as exc:
             recipe_value.set(None)
             recipe_checks_value.set(None)
-            recipe_status_value.set(f"Recipe validation failed: {exc}")
+            message = format_failure(
+                "Recipe validation failed",
+                exc,
+                context="project recipe source fingerprint validation external resource",
+            )
+            recipe_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.restore_recipe)
@@ -392,7 +409,13 @@ def reporting_server(input, output, session, state, global_status):
                 f"Project {restored.project_name!r} restored after exact dataset fingerprint verification."
             )
         except Exception as exc:
-            recipe_status_value.set(f"Project restore blocked: {exc}")
+            message = format_failure(
+                "Project restore blocked",
+                exc,
+                context="project recipe source fingerprint identity verification",
+            )
+            recipe_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.download_recipe_checkpoint)
