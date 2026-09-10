@@ -47,18 +47,23 @@ function Wait-StudioReady {
             $stderr = if (Test-Path $stderrLog) { Get-Content $stderrLog -Raw } else { "" }
             throw "$Label exited before becoming ready.`nSTDOUT:`n$stdout`nSTDERR:`n$stderr"
         }
+
+        $response = $null
         try {
             $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 2
-            if ($response.StatusCode -eq 200) {
-                if ($response.Content -notmatch "gpbiometricspy Studio") {
-                    throw "$Label returned HTTP 200 but did not expose the Studio application shell."
-                }
-                return
-            }
         }
         catch {
             Start-Sleep -Milliseconds 500
+            continue
         }
+
+        if ($response.StatusCode -eq 200) {
+            if ($response.Content -notmatch "gpbiometricspy Studio") {
+                throw "$Label returned HTTP 200 but did not expose the Studio application shell."
+            }
+            return
+        }
+        Start-Sleep -Milliseconds 500
     }
 
     $stdout = if (Test-Path $stdoutLog) { Get-Content $stdoutLog -Raw } else { "" }
@@ -76,13 +81,7 @@ function Test-StudioLaunch {
     $port = Get-FreeLoopbackPort
     $args = @($ArgumentList + @("--host", "127.0.0.1", "--port", "$port"))
     Remove-Item $stdoutLog, $stderrLog -Force -ErrorAction SilentlyContinue
-    $process = Start-Process \
-        -FilePath $FilePath \
-        -ArgumentList $args \
-        -WorkingDirectory $outsideRepo \
-        -PassThru \
-        -RedirectStandardOutput $stdoutLog \
-        -RedirectStandardError $stderrLog
+    $process = Start-Process -FilePath $FilePath -ArgumentList $args -WorkingDirectory $outsideRepo -PassThru -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
     try {
         Wait-StudioReady -Process $process -Port $port -Label $Label
         Write-Host "PASS: $Label launched on loopback port $port"
@@ -144,15 +143,8 @@ try {
         Pop-Location
     }
 
-    Test-StudioLaunch \
-        -FilePath $studioLauncher \
-        -ArgumentList @() \
-        -Label "installed gpbiometricspy-studio.exe"
-
-    Test-StudioLaunch \
-        -FilePath $venvPython \
-        -ArgumentList @("-m", "studio.cli") \
-        -Label "PATH-independent python -m studio.cli"
+    Test-StudioLaunch -FilePath $studioLauncher -ArgumentList @() -Label "installed gpbiometricspy-studio.exe"
+    Test-StudioLaunch -FilePath $venvPython -ArgumentList @("-m", "studio.cli") -Label "PATH-independent python -m studio.cli"
 
     Write-Host "Windows Studio clean-install smoke passed."
 }
