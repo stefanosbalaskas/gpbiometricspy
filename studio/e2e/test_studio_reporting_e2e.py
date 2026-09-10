@@ -151,6 +151,7 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
         timeout=60_000,
     )
     expect(page.locator("#reporting-result_catalog")).to_contain_text("eda_scr")
+    page.get_by_role("tab", name="Provenance", exact=True).click()
     expect(page.locator("#reporting-provenance")).to_be_visible()
 
     page.get_by_role("tab", name="Manifest", exact=True).click()
