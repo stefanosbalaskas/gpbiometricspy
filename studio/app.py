@@ -10,6 +10,7 @@ import gpbiometricspy as gp
 
 try:
     from studio.config import studio_runtime_config
+    from studio.error_guidance import format_failure
     from studio.product_services import (
         active_guided_start,
         channel_guidance_text,
@@ -44,6 +45,7 @@ try:
     from studio.state import ProjectState
 except ModuleNotFoundError:  # Direct execution from inside studio/.
     from config import studio_runtime_config
+    from error_guidance import format_failure
     from product_services import (
         active_guided_start,
         channel_guidance_text,
@@ -88,11 +90,8 @@ GUARDRAIL = (
 
 
 def _safe_error(prefix: str, exc: Exception) -> str:
-    """Return a concise UI-safe local error without losing the actionable message."""
-    detail = str(exc).strip() or exc.__class__.__name__
-    if len(detail) > 220:
-        detail = f"{detail[:217]}..."
-    return f"{prefix} — {detail}"
+    """Return structured, runtime-aware recovery guidance for an app-level catch."""
+    return format_failure(prefix, exc, context=prefix)
 
 
 def _workflow_step(number: str, title: str, detail: str):
