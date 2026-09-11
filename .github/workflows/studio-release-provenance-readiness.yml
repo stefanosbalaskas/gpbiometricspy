@@ -1,0 +1,103 @@
+name: studio-release-provenance-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "tools/release/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_release_provenance_windows.ps1"
+      - ".github/workflows/studio-release-provenance-readiness.yml"
+      - "tests/test_release_provenance_readiness_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "tools/release/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_release_provenance_windows.ps1"
+      - ".github/workflows/studio-release-provenance-readiness.yml"
+      - "tests/test_release_provenance_readiness_policy.py"
+
+permissions:
+  contents: read
+
+jobs:
+  release-provenance-readiness:
+    name: transient-windowed-installer-provenance (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Build transient installer and generate provenance evidence
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-release-provenance-readiness"
+          ./.github/scripts/test_studio_release_provenance_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts `
+            -SourceCommit $env:SOURCE_COMMIT
+
+      - name: Assert readiness evidence is binary-free and complete
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-release-provenance-readiness"
+          $Evidence = Join-Path $Artifacts "evidence"
+          foreach ($Required in @(
+            "release-provenance-readiness.json",
+            "studio-build-environment.cdx.json",
+            "studio-build-environment.freeze.txt",
+            "studio-build-environment.pip-list.json",
+            "SHA256SUMS.txt",
+            "iscc.log",
+            "identity/windows-identity.json"
+          )) {
+            if (-not (Test-Path -LiteralPath (Join-Path $Evidence $Required) -PathType Leaf)) {
+              throw "Missing release-provenance evidence file: $Required"
+            }
+          }
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
+            throw "Release-provenance evidence must not contain redistributable binaries or signing-key material."
+          }
+          foreach ($Path in @("installer-output", "dist", "build", "build-venv", "provenance-tool-venv")) {
+            if (Test-Path -LiteralPath (Join-Path $Artifacts $Path)) {
+              throw "Transient release-provenance path survived cleanup: $Path"
+            }
+          }
+          $Provenance = Get-Content -LiteralPath (Join-Path $Evidence "release-provenance-readiness.json") -Raw | ConvertFrom-Json
+          if ($Provenance.release_artifact -ne $false -or $Provenance.published -ne $false -or $Provenance.attested -ne $false) {
+            throw "Readiness workflow must not represent its transient build as a released or attested artifact."
+          }
+          if ($Provenance.source_commit -ne $env:SOURCE_COMMIT.ToLowerInvariant()) {
+            throw "Release-provenance source commit does not match the exact PR/push source SHA."
+          }
+          Write-Host "Release-provenance evidence is complete, exact-head bound, and binary-free."
+
+      - name: Upload release-provenance evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-release-provenance-readiness-evidence
+          path: ${{ runner.temp }}/gpbiometricspy-release-provenance-readiness/evidence/
+          if-no-files-found: error
