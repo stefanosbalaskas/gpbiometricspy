@@ -8,6 +8,11 @@ SCRIPT = (ROOT / ".github/scripts/test_studio_signing_readiness_windows.ps1").re
 WORKFLOW = (ROOT / ".github/workflows/studio-signing-readiness.yml").read_text(encoding="utf-8")
 
 
+def _executable_powershell(text: str) -> str:
+    """Return non-comment PowerShell lines for command-policy assertions."""
+    return "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+
+
 def test_signing_readiness_is_explicitly_test_only_and_hash_bound():
     assert 'test_only = $true' in SCRIPT
     assert 'release_artifact = $false' in SCRIPT
@@ -40,13 +45,14 @@ def test_signing_readiness_never_uploads_test_signed_executable_or_pfx():
 
 
 def test_signing_readiness_uses_noninteractive_signtool_sha256_path():
-    assert "CertificateRequest" in SCRIPT
-    assert "CreateSelfSigned" in SCRIPT
-    assert '"1.3.6.1.5.5.7.3.3", "Code Signing"' in SCRIPT
-    assert "New-SelfSignedCertificate" not in SCRIPT
-    assert "Set-AuthenticodeSignature" not in SCRIPT
-    assert "Get-AuthenticodeSignature" in SCRIPT
-    assert "sign /fd SHA256 /f $PfxPath /p $PfxPassword" in SCRIPT
-    assert "verify /pa /v" in SCRIPT
-    assert "Remove-TestCertificate" in SCRIPT
-    assert "Remove-Item -LiteralPath $PfxPath -Force" in SCRIPT
+    executable_script = _executable_powershell(SCRIPT)
+    assert "CertificateRequest" in executable_script
+    assert "CreateSelfSigned" in executable_script
+    assert '"1.3.6.1.5.5.7.3.3", "Code Signing"' in executable_script
+    assert "New-SelfSignedCertificate" not in executable_script
+    assert "Set-AuthenticodeSignature" not in executable_script
+    assert "Get-AuthenticodeSignature" in executable_script
+    assert "sign /fd SHA256 /f $PfxPath /p $PfxPassword" in executable_script
+    assert "verify /pa /v" in executable_script
+    assert "Remove-TestCertificate" in executable_script
+    assert "Remove-Item -LiteralPath $PfxPath -Force" in executable_script
