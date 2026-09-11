@@ -34,13 +34,36 @@ TARGETS = {
 }
 
 
-def _project_version(repo_root: Path) -> str:
+def _project_data(repo_root: Path) -> dict[str, Any]:
     with (repo_root / "pyproject.toml").open("rb") as handle:
-        data = tomllib.load(handle)
-    version = str(data["project"]["version"]).strip()
+        return tomllib.load(handle)["project"]
+
+
+def _project_version(repo_root: Path) -> str:
+    version = str(_project_data(repo_root)["version"]).strip()
     if not version:
         raise ValueError("project.version is empty")
     return version
+
+
+def _project_application_metadata(repo_root: Path) -> dict[str, str]:
+    project = _project_data(repo_root)
+    authors = list(project.get("authors") or [])
+    if not authors or not str(authors[0].get("name", "")).strip():
+        raise ValueError("project.authors[0].name is required for Windows company metadata")
+    urls = dict(project.get("urls") or {})
+    repository = str(urls.get("Repository", "")).strip().rstrip("/")
+    homepage = str(urls.get("Homepage", "")).strip()
+    support = str(urls.get("Issues", "")).strip()
+    if not repository or not homepage or not support:
+        raise ValueError("project.urls must define Repository, Homepage and Issues for Windows metadata")
+    return {
+        "company_name": str(authors[0]["name"]).strip(),
+        "homepage_url": homepage,
+        "repository_url": repository,
+        "support_url": support,
+        "updates_url": repository + "/releases",
+    }
 
 
 def _copyright(repo_root: Path) -> str:
@@ -75,6 +98,7 @@ def windows_fixed_version(version: str) -> tuple[int, int, int, int]:
 def _version_text(identity: dict[str, Any]) -> str:
     fixed = tuple(identity["fixed_file_version"])
     strings = [
+        ("CompanyName", identity["company_name"]),
         ("FileDescription", identity["file_description"]),
         ("FileVersion", identity["file_version"]),
         ("InternalName", identity["internal_name"]),
@@ -141,6 +165,7 @@ def generate_identity(repo_root: Path, output_dir: Path, target: str) -> dict[st
     output_dir.mkdir(parents=True, exist_ok=True)
 
     package_version = _project_version(repo_root)
+    application_metadata = _project_application_metadata(repo_root)
     fixed = windows_fixed_version(package_version)
     target_fields = TARGETS[target]
     identity: dict[str, Any] = {
@@ -156,6 +181,7 @@ def generate_identity(repo_root: Path, output_dir: Path, target: str) -> dict[st
         "internal_name": target_fields["internal_name"],
         "original_filename": target_fields["original_filename"],
         "legal_copyright": _copyright(repo_root),
+        **application_metadata,
     }
 
     version_path = output_dir / "version-info.txt"
