@@ -77,6 +77,9 @@ def test_windowed_installer_requires_clean_uninstall():
     assert "Installed executable survived uninstall." in SCRIPT
     assert "Uninstall registration survived uninstall." in SCRIPT
     assert "Start Menu shortcut survived uninstall." in SCRIPT
+    assert "$ResidualPayload = @()" in SCRIPT
+    assert "$ResidualPayload = @(Get-ChildItem" in SCRIPT
+    assert "$ResidualPayload.Count -ne 0" in SCRIPT
     assert 'uninstall_registration_removed = $true' in SCRIPT
     assert 'shortcuts_removed = $true' in SCRIPT
     assert 'payload_files_removed = $true' in SCRIPT
