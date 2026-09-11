@@ -21,6 +21,7 @@ function Assert-Equal {
     }
 }
 
+Assert-Equal "CompanyName" $Expected.company_name $Actual.CompanyName
 Assert-Equal "FileDescription" $Expected.file_description $Actual.FileDescription
 Assert-Equal "FileVersion" $Expected.file_version $Actual.FileVersion
 Assert-Equal "InternalName" $Expected.internal_name $Actual.InternalName
