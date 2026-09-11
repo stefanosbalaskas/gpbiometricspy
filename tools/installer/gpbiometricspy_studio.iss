@@ -54,11 +54,9 @@ VersionInfoVersion={#FileVersion}
 [Files]
 Source: "{#BundleDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-[Icons]
-Name: "{autoprograms}\gpbiometricspy Studio"; Filename: "{app}\gpbiometricspy-studio-native.exe"; WorkingDir: "{app}"
-
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: unchecked
 
 [Icons]
+Name: "{autoprograms}\gpbiometricspy Studio"; Filename: "{app}\gpbiometricspy-studio-native.exe"; WorkingDir: "{app}"
 Name: "{autodesktop}\gpbiometricspy Studio"; Filename: "{app}\gpbiometricspy-studio-native.exe"; WorkingDir: "{app}"; Tasks: desktopicon
