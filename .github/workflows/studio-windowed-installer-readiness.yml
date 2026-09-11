@@ -12,8 +12,10 @@ on:
       - "LICENSE"
       - ".github/scripts/assert_studio_windows_identity.ps1"
       - ".github/scripts/test_studio_windowed_installer_windows.ps1"
+      - ".github/scripts/test_studio_upgrade_policy_windows.ps1"
       - ".github/workflows/studio-windowed-installer-readiness.yml"
       - "tests/test_windowed_installer_readiness_policy.py"
+      - "tests/test_upgrade_policy_readiness_policy.py"
   push:
     branches:
       - main
@@ -26,8 +28,10 @@ on:
       - "LICENSE"
       - ".github/scripts/assert_studio_windows_identity.ps1"
       - ".github/scripts/test_studio_windowed_installer_windows.ps1"
+      - ".github/scripts/test_studio_upgrade_policy_windows.ps1"
       - ".github/workflows/studio-windowed-installer-readiness.yml"
       - "tests/test_windowed_installer_readiness_policy.py"
+      - "tests/test_upgrade_policy_readiness_policy.py"
 
 permissions:
   contents: read
@@ -56,15 +60,23 @@ jobs:
             -Python python `
             -ArtifactsDir $Artifacts
 
+      - name: Exercise repair, upgrade and downgrade policy
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-installer-readiness"
+          ./.github/scripts/test_studio_upgrade_policy_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts
+
       - name: Assert diagnostics are binary-free
         shell: pwsh
         run: |
           $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-installer-readiness"
           $Evidence = Join-Path $Artifacts "evidence"
-          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.dll", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
             throw "Windowed-installer evidence must not contain redistributable binaries or signing-key material."
           }
-          foreach ($Path in @("installer-output", "dist", "build", "venv")) {
+          foreach ($Path in @("installer-output", "dist", "build", "venv", "upgrade-policy-work")) {
             if (Test-Path -LiteralPath (Join-Path $Artifacts $Path)) {
               throw "Temporary windowed-installer path survived cleanup: $Path"
             }
