@@ -45,7 +45,7 @@ Assert-Equal "ProductPrivatePart" $Fixed[3] $Actual.ProductPrivatePart
 Add-Type -AssemblyName System.Drawing
 $EmbeddedIcon = [System.Drawing.Icon]::ExtractAssociatedIcon($Executable)
 if ($null -eq $EmbeddedIcon) { throw "Frozen executable does not expose an associated icon resource." }
-$SourceIcon = New-Object System.Drawing.Icon($IconPath, 32, 32)
+$SourceIcon = [System.Drawing.Icon]::new($IconPath, 32, 32)
 try {
     $EmbeddedBitmap = $EmbeddedIcon.ToBitmap()
     $SourceBitmap = $SourceIcon.ToBitmap()
