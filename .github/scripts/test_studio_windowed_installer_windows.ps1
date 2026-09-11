@@ -314,7 +314,10 @@ if (Test-Path -LiteralPath $Uninstaller) { throw "Uninstaller survived uninstall
 if (Test-Path -LiteralPath $UninstallKey) { throw "Uninstall registration survived uninstall." }
 if (Test-Path -LiteralPath $StartMenuShortcut) { throw "Start Menu shortcut survived uninstall." }
 if (Test-Path -LiteralPath $DesktopShortcut) { throw "Desktop shortcut exists after uninstall." }
-$ResidualPayload = if (Test-Path -LiteralPath $InstallRoot) { @(Get-ChildItem -LiteralPath $InstallRoot -Recurse -Force -File -ErrorAction SilentlyContinue) } else { @() }
+$ResidualPayload = @()
+if (Test-Path -LiteralPath $InstallRoot) {
+    $ResidualPayload = @(Get-ChildItem -LiteralPath $InstallRoot -Recurse -Force -File -ErrorAction SilentlyContinue)
+}
 if ($ResidualPayload.Count -ne 0) { throw "Installer payload files survived uninstall: $($ResidualPayload.Count)." }
 Remove-Item -LiteralPath $InstallRoot -Recurse -Force -ErrorAction SilentlyContinue
 
