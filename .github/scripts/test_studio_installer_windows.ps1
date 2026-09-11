@@ -15,10 +15,12 @@ $ArtifactsDir = [System.IO.Path]::GetFullPath($ArtifactsDir)
 $BuildArtifacts = Join-Path $ArtifactsDir "native-build"
 $InstallerOutput = Join-Path $ArtifactsDir "installer-output"
 $InstallRoot = Join-Path $ArtifactsDir "installed\gpbiometricspy Studio"
+$MissingRuntimeInstallRoot = Join-Path $ArtifactsDir "missing-runtime-install"
 $EvidenceDir = Join-Path $ArtifactsDir "evidence"
 $MetricsPath = Join-Path $EvidenceDir "installer-metrics.json"
 $CompileLog = Join-Path $EvidenceDir "iscc.log"
 $InstallLog = Join-Path $EvidenceDir "install.log"
+$MissingRuntimeInstallLog = Join-Path $EvidenceDir "install-missing-webview2.log"
 $UninstallLog = Join-Path $EvidenceDir "uninstall.log"
 $IssPath = Join-Path $RepoRoot "tools/installer/gpbiometricspy_studio.iss"
 $IdentityVerifier = Join-Path $RepoRoot ".github/scripts/assert_studio_windows_identity.ps1"
@@ -27,6 +29,9 @@ $AppId = "fd3ca1af-0ebb-5061-9c59-f7ab1079252e"
 $UninstallKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\${AppId}_is1"
 $StartMenuShortcut = Join-Path ([Environment]::GetFolderPath("Programs")) "gpbiometricspy Studio.lnk"
 $DesktopShortcut = Join-Path ([Environment]::GetFolderPath("Desktop")) "gpbiometricspy Studio.lnk"
+$WebView2ProductId = "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+$WebView2MachineKey = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\$WebView2ProductId"
+$WebView2UserKey = "Registry::HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\$WebView2ProductId"
 
 New-Item -ItemType Directory -Force -Path $ArtifactsDir, $InstallerOutput, $EvidenceDir | Out-Null
 
@@ -47,6 +52,27 @@ function Find-InnoCompiler {
         if (Test-Path -LiteralPath $Candidate -PathType Leaf) { return $Candidate }
     }
     return $null
+}
+
+function Get-WebView2RuntimeEvidence {
+    $Candidates = @(
+        [pscustomobject]@{ Scope = "machine"; Path = $WebView2MachineKey },
+        [pscustomobject]@{ Scope = "user"; Path = $WebView2UserKey }
+    )
+
+    foreach ($Candidate in $Candidates) {
+        if (-not (Test-Path -LiteralPath $Candidate.Path)) { continue }
+        $Version = [string](Get-ItemPropertyValue -LiteralPath $Candidate.Path -Name "pv" -ErrorAction SilentlyContinue)
+        if ($Version -and $Version.Trim() -and $Version.Trim() -ne "0.0.0.0") {
+            return [pscustomobject]@{
+                Version = $Version.Trim()
+                Scope = $Candidate.Scope
+                RegistryPath = $Candidate.Path
+            }
+        }
+    }
+
+    throw "Microsoft Edge WebView2 Runtime was not detected in the documented machine/user registry locations."
 }
 
 function Invoke-InstalledBoundarySmoke {
@@ -116,8 +142,10 @@ function Invoke-InstalledBoundarySmoke {
 if (Test-Path -LiteralPath $UninstallKey) {
     throw "Installer-readiness runner is contaminated by an existing gpbiometricspy Studio uninstall registration."
 }
-if (Test-Path -LiteralPath $InstallRoot) {
-    Remove-Item -LiteralPath $InstallRoot -Recurse -Force
+foreach ($Path in @($InstallRoot, $MissingRuntimeInstallRoot)) {
+    if (Test-Path -LiteralPath $Path) {
+        Remove-Item -LiteralPath $Path -Recurse -Force
+    }
 }
 if (Test-Path -LiteralPath $StartMenuShortcut) {
     Remove-Item -LiteralPath $StartMenuShortcut -Force
@@ -125,6 +153,9 @@ if (Test-Path -LiteralPath $StartMenuShortcut) {
 if (Test-Path -LiteralPath $DesktopShortcut) {
     Remove-Item -LiteralPath $DesktopShortcut -Force
 }
+
+$WebView2Evidence = Get-WebView2RuntimeEvidence
+Write-Host "Detected Evergreen WebView2 Runtime: scope=$($WebView2Evidence.Scope), version=$($WebView2Evidence.Version)"
 
 $Iscc = Find-InnoCompiler
 if ($null -eq $Iscc) { throw "Inno Setup ISCC.exe was not found on the Windows runner." }
@@ -180,6 +211,51 @@ $InstallerSha256 = Get-Sha256 $Installer
 $InstallerBytes = [int64](Get-Item -LiteralPath $Installer).Length
 Write-Host "Unsigned installer SHA-256: $InstallerSha256"
 
+# Fail closed when WebView2 is absent. This CI hook only forces the missing
+# branch; it can never bypass a real missing-runtime result.
+$OldForceMissing = $env:GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING
+try {
+    $env:GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING = "1"
+    $MissingInstallArgs = @(
+        "/VERYSILENT",
+        "/SUPPRESSMSGBOXES",
+        "/NORESTART",
+        "/NOCANCEL",
+        "/SP-",
+        "/DIR=`"$MissingRuntimeInstallRoot`"",
+        "/LOG=`"$MissingRuntimeInstallLog`""
+    )
+    $MissingInstallProcess = Start-Process -FilePath $Installer -ArgumentList $MissingInstallArgs -Wait -PassThru
+}
+finally {
+    if ($null -eq $OldForceMissing) {
+        Remove-Item Env:GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING -ErrorAction SilentlyContinue
+    }
+    else {
+        $env:GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING = $OldForceMissing
+    }
+}
+
+if ($MissingInstallProcess.ExitCode -ne 7) {
+    throw "Missing-WebView2 setup must fail with Inno Setup exit code 7; got $($MissingInstallProcess.ExitCode)."
+}
+$MissingLogText = if (Test-Path -LiteralPath $MissingRuntimeInstallLog) { Get-Content -LiteralPath $MissingRuntimeInstallLog -Raw } else { "" }
+if ($MissingLogText -notmatch "WebView2 Runtime missing") {
+    throw "Missing-WebView2 setup log did not record the prerequisite failure."
+}
+if (Test-Path -LiteralPath (Join-Path $MissingRuntimeInstallRoot "gpbiometricspy-studio-native.exe") -PathType Leaf) {
+    throw "Missing-WebView2 prerequisite failure still installed the native executable."
+}
+if (Test-Path -LiteralPath $UninstallKey) {
+    throw "Missing-WebView2 prerequisite failure created an uninstall registration."
+}
+if (Test-Path -LiteralPath $StartMenuShortcut -PathType Leaf) {
+    throw "Missing-WebView2 prerequisite failure created a Start Menu shortcut."
+}
+if (Test-Path -LiteralPath $MissingRuntimeInstallRoot -PathType Container) {
+    Remove-Item -LiteralPath $MissingRuntimeInstallRoot -Recurse -Force
+}
+
 $InstallArgs = @(
     "/VERYSILENT",
     "/SUPPRESSMSGBOXES",
@@ -191,6 +267,10 @@ $InstallArgs = @(
 )
 $InstallProcess = Start-Process -FilePath $Installer -ArgumentList $InstallArgs -Wait -PassThru
 if ($InstallProcess.ExitCode -ne 0) { throw "Installer exited with code $($InstallProcess.ExitCode)." }
+$InstallLogText = if (Test-Path -LiteralPath $InstallLog) { Get-Content -LiteralPath $InstallLog -Raw } else { "" }
+if ($InstallLogText -notmatch "WebView2 Runtime detected") {
+    throw "Successful setup log did not record detected WebView2 Runtime evidence."
+}
 
 $InstalledExecutable = Join-Path $InstallRoot "gpbiometricspy-studio-native.exe"
 $Uninstaller = Join-Path $InstallRoot "unins000.exe"
@@ -261,7 +341,7 @@ Copy-Item -LiteralPath (Join-Path $BuildArtifacts "identity/version-info.txt") -
 
 $Metrics = [ordered]@{
     schema = "gpbiometricspy-studio-installer-readiness"
-    schema_version = 1
+    schema_version = 2
     release_artifact = $false
     installer_published = $false
     installer_signed = $false
@@ -290,7 +370,17 @@ $Metrics = [ordered]@{
     uninstall_registration_removed = $true
     shortcuts_removed = $true
     payload_files_removed = $true
-    webview2_runtime_strategy = "host-provided-evaluation-only"
+    webview2_runtime_strategy = "evergreen-prerequisite-detect-and-remediate"
+    webview2_runtime_required = $true
+    webview2_runtime_product_id = $WebView2ProductId
+    webview2_runtime_version = $WebView2Evidence.Version
+    webview2_runtime_scope = $WebView2Evidence.Scope
+    webview2_runtime_registry_path = $WebView2Evidence.RegistryPath
+    webview2_missing_install_exit_code = $MissingInstallProcess.ExitCode
+    webview2_missing_install_blocked = $true
+    webview2_runtime_payload_bundled = $false
+    webview2_runtime_downloaded_in_ci = $false
+    webview2_evergreen_policy = $true
     production_signing_required = $true
     production_timestamp_required = $true
 }
@@ -306,4 +396,4 @@ if (Get-ChildItem -LiteralPath $EvidenceDir -Recurse -File -Include "*.exe", "*.
     throw "Installer-readiness evidence must not retain executable or signing-key material."
 }
 
-Write-Host "Windows installer readiness proof passed: per-user install, native launch, public-demo launch, and clean uninstall verified."
+Write-Host "Windows installer readiness proof passed: Evergreen WebView2 prerequisite, per-user install, native launch, public-demo launch, and clean uninstall verified."
