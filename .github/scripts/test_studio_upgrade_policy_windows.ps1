@@ -38,8 +38,8 @@ $AppId = "fd3ca1af-0ebb-5061-9c59-f7ab1079252e"
 $UninstallKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\${AppId}_is1"
 $UpgradePolicyKey = "HKCU:\Software\StefanosBalaskas\gpbiometricspy Studio"
 $UpgradePolicyValue = "InstalledFileVersion"
-$PreviousFileVersion = "0.1.5.0"
-$FutureFileVersion = "0.1.7.0"
+$PreviousFileVersion = "0.1.6.0"
+$FutureFileVersion = "0.1.8.0"
 $StartMenuShortcut = Join-Path ([Environment]::GetFolderPath("Programs")) "gpbiometricspy Studio.lnk"
 $DesktopShortcut = Join-Path ([Environment]::GetFolderPath("Desktop")) "gpbiometricspy Studio.lnk"
 
@@ -122,7 +122,7 @@ Write-Host "Building GUI-subsystem bundle for upgrade-policy proof..."
 if ($LASTEXITCODE -ne 0) { throw "Failed to generate Windows identity." }
 $Identity = Get-Content -LiteralPath $IdentityJson -Raw | ConvertFrom-Json
 $TargetFileVersion = [string]$Identity.file_version
-if ($TargetFileVersion -ne "0.1.6.0") { throw "Upgrade-policy fixture expects the 0.1.6.0 development file-version line; got $TargetFileVersion." }
+if ($TargetFileVersion -ne "0.1.7.0") { throw "Upgrade-policy fixture expects the 0.1.7.0 development file-version line; got $TargetFileVersion." }
 
 $env:GPBIOMETRICSPY_WINDOWS_IDENTITY_DIR = $IdentityDir
 Push-Location $RepoRoot
