@@ -1,0 +1,46 @@
+name: studio-desktop-release-handoff-readiness
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-desktop-release-handoff-readiness-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Prove repository handoff template is fail-closed
+        run: >-
+          python tools/release/validate_desktop_release_evidence.py
+          --manifest tools/release/desktop_release_evidence.template.json
+          --expected-tag v0.1.6
+          --expect-ineligible
+
+      - name: Exercise production handoff evidence contract
+        run: python tests/test_desktop_release_handoff_contract.py
+
+      - name: Assert template contains no signing secret material
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Eiq -- 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|BEGIN PKCS12|password|secret[_-]?key' tools/release/desktop_release_evidence.template.json; then
+            echo 'Production handoff template must not contain signing secret material.' >&2
+            exit 1
+          fi
+          echo 'Production handoff contract readiness passed: template is fail-closed and secret-free.'
