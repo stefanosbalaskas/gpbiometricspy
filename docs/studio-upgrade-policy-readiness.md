@@ -14,7 +14,7 @@ The per-user Inno Setup installer keeps the stable AppId:
 
 `fd3ca1af-0ebb-5061-9c59-f7ab1079252e`
 
-Version ordering uses the Windows fixed numeric file version rather than the PEP 440 display version. For the current development line the target is `0.1.6.0` while the product display version remains `0.1.6.dev0`.
+Version ordering uses the Windows fixed numeric file version rather than the PEP 440 display version. For the current development line the target is `0.1.6.0` while the product display version remains `0.1.6`.
 
 The installer now:
 

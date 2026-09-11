@@ -81,7 +81,7 @@ The development evidence artifact used to prepare the stable freeze is GitHub Ac
 - GitHub Release and PyPI sdist SHA-256: `b8605ad8d402a948d0610dd40ff98985dedf6351b681b7e43294df38d10dc47e`.
 - Protected PyPI Trusted Publishing completed with HTTP 200 uploads and Sigstore/Rekor attestations (wheel Rekor `2762034607`; sdist Rekor `2762034601`).
 - Zenodo archives version 0.1.5 at DOI `10.5281/zenodo.22672823` in the existing concept/version chain.
-- Live repository development is `0.1.6.dev0`; the stable `CITATION.cff` record remains pinned to 0.1.5 / 2026-09-08 / `10.5281/zenodo.22672823`.
+- Subsequent repository development moved to the 0.1.6 development line; the stable `CITATION.cff` record remains pinned to 0.1.5 / 2026-09-08 / `10.5281/zenodo.22672823`.
 
 ## Release integrity
 

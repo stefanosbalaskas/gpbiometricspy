@@ -22,7 +22,7 @@ At that exact SHA all ten pull-request workflow families completed successfully:
 Windows identity is generated, not maintained as a second handwritten version source.
 
 - `pyproject.toml` supplies the package version.
-- The current PEP 440 ProductVersion is `0.1.6.dev0`.
+- The current PEP 440 ProductVersion is `0.1.6`.
 - The corresponding four-integer Windows FileVersion is `0.1.6.0`.
 - `LICENSE` supplies the legal copyright string: `Copyright (c) 2026 Stefanos Balaskas`.
 - No CompanyName is fabricated.
@@ -58,7 +58,7 @@ All six retained diagnostic artifacts record:
 
 - `windows_identity_verified=true`;
 - ProductName `gpbiometricspy Studio`;
-- ProductVersion `0.1.6.dev0`;
+- ProductVersion `0.1.6`;
 - FileVersion `0.1.6.0`;
 - identical icon SHA-256:
   `cba6b92fdf2e35f84a0f033afdb5fc25cd2583c8de1c79a970e6670ab01062dc`.

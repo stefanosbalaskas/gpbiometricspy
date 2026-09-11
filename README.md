@@ -19,7 +19,7 @@
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml"><img alt="Studio browser E2E" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-e2e.yml/badge.svg?branch=main"></a>
   <a href="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-production.yml"><img alt="Studio production" src="https://github.com/stefanosbalaskas/gpbiometricspy/actions/workflows/studio-production.yml/badge.svg?branch=main"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
-  <a href="https://doi.org/10.5281/zenodo.22672823"><img alt="Version DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.22672823.svg"></a>
+  <a href="https://doi.org/10.5281/zenodo.22150872"><img alt="Concept DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.22150872.svg"></a>
 </p>
 
 <p align="center">
@@ -39,7 +39,7 @@
 ### Install the stable app
 
 ```bash
-python -m pip install "gpbiometricspy[studio]==0.1.5"
+python -m pip install "gpbiometricspy[studio]==0.1.6"
 ```
 
 ### Launch it
@@ -125,11 +125,11 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 
 | Area | Current state |
 |---|---|
-| Stable release | **0.1.5** |
-| Development head | **0.1.6.dev0** |
+| Stable release | **0.1.6** |
+| Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Tests | **567** |
+| Tests | **641** |
 | Statement coverage | **10,456 / 10,456 = 100.00%** |
 | Raw branch coverage | **5,629 / 5,648 = 99.6636%** |
 | Audited structural arcs | **19** |
@@ -172,11 +172,12 @@ The package preserves conservative interpretation boundaries: physiological and 
 <a id="citation"></a>
 ## Citation and archival record
 
-Stable `gpbiometricspy 0.1.5` was released on **2026-09-08** from immutable tag `v0.1.5`. Live repository development proceeds as `0.1.6.dev0`.
+Stable `gpbiometricspy 0.1.6` was released on **2026-09-11** from the fully qualified stable-release line. The 0.1.6 Zenodo version DOI is intentionally left unset until Zenodo ingests the immutable GitHub release.
 
-- **0.1.5 version DOI:** [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)
+- **0.1.6 version DOI:** pending Zenodo ingestion of `v0.1.6` — no DOI is fabricated before minting
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
-- **Previous 0.1.4 DOI:** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
+- **Previous 0.1.5 DOI:** [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)
+- **Earlier 0.1.4 DOI:** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
 - **Earlier 0.1.3 DOI:** [10.5281/zenodo.22313884](https://doi.org/10.5281/zenodo.22313884)
 - **Earlier 0.1.2 DOI:** [10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)
 - **Frozen R semantic-reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
@@ -184,7 +185,7 @@ Stable `gpbiometricspy 0.1.5` was released on **2026-09-08** from immutable tag 
 
 Recommended citation:
 
-> Balaskas, S. (2026). *gpbiometricspy: Python tools for Gazepoint biometric workflows* (Version 0.1.5) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.22672823
+> Balaskas, S. (2026). *gpbiometricspy: Python tools for Gazepoint biometric workflows* (Version 0.1.6) [Computer software]. GitHub. https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.6
 
 ## Development and provenance
 

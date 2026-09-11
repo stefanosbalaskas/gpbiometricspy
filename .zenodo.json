@@ -7,7 +7,7 @@
     }
   ],
   "title": "gpbiometricspy: Python tools for Gazepoint biometric workflows",
-  "description": "gpbiometricspy is the Python counterpart of gpbiometrics, with gpbiometrics 2.0.0 frozen as its initial semantic reference. It provides Gazepoint-native workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event alignment, multimodal quality control, analysis, plotting, reporting, simulation, reproducibility, and interoperability. Version 0.1.5 preserves the complete 406-export scientific contract and 100% statement coverage, adds physiology measurement-accountability methods, expands installed Studio replay and production validation, and retains audited branch-path enforcement with zero unaudited branch debt.",
+  "description": "gpbiometricspy is the Python counterpart of gpbiometrics, with gpbiometrics 2.0.0 frozen as its initial semantic reference. It provides Gazepoint-native workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event alignment, multimodal quality control, analysis, plotting, reporting, simulation, reproducibility, and interoperability. Version 0.1.6 preserves the complete 406-export scientific contract and 100% statement coverage while promoting gpbiometricspy Studio as a guided end-user research workflow with project identity, quality-control routing, analysis modules, timeline/provenance, reporting, and reproducible recipe support. The normal Python/GitHub/PyPI release remains independent of the optional standalone Windows signing path.",
   "access_right": "open",
   "license": "mit",
   "upload_type": "software",
@@ -33,5 +33,5 @@
       "relation": "isDerivedFrom"
     }
   ],
-  "version": "0.1.6.dev0"
+  "version": "0.1.6"
 }

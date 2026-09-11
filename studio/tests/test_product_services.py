@@ -241,7 +241,7 @@ def test_project_export_stem_preserves_unicode_and_avoids_reserved_windows_names
 
 def test_support_snapshot_excludes_source_filename_and_raw_samples():
     state = _loaded_state().with_qc({"validation": {"valid": True}})
-    snapshot = support_snapshot(state, runtime_mode="local", package_version="0.1.6.dev0")
+    snapshot = support_snapshot(state, runtime_mode="local", package_version="0.1.6")
     assert snapshot["project_name"] == "Pilot study"
     assert snapshot["source_type"] == ".csv"
     assert snapshot["raw_data_included"] is False

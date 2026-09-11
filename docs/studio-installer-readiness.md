@@ -42,7 +42,7 @@ The proof is deliberately non-elevating and current-user scoped:
 - no environment-variable or file-association mutation;
 - no production signing hook or signing secret in the installer definition or workflow.
 
-The PEP 440 display/package version remains `0.1.6.dev0`. Windows PE numeric version metadata uses the derived numeric version `0.1.6.0`; a regression test prevents the non-numeric development version from being supplied to Inno Setup PE version directives.
+The PEP 440 display/package version remains `0.1.6`. Windows PE numeric version metadata uses the derived numeric version `0.1.6.0`; a regression test prevents the non-numeric development version from being supplied to Inno Setup PE version directives.
 
 ## Certified installer evidence
 
@@ -78,12 +78,12 @@ The source native bundle used by the proof also retained the certified Windows i
 - source-bundle local startup: `3.711 s`;
 - source-bundle public-demo startup: `2.931 s`;
 - Windows identity verified: `true`;
-- product version: `0.1.6.dev0`;
+- product version: `0.1.6`;
 - file version: `0.1.6.0`.
 
 ## Failure closed during development
 
-Installer-readiness #1 correctly failed before installation because Inno Setup rejected `VersionInfoProductVersion=0.1.6.dev0`: that directive requires numeric Windows version metadata. The candidate was not certified. The installer definition was corrected to use the existing numeric `0.1.6.0` Windows file-version resource for both PE numeric version directives while preserving `AppVersion=0.1.6.dev0` as the researcher-facing development version. Installer-readiness #2 then passed the complete install/exercise/uninstall proof.
+Installer-readiness #1 correctly failed before installation because Inno Setup rejected `VersionInfoProductVersion=0.1.6`: that directive requires numeric Windows version metadata. The candidate was not certified. The installer definition was corrected to use the existing numeric `0.1.6.0` Windows file-version resource for both PE numeric version directives while preserving `AppVersion=0.1.6` as the researcher-facing development version. Installer-readiness #2 then passed the complete install/exercise/uninstall proof.
 
 ## Evidence-retention boundary
 

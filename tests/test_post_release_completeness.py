@@ -6,7 +6,7 @@ import gpbiometricspy as gp
 ROOT=Path(__file__).resolve().parents[1]
 
 def test_release_version_and_contract():
-    assert gp.__version__=='0.1.6.dev0'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
+    assert gp.__version__=='0.1.6'; assert len(gp.R_EXPORTS)==406; assert len(gp.IMPLEMENTED_EXPORTS)==406; assert len(gp.PENDING_EXPORTS)==0
 
 def test_golden_manifest_and_python_generation(tmp_path):
     manifest=json.loads((ROOT/'reference/golden/manifest.json').read_text()); assert len(manifest['cases'])>=15
@@ -67,7 +67,7 @@ def test_optional_backend_compatibility_dependencies_are_declared():
 def test_visual_documentation_surface_is_committed_and_navigable():
     manifest_path=ROOT/'docs/assets/generated/manifest.json'
     manifest=json.loads(manifest_path.read_text())
-    assert manifest['package_version']=='0.1.6.dev0'
+    assert manifest['package_version']=='0.1.6'
     assert len(manifest['figures'])==13
     for entry in manifest['figures']:
         image=ROOT/'docs/assets/generated'/entry['file']
@@ -123,7 +123,7 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     import tomllib
 
     zenodo = json.loads((ROOT / ".zenodo.json").read_text(encoding="utf-8"))
-    assert zenodo["version"] == "0.1.6.dev0"
+    assert zenodo["version"] == "0.1.6"
     assert zenodo["upload_type"] == "software"
     assert zenodo["access_right"] == "open"
     assert zenodo["license"] == "mit"
@@ -144,9 +144,9 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     cff = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     assert 'orcid: "https://orcid.org/0000-0003-2444-9796"' in cff
     assert 'affiliation: "University of Patras"' in cff
-    assert "version: 0.1.5" in cff
-    assert "date-released: 2026-09-08" in cff
-    assert "doi: 10.5281/zenodo.22672823" in cff
+    assert "version: 0.1.6" in cff
+    assert "date-released: 2026-09-11" in cff
+    assert "\ndoi: 10.5281/zenodo.22672823\n" not in cff
     assert "doi: 10.5281/zenodo.22515782" not in cff
     assert "doi: 10.5281/zenodo.22313884" not in cff
     assert "doi: 10.5281/zenodo.22150873" not in cff
@@ -155,8 +155,8 @@ def test_archival_metadata_is_zenodo_ready_and_unambiguous():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     urls = project["project"]["urls"]
     assert urls["DOI"] == "https://doi.org/10.5281/zenodo.22150872"
-    assert urls["VersionDOI"] == "https://doi.org/10.5281/zenodo.22672823"
-    assert urls["PreviousVersionDOI"] == "https://doi.org/10.5281/zenodo.22515782"
+    assert "VersionDOI" not in urls
+    assert urls["PreviousVersionDOI"] == "https://doi.org/10.5281/zenodo.22672823"
     assert urls["RReferenceDOI"] == "https://doi.org/10.5281/zenodo.21434608"
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")

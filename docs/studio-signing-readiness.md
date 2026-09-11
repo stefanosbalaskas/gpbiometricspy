@@ -97,7 +97,7 @@ The signing run rebuilt the native bundle rather than signing an unrelated artif
 - DOM-loaded proof required: `true`
 - Windows identity verified: `true`
 
-The identity remained `gpbiometricspy Studio`, product version `0.1.6.dev0`, file version `0.1.6.0`, original filename `gpbiometricspy-studio-native.exe`.
+The identity remained `gpbiometricspy Studio`, product version `0.1.6`, file version `0.1.6.0`, original filename `gpbiometricspy-studio-native.exe`.
 
 ## Trust boundary and production interpretation
 
