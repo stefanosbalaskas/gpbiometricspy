@@ -1,0 +1,115 @@
+name: studio-release-orchestration-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "tools/release/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_release_provenance_windows.ps1"
+      - ".github/scripts/test_studio_release_orchestration_windows.ps1"
+      - ".github/workflows/studio-release-orchestration-readiness.yml"
+      - "tests/test_release_provenance_readiness_policy.py"
+      - "tests/test_release_orchestration_readiness_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "tools/release/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_release_provenance_windows.ps1"
+      - ".github/scripts/test_studio_release_orchestration_windows.ps1"
+      - ".github/workflows/studio-release-orchestration-readiness.yml"
+      - "tests/test_release_provenance_readiness_policy.py"
+      - "tests/test_release_orchestration_readiness_policy.py"
+
+permissions:
+  contents: read
+
+jobs:
+  release-orchestration-readiness:
+    name: transient-signed-desktop-chain (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: "1"
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Build, sign, install, verify and uninstall transient desktop chain
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-release-orchestration-readiness"
+          ./.github/scripts/test_studio_release_orchestration_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts `
+            -SourceCommit $env:SOURCE_COMMIT
+
+      - name: Assert release-orchestration evidence is exact-source bound and binary-free
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-release-orchestration-readiness"
+          $Evidence = Join-Path $Artifacts "evidence"
+          $ManifestPath = Join-Path $Evidence "release-orchestration-readiness.json"
+          foreach ($Required in @(
+            "release-orchestration-readiness.json",
+            "SHA256SUMS.txt",
+            "iscc.log",
+            "install.log",
+            "uninstall.log",
+            "signtool-executable-sign.log",
+            "signtool-installer-sign.log",
+            "identity/windows-identity.json"
+          )) {
+            if (-not (Test-Path -LiteralPath (Join-Path $Evidence $Required) -PathType Leaf)) {
+              throw "Missing release-orchestration evidence file: $Required"
+            }
+          }
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.dll", "*.pfx", "*.p12", "*.pem", "*.key" -ErrorAction SilentlyContinue) {
+            throw "Release-orchestration evidence must not contain redistributable binaries or signing-key material."
+          }
+          foreach ($Path in @("installer-output", "dist", "build", "venv", "signing", "installed")) {
+            if (Test-Path -LiteralPath (Join-Path $Artifacts $Path)) {
+              throw "Transient release-orchestration path survived cleanup: $Path"
+            }
+          }
+          $Manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
+          if ($Manifest.source_commit -ne $env:SOURCE_COMMIT.ToLowerInvariant() -or $Manifest.checkout_sha -ne $env:SOURCE_COMMIT.ToLowerInvariant()) {
+            throw "Release-orchestration evidence is not bound to the exact PR/push source SHA."
+          }
+          if (-not $Manifest.test_only -or $Manifest.release_artifact -or $Manifest.published -or $Manifest.attested) {
+            throw "Readiness workflow must remain test-only and non-release/non-publishing/non-attesting."
+          }
+          if (-not $Manifest.production_trusted_certificate_required -or -not $Manifest.production_timestamp_required -or $Manifest.timestamped) {
+            throw "Readiness evidence must preserve the production trust/timestamp boundary."
+          }
+          if (-not $Manifest.installed_executable_matches_signed_source -or -not $Manifest.signer_identity_consistent -or -not $Manifest.uninstall_verified) {
+            throw "Transient signed desktop chain did not preserve its end-to-end identity contract."
+          }
+          Write-Host "Release-orchestration evidence is exact-source bound, signed-chain complete, and diagnostics-only."
+
+      - name: Upload release-orchestration evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-release-orchestration-readiness-evidence
+          path: ${{ runner.temp }}/gpbiometricspy-release-orchestration-readiness/evidence/
+          if-no-files-found: error
