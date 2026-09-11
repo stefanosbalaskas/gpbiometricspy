@@ -80,9 +80,27 @@ Instead, once the intended stable release commit is current `main` and its packa
 
 The successful handoff run becomes the final release gate. `cut-release.yml` will not create the stable tag until every exact-main automated release gate and one successful exact-commit production handoff are present.
 
-After the immutable tag is created, `release.yml` independently downloads that exact handoff artifact, verifies its checksum, reruns the validator against the tag commit, and only then proceeds to build distributions, create the GitHub Release and dispatch protected PyPI publication. The non-secret handoff record and its checksum manifest are attached to the GitHub Release for auditability.
+After the immutable tag is created, `cut-release.yml` dispatches `release.yml` **on that exact tag**, so the release workflow's own `GITHUB_SHA` must equal the immutable tag commit. `release.yml` independently downloads the production handoff artifact, verifies its checksum, reruns the handoff validator, builds the wheel and sdist using a source-commit-derived `SOURCE_DATE_EPOCH`, and writes `RELEASE-METADATA.json`. That metadata binds the exact tag/SHA, production-handoff run, handoff hashes, package checksum manifest and exact wheel/sdist SHA-256 values.
 
-This design deliberately keeps signing credentials, certificate private material and redistributable desktop binaries outside ordinary PR CI and outside the source tree.
+The stable-release artifact is validated by `tools/release/validate_stable_release_artifact.py`. If a GitHub Release already exists, the workflow downloads every expected asset and requires byte-for-byte identity with the newly rebuilt exact-source candidate before treating the run as successful. This prevents a manually substituted release asset from being promoted merely because its filename and version look correct.
+
+## Canonical PyPI publication chain
+
+PyPI Trusted Publishing no longer trusts an independently created GitHub Release or a free-standing manual publisher run.
+
+`pypi.yml` is triggered after a successful `release` workflow, or may be used manually only as a recovery path that first resolves an already successful canonical `release` run for the requested stable tag. It then:
+
+1. downloads the `distributions` artifact from that successful release run;
+2. reads its `RELEASE-METADATA.json` and requires exact tag/source binding;
+3. checks out the exact tag and confirms the commit remains in `main` history;
+4. verifies `SHA256SUMS.txt` and the production-handoff checksum manifest;
+5. reruns both the desktop-handoff validator and canonical stable-release-artifact validator;
+6. downloads the current GitHub Release assets and requires every package/evidence/metadata asset to be byte-identical to the successful workflow artifact;
+7. publishes **only** `canonical-release/dist/` through PyPI Trusted Publishing.
+
+This closes a previous bypass in which `pypi.yml` could be dispatched against any non-draft GitHub Release containing plausible wheel/sdist filenames. A PyPI publish now depends on a successful exact-source release run that already passed the full automated matrix and the real production handoff.
+
+The non-secret handoff record, its checksum manifest and `RELEASE-METADATA.json` are attached to the GitHub Release for auditability. Signing credentials, certificate private material and redistributable desktop binaries remain outside ordinary PR CI and outside the source tree.
 
 ## Configure `production-release` before use
 

@@ -9,11 +9,13 @@ on:
     paths:
       - "tools/release/**"
       - "tests/test_desktop_release_handoff_contract.py"
+      - "tests/test_stable_release_artifact_contract.py"
       - "tests/test_production_release_handoff_wiring.py"
       - ".github/workflows/studio-desktop-release-handoff-readiness.yml"
       - ".github/workflows/studio-production-release-handoff.yml"
       - ".github/workflows/cut-release.yml"
       - ".github/workflows/release.yml"
+      - ".github/workflows/pypi.yml"
       - "docs/studio-production-release-handoff.md"
       - "pyproject.toml"
       - ".zenodo.json"
@@ -50,7 +52,10 @@ jobs:
       - name: Exercise production handoff evidence contract
         run: python tests/test_desktop_release_handoff_contract.py
 
-      - name: Exercise stable-release handoff wiring contract
+      - name: Exercise canonical stable-release artifact contract
+        run: python tests/test_stable_release_artifact_contract.py
+
+      - name: Exercise stable-release and PyPI wiring contract
         run: python tests/test_production_release_handoff_wiring.py
 
       - name: Assert template contains no signing secret material
@@ -61,4 +66,4 @@ jobs:
             echo 'Production handoff template must not contain signing secret material.' >&2
             exit 1
           fi
-          echo 'Production handoff contract readiness passed: template is fail-closed, release-wired, and secret-free.'
+          echo 'Production handoff contract readiness passed: template is fail-closed, canonical publication is release-run-bound, and evidence is secret-free.'

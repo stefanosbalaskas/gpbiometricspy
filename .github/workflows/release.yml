@@ -36,20 +36,30 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Verify tag and package version
+      - name: Verify tag, workflow identity and package version
         run: |
           set -euo pipefail
           case "$RELEASE_TAG" in
             v*) VERSION="${RELEASE_TAG#v}" ;;
             *) echo "Release tag must start with v: $RELEASE_TAG" >&2; exit 1 ;;
           esac
-          test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+          TARGET_SHA="$(git rev-parse HEAD)"
+          test "$TARGET_SHA" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+          test "${GITHUB_SHA,,}" = "$TARGET_SHA" || {
+            echo "Release workflow must itself run on the exact release tag/commit." >&2
+            echo "workflow SHA: ${GITHUB_SHA,,}; tag SHA: $TARGET_SHA" >&2
+            exit 1
+          }
+          echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
           python - <<'PY'
-          import os, pathlib, tomllib
-          version = os.environ['RELEASE_TAG'].removeprefix('v')
+          import os, pathlib, re, tomllib
+          tag = os.environ['RELEASE_TAG']
+          version = tag.removeprefix('v')
+          if re.fullmatch(r'\d+\.\d+\.\d+', version) is None:
+              raise SystemExit(f"Stable release tag must be vX.Y.Z: {tag}")
           project = tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']
           if project['version'] != version:
-              raise SystemExit(f"Tag/version mismatch: {os.environ['RELEASE_TAG']} vs {project['version']}")
+              raise SystemExit(f"Tag/version mismatch: {tag} vs {project['version']}")
           PY
 
       - name: Verify archival metadata
@@ -57,7 +67,6 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-
           import os
           version = os.environ['RELEASE_TAG'].removeprefix('v')
           zenodo = json.loads(Path('.zenodo.json').read_text(encoding='utf-8'))
@@ -93,7 +102,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TARGET_SHA="$(git rev-parse HEAD)"
           for workflow in \
             tests.yml \
             docs.yml \
@@ -125,7 +133,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TARGET_SHA="$(git rev-parse HEAD)"
           HANDOFF_RUN_ID="$(gh run list --workflow studio-production-release-handoff.yml \
             --commit "$TARGET_SHA" --branch main --limit 30 \
             --json databaseId,event,conclusion,createdAt \
@@ -135,7 +142,6 @@ jobs:
             exit 1
           }
           echo "HANDOFF_RUN_ID=$HANDOFF_RUN_ID" >> "$GITHUB_ENV"
-          echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
 
       - name: Download and revalidate production desktop handoff
         env:
@@ -157,6 +163,9 @@ jobs:
 
       - name: Install build and validation tools
         run: python -m pip install "build>=1.2" "twine==7.0.0"
+
+      - name: Pin reproducible build epoch to source commit
+        run: echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "$GITHUB_ENV"
 
       - name: Build distributions
         run: python -m build
@@ -233,45 +242,121 @@ jobs:
             rm -rf "$envdir"
           done
 
-      - name: Write SHA-256 manifest
+      - name: Write SHA-256 package manifest
         run: sha256sum dist/* > SHA256SUMS.txt
 
-      - uses: actions/upload-artifact@v6
-        with:
-          name: distributions
-          path: |
-            dist/*
-            SHA256SUMS.txt
-            release-handoff/desktop-production-release-evidence.json
-            release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt
-
-      - name: Create immutable GitHub Release if absent
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Write and validate canonical stable-release metadata
         run: |
-          set -euo pipefail
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            echo "GitHub Release $RELEASE_TAG already exists; preserving existing assets unchanged."
-          else
-            prerelease=()
-            if [[ "$RELEASE_TAG" == *".dev"* ]]; then prerelease+=(--prerelease); fi
-            gh release create "$RELEASE_TAG" \
-              dist/* \
-              SHA256SUMS.txt \
-              release-handoff/desktop-production-release-evidence.json \
-              release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt \
-              --verify-tag --title "$RELEASE_TAG" --generate-notes "${prerelease[@]}"
-          fi
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
 
-      - name: Dispatch protected PyPI Trusted Publishing
+          def sha256(path: Path) -> str:
+              digest = hashlib.sha256()
+              with path.open('rb') as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+                      digest.update(chunk)
+              return digest.hexdigest()
+
+          packages = []
+          for path in sorted(Path('dist').iterdir()):
+              if path.is_file():
+                  packages.append({'path': path.as_posix(), 'sha256': sha256(path)})
+          metadata = {
+              'schema': 'gpbiometricspy-stable-release-artifact',
+              'schema_version': 1,
+              'release_tag': os.environ['RELEASE_TAG'],
+              'source_commit': os.environ['TARGET_SHA'].lower(),
+              'production_handoff_run_id': int(os.environ['HANDOFF_RUN_ID']),
+              'production_handoff_sha256': sha256(Path('release-handoff/desktop-production-release-evidence.json')),
+              'production_handoff_checksums_sha256': sha256(Path('release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt')),
+              'distribution_checksums_sha256': sha256(Path('SHA256SUMS.txt')),
+              'packages': packages,
+          }
+          Path('RELEASE-METADATA.json').write_text(
+              json.dumps(metadata, indent=2, sort_keys=True) + '\n',
+              encoding='utf-8',
+          )
+          PY
+          python tools/release/validate_stable_release_artifact.py \
+            --root . \
+            --manifest RELEASE-METADATA.json \
+            --expected-tag "$RELEASE_TAG" \
+            --expected-source-commit "$TARGET_SHA"
+
+      - name: Create or verify immutable GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           VERSION="${RELEASE_TAG#v}"
-          if curl --fail --silent --show-error "https://pypi.org/pypi/gpbiometricspy/${VERSION}/json" >/dev/null 2>&1; then
-            echo "gpbiometricspy ${VERSION} is already on PyPI; skipping duplicate publication dispatch."
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "GitHub Release $RELEASE_TAG already exists; verifying every canonical asset before reuse."
+            rm -rf existing-release
+            mkdir -p existing-release/dist existing-release/release-handoff
+            gh release download "$RELEASE_TAG" \
+              --pattern "gpbiometricspy-${VERSION}-py3-none-any.whl" \
+              --pattern "gpbiometricspy-${VERSION}.tar.gz" \
+              --dir existing-release/dist
+            gh release download "$RELEASE_TAG" \
+              --pattern "SHA256SUMS.txt" \
+              --pattern "RELEASE-METADATA.json" \
+              --dir existing-release
+            gh release download "$RELEASE_TAG" \
+              --pattern "desktop-production-release-evidence.json" \
+              --pattern "DESKTOP-HANDOFF-SHA256SUMS.txt" \
+              --dir existing-release/release-handoff
+            (
+              cd existing-release
+              sha256sum -c SHA256SUMS.txt
+            )
+            (
+              cd existing-release/release-handoff
+              sha256sum -c DESKTOP-HANDOFF-SHA256SUMS.txt
+            )
+            python tools/release/validate_desktop_release_evidence.py \
+              --manifest existing-release/release-handoff/desktop-production-release-evidence.json \
+              --expected-tag "$RELEASE_TAG" \
+              --expected-source-commit "$TARGET_SHA"
+            python tools/release/validate_stable_release_artifact.py \
+              --root existing-release \
+              --manifest existing-release/RELEASE-METADATA.json \
+              --expected-tag "$RELEASE_TAG" \
+              --expected-source-commit "$TARGET_SHA"
+            for rel in \
+              "dist/gpbiometricspy-${VERSION}-py3-none-any.whl" \
+              "dist/gpbiometricspy-${VERSION}.tar.gz" \
+              "SHA256SUMS.txt" \
+              "RELEASE-METADATA.json" \
+              "release-handoff/desktop-production-release-evidence.json" \
+              "release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt"; do
+              cmp --silent "$rel" "existing-release/$rel" || {
+                echo "Existing immutable release asset differs from the exact-source candidate: $rel" >&2
+                exit 1
+              }
+            done
+            echo "Existing GitHub Release assets are byte-identical to the validated exact-source candidate."
           else
-            gh workflow run pypi.yml --ref "$RELEASE_TAG" -f tag="$RELEASE_TAG"
-            echo "Dispatched pypi.yml for $RELEASE_TAG"
+            gh release create "$RELEASE_TAG" \
+              dist/* \
+              SHA256SUMS.txt \
+              RELEASE-METADATA.json \
+              release-handoff/desktop-production-release-evidence.json \
+              release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt \
+              --verify-tag --title "$RELEASE_TAG" --generate-notes
           fi
+
+      - name: Upload canonical release artifact for downstream trusted publication
+        uses: actions/upload-artifact@v6
+        with:
+          name: distributions
+          path: |
+            dist/*
+            SHA256SUMS.txt
+            RELEASE-METADATA.json
+            release-handoff/desktop-production-release-evidence.json
+            release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90

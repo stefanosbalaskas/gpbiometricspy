@@ -191,5 +191,5 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${{ steps.release.outputs.tag }}"
-          gh workflow run release.yml --ref main -f tag="$TAG"
-          echo "Dispatched release.yml explicitly for $TAG; this avoids GITHUB_TOKEN tag-push recursion suppression."
+          gh workflow run release.yml --ref "$TAG" -f tag="$TAG"
+          echo "Dispatched release.yml on exact $TAG; the workflow run SHA is therefore the immutable release commit."

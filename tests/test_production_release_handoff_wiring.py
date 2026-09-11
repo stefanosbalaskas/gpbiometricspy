@@ -1,4 +1,4 @@
-"""Static policy checks for the production desktop handoff release wiring."""
+"""Static policy checks for production handoff and canonical publication wiring."""
 
 from __future__ import annotations
 
@@ -59,40 +59,80 @@ def test_cut_release_requires_full_exact_main_matrix_and_manual_handoff() -> Non
     assert '.event == "workflow_dispatch" and .conclusion == "success"' in workflow
     assert "Final production handoff is not yet validated" in workflow
     assert "steps.gates.outputs.ready == '1'" in workflow
+    assert 'gh workflow run release.yml --ref "$TAG" -f tag="$TAG"' in workflow
+    assert 'gh workflow run release.yml --ref main' not in workflow
 
 
-def test_release_revalidates_and_attaches_handoff_before_publication() -> None:
+def test_release_is_exact_tag_bound_and_emits_canonical_artifact() -> None:
     workflow = _read(".github/workflows/release.yml")
     for gate in AUTOMATED_RELEASE_GATES:
         assert gate in workflow
+    assert 'test "${GITHUB_SHA,,}" = "$TARGET_SHA"' in workflow
     assert "studio-production-release-handoff.yml" in workflow
     assert 'gh run download "$HANDOFF_RUN_ID"' in workflow
     assert "desktop-production-release-evidence.json" in workflow
     assert "DESKTOP-HANDOFF-SHA256SUMS.txt" in workflow
-    assert "sha256sum -c DESKTOP-HANDOFF-SHA256SUMS.txt" in workflow
-    assert '--expected-tag "$RELEASE_TAG"' in workflow
-    assert '--expected-source-commit "$TARGET_SHA"' in workflow
-    handoff_validation = workflow.index("Download and revalidate production desktop handoff")
-    github_release = workflow.index("Create immutable GitHub Release if absent")
-    pypi_dispatch = workflow.index("Dispatch protected PyPI Trusted Publishing")
-    assert handoff_validation < github_release < pypi_dispatch
+    assert "SOURCE_DATE_EPOCH" in workflow
+    assert "RELEASE-METADATA.json" in workflow
+    assert "validate_stable_release_artifact.py" in workflow
+    assert "Create or verify immutable GitHub Release" in workflow
+    assert "Existing immutable release asset differs" in workflow
+    assert "Upload canonical release artifact for downstream trusted publication" in workflow
+    assert "retention-days: 90" in workflow
+    assert "gh workflow run pypi.yml" not in workflow
+    metadata = workflow.index("Write and validate canonical stable-release metadata")
+    github_release = workflow.index("Create or verify immutable GitHub Release")
+    upload = workflow.index("Upload canonical release artifact for downstream trusted publication")
+    assert metadata < github_release < upload
 
 
-def test_readiness_gate_runs_on_main_release_wiring_changes() -> None:
+def test_pypi_can_only_publish_from_successful_canonical_release_artifact() -> None:
+    workflow = _read(".github/workflows/pypi.yml")
+    assert "workflow_run:" in workflow
+    assert "- release" in workflow
+    assert "types: [completed]" in workflow
+    assert "github.event.workflow_run.conclusion == 'success'" in workflow
+    assert "environment: pypi" in workflow
+    assert "actions: read" in workflow
+    assert "id-token: write" in workflow
+    assert "Resolve successful canonical release run" in workflow
+    assert "gh run list --workflow release.yml" in workflow
+    assert "Download canonical release artifact from successful release run" in workflow
+    assert "run-id: ${{ steps.release_run.outputs.run_id }}" in workflow
+    assert "RELEASE-METADATA.json" in workflow
+    assert "validate_stable_release_artifact.py" in workflow
+    assert "validate_desktop_release_evidence.py" in workflow
+    assert "git merge-base --is-ancestor" in workflow
+    assert "Verify GitHub Release still matches canonical artifact" in workflow
+    assert "GitHub Release asset drift detected" in workflow
+    assert "packages-dir: canonical-release/dist/" in workflow
+    assert "gh release download" in workflow
+    assert "release:\n    types: [published]" not in workflow
+    canonical_validation = workflow.index("Revalidate canonical artifact, handoff and main ancestry")
+    release_match = workflow.index("Verify GitHub Release still matches canonical artifact")
+    publish = workflow.index("Publish canonical distributions to PyPI")
+    assert canonical_validation < release_match < publish
+
+
+def test_readiness_gate_covers_release_and_pypi_wiring_changes() -> None:
     workflow = _read(".github/workflows/studio-desktop-release-handoff-readiness.yml")
     assert "push:" in workflow
     assert "- main" in workflow
     assert "tests/test_production_release_handoff_wiring.py" in workflow
+    assert "tests/test_stable_release_artifact_contract.py" in workflow
     assert ".github/workflows/studio-production-release-handoff.yml" in workflow
-    assert "Exercise stable-release handoff wiring contract" in workflow
+    assert ".github/workflows/pypi.yml" in workflow
+    assert "Exercise canonical stable-release artifact contract" in workflow
+    assert "Exercise stable-release and PyPI wiring contract" in workflow
 
 
 def main() -> int:
     test_production_handoff_workflow_is_manual_protected_and_exact_source_bound()
     test_cut_release_requires_full_exact_main_matrix_and_manual_handoff()
-    test_release_revalidates_and_attaches_handoff_before_publication()
-    test_readiness_gate_runs_on_main_release_wiring_changes()
-    print("production release handoff wiring policy PASS")
+    test_release_is_exact_tag_bound_and_emits_canonical_artifact()
+    test_pypi_can_only_publish_from_successful_canonical_release_artifact()
+    test_readiness_gate_covers_release_and_pypi_wiring_changes()
+    print("production handoff and canonical publication wiring policy PASS")
     return 0
 
 
