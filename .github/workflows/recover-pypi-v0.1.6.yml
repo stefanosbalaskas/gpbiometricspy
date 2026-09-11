@@ -1,0 +1,54 @@
+name: recover-pypi-v0.1.6
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/recover-pypi-v0.1.6.yml
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: recover-pypi-v0.1.6
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Verify immutable 0.1.6 release and dispatch guarded Trusted Publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v0.1.6"
+          EXPECTED_SHA="a3ad2d82447011284da8ea97d35bb7aea2ee8206"
+          LIVE_VERSION="$(python - <<'PY'
+          import pathlib, tomllib
+          print(tomllib.loads(pathlib.Path('pyproject.toml').read_text(encoding='utf-8'))['project']['version'])
+          PY
+          )"
+          test "$LIVE_VERSION" = "0.1.7.dev0"
+
+          git fetch origin "refs/tags/$TAG:refs/tags/$TAG" --force
+          test "$(git rev-parse "refs/tags/$TAG^{commit}")" = "$EXPECTED_SHA"
+
+          RELEASE_RUN="$(gh run list --workflow release.yml --commit "$EXPECTED_SHA" --event workflow_dispatch --limit 30 \
+            --json databaseId,conclusion,createdAt \
+            --jq '[.[] | select(.conclusion == "success")] | sort_by(.createdAt) | last | .databaseId // empty')"
+          test -n "$RELEASE_RUN" || { echo "No successful canonical release exists for $TAG." >&2; exit 1; }
+
+          if curl --fail --silent --show-error "https://pypi.org/pypi/gpbiometricspy/0.1.6/json" >/dev/null 2>&1; then
+            echo "gpbiometricspy 0.1.6 is already public on PyPI; recovery is an idempotent no-op."
+            exit 0
+          fi
+
+          gh workflow run pypi.yml --ref main -f tag="$TAG"
+          echo "Dispatched the repository's guarded pypi.yml recovery path for $TAG."
