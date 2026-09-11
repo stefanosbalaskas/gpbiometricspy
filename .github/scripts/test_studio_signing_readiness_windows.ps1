@@ -15,6 +15,7 @@ $BuildArtifacts = Join-Path $ArtifactsDir "native-build"
 $SigningDir = Join-Path $ArtifactsDir "signing"
 $ManifestPath = Join-Path $SigningDir "signing-provenance.json"
 $VerifyLog = Join-Path $SigningDir "signtool-verify.log"
+$PfxPath = Join-Path $SigningDir "ephemeral-test-signing.pfx"
 $IdentityVerifier = Join-Path $RepoRoot ".github/scripts/assert_studio_windows_identity.ps1"
 
 New-Item -ItemType Directory -Force -Path $SigningDir | Out-Null
@@ -29,22 +30,52 @@ function Find-SignTool {
     if (-not (Test-Path -LiteralPath $KitsRoot -PathType Container)) {
         return $null
     }
-    $Candidate = Get-ChildItem -LiteralPath $KitsRoot -Recurse -File -Filter "signtool.exe" -ErrorAction SilentlyContinue |
-        Where-Object { $_.FullName -match "\\x64\\signtool\.exe$" } |
-        Sort-Object FullName -Descending |
-        Select-Object -First 1
-    if ($null -eq $Candidate) { return $null }
-    return $Candidate.FullName
+
+    # Avoid a recursive Windows Kits walk. Hosted runners contain versioned
+    # bin directories with the x64 SignTool at this fixed relative location.
+    $Candidates = @(
+        Get-ChildItem -LiteralPath $KitsRoot -Directory -ErrorAction SilentlyContinue |
+            ForEach-Object {
+                $Path = Join-Path $_.FullName "x64\signtool.exe"
+                if (Test-Path -LiteralPath $Path -PathType Leaf) { Get-Item -LiteralPath $Path }
+            }
+    )
+    if ($Candidates.Count -eq 0) { return $null }
+    return ($Candidates | Sort-Object FullName -Descending | Select-Object -First 1).FullName
+}
+
+function Add-TestCertificateTrust {
+    param([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate)
+
+    $PublicCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
+        $Certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+    )
+    try {
+        foreach ($StoreName in @("Root", "TrustedPublisher")) {
+            $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
+            try {
+                $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+                $Store.Add($PublicCertificate)
+            }
+            finally {
+                $Store.Close()
+                $Store.Dispose()
+            }
+        }
+    }
+    finally {
+        $PublicCertificate.Dispose()
+    }
 }
 
 function Remove-TestCertificate {
-    param([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate)
-    if ($null -eq $Certificate) { return }
+    param([string]$Thumbprint)
+    if (-not $Thumbprint) { return }
     foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
         $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
         try {
             $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-            $Matches = @($Store.Certificates | Where-Object { $_.Thumbprint -eq $Certificate.Thumbprint })
+            $Matches = @($Store.Certificates | Where-Object { $_.Thumbprint -eq $Thumbprint })
             foreach ($Match in $Matches) { $Store.Remove($Match) }
         }
         finally {
@@ -53,6 +84,54 @@ function Remove-TestCertificate {
         }
     }
 }
+
+function New-EphemeralCodeSigningCertificate {
+    # Build the one-day CI certificate entirely in memory. This deliberately
+    # avoids New-SelfSignedCertificate and certificate-provider UI/provider
+    # behavior on hosted Windows images.
+    $Rsa = [System.Security.Cryptography.RSA]::Create(3072)
+    try {
+        $Request = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+            "CN=gpbiometricspy Studio CI Test Signing",
+            $Rsa,
+            [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+            [System.Security.Cryptography.RSASignaturePadding]::Pkcs1
+        )
+        $Request.CertificateExtensions.Add(
+            [System.Security.Cryptography.X509Certificates.X509BasicConstraintsExtension]::new($false, $false, 0, $true)
+        )
+        $Request.CertificateExtensions.Add(
+            [System.Security.Cryptography.X509Certificates.X509KeyUsageExtension]::new(
+                [System.Security.Cryptography.X509Certificates.X509KeyUsageFlags]::DigitalSignature,
+                $true
+            )
+        )
+        $EnhancedKeyUsages = [System.Security.Cryptography.OidCollection]::new()
+        [void]$EnhancedKeyUsages.Add([System.Security.Cryptography.Oid]::new("1.3.6.1.5.5.7.3.3", "Code Signing"))
+        $Request.CertificateExtensions.Add(
+            [System.Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension]::new($EnhancedKeyUsages, $true)
+        )
+
+        $Certificate = $Request.CreateSelfSigned((Get-Date).AddMinutes(-5), (Get-Date).AddDays(1))
+        if ($null -eq $Certificate -or -not $Certificate.HasPrivateKey) {
+            throw "Failed to create an in-memory ephemeral CI code-signing certificate."
+        }
+        return [pscustomobject]@{
+            Certificate = $Certificate
+            Rsa = $Rsa
+        }
+    }
+    catch {
+        $Rsa.Dispose()
+        throw
+    }
+}
+
+$SignTool = Find-SignTool
+if ($null -eq $SignTool) {
+    throw "Windows SignTool was not found; signing readiness requires the production-class Authenticode toolchain."
+}
+Write-Host "Using SignTool: $SignTool"
 
 Write-Host "Building and validating the unsigned native Studio candidate first..."
 & (Join-Path $RepoRoot ".github/scripts/test_studio_pyinstaller_native_windows.ps1") `
@@ -75,42 +154,32 @@ $UnsignedBytes = [int64](Get-Item -LiteralPath $Executable).Length
 $IdentityManifestSha256 = Get-Sha256 $IdentityJson
 Write-Host "Unsigned SHA-256: $UnsignedSha256"
 
+$CertificateBundle = $null
 $Certificate = $null
+$CertificateThumbprint = $null
+$PfxPassword = [guid]::NewGuid().ToString("N")
 $Signed = $false
 try {
-    $Certificate = New-SelfSignedCertificate `
-        -Type CodeSigningCert `
-        -Subject "CN=gpbiometricspy Studio CI Test Signing" `
-        -CertStoreLocation "Cert:\CurrentUser\My" `
-        -HashAlgorithm "SHA256" `
-        -NotAfter (Get-Date).AddDays(1)
+    Write-Host "Creating in-memory ephemeral CI code-signing certificate..."
+    $CertificateBundle = New-EphemeralCodeSigningCertificate
+    $Certificate = $CertificateBundle.Certificate
+    $CertificateThumbprint = $Certificate.Thumbprint
+    Write-Host "Ephemeral certificate created: $CertificateThumbprint"
 
-    if ($null -eq $Certificate -or -not $Certificate.HasPrivateKey) {
-        throw "Failed to create the ephemeral CI code-signing certificate."
-    }
+    Add-TestCertificateTrust $Certificate
 
-    # Trust only this ephemeral public certificate in the current-user stores so
-    # Authenticode verification can exercise the full trusted-signature path.
-    foreach ($StoreName in @("Root", "TrustedPublisher")) {
-        $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
-        try {
-            $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-            $Store.Add($Certificate)
-        }
-        finally {
-            $Store.Close()
-            $Store.Dispose()
-        }
-    }
+    # Export only to this runner-local temporary path because SignTool consumes
+    # a PFX directly. The password is random per run, never logged, never stored
+    # in GitHub, and the PFX is deleted in finally before evidence upload.
+    [System.IO.File]::WriteAllBytes(
+        $PfxPath,
+        $Certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $PfxPassword)
+    )
 
-    Write-Host "Applying ephemeral test-only Authenticode signature with SHA-256..."
-    $Applied = Set-AuthenticodeSignature `
-        -LiteralPath $Executable `
-        -Certificate $Certificate `
-        -HashAlgorithm SHA256
-    if ($Applied.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
-        throw "Set-AuthenticodeSignature did not produce a valid trusted test signature: $($Applied.Status) $($Applied.StatusMessage)"
-    }
+    Write-Host "Applying ephemeral test-only Authenticode signature with SignTool /fd SHA256..."
+    $SignOutput = & $SignTool sign /fd SHA256 /f $PfxPath /p $PfxPassword $Executable 2>&1
+    $SignOutput | ForEach-Object { Write-Host $_ }
+    if ($LASTEXITCODE -ne 0) { throw "SignTool signing failed with exit code $LASTEXITCODE." }
     $Signed = $true
 
     $AfterSignature = Get-AuthenticodeSignature -LiteralPath $Executable
@@ -118,7 +187,7 @@ try {
         throw "Signed native executable failed Authenticode verification: $($AfterSignature.Status) $($AfterSignature.StatusMessage)"
     }
     if ($null -eq $AfterSignature.SignerCertificate) { throw "Signed executable has no signer certificate metadata." }
-    if ($AfterSignature.SignerCertificate.Thumbprint -ne $Certificate.Thumbprint) {
+    if ($AfterSignature.SignerCertificate.Thumbprint -ne $CertificateThumbprint) {
         throw "Signer thumbprint does not match the ephemeral CI signing certificate."
     }
 
@@ -130,21 +199,13 @@ try {
     & $IdentityVerifier -Executable $Executable -IdentityJson $IdentityJson -IconPath $IconPath
     if ($LASTEXITCODE -ne 0) { throw "Windows application identity changed after Authenticode signing." }
 
-    $SignTool = Find-SignTool
-    $SignToolVerified = $false
-    if ($null -ne $SignTool) {
-        Write-Host "Verifying the test signature with Windows SignTool /pa..."
-        & $SignTool verify /pa /v $Executable 2>&1 | Tee-Object -FilePath $VerifyLog
-        if ($LASTEXITCODE -ne 0) { throw "SignTool Authenticode verification failed with exit code $LASTEXITCODE." }
-        $SignToolVerified = $true
-    }
-    else {
-        "SignTool not found on runner; PowerShell Authenticode verification was still required and passed." | Set-Content -LiteralPath $VerifyLog -Encoding UTF8
-    }
+    Write-Host "Verifying the test signature with Windows SignTool /pa..."
+    & $SignTool verify /pa /v $Executable 2>&1 | Tee-Object -FilePath $VerifyLog
+    if ($LASTEXITCODE -ne 0) { throw "SignTool Authenticode verification failed with exit code $LASTEXITCODE." }
 
     $Manifest = [ordered]@{
         schema = "gpbiometricspy-studio-signing-provenance"
-        schema_version = 1
+        schema_version = 2
         test_only = $true
         release_artifact = $false
         certificate_ephemeral = $true
@@ -153,6 +214,7 @@ try {
         production_timestamp_required = $true
         production_digest_algorithm = "SHA256"
         production_timestamp_digest_algorithm = "SHA256"
+        signing_tool = "signtool"
         unsigned_sha256 = $UnsignedSha256
         signed_sha256 = $SignedSha256
         unsigned_bytes = $UnsignedBytes
@@ -162,26 +224,36 @@ try {
         signer_subject = $AfterSignature.SignerCertificate.Subject
         signer_thumbprint = $AfterSignature.SignerCertificate.Thumbprint
         signer_not_after_utc = $AfterSignature.SignerCertificate.NotAfter.ToUniversalTime().ToString("o")
-        signtool_verified = $SignToolVerified
+        signtool_verified = $true
         executable_name = [System.IO.Path]::GetFileName($Executable)
     }
     $Manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
     Write-Host "Signing readiness proof passed. Signed SHA-256: $SignedSha256"
 }
 finally {
+    if (Test-Path -LiteralPath $PfxPath -PathType Leaf) {
+        Remove-Item -LiteralPath $PfxPath -Force
+    }
+    if ($CertificateThumbprint) {
+        Remove-TestCertificate $CertificateThumbprint
+    }
     if ($null -ne $Certificate) {
-        Remove-TestCertificate $Certificate
+        $Certificate.Dispose()
+    }
+    if ($null -ne $CertificateBundle -and $null -ne $CertificateBundle.Rsa) {
+        $CertificateBundle.Rsa.Dispose()
     }
 }
 
 if (-not $Signed) { throw "Signing readiness did not reach a signed state." }
+if (Test-Path -LiteralPath $PfxPath -PathType Leaf) { throw "Ephemeral test PFX survived signing cleanup." }
 
 # Fail closed if the ephemeral certificate survived cleanup in any tested store.
 foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
     $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
     try {
         $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
-        if (@($Store.Certificates | Where-Object { $_.Thumbprint -eq $Certificate.Thumbprint }).Count -ne 0) {
+        if (@($Store.Certificates | Where-Object { $_.Thumbprint -eq $CertificateThumbprint }).Count -ne 0) {
             throw "Ephemeral CI certificate was not removed from CurrentUser/$StoreName."
         }
     }
@@ -191,4 +263,4 @@ foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
     }
 }
 
-Write-Host "Ephemeral signing certificate cleanup verified."
+Write-Host "Ephemeral signing certificate and PFX cleanup verified."
