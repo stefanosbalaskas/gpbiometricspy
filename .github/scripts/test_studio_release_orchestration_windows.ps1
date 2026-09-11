@@ -172,7 +172,7 @@ function Assert-EphemeralSignature {
         throw "Unexpected Authenticode status $($Signature.Status) for $Path"
     }
     if ([string]$Signature.Status -eq "UnknownError" -and [string]$Signature.StatusMessage -notmatch "(?i)(not trusted|certificate chain|root certificate|trust provider|unknown certificate authority)") {
-        throw "Unexpected Authenticode verification error for $Path: $($Signature.StatusMessage)"
+        throw "Unexpected Authenticode verification error for ${Path}: $($Signature.StatusMessage)"
     }
     return [pscustomobject]@{
         Status = [string]$Signature.Status
