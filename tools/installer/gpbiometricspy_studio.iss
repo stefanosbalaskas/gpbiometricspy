@@ -167,25 +167,20 @@ begin
     Comparison := ComparePackedVersion(InstalledVersion, TargetVersion);
     if Comparison < 0 then
     begin
-      Log(Format('Upgrade policy: in-place upgrade allowed; installed=%s; target=%s; source=%s',
-        [InstalledText, TargetFileVersion, InstalledSource]));
+      Log(Format('Upgrade policy: in-place upgrade allowed; installed=%s; target=%s; source=%s', [InstalledText, TargetFileVersion, InstalledSource]));
       Result := True;
       Exit;
     end;
 
     if Comparison = 0 then
     begin
-      Log(Format('Upgrade policy: same-version repair allowed; installed=%s; target=%s; source=%s',
-        [InstalledText, TargetFileVersion, InstalledSource]));
+      Log(Format('Upgrade policy: same-version repair allowed; installed=%s; target=%s; source=%s', [InstalledText, TargetFileVersion, InstalledSource]));
       Result := True;
       Exit;
     end;
 
-    Log(Format('Upgrade policy: downgrade blocked; installed=%s; target=%s; source=%s',
-      [InstalledText, TargetFileVersion, InstalledSource]));
-    ErrorText := Format(
-      'A newer gpbiometricspy Studio version (%s) is already installed. Setup %s will not downgrade it. Uninstall the newer version first if you intentionally need an older release.',
-      [InstalledText, TargetFileVersion]);
+    Log(Format('Upgrade policy: downgrade blocked; installed=%s; target=%s; source=%s', [InstalledText, TargetFileVersion, InstalledSource]));
+    ErrorText := Format('A newer gpbiometricspy Studio version (%s) is already installed. Setup %s will not downgrade it. Uninstall the newer version first if you intentionally need an older release.', [InstalledText, TargetFileVersion]);
     Exit;
   end;
 
