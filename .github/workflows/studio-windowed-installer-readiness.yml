@@ -64,10 +64,17 @@ jobs:
           if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
             throw "Windowed-installer evidence must not contain redistributable binaries or signing-key material."
           }
-          foreach ($Path in @("installer-output", "dist", "build", "venv", "installed")) {
+          foreach ($Path in @("installer-output", "dist", "build", "venv")) {
             if (Test-Path -LiteralPath (Join-Path $Artifacts $Path)) {
               throw "Temporary windowed-installer path survived cleanup: $Path"
             }
+          }
+          $InstalledParent = Join-Path $Artifacts "installed"
+          if (Test-Path -LiteralPath $InstalledParent) {
+            if (Get-ChildItem -LiteralPath $InstalledParent -Recurse -Force -File -ErrorAction SilentlyContinue) {
+              throw "Installed payload files survived windowed-installer cleanup."
+            }
+            Remove-Item -LiteralPath $InstalledParent -Recurse -Force
           }
           Write-Host "Windowed-installer evidence contains diagnostics only."
 
