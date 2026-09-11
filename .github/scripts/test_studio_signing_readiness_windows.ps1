@@ -15,6 +15,7 @@ $BuildArtifacts = Join-Path $ArtifactsDir "native-build"
 $SigningDir = Join-Path $ArtifactsDir "signing"
 $ManifestPath = Join-Path $SigningDir "signing-provenance.json"
 $VerifyLog = Join-Path $SigningDir "signtool-verify.log"
+$SignLog = Join-Path $SigningDir "signtool-sign.log"
 $PfxPath = Join-Path $SigningDir "ephemeral-test-signing.pfx"
 $IdentityVerifier = Join-Path $RepoRoot ".github/scripts/assert_studio_windows_identity.ps1"
 
@@ -31,8 +32,6 @@ function Find-SignTool {
         return $null
     }
 
-    # Avoid a recursive Windows Kits walk. Hosted runners contain versioned
-    # bin directories with the x64 SignTool at this fixed relative location.
     $Candidates = @(
         Get-ChildItem -LiteralPath $KitsRoot -Directory -ErrorAction SilentlyContinue |
             ForEach-Object {
@@ -44,6 +43,74 @@ function Find-SignTool {
     return ($Candidates | Sort-Object FullName -Descending | Select-Object -First 1).FullName
 }
 
+function Invoke-BoundedProcess {
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath,
+        [Parameter(Mandatory = $true)][string[]]$ArgumentList,
+        [Parameter(Mandatory = $true)][string]$StdoutPath,
+        [Parameter(Mandatory = $true)][string]$StderrPath,
+        [int]$TimeoutSeconds = 60
+    )
+
+    Remove-Item -LiteralPath $StdoutPath, $StderrPath -Force -ErrorAction SilentlyContinue
+    $Process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentList -PassThru `
+        -RedirectStandardOutput $StdoutPath -RedirectStandardError $StderrPath
+    try {
+        if (-not $Process.WaitForExit($TimeoutSeconds * 1000)) {
+            Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
+            throw "Process timed out after $TimeoutSeconds seconds: $FilePath $($ArgumentList -join ' ')"
+        }
+        $Process.Refresh()
+        $Stdout = if (Test-Path -LiteralPath $StdoutPath) { Get-Content -LiteralPath $StdoutPath -Raw } else { "" }
+        $Stderr = if (Test-Path -LiteralPath $StderrPath) { Get-Content -LiteralPath $StderrPath -Raw } else { "" }
+        if ($Stdout) { Write-Host $Stdout.TrimEnd() }
+        if ($Stderr) { Write-Host $Stderr.TrimEnd() }
+        return [pscustomobject]@{
+            ExitCode = $Process.ExitCode
+            Stdout = $Stdout
+            Stderr = $Stderr
+        }
+    }
+    finally {
+        $Process.Dispose()
+    }
+}
+
+function Get-BoundedAuthenticodeSnapshot {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [int]$TimeoutSeconds = 30
+    )
+
+    $Job = Start-Job -ScriptBlock {
+        param($TargetPath)
+        $Signature = Get-AuthenticodeSignature -LiteralPath $TargetPath
+        [pscustomobject]@{
+            Status = [string]$Signature.Status
+            StatusMessage = [string]$Signature.StatusMessage
+            SignerSubject = if ($null -ne $Signature.SignerCertificate) { $Signature.SignerCertificate.Subject } else { $null }
+            SignerThumbprint = if ($null -ne $Signature.SignerCertificate) { $Signature.SignerCertificate.Thumbprint } else { $null }
+            SignerNotAfterUtc = if ($null -ne $Signature.SignerCertificate) { $Signature.SignerCertificate.NotAfter.ToUniversalTime().ToString("o") } else { $null }
+        }
+    } -ArgumentList $Path
+    try {
+        if ($null -eq (Wait-Job -Job $Job -Timeout $TimeoutSeconds)) {
+            Stop-Job -Job $Job -ErrorAction SilentlyContinue
+            throw "Get-AuthenticodeSignature timed out after $TimeoutSeconds seconds for $Path"
+        }
+        if ($Job.State -ne "Completed") {
+            $Reason = if ($null -ne $Job.ChildJobs[0].JobStateInfo.Reason) { $Job.ChildJobs[0].JobStateInfo.Reason.Message } else { $Job.State }
+            throw "Get-AuthenticodeSignature job did not complete successfully: $Reason"
+        }
+        $Result = Receive-Job -Job $Job
+        if ($null -eq $Result) { throw "Get-AuthenticodeSignature returned no result for $Path" }
+        return $Result
+    }
+    finally {
+        Remove-Job -Job $Job -Force -ErrorAction SilentlyContinue
+    }
+}
+
 function Add-TestCertificateTrust {
     param([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate)
 
@@ -52,6 +119,7 @@ function Add-TestCertificateTrust {
     )
     try {
         foreach ($StoreName in @("Root", "TrustedPublisher")) {
+            Write-Host "Adding ephemeral public certificate to CurrentUser/$StoreName..."
             $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
             try {
                 $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
@@ -86,9 +154,8 @@ function Remove-TestCertificate {
 }
 
 function New-EphemeralCodeSigningCertificate {
-    # Build the one-day CI certificate entirely in memory. This deliberately
-    # avoids New-SelfSignedCertificate and certificate-provider UI/provider
-    # behavior on hosted Windows images.
+    # Build the one-day CI certificate entirely in memory so certificate
+    # creation cannot invoke an interactive Windows certificate provider.
     $Rsa = [System.Security.Cryptography.RSA]::Create(3072)
     try {
         $Request = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
@@ -144,8 +211,8 @@ $IdentityJson = Join-Path $BuildArtifacts "identity/windows-identity.json"
 $IconPath = Join-Path $BuildArtifacts "identity/gpbiometricspy-studio.ico"
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) { throw "Unsigned native executable not found: $Executable" }
 
-$BeforeSignature = Get-AuthenticodeSignature -LiteralPath $Executable
-if ($BeforeSignature.Status -ne [System.Management.Automation.SignatureStatus]::NotSigned) {
+$BeforeSignature = Get-BoundedAuthenticodeSnapshot -Path $Executable -TimeoutSeconds 30
+if ($BeforeSignature.Status -ne "NotSigned") {
     throw "Signing-readiness input must be unsigned; got Authenticode status $($BeforeSignature.Status)."
 }
 
@@ -168,26 +235,25 @@ try {
 
     Add-TestCertificateTrust $Certificate
 
-    # Export only to this runner-local temporary path because SignTool consumes
-    # a PFX directly. The password is random per run, never logged, never stored
-    # in GitHub, and the PFX is deleted in finally before evidence upload.
     [System.IO.File]::WriteAllBytes(
         $PfxPath,
         $Certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $PfxPassword)
     )
 
     Write-Host "Applying ephemeral test-only Authenticode signature with SignTool /fd SHA256..."
-    $SignOutput = & $SignTool sign /fd SHA256 /f $PfxPath /p $PfxPassword $Executable 2>&1
-    $SignOutput | ForEach-Object { Write-Host $_ }
-    if ($LASTEXITCODE -ne 0) { throw "SignTool signing failed with exit code $LASTEXITCODE." }
+    $SignStderr = Join-Path $SigningDir "signtool-sign-stderr.log"
+    $SignResult = Invoke-BoundedProcess -FilePath $SignTool `
+        -ArgumentList @("sign", "/fd", "SHA256", "/f", $PfxPath, "/p", $PfxPassword, $Executable) `
+        -StdoutPath $SignLog -StderrPath $SignStderr -TimeoutSeconds 60
+    if ($SignResult.ExitCode -ne 0) { throw "SignTool signing failed with exit code $($SignResult.ExitCode)." }
     $Signed = $true
 
-    $AfterSignature = Get-AuthenticodeSignature -LiteralPath $Executable
-    if ($AfterSignature.Status -ne [System.Management.Automation.SignatureStatus]::Valid) {
+    $AfterSignature = Get-BoundedAuthenticodeSnapshot -Path $Executable -TimeoutSeconds 30
+    if ($AfterSignature.Status -ne "Valid") {
         throw "Signed native executable failed Authenticode verification: $($AfterSignature.Status) $($AfterSignature.StatusMessage)"
     }
-    if ($null -eq $AfterSignature.SignerCertificate) { throw "Signed executable has no signer certificate metadata." }
-    if ($AfterSignature.SignerCertificate.Thumbprint -ne $CertificateThumbprint) {
+    if (-not $AfterSignature.SignerThumbprint) { throw "Signed executable has no signer certificate metadata." }
+    if ($AfterSignature.SignerThumbprint -ne $CertificateThumbprint) {
         throw "Signer thumbprint does not match the ephemeral CI signing certificate."
     }
 
@@ -195,17 +261,19 @@ try {
     $SignedBytes = [int64](Get-Item -LiteralPath $Executable).Length
     if ($SignedSha256 -eq $UnsignedSha256) { throw "Authenticode signing did not change the executable SHA-256." }
 
-    # Signing must not alter the already-certified PE identity/icon resources.
     & $IdentityVerifier -Executable $Executable -IdentityJson $IdentityJson -IconPath $IconPath
     if ($LASTEXITCODE -ne 0) { throw "Windows application identity changed after Authenticode signing." }
 
     Write-Host "Verifying the test signature with Windows SignTool /pa..."
-    & $SignTool verify /pa /v $Executable 2>&1 | Tee-Object -FilePath $VerifyLog
-    if ($LASTEXITCODE -ne 0) { throw "SignTool Authenticode verification failed with exit code $LASTEXITCODE." }
+    $VerifyStderr = Join-Path $SigningDir "signtool-verify-stderr.log"
+    $VerifyResult = Invoke-BoundedProcess -FilePath $SignTool `
+        -ArgumentList @("verify", "/pa", "/v", $Executable) `
+        -StdoutPath $VerifyLog -StderrPath $VerifyStderr -TimeoutSeconds 60
+    if ($VerifyResult.ExitCode -ne 0) { throw "SignTool Authenticode verification failed with exit code $($VerifyResult.ExitCode)." }
 
     $Manifest = [ordered]@{
         schema = "gpbiometricspy-studio-signing-provenance"
-        schema_version = 2
+        schema_version = 3
         test_only = $true
         release_artifact = $false
         certificate_ephemeral = $true
@@ -215,15 +283,17 @@ try {
         production_digest_algorithm = "SHA256"
         production_timestamp_digest_algorithm = "SHA256"
         signing_tool = "signtool"
+        bounded_process_seconds = 60
+        bounded_authenticode_seconds = 30
         unsigned_sha256 = $UnsignedSha256
         signed_sha256 = $SignedSha256
         unsigned_bytes = $UnsignedBytes
         signed_bytes = $SignedBytes
         identity_manifest_sha256 = $IdentityManifestSha256
-        signature_status = [string]$AfterSignature.Status
-        signer_subject = $AfterSignature.SignerCertificate.Subject
-        signer_thumbprint = $AfterSignature.SignerCertificate.Thumbprint
-        signer_not_after_utc = $AfterSignature.SignerCertificate.NotAfter.ToUniversalTime().ToString("o")
+        signature_status = $AfterSignature.Status
+        signer_subject = $AfterSignature.SignerSubject
+        signer_thumbprint = $AfterSignature.SignerThumbprint
+        signer_not_after_utc = $AfterSignature.SignerNotAfterUtc
         signtool_verified = $true
         executable_name = [System.IO.Path]::GetFileName($Executable)
     }
@@ -248,7 +318,6 @@ finally {
 if (-not $Signed) { throw "Signing readiness did not reach a signed state." }
 if (Test-Path -LiteralPath $PfxPath -PathType Leaf) { throw "Ephemeral test PFX survived signing cleanup." }
 
-# Fail closed if the ephemeral certificate survived cleanup in any tested store.
 foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
     $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
     try {
