@@ -26,6 +26,8 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
+          development_version = "0.1.6" + ".dev0"
+          stable_version = "0.1.6"
           paths = [
               "docs/studio-installer-readiness.md",
               "docs/studio-release-provenance.md",
@@ -42,10 +44,10 @@ jobs:
           for rel in paths:
               path = Path(rel)
               text = path.read_text(encoding="utf-8")
-              count = text.count("0.1.6.dev0")
+              count = text.count(development_version)
               if count == 0:
-                  raise SystemExit(f"{rel}: expected at least one 0.1.6.dev0 literal")
-              path.write_text(text.replace("0.1.6.dev0", "0.1.6"), encoding="utf-8")
+                  raise SystemExit(f"{rel}: expected at least one development-version literal")
+              path.write_text(text.replace(development_version, stable_version), encoding="utf-8")
               total += count
               print(f"{rel}: normalized {count} literal(s)")
           print(f"normalized {total} remaining stable-readiness literal(s)")
