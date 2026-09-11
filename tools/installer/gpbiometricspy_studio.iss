@@ -34,9 +34,9 @@ SetupIconFile={#IconPath}
 UninstallDisplayName=gpbiometricspy Studio
 UninstallDisplayIcon={app}\gpbiometricspy-studio-native.exe
 Uninstallable=yes
-UsePreviousAppDir=no
-UsePreviousGroup=no
-UsePreviousTasks=no
+UsePreviousAppDir=yes
+UsePreviousGroup=yes
+UsePreviousTasks=yes
 UsePreviousPrivileges=no
 ChangesEnvironment=no
 ChangesAssociations=no
@@ -55,6 +55,9 @@ VersionInfoVersion={#FileVersion}
 [Files]
 Source: "{#BundleDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
+[Registry]
+Root: HKCU; Subkey: "Software\StefanosBalaskas\gpbiometricspy Studio"; ValueType: string; ValueName: "InstalledFileVersion"; ValueData: "{#FileVersion}"; Flags: uninsdeletevalue uninsdeletekeyifempty
+
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: unchecked
 
@@ -66,6 +69,10 @@ Name: "{autodesktop}\gpbiometricspy Studio"; Filename: "{app}\gpbiometricspy-stu
 const
   WebView2ClientKey = 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}';
   WebView2DownloadUrl = 'https://developer.microsoft.com/microsoft-edge/webview2/';
+  UpgradePolicyKey = 'Software\StefanosBalaskas\gpbiometricspy Studio';
+  UpgradePolicyValue = 'InstalledFileVersion';
+  UninstallRegistrationKey = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\fd3ca1af-0ebb-5061-9c59-f7ab1079252e_is1';
+  TargetFileVersion = '{#FileVersion}';
 
 function IsUsableWebView2Version(const Version: String): Boolean;
 begin
@@ -104,13 +111,110 @@ begin
   end;
 end;
 
+function DetectInstalledStudioVersion(var Version: Int64; var VersionText: String;
+  var VersionSource: String): Boolean;
+var
+  Marker: String;
+  Executable: String;
+begin
+  Result := False;
+  VersionText := '';
+  VersionSource := '';
+
+  if RegQueryStringValue(HKCU, UpgradePolicyKey, UpgradePolicyValue, Marker) then
+  begin
+    Marker := Trim(Marker);
+    if StrToVersion(Marker, Version) then
+    begin
+      VersionText := Marker;
+      VersionSource := 'registry';
+      Result := True;
+      Exit;
+    end;
+    Log(Format('Upgrade policy: invalid registry version marker ignored: %s', [Marker]));
+  end;
+
+  Executable := ExpandConstant('{app}\gpbiometricspy-studio-native.exe');
+  if GetPackedVersion(Executable, Version) then
+  begin
+    if not GetVersionNumbersString(Executable, VersionText) then
+      VersionText := VersionToStr(Version);
+    VersionSource := 'executable';
+    Result := True;
+  end;
+end;
+
+function CheckUpgradePolicy(var ErrorText: String): Boolean;
+var
+  TargetVersion: Int64;
+  InstalledVersion: Int64;
+  InstalledText: String;
+  InstalledSource: String;
+  Comparison: Integer;
+begin
+  Result := False;
+  ErrorText := '';
+
+  if not StrToVersion(TargetFileVersion, TargetVersion) then
+  begin
+    ErrorText := 'Setup cannot determine its numeric release file version.';
+    Log('Upgrade policy: target file version is invalid.');
+    Exit;
+  end;
+
+  if DetectInstalledStudioVersion(InstalledVersion, InstalledText, InstalledSource) then
+  begin
+    Comparison := ComparePackedVersion(InstalledVersion, TargetVersion);
+    if Comparison < 0 then
+    begin
+      Log(Format('Upgrade policy: in-place upgrade allowed; installed=%s; target=%s; source=%s',
+        [InstalledText, TargetFileVersion, InstalledSource]));
+      Result := True;
+      Exit;
+    end;
+
+    if Comparison = 0 then
+    begin
+      Log(Format('Upgrade policy: same-version repair allowed; installed=%s; target=%s; source=%s',
+        [InstalledText, TargetFileVersion, InstalledSource]));
+      Result := True;
+      Exit;
+    end;
+
+    Log(Format('Upgrade policy: downgrade blocked; installed=%s; target=%s; source=%s',
+      [InstalledText, TargetFileVersion, InstalledSource]));
+    ErrorText := Format(
+      'A newer gpbiometricspy Studio version (%s) is already installed. Setup %s will not downgrade it. Uninstall the newer version first if you intentionally need an older release.',
+      [InstalledText, TargetFileVersion]);
+    Exit;
+  end;
+
+  if RegKeyExists(HKCU, UninstallRegistrationKey) then
+  begin
+    Log('Upgrade policy: existing installation has indeterminate version; setup blocked fail-closed.');
+    ErrorText :=
+      'An existing gpbiometricspy Studio installation was detected, but its version could not be verified. Repair or uninstall that installation before continuing.';
+    Exit;
+  end;
+
+  Log(Format('Upgrade policy: first install allowed; target=%s', [TargetFileVersion]));
+  Result := True;
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   RuntimeVersion: String;
   RuntimeScope: String;
+  UpgradeError: String;
 begin
   NeedsRestart := False;
   Result := '';
+
+  if not CheckUpgradePolicy(UpgradeError) then
+  begin
+    Result := UpgradeError;
+    Exit;
+  end;
 
   if DetectWebView2Runtime(RuntimeVersion, RuntimeScope) then
   begin
