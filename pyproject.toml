@@ -54,6 +54,10 @@ interop = [
 studio = [
   "shiny>=1.7,<2",
 ]
+studio-native = [
+  "shiny>=1.7,<2",
+  "pywebview==6.2.1; sys_platform == 'win32'",
+]
 studio-test = [
   "shiny>=1.7,<2",
   "pytest-playwright>=0.9,<1",
@@ -75,6 +79,7 @@ dev = [
 gpbiometricspy-studio = "studio.cli:main"
 gpbiometricspy-studio-public = "studio.cli:main_public"
 gpbiometricspy-studio-desktop = "studio.desktop:main"
+gpbiometricspy-studio-native = "studio.native:main"
 gpbiometricspy-studio-doctor = "studio.doctor:main"
 
 [project.urls]
