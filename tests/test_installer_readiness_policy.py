@@ -23,6 +23,13 @@ def test_installer_is_stable_per_user_non_elevating_and_uninstallable():
     assert "ChangesAssociations=no" in ISS
 
 
+def test_installer_keeps_display_version_and_pe_versions_separate():
+    assert "AppVersion={#AppVersion}" in ISS
+    assert "VersionInfoProductVersion={#FileVersion}" in ISS
+    assert "VersionInfoVersion={#FileVersion}" in ISS
+    assert "VersionInfoProductVersion={#AppVersion}" not in ISS
+
+
 def test_installer_never_auto_runs_and_desktop_shortcut_is_opt_in():
     assert "[Run]" not in ISS
     assert "[UninstallRun]" not in ISS
