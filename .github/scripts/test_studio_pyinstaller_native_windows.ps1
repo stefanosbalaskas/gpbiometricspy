@@ -35,10 +35,12 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to install gpbiometricspy native Studio
 & $VenvPython -m pip install -r $RequirementsPath
 if ($LASTEXITCODE -ne 0) { throw "Failed to install pinned PyInstaller build tools." }
 
-Write-Host "Validating native launcher unit contract..."
+Write-Host "Validating native launcher and frozen-adapter unit contracts..."
 & $VenvPython -m pip install pytest
 if ($LASTEXITCODE -ne 0) { throw "Failed to install pytest." }
-& $VenvPython -m pytest -q (Join-Path $RepoRoot "studio/tests/test_native.py")
+& $VenvPython -m pytest -q `
+    (Join-Path $RepoRoot "studio/tests/test_native.py") `
+    (Join-Path $RepoRoot "studio/tests/test_native_frozen.py")
 if ($LASTEXITCODE -ne 0) { throw "Native launcher unit contract failed." }
 
 $BuildStarted = Get-Date
@@ -79,7 +81,7 @@ function Invoke-NativeBoundarySmoke {
 
     $StdoutLog = Join-Path $ArtifactsDir ("native-{0}-stdout.log" -f $Name)
     $StderrLog = Join-Path $ArtifactsDir ("native-{0}-stderr.log" -f $Name)
-    $Arguments = @("--host", "127.0.0.1", "--port", "$BoundaryPort", "--automation-close-seconds", "12")
+    $Arguments = @("--host", "127.0.0.1", "--port", "$BoundaryPort", "--automation-close-seconds", "30")
     if ($PublicDemo) { $Arguments += "--public-demo" }
 
     Write-Host "Launching frozen native Studio ($Name) with external Python removed from PATH..."
@@ -114,9 +116,9 @@ function Invoke-NativeBoundarySmoke {
     $Startup = ((Get-Date) - $Started).TotalSeconds
     $StartupSamples[$Name] = [Math]::Round($Startup, 3)
 
-    if (-not $Process.WaitForExit(45000)) {
+    if (-not $Process.WaitForExit(60000)) {
         Stop-Process -Id $Process.Id -Force -ErrorAction SilentlyContinue
-        throw "Frozen native Studio ($Name) did not close after its automation window lifetime."
+        throw "Frozen native Studio ($Name) did not close after its DOM-readiness automation window."
     }
     if ($Process.ExitCode -ne 0) {
         Write-Host "---- native $Name stdout ----"
@@ -130,11 +132,14 @@ function Invoke-NativeBoundarySmoke {
     if ($Output -notmatch "Native renderer requested: edgechromium") {
         throw "Frozen native Studio ($Name) did not request the WebView2/edgechromium renderer."
     }
+    if ($Output -notmatch "Native DOM loaded\.") {
+        throw "Frozen native Studio ($Name) did not reach the pywebview DOM loaded event."
+    }
     if ($Output -notmatch "window closed cleanly") {
         throw "Frozen native Studio ($Name) did not report a clean native-window close."
     }
 
-    Write-Host ("Frozen native Studio ({0}) reached HTTP 200 in {1:N2} s and closed cleanly." -f $Name, $Startup)
+    Write-Host ("Frozen native Studio ({0}) reached HTTP 200 in {1:N2} s, loaded its DOM, and closed cleanly." -f $Name, $Startup)
 }
 
 try {
@@ -151,11 +156,12 @@ try {
 
     $Metrics = [ordered]@{
         schema = "gpbiometricspy-studio-native-pyinstaller-smoke"
-        schema_version = 1
+        schema_version = 2
         bundle_mode = "onedir-native-webview2"
         renderer = "edgechromium"
         console = $true
         external_python_required = $false
+        dom_loaded_required = $true
         local_http_startup_seconds = $StartupSamples["local"]
         public_http_startup_seconds = $StartupSamples["public"]
         file_count = $FileCount
