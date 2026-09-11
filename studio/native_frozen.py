@@ -58,8 +58,12 @@ def _run_server(app: Any, *, host: str, port: int, errors: list[BaseException]) 
         errors.append(exc)
 
 
-def _close_after(window: Any, seconds: float) -> None:
-    time.sleep(max(0.0, float(seconds)))
+def _close_after_loaded(window: Any, loaded: threading.Event, timeout: float) -> None:
+    """Automation helper: never close a validation window before its DOM loaded event."""
+    loaded.wait(timeout=max(0.0, float(timeout)))
+    if loaded.is_set():
+        # Leave a short dwell after DOM readiness so the reactive WebSocket can settle.
+        time.sleep(0.75)
     window.destroy()
 
 
@@ -122,6 +126,14 @@ def main(argv: list[str] | None = None) -> int:
         resizable=True,
         text_select=True,
     )
+    dom_loaded = threading.Event()
+
+    def _on_loaded() -> None:
+        print("Native DOM loaded.")
+        dom_loaded.set()
+
+    window.events.loaded += _on_loaded
+
     start_kwargs: dict[str, object] = {
         "debug": bool(args.debug),
         "private_mode": True,
@@ -133,8 +145,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.automation_close_seconds > 0:
             webview.start(
-                _close_after,
-                (window, float(args.automation_close_seconds)),
+                _close_after_loaded,
+                (window, dom_loaded, float(args.automation_close_seconds)),
                 **start_kwargs,
             )
         else:
@@ -145,6 +157,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if errors:
         print(f"Frozen native Studio server failed: {errors[0]}", file=sys.stderr)
+        return 1
+
+    if args.automation_close_seconds > 0 and not dom_loaded.is_set():
+        print(
+            f"Frozen native Studio DOM did not load within {args.automation_close_seconds:g} seconds.",
+            file=sys.stderr,
+        )
         return 1
 
     print("Frozen native Studio window closed cleanly.")
