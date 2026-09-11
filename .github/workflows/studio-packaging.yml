@@ -10,6 +10,7 @@ on:
       - "tools/nuitka/**"
       - "pyproject.toml"
       - "MANIFEST.in"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
@@ -26,6 +27,7 @@ on:
       - "tools/nuitka/**"
       - "pyproject.toml"
       - "MANIFEST.in"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
@@ -90,6 +92,9 @@ jobs:
           name: studio-pyinstaller-diagnostics-py${{ matrix.python-version }}
           path: |
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stdout.log
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stderr.log
             ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-stdout.log
@@ -144,6 +149,9 @@ jobs:
           name: studio-pyinstaller-onefile-diagnostics-py${{ matrix.python-version }}
           path: |
             ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
             ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-stdout.log
             ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-stderr.log
             ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/*-browser-stdout.log
@@ -183,6 +191,9 @@ jobs:
           name: studio-pyinstaller-native-diagnostics-py${{ matrix.python-version }}
           path: |
             ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
             ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stdout.log
             ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stderr.log
           if-no-files-found: warn
