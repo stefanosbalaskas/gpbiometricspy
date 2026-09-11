@@ -1,10 +1,9 @@
-"""Contract tests for canonical stable-release artifact metadata."""
+"""Contract tests for canonical stable Python-package release metadata."""
 
 from __future__ import annotations
 
 import hashlib
 import importlib.util
-import json
 import tempfile
 from pathlib import Path
 
@@ -27,9 +26,7 @@ def _sha256(path: Path) -> str:
 
 def _fixture(root: Path) -> dict[str, object]:
     dist = root / "dist"
-    handoff = root / "release-handoff"
     dist.mkdir(parents=True)
-    handoff.mkdir(parents=True)
 
     wheel = dist / f"gpbiometricspy-{VERSION}-py3-none-any.whl"
     sdist = dist / f"gpbiometricspy-{VERSION}.tar.gz"
@@ -44,22 +41,12 @@ def _fixture(root: Path) -> dict[str, object]:
         "".join(f"{item['sha256']}  {item['path']}\n" for item in packages),
         encoding="utf-8",
     )
-    evidence = handoff / "desktop-production-release-evidence.json"
-    evidence.write_text('{"release_tag":"v0.1.6"}\n', encoding="utf-8")
-    evidence_sum = handoff / "DESKTOP-HANDOFF-SHA256SUMS.txt"
-    evidence_sum.write_text(
-        f"{_sha256(evidence)}  desktop-production-release-evidence.json\n",
-        encoding="utf-8",
-    )
 
     return {
         "schema": "gpbiometricspy-stable-release-artifact",
-        "schema_version": 1,
+        "schema_version": 2,
         "release_tag": TAG,
         "source_commit": SOURCE,
-        "production_handoff_run_id": 123456,
-        "production_handoff_sha256": _sha256(evidence),
-        "production_handoff_checksums_sha256": _sha256(evidence_sum),
         "distribution_checksums_sha256": _sha256(root / "SHA256SUMS.txt"),
         "packages": packages,
     }
@@ -121,13 +108,23 @@ def test_package_path_traversal_is_rejected() -> None:
         assert any("safe relative path" in error for error in errors)
 
 
+def test_stale_desktop_handoff_metadata_is_not_part_of_package_schema() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        metadata = _fixture(root)
+        metadata["production_handoff_run_id"] = 123
+        errors = validator.validate_stable_release_artifact(metadata, root=root)
+        assert any("unexpected metadata keys" in error for error in errors)
+
+
 def main() -> int:
     test_valid_bundle_is_eligible()
     test_package_tampering_fails_closed()
     test_checksum_manifest_must_match_package_metadata()
     test_wrong_tag_or_source_fails_closed()
     test_package_path_traversal_is_rejected()
-    print("stable release artifact contract PASS")
+    test_stale_desktop_handoff_metadata_is_not_part_of_package_schema()
+    print("stable Python-package release artifact contract PASS")
     return 0
 
 

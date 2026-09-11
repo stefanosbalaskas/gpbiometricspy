@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Validate a canonical stable-release artifact bundle.
+"""Validate a canonical stable Python-package release artifact bundle.
 
-The bundle binds the exact release tag/source commit to the package files,
-distribution checksum manifest, and validated production desktop handoff.
+The bundle binds an exact stable tag and source commit to the wheel/sdist and
+their checksum manifest. Desktop executable/installer signing is intentionally
+outside this Python-package publication contract.
 """
 
 from __future__ import annotations
@@ -15,10 +16,18 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 SCHEMA = "gpbiometricspy-stable-release-artifact"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 SHA256_RE = re.compile(r"^[0-9a-fA-F]{64}$")
 COMMIT_RE = re.compile(r"^[0-9a-fA-F]{40}$")
 TAG_RE = re.compile(r"^v(\d+\.\d+\.\d+)$")
+ALLOWED_KEYS = {
+    "schema",
+    "schema_version",
+    "release_tag",
+    "source_commit",
+    "distribution_checksums_sha256",
+    "packages",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -69,6 +78,10 @@ def validate_stable_release_artifact(
     errors: list[str] = []
     root = root.resolve()
 
+    unexpected = sorted(set(metadata) - ALLOWED_KEYS)
+    if unexpected:
+        errors.append("unexpected metadata keys: " + ", ".join(unexpected))
+
     if metadata.get("schema") != SCHEMA:
         errors.append(f"schema must equal {SCHEMA!r}")
     if metadata.get("schema_version") != SCHEMA_VERSION:
@@ -90,30 +103,14 @@ def validate_stable_release_artifact(
     elif expected_source_commit is not None and source_commit.lower() != expected_source_commit.lower():
         errors.append("source_commit does not match the expected exact release commit")
 
-    handoff_run_id = metadata.get("production_handoff_run_id")
-    if not isinstance(handoff_run_id, int) or isinstance(handoff_run_id, bool) or handoff_run_id <= 0:
-        errors.append("production_handoff_run_id must be a positive integer")
-
-    fixed_hashes = {
-        "distribution_checksums_sha256": root / "SHA256SUMS.txt",
-        "production_handoff_sha256": root
-        / "release-handoff"
-        / "desktop-production-release-evidence.json",
-        "production_handoff_checksums_sha256": root
-        / "release-handoff"
-        / "DESKTOP-HANDOFF-SHA256SUMS.txt",
-    }
-    for key, path in fixed_hashes.items():
-        expected = metadata.get(key)
-        if not isinstance(expected, str) or SHA256_RE.fullmatch(expected) is None:
-            errors.append(f"{key} must be a 64-character SHA-256 hex digest")
-            continue
-        if not path.is_file():
-            errors.append(f"required release artifact is missing: {path.relative_to(root)}")
-            continue
-        actual = _sha256(path)
-        if actual != expected.lower():
-            errors.append(f"{key} does not match {path.relative_to(root)}")
+    checksum_path = root / "SHA256SUMS.txt"
+    checksum_digest = metadata.get("distribution_checksums_sha256")
+    if not isinstance(checksum_digest, str) or SHA256_RE.fullmatch(checksum_digest) is None:
+        errors.append("distribution_checksums_sha256 must be a 64-character SHA-256 hex digest")
+    elif not checksum_path.is_file():
+        errors.append("required release artifact is missing: SHA256SUMS.txt")
+    elif _sha256(checksum_path) != checksum_digest.lower():
+        errors.append("distribution_checksums_sha256 does not match SHA256SUMS.txt")
 
     packages = metadata.get("packages")
     if not isinstance(packages, list):
@@ -132,6 +129,9 @@ def validate_stable_release_artifact(
         path_name = f"packages[{index}]"
         if not isinstance(package, dict):
             errors.append(f"{path_name} must be an object")
+            continue
+        if set(package) != {"path", "sha256"}:
+            errors.append(f"{path_name} must contain exactly path and sha256")
             continue
         rel = package.get("path")
         digest = package.get("sha256")
@@ -158,7 +158,7 @@ def validate_stable_release_artifact(
             + ", ".join(sorted(expected_paths))
         )
 
-    checksum_entries = _read_checksum_manifest(root / "SHA256SUMS.txt", errors)
+    checksum_entries = _read_checksum_manifest(checksum_path, errors)
     if checksum_entries and checksum_entries != package_hashes:
         errors.append("SHA256SUMS.txt entries do not exactly match metadata.packages")
 

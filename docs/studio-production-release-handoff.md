@@ -1,8 +1,10 @@
 # Production desktop release handoff
 
+> **Scope:** this contract applies only when gpbiometricspy Studio is distributed as a standalone Windows executable/installer. It is **not** a prerequisite for the normal Python package, GitHub Release, PyPI publication, or Zenodo archival release.
+
 The automated desktop release-orchestration boundary proves that gpbiometricspy Studio can be built, transiently signed, packaged, installed, verified and uninstalled in CI. That evidence deliberately uses an ephemeral untrusted certificate and **must not** be treated as production signing or human release approval.
 
-A production Windows desktop release is eligible only after the remaining external and human boundaries are recorded in one fail-closed handoff manifest.
+A future production Windows desktop release is eligible only after the remaining external and human boundaries are recorded in one fail-closed handoff manifest. Until then, users can install the Python package and launch Studio through its Python entry points; the standalone Windows installer remains an optional distribution channel.
 
 ## Evidence record
 
@@ -23,11 +25,11 @@ python tools/release/validate_desktop_release_evidence.py `
   --expected-source-commit <40-character-release-SHA>
 ```
 
-The validator is intentionally fail-closed. A missing approval, pending human scenario, untrusted signing record, absent RFC 3161 timestamp, missing attestation/SBOM/checksum digest, malformed hash, or source/tag mismatch makes the record ineligible.
+The validator is intentionally fail-closed. A missing approval, pending human scenario, untrusted signing record, absent RFC 3161 timestamp, missing attestation/SBOM/checksum digest, malformed hash, or source/tag mismatch makes the **desktop installer handoff** ineligible.
 
 ## Required production signing evidence
 
-The record requires all of the following from the actual redistributable executable and installer:
+The desktop record requires all of the following from the actual redistributable executable and installer:
 
 - the production signing provider/service identifier;
 - signer subject and certificate thumbprint;
@@ -37,25 +39,25 @@ The record requires all of the following from the actual redistributable executa
 - the timestamp authority used;
 - SHA-256 digests for the final signed executable and final signed installer.
 
-The validator checks the handoff record for completeness and consistency. The protected production release process remains responsible for actually verifying Authenticode trust and timestamp status on the final binaries before recording those fields as passed.
+The validator checks the handoff record for completeness and consistency. The protected production desktop process remains responsible for actually verifying Authenticode trust and timestamp status on the final binaries before recording those fields as passed.
 
 ## Protected release-environment evidence
 
-The handoff must also record that the production run occurred in the intended protected release environment and retain SHA-256 identities for:
+The desktop handoff must also record that the production run occurred in the intended protected release environment and retain SHA-256 identities for:
 
 - the final release attestation/provenance statement;
 - the final SBOM;
 - the final checksum manifest.
 
-The handoff record itself may be attached to the GitHub Release alongside these non-secret evidence files. Signing keys and certificate private material must never be attached.
+The handoff record itself may be retained with the desktop release evidence. Signing keys and certificate private material must never be attached.
 
 ## Human branding approval
 
-The generated CI icon remains evaluation/reproducibility artwork. Production eligibility requires explicit final-icon approval with a human reviewer identity and timezone-aware approval timestamp.
+The generated CI icon remains evaluation/reproducibility artwork. Production desktop eligibility requires explicit final-icon approval with a human reviewer identity and timezone-aware approval timestamp.
 
 ## Representative Windows validation
 
-At least **two representative Windows machines** must be recorded. Each machine must identify the Windows version, architecture and WebView2 version, and every required scenario must be marked `pass`:
+At least **two representative Windows machines** must be recorded before distributing a production standalone installer. Each machine must identify the Windows version, architecture and WebView2 version, and every required scenario must be marked `pass`:
 
 1. clean install;
 2. same-version repair/reinstall;
@@ -66,50 +68,66 @@ At least **two representative Windows machines** must be recorded. Each machine 
 
 The first-session UX check should replay the already documented researcher path: launch, Home/teaching route comprehension, guided synthetic analysis, QC, signal analysis, Reporting, Timeline/Provenance, recipe export, Saved/Unsaved state and safe recovery messaging. Automation remains evidence for functional invariants; this human record is specifically for comprehension, visual hierarchy, perceived friction and real install/launch experience.
 
-## Stable-release handoff workflow
+## Optional desktop handoff workflow
 
-The completed record is **not committed to the source tree**. Committing a record that names its own source commit would create a circular source-identity problem because adding the record would change the commit SHA.
+The completed desktop record is **not committed to the source tree**. Committing a record that names its own source commit would create a circular source-identity problem because adding the record would change the commit SHA.
 
-Instead, once the intended stable release commit is current `main` and its package version is a plain `X.Y.Z`:
+When a signed standalone Windows distribution is eventually wanted:
 
-1. complete the real production signing/timestamping, attestation, branding approval and representative-machine validation;
+1. complete real production signing/timestamping, attestation, branding approval and representative-machine validation;
 2. run the manual `studio-production-release-handoff` workflow on `main`;
-3. provide the predicted stable tag (for example `v0.1.6`), the exact 40-character current-main commit, and the completed **non-secret** evidence JSON;
-4. pass the `production-release` GitHub Environment approval/protection boundary;
-5. allow the workflow to verify that the supplied SHA is still current `main`, validate the record against the exact tag/SHA, reject secret-looking content, and retain only the evidence JSON plus its SHA-256 manifest.
+3. provide the stable tag, the exact 40-character source commit, and the completed **non-secret** evidence JSON;
+4. pass the `production-release` GitHub Environment boundary;
+5. allow the workflow to verify current-main identity, validate the desktop record, reject secret-looking content, and retain only the evidence JSON plus its SHA-256 manifest.
 
-The successful handoff run becomes the final release gate. `cut-release.yml` will not create the stable tag until every exact-main automated release gate and one successful exact-commit production handoff are present.
+This workflow remains available as a rigorous desktop-distribution control, but its success is deliberately **not consulted by `cut-release.yml`, `release.yml`, or `pypi.yml`**.
 
-After the immutable tag is created, `cut-release.yml` dispatches `release.yml` **on that exact tag**, so the release workflow's own `GITHUB_SHA` must equal the immutable tag commit. `release.yml` independently downloads the production handoff artifact, verifies its checksum, reruns the handoff validator, builds the wheel and sdist using a source-commit-derived `SOURCE_DATE_EPOCH`, and writes `RELEASE-METADATA.json`. That metadata binds the exact tag/SHA, production-handoff run, handoff hashes, package checksum manifest and exact wheel/sdist SHA-256 values.
+## Python package release and PyPI publication
 
-The stable-release artifact is validated by `tools/release/validate_stable_release_artifact.py`. If a GitHub Release already exists, the workflow downloads every expected asset and requires byte-for-byte identity with the newly rebuilt exact-source candidate before treating the run as successful. This prevents a manually substituted release asset from being promoted merely because its filename and version look correct.
+The stable Python package has a separate package-only publication contract.
+
+`cut-release.yml` requires the exact-current-`main` package/scientific validation matrix:
+
+- tests;
+- docs;
+- CodeQL;
+- deep parity;
+- interoperability;
+- branch coverage;
+- private real-data validation;
+- Studio;
+- Studio E2E;
+- Studio production-mode validation.
+
+Desktop packaging/signing/installer workflows remain useful engineering evidence but do not block the Python package.
+
+After the immutable tag is created, `cut-release.yml` dispatches `release.yml` **on that exact tag**. `release.yml` additionally requires the tag commit to equal current `main`, rebuilds the wheel and sdist using a source-commit-derived `SOURCE_DATE_EPOCH`, smoke-installs both artifacts, verifies the frozen 406-function contract and Studio entry points, writes `SHA256SUMS.txt`, and writes schema-v2 `RELEASE-METADATA.json`.
+
+`tools/release/validate_stable_release_artifact.py` binds only the exact stable tag/source SHA, checksum manifest, wheel and sdist. It intentionally contains no code-signing or desktop-handoff requirement.
+
+If a GitHub Release already exists, the release workflow downloads the wheel, sdist, checksum manifest and metadata and requires byte-for-byte identity with the newly rebuilt exact-source candidate before treating it as canonical.
 
 ## Canonical PyPI publication chain
 
-PyPI Trusted Publishing no longer trusts an independently created GitHub Release or a free-standing manual publisher run.
-
-`pypi.yml` is triggered after a successful `release` workflow, or may be used manually only as a recovery path that first resolves an already successful canonical `release` run for the requested stable tag. It then:
+`pypi.yml` runs only after a successful canonical `release` workflow, or manually as a recovery path that first resolves an already successful canonical release run for the requested stable tag. It then:
 
 1. downloads the `distributions` artifact from that successful release run;
-2. reads its `RELEASE-METADATA.json` and requires exact tag/source binding;
-3. checks out the exact tag and confirms the commit remains in `main` history;
-4. verifies `SHA256SUMS.txt` and the production-handoff checksum manifest;
-5. reruns both the desktop-handoff validator and canonical stable-release-artifact validator;
-6. downloads the current GitHub Release assets and requires every package/evidence/metadata asset to be byte-identical to the successful workflow artifact;
-7. publishes **only** `canonical-release/dist/` through PyPI Trusted Publishing.
+2. requires schema-v2 `RELEASE-METADATA.json` with exact tag/source binding;
+3. checks out the exact tag and confirms the source commit remains in `main` history;
+4. verifies `SHA256SUMS.txt` and reruns the canonical package-artifact validator;
+5. downloads the current GitHub Release package assets and requires byte-for-byte identity with the successful workflow artifact;
+6. publishes **only** `canonical-release/dist/` through PyPI Trusted Publishing.
 
-This closes a previous bypass in which `pypi.yml` could be dispatched against any non-draft GitHub Release containing plausible wheel/sdist filenames. A PyPI publish now depends on a successful exact-source release run that already passed the full automated matrix and the real production handoff.
+This preserves the important anti-bypass property: a manually substituted GitHub Release, plausible filenames, or a free-standing publisher invocation cannot replace the canonical exact-source package artifact.
 
-The non-secret handoff record, its checksum manifest and `RELEASE-METADATA.json` are attached to the GitHub Release for auditability. Signing credentials, certificate private material and redistributable desktop binaries remain outside ordinary PR CI and outside the source tree.
+## Configure `production-release` before desktop use
 
-## Configure `production-release` before use
+The optional manual desktop-handoff job references the GitHub Environment named `production-release`. Repository administrators should retain appropriate deployment restrictions on that environment before using it for a real standalone Windows release.
 
-The manual handoff job references the GitHub Environment named `production-release`. Repository administrators should configure that environment with the intended release protections (for example required reviewers and appropriate deployment-branch restrictions) before the workflow is used for a real release.
-
-A workflow run reaching that environment is not, by itself, evidence that a trusted signing operation occurred. The handoff manifest still has to contain the real trusted signer/timestamp, attestation and human-validation evidence and pass the fail-closed validator.
+A workflow run reaching that environment is not, by itself, evidence that a trusted signing operation occurred. The desktop handoff manifest still has to contain the real trusted signer/timestamp, attestation and human-validation evidence and pass the fail-closed validator.
 
 ## What the repository template means
 
-The committed template intentionally contains blank identities, `false` approvals and `pending` human outcomes. It is therefore **not release-eligible**, and CI asserts that it remains rejected. This prevents the template from being mistaken for a completed production attestation.
+The committed desktop template intentionally contains blank identities, `false` approvals and `pending` human outcomes. It is therefore **not desktop-release-eligible**, and CI asserts that it remains rejected. This prevents the template from being mistaken for a completed production attestation.
 
-Only a separately populated record derived from the real protected release, real trusted signing/timestamp verification and actual human validation can satisfy the contract.
+Only a separately populated record derived from a real protected desktop release, real trusted signing/timestamp verification and actual human validation can satisfy the standalone Windows distribution contract.

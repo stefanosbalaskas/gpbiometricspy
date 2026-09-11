@@ -93,7 +93,7 @@ jobs:
           data = json.loads(path.read_text(encoding='utf-8'))
           tag = data.get('release_tag')
           source = str(data.get('source_commit', '')).lower()
-          if data.get('schema') != 'gpbiometricspy-stable-release-artifact' or data.get('schema_version') != 1:
+          if data.get('schema') != 'gpbiometricspy-stable-release-artifact' or data.get('schema_version') != 2:
               raise SystemExit('Canonical release metadata schema mismatch')
           if not isinstance(tag, str) or re.fullmatch(r'v\d+\.\d+\.\d+', tag) is None:
               raise SystemExit(f'Canonical release metadata has invalid stable tag: {tag!r}')
@@ -117,7 +117,7 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Revalidate canonical artifact, handoff and main ancestry
+      - name: Revalidate canonical package artifact and main ancestry
         env:
           PUBLISH_TAG: ${{ steps.metadata.outputs.tag }}
           TARGET_SHA: ${{ steps.metadata.outputs.source_commit }}
@@ -135,14 +135,6 @@ jobs:
             cd canonical-release
             sha256sum -c SHA256SUMS.txt
           )
-          (
-            cd canonical-release/release-handoff
-            sha256sum -c DESKTOP-HANDOFF-SHA256SUMS.txt
-          )
-          python tools/release/validate_desktop_release_evidence.py \
-            --manifest canonical-release/release-handoff/desktop-production-release-evidence.json \
-            --expected-tag "$PUBLISH_TAG" \
-            --expected-source-commit "$TARGET_SHA"
           python tools/release/validate_stable_release_artifact.py \
             --root canonical-release \
             --manifest canonical-release/RELEASE-METADATA.json \
@@ -159,7 +151,7 @@ jobs:
           VERSION="${PUBLISH_TAG#v}"
           gh release view "$PUBLISH_TAG" --json isDraft,tagName --jq 'select(.isDraft == false) | .tagName' | grep -Fx "$PUBLISH_TAG"
           rm -rf release-assets
-          mkdir -p release-assets/dist release-assets/release-handoff
+          mkdir -p release-assets/dist
           gh release download "$PUBLISH_TAG" \
             --pattern "gpbiometricspy-${VERSION}-py3-none-any.whl" \
             --pattern "gpbiometricspy-${VERSION}.tar.gz" \
@@ -168,17 +160,11 @@ jobs:
             --pattern "SHA256SUMS.txt" \
             --pattern "RELEASE-METADATA.json" \
             --dir release-assets
-          gh release download "$PUBLISH_TAG" \
-            --pattern "desktop-production-release-evidence.json" \
-            --pattern "DESKTOP-HANDOFF-SHA256SUMS.txt" \
-            --dir release-assets/release-handoff
           for rel in \
             "dist/gpbiometricspy-${VERSION}-py3-none-any.whl" \
             "dist/gpbiometricspy-${VERSION}.tar.gz" \
             "SHA256SUMS.txt" \
-            "RELEASE-METADATA.json" \
-            "release-handoff/desktop-production-release-evidence.json" \
-            "release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt"; do
+            "RELEASE-METADATA.json"; do
             cmp --silent "canonical-release/$rel" "release-assets/$rel" || {
               echo "GitHub Release asset drift detected: $rel" >&2
               exit 1
