@@ -13,7 +13,7 @@ WORKFLOW = (ROOT / ".github/workflows/studio-windowed-readiness.yml").read_text(
 
 def test_engineering_console_build_is_preserved_while_release_build_is_windowed():
     assert "console=True" in ENGINEERING_SPEC
-    assert "studio/native_frozen.py" in ENGINEERING_SPEC
+    assert 'ENTRY = ROOT / "studio" / "native_frozen.py"' in ENGINEERING_SPEC
     assert "console=False" in WINDOWED_SPEC
     assert 'ENTRY = ROOT / "studio" / "native_windowed.py"' in WINDOWED_SPEC
     assert 'name="gpbiometricspy-studio-native"' in WINDOWED_SPEC
