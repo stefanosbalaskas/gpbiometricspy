@@ -44,7 +44,7 @@ def test_signing_readiness_never_uploads_test_signed_executable_or_pfx():
     assert "signtool-verify.log" in upload_section
 
 
-def test_signing_readiness_uses_noninteractive_signtool_sha256_path():
+def test_signing_readiness_uses_noninteractive_bounded_signtool_sha256_path():
     executable_script = _executable_powershell(SCRIPT)
     assert "CertificateRequest" in executable_script
     assert "CreateSelfSigned" in executable_script
@@ -52,7 +52,11 @@ def test_signing_readiness_uses_noninteractive_signtool_sha256_path():
     assert "New-SelfSignedCertificate" not in executable_script
     assert "Set-AuthenticodeSignature" not in executable_script
     assert "Get-AuthenticodeSignature" in executable_script
-    assert "sign /fd SHA256 /f $PfxPath /p $PfxPassword" in executable_script
-    assert "verify /pa /v" in executable_script
+    assert "Invoke-BoundedProcess" in executable_script
+    assert "Get-BoundedAuthenticodeSnapshot" in executable_script
+    assert '@("sign", "/fd", "SHA256", "/f", $PfxPath, "/p", $PfxPassword, $Executable)' in executable_script
+    assert '@("verify", "/pa", "/v", $Executable)' in executable_script
+    assert "-TimeoutSeconds 60" in executable_script
+    assert "-TimeoutSeconds 30" in executable_script
     assert "Remove-TestCertificate" in executable_script
     assert "Remove-Item -LiteralPath $PfxPath -Force" in executable_script
