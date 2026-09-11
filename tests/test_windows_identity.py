@@ -30,7 +30,7 @@ def _license_copyright() -> str:
 
 
 def test_windows_fixed_version_maps_dev_suffix_into_fourth_component():
-    assert windows_fixed_version("0.1.6.dev0") == (0, 1, 6, 0)
+    assert windows_fixed_version("0.1.6") == (0, 1, 6, 0)
     assert windows_fixed_version("1.2.3.dev4") == (1, 2, 3, 4)
     assert windows_fixed_version("2.5") == (2, 5, 0, 0)
 

@@ -18,7 +18,7 @@ def test_upgrade_policy_uses_numeric_windows_file_version_and_stable_app_identit
     assert "GetPackedVersion(Executable, Version)" in ISS
     assert "GetVersionNumbersString(Executable, VersionText)" in ISS
     assert "AppVersion" in ISS
-    assert "0.1.6.dev0" not in ISS
+    assert "0.1.6" not in ISS
 
 
 def test_upgrade_policy_preserves_previous_install_location_and_choices():

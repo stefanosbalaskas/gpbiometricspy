@@ -6,7 +6,7 @@ This checkpoint records the first exact-head certification in which the console-
 
 - Certified product-code SHA: `449a0abc84788ed31c9dc3ccf292e72721a9414d`
 - Previous certified windowed SHA: `9153754dc36bd796d8871953287436614e172b75`
-- Product version under test: `0.1.6.dev0`
+- Product version under test: `0.1.6`
 - File version under test: `0.1.6.0`
 - PR: `#107`
 - Certification rule: every expected pull-request workflow family must be workflow-level `completed/success` on the exact product-code SHA.

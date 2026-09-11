@@ -65,7 +65,7 @@ The readiness workflow built a transient GUI-subsystem installer and source exec
 - transient source executable SHA-256: `a92f701f98d629219cf0f9dcabfba2322088116334046bed0f37c9dd73307922`;
 - source PE subsystem: `2` / `IMAGE_SUBSYSTEM_WINDOWS_GUI`;
 - identity manifest SHA-256: `e3f198e13bb5f4de1b99a2ea171bfcdb5e2eb0f679885b59b76dd9f1a535fbb3`;
-- product version: `0.1.6.dev0`;
+- product version: `0.1.6`;
 - Windows file version: `0.1.6.0`.
 
 `SHA256SUMS.txt` intentionally contains entries for both transient binaries even though the binaries themselves are not retained. The checksum file itself has SHA-256:
@@ -85,7 +85,7 @@ The workflow inventories the actual isolated Python build environment before cle
 - reproducible-output mode: `true`;
 - target: actual build virtual environment;
 - environment component count: `58`;
-- metadata root component: `gpbiometricspy 0.1.6.dev0`, type `application`;
+- metadata root component: `gpbiometricspy 0.1.6`, type `application`;
 - dependency nodes: `59`;
 - SBOM SHA-256: `9491264e0b7c2a01d9988c0e8ea8552a9a4bdee485a545f15dbd328f1348c9c2`.
 

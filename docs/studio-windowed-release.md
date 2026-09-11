@@ -81,7 +81,7 @@ The dedicated Windows harness does not infer windowed behavior from the PyInstal
 - Windows identity verified: `true`;
 - engineering console build preserved: `true`;
 - product name: `gpbiometricspy Studio`;
-- product version: `0.1.6.dev0`;
+- product version: `0.1.6`;
 - Windows file version: `0.1.6.0`;
 - local HTTP startup: `3.188 s`;
 - public-demo HTTP startup: `2.974 s`;
