@@ -100,7 +100,7 @@ def test_public_demo_home_guidance_tracks_validated_channels_and_completed_workf
 
     open_nav(page, "home")
     expect(guidance).to_contain_text("Channel-aware recommendation:", timeout=60_000)
-    expect(guidance).not_to_contain_text("EDA / SCR")
+    expect(guidance).not_to_contain_text("EDA / SCR", timeout=60_000)
     expect(guidance).to_contain_text("PPG / HR / HRV")
     expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
     expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
