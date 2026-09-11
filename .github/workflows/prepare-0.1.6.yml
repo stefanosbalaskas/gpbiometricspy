@@ -21,6 +21,36 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Normalize remaining stable-readiness version literals
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          paths = [
+              "docs/studio-installer-readiness.md",
+              "docs/studio-release-provenance.md",
+              "docs/studio-signing-readiness.md",
+              "docs/studio-upgrade-policy-readiness.md",
+              "docs/studio-windowed-installer-integration.md",
+              "docs/studio-windowed-release.md",
+              "docs/studio-windows-identity.md",
+              "studio/tests/test_product_services.py",
+              "tests/test_upgrade_policy_readiness_policy.py",
+              "tests/test_windows_identity.py",
+          ]
+          total = 0
+          for rel in paths:
+              path = Path(rel)
+              text = path.read_text(encoding="utf-8")
+              count = text.count("0.1.6.dev0")
+              if count == 0:
+                  raise SystemExit(f"{rel}: expected at least one 0.1.6.dev0 literal")
+              path.write_text(text.replace("0.1.6.dev0", "0.1.6"), encoding="utf-8")
+              total += count
+              print(f"{rel}: normalized {count} literal(s)")
+          print(f"normalized {total} remaining stable-readiness literal(s)")
+          PY
+
       - name: Apply deterministic stable identity freeze
         run: python tools/release/prepare_0_1_6.py
 
