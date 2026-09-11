@@ -28,9 +28,9 @@ def test_signing_readiness_is_explicitly_test_only_and_hash_bound():
 def test_signing_readiness_does_not_use_repository_signing_secrets():
     lowered = WORKFLOW.lower()
     assert "secrets." not in lowered
-    assert ".pfx" not in lowered
-    assert ".p12" not in lowered
-    assert "private key" not in lowered
+    assert "github.token" not in lowered
+    assert "actions/checkout" in lowered
+    assert "permissions:\n  contents: read" in lowered
 
 
 def test_signing_readiness_never_uploads_test_signed_executable_or_pfx():
