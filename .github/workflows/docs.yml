@@ -126,8 +126,14 @@ jobs:
               else:
                   assert cff_doi == version_doi
           else:
-              assert version_doi is not None
-              assert cff_doi == version_doi
+              # A development head may legitimately follow a newly released stable
+              # version before Zenodo has minted that stable version's DOI. In that
+              # pre-ingestion window, both VersionDOI and the stable CFF DOI remain
+              # unset. Once the DOI is known, they must agree exactly.
+              if version_doi is None:
+                  assert cff_doi is None
+              else:
+                  assert cff_doi == version_doi
 
           if previous_doi is not None:
               assert cff_doi != previous_doi
