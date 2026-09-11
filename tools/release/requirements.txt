@@ -1,0 +1,3 @@
+# Release-provenance tooling only.
+# Keep SBOM tooling isolated from gpbiometricspy runtime and packaging dependencies.
+cyclonedx-bom==7.3.1
