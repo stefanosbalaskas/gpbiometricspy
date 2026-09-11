@@ -18,7 +18,10 @@ def test_installer_is_stable_per_user_non_elevating_and_uninstallable():
     assert "ArchitecturesAllowed=x64compatible" in ISS
     assert "ArchitecturesInstallIn64BitMode=x64compatible" in ISS
     assert "Uninstallable=yes" in ISS
-    assert "UsePreviousAppDir=no" in ISS
+    assert "UsePreviousAppDir=yes" in ISS
+    assert "UsePreviousGroup=yes" in ISS
+    assert "UsePreviousTasks=yes" in ISS
+    assert "UsePreviousPrivileges=no" in ISS
     assert "ChangesEnvironment=no" in ISS
     assert "ChangesAssociations=no" in ISS
 
