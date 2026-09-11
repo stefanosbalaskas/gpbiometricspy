@@ -16,9 +16,14 @@ $BuildRoot = Join-Path $ArtifactsDir "build"
 $DistRoot = Join-Path $ArtifactsDir "dist"
 $VenvRoot = Join-Path $ArtifactsDir "venv"
 $VenvPython = Join-Path $VenvRoot "Scripts/python.exe"
+$IdentityDir = Join-Path $ArtifactsDir "identity"
+$IdentityJson = Join-Path $IdentityDir "windows-identity.json"
+$IconPath = Join-Path $IdentityDir "gpbiometricspy-studio.ico"
 $MetricsPath = Join-Path $ArtifactsDir "native-metrics.json"
 $SpecPath = Join-Path $RepoRoot "tools/pyinstaller/gpbiometricspy_studio_native.spec"
 $RequirementsPath = Join-Path $RepoRoot "tools/pyinstaller/requirements.txt"
+$IdentityGenerator = Join-Path $RepoRoot "tools/pyinstaller/generate_windows_identity.py"
+$IdentityVerifier = Join-Path $RepoRoot ".github/scripts/assert_studio_windows_identity.ps1"
 
 New-Item -ItemType Directory -Force -Path $ArtifactsDir | Out-Null
 
@@ -43,6 +48,11 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to install pytest." }
     (Join-Path $RepoRoot "studio/tests/test_native_frozen.py")
 if ($LASTEXITCODE -ne 0) { throw "Native launcher unit contract failed." }
 
+Write-Host "Generating Windows application identity from repository metadata..."
+& $VenvPython $IdentityGenerator --repo-root $RepoRoot --output-dir $IdentityDir --target native
+if ($LASTEXITCODE -ne 0) { throw "Failed to generate Windows application identity." }
+$env:GPBIOMETRICSPY_WINDOWS_IDENTITY_DIR = $IdentityDir
+
 $BuildStarted = Get-Date
 Write-Host "Building diagnosable native WebView2 Studio bundle..."
 Push-Location $RepoRoot
@@ -60,6 +70,10 @@ $Executable = Join-Path $BundleRoot "gpbiometricspy-studio-native.exe"
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
     throw "Frozen native Studio executable was not created at $Executable"
 }
+
+& $IdentityVerifier -Executable $Executable -IdentityJson $IdentityJson -IconPath $IconPath
+if ($LASTEXITCODE -ne 0) { throw "Native Studio Windows identity verification failed." }
+$Identity = Get-Content -LiteralPath $IdentityJson -Raw | ConvertFrom-Json
 
 $BundleFiles = @(Get-ChildItem -LiteralPath $BundleRoot -Recurse -File)
 $BundleBytes = [int64](($BundleFiles | Measure-Object -Property Length -Sum).Sum)
@@ -156,12 +170,16 @@ try {
 
     $Metrics = [ordered]@{
         schema = "gpbiometricspy-studio-native-pyinstaller-smoke"
-        schema_version = 2
+        schema_version = 3
         bundle_mode = "onedir-native-webview2"
         renderer = "edgechromium"
         console = $true
         external_python_required = $false
         dom_loaded_required = $true
+        windows_identity_verified = $true
+        product_name = $Identity.product_name
+        product_version = $Identity.product_version
+        file_version = $Identity.file_version
         local_http_startup_seconds = $StartupSamples["local"]
         public_http_startup_seconds = $StartupSamples["public"]
         file_count = $FileCount
@@ -183,4 +201,4 @@ finally {
 }
 
 if ($null -ne $Failure) { throw $Failure }
-Write-Host "PyInstaller native WebView2 Studio smoke passed."
+Write-Host "PyInstaller native WebView2 Studio smoke passed with verified Windows identity."
