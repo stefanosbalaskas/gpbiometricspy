@@ -13,9 +13,13 @@ from tools.pyinstaller.generate_windows_identity import PRODUCT_NAME, TARGETS, g
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _project_version() -> str:
+def _project() -> dict:
     with (ROOT / "pyproject.toml").open("rb") as handle:
-        return str(tomllib.load(handle)["project"]["version"])
+        return tomllib.load(handle)["project"]
+
+
+def _project_version() -> str:
+    return str(_project()["version"])
 
 
 def _license_copyright() -> str:
@@ -33,8 +37,10 @@ def test_windows_fixed_version_maps_dev_suffix_into_fourth_component():
 
 def test_generate_windows_identity_uses_project_and_license_sources(tmp_path):
     identity = generate_identity(ROOT, tmp_path, "native")
-    project_version = _project_version()
+    project = _project()
+    project_version = str(project["version"])
     fixed = windows_fixed_version(project_version)
+    repository = str(project["urls"]["Repository"]).rstrip("/")
 
     assert identity["package_version"] == project_version
     assert identity["product_version"] == project_version
@@ -43,6 +49,11 @@ def test_generate_windows_identity_uses_project_and_license_sources(tmp_path):
     assert identity["product_name"] == PRODUCT_NAME
     assert identity["file_description"] == "gpbiometricspy Studio Desktop"
     assert identity["legal_copyright"] == _license_copyright()
+    assert identity["company_name"] == project["authors"][0]["name"]
+    assert identity["homepage_url"] == project["urls"]["Homepage"]
+    assert identity["repository_url"] == repository
+    assert identity["support_url"] == project["urls"]["Issues"]
+    assert identity["updates_url"] == repository + "/releases"
     assert len(identity["version_resource_sha256"]) == 64
     assert len(identity["icon_sha256"]) == 64
 
@@ -52,7 +63,8 @@ def test_generate_windows_identity_uses_project_and_license_sources(tmp_path):
     version_text = (tmp_path / "version-info.txt").read_text(encoding="utf-8")
     assert "ProductName" in version_text
     assert "gpbiometricspy Studio" in version_text
-    assert "CompanyName" not in version_text
+    assert "CompanyName" in version_text
+    assert str(project["authors"][0]["name"]) in version_text
 
     with Image.open(tmp_path / "gpbiometricspy-studio.ico") as icon:
         assert icon.format == "ICO"
