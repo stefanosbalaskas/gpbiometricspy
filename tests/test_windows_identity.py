@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import re
+import tomllib
 from pathlib import Path
 
 from PIL import Image
@@ -11,6 +13,18 @@ from tools.pyinstaller.generate_windows_identity import PRODUCT_NAME, TARGETS, g
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _project_version() -> str:
+    with (ROOT / "pyproject.toml").open("rb") as handle:
+        return str(tomllib.load(handle)["project"]["version"])
+
+
+def _license_copyright() -> str:
+    text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    match = re.search(r"^Copyright \(c\) .+$", text, flags=re.MULTILINE)
+    assert match is not None
+    return match.group(0).strip()
+
+
 def test_windows_fixed_version_maps_dev_suffix_into_fourth_component():
     assert windows_fixed_version("0.1.6.dev0") == (0, 1, 6, 0)
     assert windows_fixed_version("1.2.3.dev4") == (1, 2, 3, 4)
@@ -19,14 +33,16 @@ def test_windows_fixed_version_maps_dev_suffix_into_fourth_component():
 
 def test_generate_windows_identity_uses_project_and_license_sources(tmp_path):
     identity = generate_identity(ROOT, tmp_path, "native")
+    project_version = _project_version()
+    fixed = windows_fixed_version(project_version)
 
-    assert identity["package_version"] == "0.1.6.dev0"
-    assert identity["product_version"] == "0.1.6.dev0"
-    assert identity["file_version"] == "0.1.6.0"
-    assert identity["fixed_file_version"] == [0, 1, 6, 0]
+    assert identity["package_version"] == project_version
+    assert identity["product_version"] == project_version
+    assert identity["file_version"] == ".".join(str(part) for part in fixed)
+    assert identity["fixed_file_version"] == list(fixed)
     assert identity["product_name"] == PRODUCT_NAME
     assert identity["file_description"] == "gpbiometricspy Studio Desktop"
-    assert identity["legal_copyright"] == "Copyright (c) 2026 Stefanos Balaskas"
+    assert identity["legal_copyright"] == _license_copyright()
     assert len(identity["version_resource_sha256"]) == 64
     assert len(identity["icon_sha256"]) == 64
 
