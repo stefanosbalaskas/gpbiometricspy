@@ -28,19 +28,25 @@ def test_signing_readiness_does_not_use_repository_signing_secrets():
     assert "private key" not in lowered
 
 
-def test_signing_readiness_never_uploads_test_signed_executable():
+def test_signing_readiness_never_uploads_test_signed_executable_or_pfx():
     upload_section = WORKFLOW.split("Upload signing-readiness evidence only", 1)[1]
     upload_section = upload_section.split("Assert no signed executable is retained as evidence", 1)[0]
     assert "*.exe" not in upload_section
     assert ".exe" not in upload_section
+    assert ".pfx" not in upload_section.lower()
+    assert ".p12" not in upload_section.lower()
     assert "signing-provenance.json" in upload_section
     assert "signtool-verify.log" in upload_section
 
 
-def test_signing_readiness_uses_authenticode_and_sha256():
+def test_signing_readiness_uses_noninteractive_signtool_sha256_path():
+    assert "CertificateRequest" in SCRIPT
+    assert "CreateSelfSigned" in SCRIPT
+    assert '"1.3.6.1.5.5.7.3.3", "Code Signing"' in SCRIPT
+    assert "New-SelfSignedCertificate" not in SCRIPT
+    assert "Set-AuthenticodeSignature" not in SCRIPT
     assert "Get-AuthenticodeSignature" in SCRIPT
-    assert "Set-AuthenticodeSignature" in SCRIPT
-    assert "-HashAlgorithm SHA256" in SCRIPT
+    assert "sign /fd SHA256 /f $PfxPath /p $PfxPassword" in SCRIPT
     assert "verify /pa /v" in SCRIPT
-    assert "New-SelfSignedCertificate" in SCRIPT
     assert "Remove-TestCertificate" in SCRIPT
+    assert "Remove-Item -LiteralPath $PfxPath -Force" in SCRIPT
