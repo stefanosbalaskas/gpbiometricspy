@@ -13,6 +13,15 @@ on:
       - studio
       - studio-e2e
       - studio-production
+      - studio-packaging
+      - studio-signing-readiness
+      - studio-installer-readiness
+      - studio-windowed-readiness
+      - studio-windowed-installer-readiness
+      - studio-release-provenance-readiness
+      - studio-release-orchestration-readiness
+      - studio-desktop-release-handoff-readiness
+      - studio-production-release-handoff
     types: [completed]
 
 permissions:
@@ -26,9 +35,15 @@ concurrency:
 jobs:
   cut:
     if: >-
-      github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.conclusion == 'success'
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        github.event.workflow_run.event == 'push' ||
+        (
+          github.event.workflow_run.name == 'studio-production-release-handoff' &&
+          github.event.workflow_run.event == 'workflow_dispatch'
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout triggering main commit
@@ -83,7 +98,7 @@ jobs:
           echo "current=true" >> "$GITHUB_OUTPUT"
           echo "sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Require every exact-main release gate
+      - name: Require every exact-main automated release gate
         if: steps.release.outputs.eligible == 'true' && steps.current.outputs.current == 'true'
         id: gates
         env:
@@ -102,7 +117,15 @@ jobs:
             real-data-validation.yml \
             studio.yml \
             studio-e2e.yml \
-            studio-production.yml; do
+            studio-production.yml \
+            studio-packaging.yml \
+            studio-signing-readiness.yml \
+            studio-installer-readiness.yml \
+            studio-windowed-readiness.yml \
+            studio-windowed-installer-readiness.yml \
+            studio-release-provenance-readiness.yml \
+            studio-release-orchestration-readiness.yml \
+            studio-desktop-release-handoff-readiness.yml; do
             ok="$(gh run list --workflow "$workflow" --commit "$TARGET_SHA" --branch main --limit 30 \
               --json event,conclusion \
               --jq '[.[] | select(.event == "push" and .conclusion == "success")] | length')"
@@ -113,6 +136,17 @@ jobs:
               echo "Gate green: $workflow @ $TARGET_SHA"
             fi
           done
+
+          handoff_ok="$(gh run list --workflow studio-production-release-handoff.yml \
+            --commit "$TARGET_SHA" --branch main --limit 30 \
+            --json event,conclusion \
+            --jq '[.[] | select(.event == "workflow_dispatch" and .conclusion == "success")] | length')"
+          if [[ "$handoff_ok" -lt 1 ]]; then
+            echo "Final production handoff is not yet validated for $TARGET_SHA"
+            ready=0
+          else
+            echo "Final production handoff green for $TARGET_SHA"
+          fi
           echo "ready=$ready" >> "$GITHUB_OUTPUT"
 
       - name: Create immutable annotated release tag

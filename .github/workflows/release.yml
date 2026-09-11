@@ -88,7 +88,7 @@ jobs:
               raise SystemExit('R reference DOI must not be presented as the Python software identifier')
           PY
 
-      - name: Require successful validation runs on exact main commit
+      - name: Require successful automated validation runs on exact main commit
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -104,13 +104,56 @@ jobs:
             real-data-validation.yml \
             studio.yml \
             studio-e2e.yml \
-            studio-production.yml; do
+            studio-production.yml \
+            studio-packaging.yml \
+            studio-signing-readiness.yml \
+            studio-installer-readiness.yml \
+            studio-windowed-readiness.yml \
+            studio-windowed-installer-readiness.yml \
+            studio-release-provenance-readiness.yml \
+            studio-release-orchestration-readiness.yml \
+            studio-desktop-release-handoff-readiness.yml; do
             echo "Checking $workflow for $TARGET_SHA on main..."
-            ok="$(gh run list --workflow "$workflow" --commit "$TARGET_SHA" --branch main --limit 20 \
-              --json conclusion \
-              --jq '[.[] | select(.conclusion == "success")] | length')"
-            test "$ok" -ge 1 || { echo "Missing successful exact-commit validation for $workflow" >&2; exit 1; }
+            ok="$(gh run list --workflow "$workflow" --commit "$TARGET_SHA" --branch main --limit 30 \
+              --json event,conclusion \
+              --jq '[.[] | select(.event == "push" and .conclusion == "success")] | length')"
+            test "$ok" -ge 1 || { echo "Missing successful exact-main validation for $workflow" >&2; exit 1; }
           done
+
+      - name: Resolve validated production desktop handoff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TARGET_SHA="$(git rev-parse HEAD)"
+          HANDOFF_RUN_ID="$(gh run list --workflow studio-production-release-handoff.yml \
+            --commit "$TARGET_SHA" --branch main --limit 30 \
+            --json databaseId,event,conclusion,createdAt \
+            --jq '[.[] | select(.event == "workflow_dispatch" and .conclusion == "success")] | sort_by(.createdAt) | last | .databaseId // empty')"
+          test -n "$HANDOFF_RUN_ID" || {
+            echo "Missing successful production desktop handoff for $TARGET_SHA" >&2
+            exit 1
+          }
+          echo "HANDOFF_RUN_ID=$HANDOFF_RUN_ID" >> "$GITHUB_ENV"
+          echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
+
+      - name: Download and revalidate production desktop handoff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-handoff
+          gh run download "$HANDOFF_RUN_ID" \
+            --name "studio-production-release-handoff-evidence-$TARGET_SHA" \
+            --dir release-handoff
+          (
+            cd release-handoff
+            sha256sum -c DESKTOP-HANDOFF-SHA256SUMS.txt
+          )
+          python tools/release/validate_desktop_release_evidence.py \
+            --manifest release-handoff/desktop-production-release-evidence.json \
+            --expected-tag "$RELEASE_TAG" \
+            --expected-source-commit "$TARGET_SHA"
 
       - name: Install build and validation tools
         run: python -m pip install "build>=1.2" "twine==7.0.0"
@@ -199,6 +242,8 @@ jobs:
           path: |
             dist/*
             SHA256SUMS.txt
+            release-handoff/desktop-production-release-evidence.json
+            release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt
 
       - name: Create immutable GitHub Release if absent
         env:
@@ -210,7 +255,11 @@ jobs:
           else
             prerelease=()
             if [[ "$RELEASE_TAG" == *".dev"* ]]; then prerelease+=(--prerelease); fi
-            gh release create "$RELEASE_TAG" dist/* SHA256SUMS.txt \
+            gh release create "$RELEASE_TAG" \
+              dist/* \
+              SHA256SUMS.txt \
+              release-handoff/desktop-production-release-evidence.json \
+              release-handoff/DESKTOP-HANDOFF-SHA256SUMS.txt \
               --verify-tag --title "$RELEASE_TAG" --generate-notes "${prerelease[@]}"
           fi
 

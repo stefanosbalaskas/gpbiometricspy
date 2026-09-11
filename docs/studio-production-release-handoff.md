@@ -66,6 +66,30 @@ At least **two representative Windows machines** must be recorded. Each machine 
 
 The first-session UX check should replay the already documented researcher path: launch, Home/teaching route comprehension, guided synthetic analysis, QC, signal analysis, Reporting, Timeline/Provenance, recipe export, Saved/Unsaved state and safe recovery messaging. Automation remains evidence for functional invariants; this human record is specifically for comprehension, visual hierarchy, perceived friction and real install/launch experience.
 
+## Stable-release handoff workflow
+
+The completed record is **not committed to the source tree**. Committing a record that names its own source commit would create a circular source-identity problem because adding the record would change the commit SHA.
+
+Instead, once the intended stable release commit is current `main` and its package version is a plain `X.Y.Z`:
+
+1. complete the real production signing/timestamping, attestation, branding approval and representative-machine validation;
+2. run the manual `studio-production-release-handoff` workflow on `main`;
+3. provide the predicted stable tag (for example `v0.1.6`), the exact 40-character current-main commit, and the completed **non-secret** evidence JSON;
+4. pass the `production-release` GitHub Environment approval/protection boundary;
+5. allow the workflow to verify that the supplied SHA is still current `main`, validate the record against the exact tag/SHA, reject secret-looking content, and retain only the evidence JSON plus its SHA-256 manifest.
+
+The successful handoff run becomes the final release gate. `cut-release.yml` will not create the stable tag until every exact-main automated release gate and one successful exact-commit production handoff are present.
+
+After the immutable tag is created, `release.yml` independently downloads that exact handoff artifact, verifies its checksum, reruns the validator against the tag commit, and only then proceeds to build distributions, create the GitHub Release and dispatch protected PyPI publication. The non-secret handoff record and its checksum manifest are attached to the GitHub Release for auditability.
+
+This design deliberately keeps signing credentials, certificate private material and redistributable desktop binaries outside ordinary PR CI and outside the source tree.
+
+## Configure `production-release` before use
+
+The manual handoff job references the GitHub Environment named `production-release`. Repository administrators should configure that environment with the intended release protections (for example required reviewers and appropriate deployment-branch restrictions) before the workflow is used for a real release.
+
+A workflow run reaching that environment is not, by itself, evidence that a trusted signing operation occurred. The handoff manifest still has to contain the real trusted signer/timestamp, attestation and human-validation evidence and pass the fail-closed validator.
+
 ## What the repository template means
 
 The committed template intentionally contains blank identities, `false` approvals and `pending` human outcomes. It is therefore **not release-eligible**, and CI asserts that it remains rejected. This prevents the template from being mistaken for a completed production attestation.
