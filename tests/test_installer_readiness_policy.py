@@ -48,6 +48,38 @@ def test_installer_ci_definition_contains_no_signing_hook_or_secret():
     assert "timeout-minutes: 25" in lowered
 
 
+def test_installer_enforces_evergreen_webview2_prerequisite_without_bypass():
+    product_id = "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+    assert product_id in ISS
+    assert product_id in SCRIPT
+    assert "RegQueryStringValue(HKLM32" in ISS
+    assert "RegQueryStringValue(HKCU" in ISS
+    assert "'pv'" in ISS
+    assert "PrepareToInstall(var NeedsRestart: Boolean): String" in ISS
+    assert "WebView2 Runtime missing; setup cannot continue." in ISS
+    assert "Evergreen WebView2 Runtime" in ISS
+    assert "GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING" in ISS
+    assert "GPBIOMETRICSPY_CI_FORCE_WEBVIEW2_MISSING" in SCRIPT
+    assert "BYPASS_WEBVIEW2" not in ISS
+    assert "BYPASS_WEBVIEW2" not in SCRIPT
+    assert "DownloadTemporaryFile" not in ISS
+    assert "Exec(" not in ISS
+
+
+def test_installer_harness_independently_detects_runtime_and_proves_missing_path():
+    assert "Get-WebView2RuntimeEvidence" in SCRIPT
+    assert "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients" in SCRIPT
+    assert "HKEY_CURRENT_USER\\Software\\Microsoft\\EdgeUpdate\\Clients" in SCRIPT
+    assert 'Get-ItemPropertyValue -LiteralPath $Candidate.Path -Name "pv"' in SCRIPT
+    assert '$Version.Trim() -ne "0.0.0.0"' in SCRIPT
+    assert "$MissingInstallProcess.ExitCode -ne 7" in SCRIPT
+    assert '"WebView2 Runtime missing"' in SCRIPT
+    assert "Missing-WebView2 prerequisite failure still installed the native executable." in SCRIPT
+    assert "Missing-WebView2 prerequisite failure created an uninstall registration." in SCRIPT
+    assert "Missing-WebView2 prerequisite failure created a Start Menu shortcut." in SCRIPT
+    assert '"WebView2 Runtime detected"' in SCRIPT
+
+
 def test_installer_proof_binds_installed_bytes_and_windows_identity():
     assert "$SourceExecutableSha256 = Get-Sha256 $SourceExecutable" in SCRIPT
     assert "$InstalledSha256 = Get-Sha256 $InstalledExecutable" in SCRIPT
@@ -79,10 +111,17 @@ def test_installer_proof_requires_clean_uninstall_and_current_user_cleanup():
     assert "Start Menu shortcut survived uninstall." in SCRIPT
 
 
-def test_installer_evidence_is_diagnostics_only():
+def test_installer_evidence_is_diagnostics_only_and_runtime_payload_free():
+    assert 'schema_version = 2' in SCRIPT
     assert 'release_artifact = $false' in SCRIPT
     assert 'installer_published = $false' in SCRIPT
-    assert 'webview2_runtime_strategy = "host-provided-evaluation-only"' in SCRIPT
+    assert 'webview2_runtime_strategy = "evergreen-prerequisite-detect-and-remediate"' in SCRIPT
+    assert 'webview2_runtime_required = $true' in SCRIPT
+    assert 'webview2_missing_install_exit_code = $MissingInstallProcess.ExitCode' in SCRIPT
+    assert 'webview2_missing_install_blocked = $true' in SCRIPT
+    assert 'webview2_runtime_payload_bundled = $false' in SCRIPT
+    assert 'webview2_runtime_downloaded_in_ci = $false' in SCRIPT
+    assert 'webview2_evergreen_policy = $true' in SCRIPT
     assert 'production_signing_required = $true' in SCRIPT
     assert 'production_timestamp_required = $true' in SCRIPT
     assert 'Remove-Item -LiteralPath $InstallerOutput -Recurse -Force' in SCRIPT
