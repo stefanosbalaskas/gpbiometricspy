@@ -34,7 +34,7 @@ jobs:
   authenticode-readiness:
     name: ephemeral-authenticode (3.14)
     runs-on: windows-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
     env:
       SHINY_OTEL_COLLECT: none
       MPLBACKEND: Agg
@@ -61,7 +61,10 @@ jobs:
           name: studio-signing-readiness-evidence
           path: |
             ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signing-provenance.json
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-sign.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-sign-stderr.log
             ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-verify.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-verify-stderr.log
             ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/native-metrics.json
             ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/identity/windows-identity.json
             ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/identity/version-info.txt
@@ -74,4 +77,7 @@ jobs:
           if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Filter "*.exe" -ErrorAction SilentlyContinue) {
             throw "Signing-readiness evidence directory must not retain test-signed executables."
           }
-          Write-Host "No test-signed executable is retained in signing evidence."
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Filter "*.pfx" -ErrorAction SilentlyContinue) {
+            throw "Signing-readiness evidence directory must not retain ephemeral signing PFX files."
+          }
+          Write-Host "No test-signed executable or signing PFX is retained in signing evidence."
