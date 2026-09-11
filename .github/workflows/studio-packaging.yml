@@ -1,6 +1,7 @@
 name: studio-packaging
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "studio/**"
@@ -11,6 +12,7 @@ on:
       - "MANIFEST.in"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
       - ".github/scripts/test_studio_nuitka_windows.ps1"
       - ".github/scripts/test_studio_frozen_browser_windows.ps1"
       - ".github/workflows/studio-packaging.yml"
@@ -26,6 +28,7 @@ on:
       - "MANIFEST.in"
       - ".github/scripts/test_studio_pyinstaller_windows.ps1"
       - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
       - ".github/scripts/test_studio_nuitka_windows.ps1"
       - ".github/scripts/test_studio_frozen_browser_windows.ps1"
       - ".github/workflows/studio-packaging.yml"
@@ -148,7 +151,44 @@ jobs:
             ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/*-browser-pytest.xml
           if-no-files-found: warn
 
+  pyinstaller-native-windows:
+    name: pyinstaller-native-windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build and exercise native WebView2 Studio without external Python
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-native-py${{ matrix.python-version }}"
+          ./.github/scripts/test_studio_pyinstaller_native_windows.ps1 -Python python -ArtifactsDir $Artifacts
+
+      - name: Upload native-window diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-pyinstaller-native-diagnostics-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stderr.log
+          if-no-files-found: warn
+
   nuitka-windows:
+    if: github.event_name == 'workflow_dispatch'
     name: nuitka-windows (${{ matrix.python-version }})
     runs-on: windows-latest
     timeout-minutes: 90
