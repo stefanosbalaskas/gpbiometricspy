@@ -111,51 +111,10 @@ function Get-BoundedAuthenticodeSnapshot {
     }
 }
 
-function Add-TestCertificateTrust {
-    param([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate)
-
-    $PublicCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
-        $Certificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
-    )
-    try {
-        foreach ($StoreName in @("Root", "TrustedPublisher")) {
-            Write-Host "Adding ephemeral public certificate to CurrentUser/$StoreName..."
-            $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
-            try {
-                $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-                $Store.Add($PublicCertificate)
-            }
-            finally {
-                $Store.Close()
-                $Store.Dispose()
-            }
-        }
-    }
-    finally {
-        $PublicCertificate.Dispose()
-    }
-}
-
-function Remove-TestCertificate {
-    param([string]$Thumbprint)
-    if (-not $Thumbprint) { return }
-    foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
-        $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
-        try {
-            $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
-            $Matches = @($Store.Certificates | Where-Object { $_.Thumbprint -eq $Thumbprint })
-            foreach ($Match in $Matches) { $Store.Remove($Match) }
-        }
-        finally {
-            $Store.Close()
-            $Store.Dispose()
-        }
-    }
-}
-
 function New-EphemeralCodeSigningCertificate {
-    # Build the one-day CI certificate entirely in memory so certificate
-    # creation cannot invoke an interactive Windows certificate provider.
+    # Build the one-day CI certificate entirely in memory. It is intentionally
+    # never written to a Windows trust store: CI proves signing mechanics and
+    # file/signature binding without installing a fake root CA on the runner.
     $Rsa = [System.Security.Cryptography.RSA]::Create(3072)
     try {
         $Request = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
@@ -191,6 +150,24 @@ function New-EphemeralCodeSigningCertificate {
     catch {
         $Rsa.Dispose()
         throw
+    }
+}
+
+function Assert-CustomCertificateChain {
+    param([System.Security.Cryptography.X509Certificates.X509Certificate2]$Certificate)
+
+    $Chain = [System.Security.Cryptography.X509Certificates.X509Chain]::new()
+    try {
+        $Chain.ChainPolicy.TrustMode = [System.Security.Cryptography.X509Certificates.X509ChainTrustMode]::CustomRootTrust
+        $Chain.ChainPolicy.RevocationMode = [System.Security.Cryptography.X509Certificates.X509RevocationMode]::NoCheck
+        [void]$Chain.ChainPolicy.CustomTrustStore.Add($Certificate)
+        if (-not $Chain.Build($Certificate)) {
+            $Statuses = @($Chain.ChainStatus | ForEach-Object { $_.Status.ToString() }) -join ", "
+            throw "Ephemeral code-signing certificate failed in-memory custom-root validation: $Statuses"
+        }
+    }
+    finally {
+        $Chain.Dispose()
     }
 }
 
@@ -231,9 +208,8 @@ try {
     $CertificateBundle = New-EphemeralCodeSigningCertificate
     $Certificate = $CertificateBundle.Certificate
     $CertificateThumbprint = $Certificate.Thumbprint
-    Write-Host "Ephemeral certificate created: $CertificateThumbprint"
-
-    Add-TestCertificateTrust $Certificate
+    Assert-CustomCertificateChain $Certificate
+    Write-Host "Ephemeral certificate created and validated in memory: $CertificateThumbprint"
 
     [System.IO.File]::WriteAllBytes(
         $PfxPath,
@@ -249,8 +225,12 @@ try {
     $Signed = $true
 
     $AfterSignature = Get-BoundedAuthenticodeSnapshot -Path $Executable -TimeoutSeconds 30
-    if ($AfterSignature.Status -ne "Valid") {
-        throw "Signed native executable failed Authenticode verification: $($AfterSignature.Status) $($AfterSignature.StatusMessage)"
+    $AllowedStatuses = @("Valid", "NotTrusted", "UnknownError")
+    if ($AfterSignature.Status -notin $AllowedStatuses) {
+        throw "Signed native executable has an invalid Authenticode state: $($AfterSignature.Status) $($AfterSignature.StatusMessage)"
+    }
+    if ($AfterSignature.Status -eq "UnknownError" -and $AfterSignature.StatusMessage -notmatch "(?i)(not trusted|certificate chain|root certificate|trust provider)") {
+        throw "Unexpected Authenticode verification error for test certificate: $($AfterSignature.StatusMessage)"
     }
     if (-not $AfterSignature.SignerThumbprint) { throw "Signed executable has no signer certificate metadata." }
     if ($AfterSignature.SignerThumbprint -ne $CertificateThumbprint) {
@@ -264,20 +244,33 @@ try {
     & $IdentityVerifier -Executable $Executable -IdentityJson $IdentityJson -IconPath $IconPath
     if ($LASTEXITCODE -ne 0) { throw "Windows application identity changed after Authenticode signing." }
 
-    Write-Host "Verifying the test signature with Windows SignTool /pa..."
+    Write-Host "Running SignTool policy verification; the ephemeral self-signed certificate is intentionally not trusted by the runner..."
     $VerifyStderr = Join-Path $SigningDir "signtool-verify-stderr.log"
     $VerifyResult = Invoke-BoundedProcess -FilePath $SignTool `
         -ArgumentList @("verify", "/pa", "/v", $Executable) `
         -StdoutPath $VerifyLog -StderrPath $VerifyStderr -TimeoutSeconds 60
-    if ($VerifyResult.ExitCode -ne 0) { throw "SignTool Authenticode verification failed with exit code $($VerifyResult.ExitCode)." }
+    $VerifyText = (($VerifyResult.Stdout + "`n" + $VerifyResult.Stderr).Trim())
+    $SignToolTrustResult = if ($VerifyResult.ExitCode -eq 0) { "trusted" } else { "expected-untrusted-test-certificate" }
+    if ($VerifyResult.ExitCode -ne 0) {
+        if ($VerifyText -match "(?i)hash mismatch") {
+            throw "SignTool reported an Authenticode hash mismatch."
+        }
+        if ($VerifyText -notmatch "(?i)(not trusted|certificate chain|root certificate|trust provider|unknown certificate authority)") {
+            throw "SignTool verification failed for a reason other than the expected untrusted ephemeral certificate (exit $($VerifyResult.ExitCode))."
+        }
+        Write-Host "SignTool reached the expected trust boundary for the self-signed CI certificate."
+    }
 
     $Manifest = [ordered]@{
         schema = "gpbiometricspy-studio-signing-provenance"
-        schema_version = 3
+        schema_version = 4
         test_only = $true
         release_artifact = $false
         certificate_ephemeral = $true
         certificate_persisted = $false
+        trust_store_mutated = $false
+        test_certificate_trusted = ($AfterSignature.Status -eq "Valid")
+        production_trusted_certificate_required = $true
         timestamped = $false
         production_timestamp_required = $true
         production_digest_algorithm = "SHA256"
@@ -291,10 +284,13 @@ try {
         signed_bytes = $SignedBytes
         identity_manifest_sha256 = $IdentityManifestSha256
         signature_status = $AfterSignature.Status
+        signature_status_message = $AfterSignature.StatusMessage
         signer_subject = $AfterSignature.SignerSubject
         signer_thumbprint = $AfterSignature.SignerThumbprint
         signer_not_after_utc = $AfterSignature.SignerNotAfterUtc
-        signtool_verified = $true
+        signtool_verify_exit_code = $VerifyResult.ExitCode
+        signtool_trust_result = $SignToolTrustResult
+        signer_identity_match = $true
         executable_name = [System.IO.Path]::GetFileName($Executable)
     }
     $Manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $ManifestPath -Encoding UTF8
@@ -303,9 +299,6 @@ try {
 finally {
     if (Test-Path -LiteralPath $PfxPath -PathType Leaf) {
         Remove-Item -LiteralPath $PfxPath -Force
-    }
-    if ($CertificateThumbprint) {
-        Remove-TestCertificate $CertificateThumbprint
     }
     if ($null -ne $Certificate) {
         $Certificate.Dispose()
@@ -317,19 +310,4 @@ finally {
 
 if (-not $Signed) { throw "Signing readiness did not reach a signed state." }
 if (Test-Path -LiteralPath $PfxPath -PathType Leaf) { throw "Ephemeral test PFX survived signing cleanup." }
-
-foreach ($StoreName in @("My", "Root", "TrustedPublisher")) {
-    $Store = [System.Security.Cryptography.X509Certificates.X509Store]::new($StoreName, "CurrentUser")
-    try {
-        $Store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadOnly)
-        if (@($Store.Certificates | Where-Object { $_.Thumbprint -eq $CertificateThumbprint }).Count -ne 0) {
-            throw "Ephemeral CI certificate was not removed from CurrentUser/$StoreName."
-        }
-    }
-    finally {
-        $Store.Close()
-        $Store.Dispose()
-    }
-}
-
-Write-Host "Ephemeral signing certificate and PFX cleanup verified."
+Write-Host "Ephemeral signing PFX cleanup verified; no Windows trust store was modified."
