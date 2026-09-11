@@ -329,7 +329,10 @@ try {
         Start-Sleep -Milliseconds 250
     }
     if (Test-Path -LiteralPath $UninstallKey) { throw "Uninstall registration survived signed-chain uninstall." }
-    $ResidualFiles = if (Test-Path -LiteralPath $InstallRoot) { @(Get-ChildItem -LiteralPath $InstallRoot -Recurse -Force -File -ErrorAction SilentlyContinue) } else { @() }
+    $ResidualFiles = @()
+    if (Test-Path -LiteralPath $InstallRoot) {
+        $ResidualFiles = @(Get-ChildItem -LiteralPath $InstallRoot -Recurse -Force -File -ErrorAction SilentlyContinue)
+    }
     if ($ResidualFiles.Count -ne 0) { throw "Installed payload files survived signed-chain uninstall: $($ResidualFiles.FullName -join ', ')" }
     foreach ($Shortcut in @($StartMenuShortcut, $DesktopShortcut)) {
         if (Test-Path -LiteralPath $Shortcut) { throw "Application shortcut survived signed-chain uninstall: $Shortcut" }
