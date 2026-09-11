@@ -16,11 +16,16 @@ $BuildRoot = Join-Path $ArtifactsDir "build"
 $DistRoot = Join-Path $ArtifactsDir "dist"
 $VenvRoot = Join-Path $ArtifactsDir "venv"
 $VenvPython = Join-Path $VenvRoot "Scripts/python.exe"
+$IdentityDir = Join-Path $ArtifactsDir "identity"
+$IdentityJson = Join-Path $IdentityDir "windows-identity.json"
+$IconPath = Join-Path $IdentityDir "gpbiometricspy-studio.ico"
 $StdoutLog = Join-Path $ArtifactsDir "onefile-stdout.log"
 $StderrLog = Join-Path $ArtifactsDir "onefile-stderr.log"
 $MetricsPath = Join-Path $ArtifactsDir "onefile-metrics.json"
 $SpecPath = Join-Path $RepoRoot "tools/pyinstaller/gpbiometricspy_studio_onefile.spec"
 $RequirementsPath = Join-Path $RepoRoot "tools/pyinstaller/requirements.txt"
+$IdentityGenerator = Join-Path $RepoRoot "tools/pyinstaller/generate_windows_identity.py"
+$IdentityVerifier = Join-Path $RepoRoot ".github/scripts/assert_studio_windows_identity.ps1"
 
 New-Item -ItemType Directory -Force -Path $ArtifactsDir | Out-Null
 
@@ -37,6 +42,11 @@ if ($LASTEXITCODE -ne 0) { throw "Failed to install gpbiometricspy Studio into o
 & $VenvPython -m pip install -r $RequirementsPath
 if ($LASTEXITCODE -ne 0) { throw "Failed to install pinned PyInstaller build tools." }
 
+Write-Host "Generating Windows application identity from repository metadata..."
+& $VenvPython $IdentityGenerator --repo-root $RepoRoot --output-dir $IdentityDir --target onefile
+if ($LASTEXITCODE -ne 0) { throw "Failed to generate Windows application identity." }
+$env:GPBIOMETRICSPY_WINDOWS_IDENTITY_DIR = $IdentityDir
+
 Write-Host "Building PyInstaller onefile Studio evaluation executable..."
 Push-Location $RepoRoot
 try {
@@ -51,6 +61,10 @@ $Executable = Join-Path $DistRoot "gpbiometricspy-studio-onefile.exe"
 if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
     throw "Onefile Studio executable was not created at $Executable"
 }
+
+& $IdentityVerifier -Executable $Executable -IdentityJson $IdentityJson -IconPath $IconPath
+if ($LASTEXITCODE -ne 0) { throw "Onefile Studio Windows identity verification failed." }
+$Identity = Get-Content -LiteralPath $IdentityJson -Raw | ConvertFrom-Json
 
 $ExeBytes = [int64](Get-Item -LiteralPath $Executable).Length
 Write-Host ("Onefile executable: {0:N1} MiB." -f ($ExeBytes / 1MB))
@@ -112,10 +126,14 @@ try {
 
     $Metrics = [ordered]@{
         schema = "gpbiometricspy-studio-pyinstaller-onefile-smoke"
-        schema_version = 1
+        schema_version = 2
         bundle_mode = "onefile"
         console = $true
         external_python_required = $false
+        windows_identity_verified = $true
+        product_name = $Identity.product_name
+        product_version = $Identity.product_version
+        file_version = $Identity.file_version
         host = "127.0.0.1"
         port = $Port
         executable_bytes = $ExeBytes
@@ -155,4 +173,4 @@ if (-not $Ready) {
     throw "Onefile Studio smoke did not complete successfully."
 }
 
-Write-Host "PyInstaller onefile Studio smoke passed."
+Write-Host "PyInstaller onefile Studio smoke passed with verified Windows identity."
