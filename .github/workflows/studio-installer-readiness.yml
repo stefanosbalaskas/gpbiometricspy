@@ -1,0 +1,83 @@
+name: studio-installer-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_installer_windows.ps1"
+      - ".github/workflows/studio-installer-readiness.yml"
+      - "tests/test_installer_readiness_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_installer_windows.ps1"
+      - ".github/workflows/studio-installer-readiness.yml"
+      - "tests/test_installer_readiness_policy.py"
+
+permissions:
+  contents: read
+
+jobs:
+  installer-readiness:
+    name: per-user-install-uninstall (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Build, install, exercise and uninstall Studio
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-installer-readiness"
+          ./.github/scripts/test_studio_installer_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts
+
+      - name: Assert diagnostics are binary-free
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-installer-readiness"
+          $Evidence = Join-Path $Artifacts "evidence"
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
+            throw "Installer-readiness evidence must not contain redistributable binaries or signing-key material."
+          }
+          if (Test-Path -LiteralPath (Join-Path $Artifacts "installer-output")) {
+            throw "Compiled installer output survived readiness cleanup."
+          }
+          if (Test-Path -LiteralPath (Join-Path $Artifacts "installed")) {
+            throw "Temporary installed payload survived readiness cleanup."
+          }
+          Write-Host "Installer-readiness evidence contains diagnostics only."
+
+      - name: Upload installer-readiness evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-installer-readiness-evidence
+          path: ${{ runner.temp }}/gpbiometricspy-installer-readiness/evidence/
+          if-no-files-found: error

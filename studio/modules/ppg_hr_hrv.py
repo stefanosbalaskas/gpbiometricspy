@@ -7,6 +7,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.ppg_services import (
         analysis_group_column_choices,
         crosscheck_status_table,
@@ -19,6 +20,7 @@ try:
         time_column_choices,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from ppg_services import (
         analysis_group_column_choices,
         crosscheck_status_table,
@@ -277,7 +279,9 @@ def ppg_hr_hrv_server(input, output, session, state, status_text):
             local_status.set("PPG/HR/HRV workflow complete using public gpbiometricspy APIs.")
             status_text.set("Cardiac analysis complete. Review PPG, HR, IBI/HRV, and export tabs.")
         except Exception as exc:
-            local_status.set(f"PPG/HR/HRV analysis failed: {exc}")
+            failure = format_failure("PPG/HR/HRV analysis failed", exc, context="ppg_hr_hrv")
+            local_status.set(failure)
+            status_text.set(failure)
 
     @render.text
     def status():

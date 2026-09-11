@@ -8,6 +8,7 @@ import subprocess
 import gpbiometricspy as gp
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 
 
@@ -35,13 +36,14 @@ def _load_uploaded_dataset(page: Page, path: Path) -> None:
     page.locator("#load_upload").click()
     expect(status).not_to_have_text(previous_status, timeout=60_000)
 
-    missing = "Import failed: Choose a Gazepoint CSV or TXT file first."
-    if status.inner_text() == missing:
+    missing_upload_message = "Choose a Gazepoint CSV or TXT file first."
+    if missing_upload_message in status.inner_text():
+        missing_status = status.inner_text()
         page.locator("#load_upload").click()
-        expect(status).not_to_have_text(missing, timeout=60_000)
+        expect(status).not_to_have_text(missing_status, timeout=60_000)
 
     expect(status).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -91,7 +93,7 @@ def test_installed_eda_and_ppg_replay_from_wheel_and_sdist(
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
     _load_uploaded_dataset(page, participant_path)
 
-    page.get_by_text("EDA / SCR Analysis", exact=True).click()
+    open_nav(page, "eda_scr", group="Analyze")
     expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
     page.locator("#eda_scr-run").click()
     expect(page.locator("#eda_scr-status")).to_contain_text(
@@ -101,7 +103,7 @@ def test_installed_eda_and_ppg_replay_from_wheel_and_sdist(
     expect(page.locator("#eda_scr-decomposition_method")).not_to_have_text("Not run")
     assert int(page.locator("#eda_scr-event_count").inner_text().replace(",", "")) >= 0
 
-    page.get_by_text("PPG / HR / HRV Analysis", exact=True).click()
+    open_nav(page, "ppg_hr_hrv", group="Analyze")
     expect(
         page.get_by_text("PPG / HR / HRV analysis controls", exact=True)
     ).to_be_visible()
@@ -112,7 +114,7 @@ def test_installed_eda_and_ppg_replay_from_wheel_and_sdist(
     )
     assert int(page.locator("#ppg_hr_hrv-peak_count").inner_text().replace(",", "")) > 0
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("2", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()

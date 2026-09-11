@@ -1,0 +1,63 @@
+{
+  "schema": "gpbiometricspy-studio-production-release-evidence",
+  "schema_version": 1,
+  "release_tag": "v0.1.6",
+  "source_commit": "",
+  "branding": {
+    "final_icon_approved": false,
+    "approved_by": "",
+    "approved_at_utc": ""
+  },
+  "signing": {
+    "provider": "",
+    "signer_subject": "",
+    "certificate_thumbprint": "",
+    "trusted_chain_verified": false,
+    "digest_algorithm": "SHA256",
+    "rfc3161_timestamp_verified": false,
+    "timestamp_digest_algorithm": "SHA256",
+    "timestamp_authority": "",
+    "executable_sha256": "",
+    "installer_sha256": ""
+  },
+  "release_environment": {
+    "protected": false,
+    "attestation_present": false,
+    "attestation_sha256": "",
+    "sbom_present": false,
+    "sbom_sha256": "",
+    "checksums_present": false,
+    "checksums_sha256": ""
+  },
+  "human_windows_validation": {
+    "reviewed_by": "",
+    "reviewed_at_utc": "",
+    "minimum_machine_count": 2,
+    "machines": [
+      {
+        "label": "",
+        "windows_version": "",
+        "architecture": "x64",
+        "webview2_version": "",
+        "install": "pending",
+        "repair_reinstall": "pending",
+        "upgrade_0_1_5_to_0_1_6": "pending",
+        "downgrade_block": "pending",
+        "uninstall": "pending",
+        "first_session_ux": "pending"
+      },
+      {
+        "label": "",
+        "windows_version": "",
+        "architecture": "x64",
+        "webview2_version": "",
+        "install": "pending",
+        "repair_reinstall": "pending",
+        "upgrade_0_1_5_to_0_1_6": "pending",
+        "downgrade_block": "pending",
+        "uninstall": "pending",
+        "first_session_ux": "pending"
+      }
+    ]
+  }
+}

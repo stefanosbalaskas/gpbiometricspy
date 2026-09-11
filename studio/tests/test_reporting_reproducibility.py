@@ -93,6 +93,7 @@ def test_project_recipe_excludes_raw_rows_and_analysis_outputs():
     recipe = project_recipe(state)
     text = project_recipe_json(state)
     assert recipe["schema"] == PROJECT_RECIPE_SCHEMA
+    assert recipe["project"]["name"] == state.project_name
     assert recipe["dataset"]["sha256"] == dataset_fingerprint(state.data)
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
@@ -105,7 +106,7 @@ def test_project_recipe_excludes_raw_rows_and_analysis_outputs():
 
 
 def test_project_recipe_restore_requires_exact_dataset_fingerprint():
-    original = _state()
+    original = _state().with_project_name("Synthetic reporting study")
     recipe = project_recipe(original)
     data = original.data.copy()
     fresh = ProjectState().with_dataset(
@@ -117,9 +118,11 @@ def test_project_recipe_restore_requires_exact_dataset_fingerprint():
     checks = recipe_validation_table(recipe, fresh.data)
     assert checks["passed"].all()
     restored = restore_project_recipe(fresh, recipe)
+    assert restored.project_name == "Synthetic reporting study"
     assert len(restored.annotations) == 1
     assert restored.analyses == {}
     assert restored.provenance[-1]["operation"] == "restore_project_recipe"
+    assert restored.provenance[-1]["project_name"] == "Synthetic reporting study"
     assert restored.provenance[-1]["analysis_outputs_restored"] is False
 
     changed = data.copy()
@@ -159,21 +162,25 @@ def test_recipe_file_and_upload_loader_enforce_metadata_contract(tmp_path: Path)
 
 
 def test_reporting_artifacts_delegate_to_package_reporting_contracts():
-    state = _state().with_operation("pre_report_checkpoint")
+    state = _state().with_project_name("Synthetic reporting study").with_operation("pre_report_checkpoint")
     artifacts = build_reporting_artifacts(state, title="Studio test report", subtitle="Synthetic fixture")
     assert artifacts["title"] == "Studio test report"
+    assert artifacts["project_name"] == "Synthetic reporting study"
     assert artifacts["dataset_fingerprint"] == dataset_fingerprint(state.data)
     assert artifacts["report"]["overview"].iloc[0]["status"] == "report_created"
     assert str(artifacts["methods_text"]).strip()
     assert "structured analysis decision log" in str(artifacts["reproducibility"]).lower()
     assert "studio_analysis_inventory" in artifacts["tables"]
     assert "studio_provenance" in artifacts["tables"]
+    assert artifacts["manifest"]["settings"]["project_name"] == "Synthetic reporting study"
     assert artifacts["manifest"]["settings"]["dataset_sha256"] == dataset_fingerprint(state.data)
 
     report = report_markdown(artifacts)
     assert "Studio test report" in report
+    assert "project: `Synthetic reporting study`" in report
     assert "dataset SHA-256" in report
     manifest = json.loads(manifest_json(artifacts))
+    assert manifest["studio"]["project_name"] == "Synthetic reporting study"
     assert manifest["studio"]["raw_data_included"] is False
 
 
@@ -192,7 +199,7 @@ def test_reporting_inventory_catalog_and_replay_script():
 
 
 def test_report_bundle_zip_is_metadata_and_reporting_only():
-    state = _state()
+    state = _state().with_project_name("Bundled reporting study")
     artifacts = build_reporting_artifacts(state, title="Bundle test")
     payload = bundle_zip_bytes(artifacts, state)
     assert payload.startswith(b"PK")
@@ -203,6 +210,9 @@ def test_report_bundle_zip_is_metadata_and_reporting_only():
         assert "gpbiometricspy_studio_project_recipe.json" in names
         assert "gpbiometricspy_studio_replay.py" in names
         recipe = json.loads(archive.read("gpbiometricspy_studio_project_recipe.json").decode("utf-8"))
+        manifest = json.loads(archive.read("gpbiometricspy_studio_manifest.json").decode("utf-8"))
+        assert recipe["project"]["name"] == "Bundled reporting study"
+        assert manifest["studio"]["project_name"] == "Bundled reporting study"
         assert recipe["raw_data_included"] is False
         assert recipe["analysis_outputs_included"] is False
         assert not any(name.endswith("raw.csv") or "raw_data" in name for name in names)
@@ -211,6 +221,11 @@ def test_report_bundle_zip_is_metadata_and_reporting_only():
 def test_state_operation_and_restored_metadata_guards():
     state = _state()
     before = len(state.provenance)
+    named = state.with_project_name("Pilot project")
+    assert named.project_name == "Pilot project"
+    assert named.provenance[-1]["operation"] == "set_project_name"
+    with pytest.raises(ValueError, match="non-empty"):
+        state.with_project_name("   ")
     updated = state.with_operation("report_checkpoint", purpose="test")
     assert len(updated.provenance) == before + 1
     assert updated.provenance[-1]["purpose"] == "test"

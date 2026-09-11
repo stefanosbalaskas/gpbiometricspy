@@ -6,6 +6,7 @@ import pandas as pd
 from shiny import module, reactive, render, ui
 
 try:
+    from studio.error_guidance import format_failure
     from studio.event_alignment_services import (
         event_alignment_reproducibility_script,
         event_alignment_tables,
@@ -19,6 +20,7 @@ try:
         ttl_validity_choices,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from event_alignment_services import (
         event_alignment_reproducibility_script,
         event_alignment_tables,
@@ -260,7 +262,9 @@ def event_alignment_server(input, output, session, state, global_status):
         except Exception as exc:
             target_stream.set(None)
             target_name.set("No target stream loaded")
-            local_status.set(f"Target load failed: {exc}")
+            failure = format_failure("Target load failed", exc, context="event_alignment_target")
+            local_status.set(failure)
+            global_status.set(failure)
 
     @reactive.effect
     @reactive.event(input.run)
@@ -309,8 +313,9 @@ def event_alignment_server(input, output, session, state, global_status):
             local_status.set(f"Events & alignment complete: {n_events} reference events available.")
             global_status.set("Events & alignment analysis complete. Review timing diagnostics before downstream multimodal analysis.")
         except Exception as exc:
-            local_status.set(f"Events & alignment failed: {exc}")
-            global_status.set(f"Events & alignment failed: {exc}")
+            failure = format_failure("Events & alignment failed", exc, context="event_alignment")
+            local_status.set(failure)
+            global_status.set(failure)
 
     @reactive.calc
     def _result():

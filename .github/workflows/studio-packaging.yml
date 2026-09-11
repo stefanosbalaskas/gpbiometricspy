@@ -1,0 +1,257 @@
+name: studio-packaging
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/nuitka/**"
+      - "pyproject.toml"
+      - "MANIFEST.in"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_nuitka_windows.ps1"
+      - ".github/scripts/test_studio_frozen_browser_windows.ps1"
+      - ".github/workflows/studio-packaging.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/nuitka/**"
+      - "pyproject.toml"
+      - "MANIFEST.in"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_onefile_windows.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_nuitka_windows.ps1"
+      - ".github/scripts/test_studio_frozen_browser_windows.ps1"
+      - ".github/workflows/studio-packaging.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  pyinstaller-windows:
+    name: pyinstaller-windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Validate frozen launcher unit contract
+        shell: pwsh
+        run: |
+          python -m pip install -e ".[studio]" pytest
+          python -m pytest -q studio/tests/test_frozen.py
+
+      - name: Build and smoke standalone Studio without external Python
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}"
+          ./.github/scripts/test_studio_pyinstaller_windows.ps1 -Python python -ArtifactsDir $Artifacts
+
+      - name: Install Chromium interaction harness
+        shell: pwsh
+        run: |
+          python -m pip install "pytest-playwright>=0.9,<1"
+          python -m playwright install chromium
+
+      - name: Exercise frozen local and public Studio in Chromium
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}"
+          $Executable = Join-Path $Artifacts "dist/gpbiometricspy-studio/gpbiometricspy-studio.exe"
+          ./.github/scripts/test_studio_frozen_browser_windows.ps1 `
+            -Python python `
+            -Executable $Executable `
+            -ArtifactsDir $Artifacts
+
+      - name: Upload packaging diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-pyinstaller-diagnostics-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/frozen-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-pyinstaller-py${{ matrix.python-version }}/*-browser-pytest.xml
+          if-no-files-found: warn
+
+  pyinstaller-onefile-windows:
+    name: pyinstaller-onefile-windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build and smoke onefile Studio without external Python
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-onefile-py${{ matrix.python-version }}"
+          ./.github/scripts/test_studio_pyinstaller_onefile_windows.ps1 -Python python -ArtifactsDir $Artifacts
+
+      - name: Install Chromium interaction harness
+        shell: pwsh
+        run: |
+          python -m pip install "pytest-playwright>=0.9,<1"
+          python -m playwright install chromium
+
+      - name: Exercise onefile local and public Studio in Chromium
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-onefile-py${{ matrix.python-version }}"
+          $Executable = Join-Path $Artifacts "dist/gpbiometricspy-studio-onefile.exe"
+          ./.github/scripts/test_studio_frozen_browser_windows.ps1 `
+            -Python python `
+            -Executable $Executable `
+            -ArtifactsDir $Artifacts
+
+      - name: Upload onefile diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-pyinstaller-onefile-diagnostics-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/onefile-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/*-browser-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/*-browser-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-onefile-py${{ matrix.python-version }}/*-browser-pytest.xml
+          if-no-files-found: warn
+
+  pyinstaller-native-windows:
+    name: pyinstaller-native-windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build and exercise native WebView2 Studio without external Python
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-native-py${{ matrix.python-version }}"
+          ./.github/scripts/test_studio_pyinstaller_native_windows.ps1 -Python python -ArtifactsDir $Artifacts
+
+      - name: Upload native-window diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-pyinstaller-native-diagnostics-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/version-info.txt
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/identity/gpbiometricspy-studio.ico
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-native-py${{ matrix.python-version }}/native-*-stderr.log
+          if-no-files-found: warn
+
+  nuitka-windows:
+    if: github.event_name == 'workflow_dispatch'
+    name: nuitka-windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      NUITKA_UPDATE_CHECK: never
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Build and smoke Nuitka standalone Studio without external Python
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}"
+          ./.github/scripts/test_studio_nuitka_windows.ps1 -Python python -ArtifactsDir $Artifacts
+
+      - name: Install Chromium interaction harness
+        shell: pwsh
+        run: |
+          python -m pip install "pytest-playwright>=0.9,<1"
+          python -m playwright install chromium
+
+      - name: Exercise Nuitka local and public Studio in Chromium
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}"
+          $ExecutableItem = Get-ChildItem -LiteralPath (Join-Path $Artifacts "dist") -Recurse -File -Filter "gpbiometricspy-studio.exe" | Select-Object -First 1
+          if ($null -eq $ExecutableItem) { throw "Nuitka executable not found below $Artifacts/dist" }
+          ./.github/scripts/test_studio_frozen_browser_windows.ps1 `
+            -Python python `
+            -Executable $ExecutableItem.FullName `
+            -ArtifactsDir $Artifacts
+
+      - name: Upload Nuitka diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-nuitka-diagnostics-py${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/nuitka-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/nuitka-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/nuitka-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/nuitka-compilation-report.xml
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/*-browser-stdout.log
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/*-browser-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-studio-nuitka-py${{ matrix.python-version }}/*-browser-pytest.xml
+          if-no-files-found: warn

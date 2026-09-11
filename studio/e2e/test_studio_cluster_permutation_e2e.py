@@ -4,6 +4,7 @@ from pathlib import Path
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -47,7 +48,7 @@ def _load_cluster_timecourse(page: Page, app: ShinyAppProc, path: Path) -> None:
     controller.AppTestValues(page).expect_input("upload", _uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     assert int(page.locator("#row_count").inner_text().replace(",", "")) == 432
@@ -61,7 +62,7 @@ def test_cluster_permutation_valid_design_renders_and_exports(
     fixture = _cluster_fixture(tmp_path)
     _load_cluster_timecourse(page, app, fixture)
 
-    page.get_by_text("Statistics & Modelling", exact=True).click()
+    open_nav(page, "statistics_modelling")
     expect(page.get_by_text("Model controls", exact=True)).to_be_visible()
     page.get_by_role("tab", name="Cluster permutation", exact=True).click()
     expect(page.get_by_text("Cluster controls", exact=True)).to_be_visible()

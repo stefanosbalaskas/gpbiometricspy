@@ -8,6 +8,7 @@ on:
       - "studio/**"
       - "pyproject.toml"
       - "MANIFEST.in"
+      - ".github/scripts/test_studio_windows.ps1"
       - ".github/workflows/studio-production.yml"
   push:
     branches:
@@ -18,6 +19,7 @@ on:
       - "studio/**"
       - "pyproject.toml"
       - "MANIFEST.in"
+      - ".github/scripts/test_studio_windows.ps1"
       - ".github/workflows/studio-production.yml"
 
 permissions:
@@ -45,9 +47,9 @@ jobs:
       - name: Install test/build tools
         run: python -m pip install pytest ruff build pytest-playwright
       - name: Ruff production boundary
-        run: ruff check app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
+        run: ruff check app.py studio/config.py studio/cli.py studio/desktop.py studio/doctor.py studio/product_services.py studio/public_demo.py studio/production.py studio/tests/test_cli.py studio/tests/test_desktop.py studio/tests/test_doctor.py studio/tests/test_product_services.py studio/tests/test_production_hardening.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
       - name: Compile production boundary
-        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
+        run: python -m compileall -q app.py studio/config.py studio/cli.py studio/desktop.py studio/doctor.py studio/product_services.py studio/public_demo.py studio/production.py studio/e2e/test_installed_public_cli_e2e.py studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py
       - name: Verify installed distribution carries Studio
         run: |
           python - <<'PY'
@@ -59,7 +61,13 @@ jobs:
               "studio/__init__.py",
               "studio/app.py",
               "studio/cli.py",
+              "studio/desktop.py",
+              "studio/doctor.py",
+              "studio/product_services.py",
               "studio/public_demo.py",
+              "studio/reporting_services.py",
+              "studio/services.py",
+              "studio/state.py",
               "studio/modules/__init__.py",
               "studio/www/studio.css",
               "studio/www/public-demo.css",
@@ -69,9 +77,11 @@ jobs:
           scripts = {ep.name: ep.value for ep in dist.entry_points if ep.group == "console_scripts"}
           assert scripts.get("gpbiometricspy-studio") == "studio.cli:main"
           assert scripts.get("gpbiometricspy-studio-public") == "studio.cli:main_public"
+          assert scripts.get("gpbiometricspy-studio-desktop") == "studio.desktop:main"
+          assert scripts.get("gpbiometricspy-studio-doctor") == "studio.doctor:main"
           PY
       - name: Production policy and CLI tests
-        run: python -m pytest -q studio/tests/test_production_hardening.py studio/tests/test_cli.py
+        run: python -m pytest -q studio/tests/test_production_hardening.py studio/tests/test_cli.py studio/tests/test_desktop.py studio/tests/test_doctor.py studio/tests/test_product_services.py
       - name: Verify source distribution carries deployment assets
         run: |
           python -m build --sdist
@@ -88,6 +98,9 @@ jobs:
               f"{root}/requirements.txt",
               f"{root}/DEPLOYMENT.md",
               f"{root}/studio/app.py",
+              f"{root}/studio/desktop.py",
+              f"{root}/studio/doctor.py",
+              f"{root}/studio/product_services.py",
               f"{root}/studio/public_demo.py",
               f"{root}/studio/www/studio.css",
           }
@@ -108,6 +121,9 @@ jobs:
           test -n "$wheel"
           test -n "$sdist"
 
+          diagnostics_root="$RUNNER_TEMP/gpbiometricspy-studio-production-diagnostics"
+          mkdir -p "$diagnostics_root"
+
           exercise_artifact() (
             set -euo pipefail
             kind="$1"
@@ -116,8 +132,10 @@ jobs:
             local_port="$4"
             envdir="$(mktemp -d)"
             venv="$envdir/venv"
+            diagdir="$diagnostics_root/$kind"
             server_pid=""
             server_log=""
+            mkdir -p "$diagdir"
 
             stop_server() {
               if [[ -n "$server_pid" ]]; then
@@ -162,7 +180,7 @@ jobs:
               mode="$1"
               launcher="$2"
               port="$3"
-              server_log="$envdir/${mode}-studio-${kind}.log"
+              server_log="$diagdir/${mode}-studio-${kind}.log"
 
               (
                 cd "$envdir"
@@ -187,12 +205,14 @@ jobs:
               if [[ "$mode" == "public" ]]; then
                 GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
                   GPBIOMETRICSPY_INSTALLED_PUBLIC_URL="http://127.0.0.1:${port}/" \
-                  python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium
+                  python -m pytest -q studio/e2e/test_installed_public_cli_e2e.py --browser chromium \
+                    --junitxml="$diagdir/${mode}-pytest.xml"
               else
                 GPBIOMETRICSPY_INSTALLED_ARTIFACT_KIND="$kind" \
                   GPBIOMETRICSPY_INSTALLED_LOCAL_URL="http://127.0.0.1:${port}/" \
                   GPBIOMETRICSPY_INSTALLED_PYTHON="$venv/bin/python" \
-                  python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py --browser chromium
+                  python -m pytest -q studio/e2e/test_installed_local_cli_e2e.py studio/e2e/test_installed_external_event_replay_e2e.py studio/e2e/test_installed_event_replay_missing_resources_e2e.py studio/e2e/test_installed_physiology_replay_e2e.py studio/e2e/test_installed_multimodal_model_replay_e2e.py studio/e2e/test_installed_cluster_replay_e2e.py --browser chromium \
+                    --junitxml="$diagdir/${mode}-pytest.xml"
               fi
 
               stop_server
@@ -204,6 +224,13 @@ jobs:
 
           exercise_artifact wheel "$wheel" 8765 8767
           exercise_artifact sdist "$sdist" 8766 8768
+      - name: Upload installed browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-production-browser-diagnostics-py${{ matrix.python-version }}
+          path: ${{ runner.temp }}/gpbiometricspy-studio-production-diagnostics
+          if-no-files-found: warn
       - name: Synthetic runtime smoke profile
         run: python -m studio.production --json studio-production-metrics.json
       - name: Upload runtime metrics
@@ -212,3 +239,24 @@ jobs:
           name: studio-production-metrics-py${{ matrix.python-version }}
           path: studio-production-metrics.json
           if-no-files-found: error
+
+  windows-local-smoke:
+    name: windows-local-smoke (${{ matrix.python-version }})
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Clean Windows install, Doctor and launch smoke
+        shell: pwsh
+        run: ./.github/scripts/test_studio_windows.ps1 -Python python

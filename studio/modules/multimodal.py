@@ -7,6 +7,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.multimodal_services import (
         event_alignment_available,
         multimodal_group_choices,
@@ -18,6 +19,7 @@ try:
         run_multimodal_analysis,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from multimodal_services import (
         event_alignment_available,
         multimodal_group_choices,
@@ -280,8 +282,9 @@ def multimodal_server(input, output, session, state, global_status):
             local_status.set(f"Multimodal Analysis complete: {summary_rows:,} event-response rows.")
             global_status.set("Multimodal Analysis complete. Review modality sources and timing assumptions before interpretation.")
         except Exception as exc:
-            local_status.set(f"Multimodal Analysis failed: {exc}")
-            global_status.set(f"Multimodal Analysis failed: {exc}")
+            failure = format_failure("Multimodal Analysis failed", exc, context="multimodal")
+            local_status.set(failure)
+            global_status.set(failure)
 
     @reactive.calc
     def _result():
@@ -426,7 +429,7 @@ def multimodal_server(input, output, session, state, global_status):
         try:
             return gp.plot_gazepoint_aoi_biometrics(summary)
         except (TypeError, ValueError) as exc:
-            return _placeholder(f"AOI plot unavailable for this summary: {exc}")
+            return _placeholder(format_failure("AOI plot unavailable for this summary", exc, context="multimodal_plot"))
 
     @render.text
     def parameters():

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
 
@@ -51,6 +52,60 @@ def test_public_demo_is_synthetic_only_and_sanitized_in_browser(page: Page, publ
     expect(status).to_contain_text("Synthetic kiosk demo loaded")
 
 
+def test_public_demo_caught_failure_uses_safe_remediation_code_without_exception_detail(
+    page: Page,
+    public_app: ShinyAppProc,
+) -> None:
+    page.goto(public_app.url)
+    expect(page.locator("#project_name")).to_have_text("Untitled project")
+
+    page.locator("#project_name_input").fill("")
+    page.locator("#apply_project_name").click()
+
+    status = page.get_by_role("status")
+    expect(status).to_contain_text("Project name not updated.", timeout=30_000)
+    expect(status).to_contain_text("GP-STUDIO-INPUT")
+    expect(status).to_contain_text("Next:")
+    expect(status).not_to_contain_text("Project name must be non-empty")
+    expect(page.locator("#project_name")).to_have_text("Untitled project")
+    expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
+    expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
+
+
+def test_public_demo_home_guidance_tracks_validated_channels_and_completed_workflows(
+    page: Page,
+    public_app: ShinyAppProc,
+) -> None:
+    _load_public_demo(page, public_app)
+
+    expect(page.locator("#next_step")).to_contain_text("Run foundation QC")
+    page.locator("#run_qc").click()
+    expect(page.get_by_role("status")).to_contain_text(
+        "Foundation QC complete",
+        timeout=90_000,
+    )
+
+    guidance = page.locator("#next_step")
+    expect(guidance).to_contain_text("Channel-aware recommendation:", timeout=60_000)
+    expect(guidance).to_contain_text("EDA / SCR")
+    expect(guidance).to_contain_text("PPG / HR / HRV")
+
+    open_nav(page, "eda_scr", group="Analyze")
+    expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
+    page.locator("#eda_scr-run").click()
+    expect(page.locator("#eda_scr-status")).to_contain_text(
+        "EDA/SCR workflow complete using public gpbiometricspy APIs.",
+        timeout=90_000,
+    )
+
+    open_nav(page, "home")
+    expect(guidance).to_contain_text("Channel-aware recommendation:", timeout=60_000)
+    expect(guidance).not_to_contain_text("EDA / SCR", timeout=60_000)
+    expect(guidance).to_contain_text("PPG / HR / HRV")
+    expect(page.locator(".shiny-output-error:visible")).to_have_count(0)
+    expect(page.locator(".shiny-notification-error:visible")).to_have_count(0)
+
+
 def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hidden(
     page: Page,
     public_app: ShinyAppProc,
@@ -59,7 +114,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # The deployed root entrypoint must keep external AOI uploads non-visible while
     # preserving the package-backed synthetic Gaze workflow and its downloads.
-    page.get_by_text("Gaze / Fixation / AOI Analysis", exact=True).click()
+    open_nav(page, "gaze", group="Analyze")
     expect(page.get_by_text("Gaze / fixation / saccade / AOI controls", exact=True)).to_be_visible()
     expect(page.locator("#gaze-aoi_upload")).to_be_hidden()
     assert page.locator('input[type="file"]:visible').count() == 0
@@ -81,7 +136,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # Event-log and secondary-stream inputs are present in the full Studio contract
     # but must remain non-visible in the public synthetic deployment.
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     expect(page.locator("#event_alignment-event_upload")).to_be_hidden()
     expect(page.locator("#event_alignment-target_upload")).to_be_hidden()
@@ -90,7 +145,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
 
     # Reporting remains usable for the synthetic analysis, while restore controls
     # that could consume an external project recipe stay hidden.
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.locator("#reporting-build_report").click()
@@ -98,7 +153,7 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
         "Reporting artifacts built through public gpbiometricspy reporting APIs.",
         timeout=90_000,
     )
-    page.get_by_role("tab", name="Report", exact=True).click()
+    page.locator('a[data-value="Report"]:visible').click()
     expect(page.locator("#reporting-identity_summary")).to_contain_text(
         "Raw rows embedded in recipe: False",
         timeout=60_000,
@@ -120,6 +175,9 @@ def test_public_demo_runs_synthetic_gaze_and_reporting_with_external_sources_hid
     expect(page.locator("#reporting-recipe_upload")).to_be_hidden()
     expect(page.locator("#reporting-validate_recipe")).to_be_hidden()
     expect(page.locator("#reporting-restore_recipe")).to_be_hidden()
+    assert page.locator("#reporting-remember_recent").count() == 0
+    assert page.locator("#reporting-recent_projects-table").count() == 0
+    assert page.get_by_text("Recent projects on this device", exact=True).count() == 0
     assert page.locator('input[type="file"]:visible').count() == 0
 
     recipe = json.loads(

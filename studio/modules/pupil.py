@@ -8,6 +8,7 @@ from shiny import module, reactive, render, ui
 import gpbiometricspy as gp
 
 try:
+    from studio.error_guidance import format_failure
     from studio.pupil_services import (
         analysis_group_column_choices,
         marker_column_choices,
@@ -21,6 +22,7 @@ try:
         trial_column_choices,
     )
 except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from error_guidance import format_failure
     from pupil_services import (
         analysis_group_column_choices,
         marker_column_choices,
@@ -379,7 +381,9 @@ def pupil_server(input, output, session, state, status_text):
             local_status.set("Pupil workflow complete using public gpbiometricspy APIs.")
             status_text.set("Pupil analysis complete. Review blink QC, preprocessing, event-locked summaries, and exports.")
         except Exception as exc:
-            local_status.set(f"Pupil analysis failed: {exc}")
+            failure = format_failure("Pupil analysis failed", exc, context="pupil")
+            local_status.set(failure)
+            status_text.set(failure)
 
     @render.text
     def status():
@@ -463,7 +467,7 @@ def pupil_server(input, output, session, state, status_text):
         try:
             return gp.plot_gazepoint_missingness(processed, cols=cols, time_col=parameters.get("time_col"))
         except Exception as exc:
-            return _placeholder(f"Missingness plot unavailable: {exc}")
+            return _placeholder(format_failure("Missingness plot unavailable", exc, context="pupil_plot"))
 
     @render.plot(alt="Raw and processed pupil time series")
     def pupil_trace():

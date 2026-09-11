@@ -1,40 +1,182 @@
 name: pypi
 
 on:
+  workflow_run:
+    workflows:
+      - release
+    types: [completed]
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing GitHub Release tag to publish to PyPI
+        description: Stable release tag to republish from a successful canonical release run
         required: true
         type: string
-  release:
-    types: [published]
 
 concurrency:
-  group: pypi-${{ github.event.release.tag_name || inputs.tag }}
+  group: pypi-${{ inputs.tag || github.event.workflow_run.head_sha }}
   cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
 
 jobs:
   publish:
-    name: publish to PyPI
+    name: publish canonical release artifact to PyPI
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
       contents: read
+      actions: read
       id-token: write
-    env:
-      PUBLISH_TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
-      - name: Validate requested tag
+      - name: Resolve successful canonical release run
+        id: release_run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ inputs.tag || '' }}
+          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+          TRIGGER_HEAD_SHA: ${{ github.event.workflow_run.head_sha || '' }}
+          TRIGGER_CONCLUSION: ${{ github.event.workflow_run.conclusion || '' }}
+        shell: bash
         run: |
           set -euo pipefail
-          case "$PUBLISH_TAG" in
-            v*) ;;
-            *) echo "Release tag must start with v: $PUBLISH_TAG" >&2; exit 1 ;;
-          esac
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_run" ]]; then
+            test "$TRIGGER_CONCLUSION" = "success"
+            test -n "$TRIGGER_RUN_ID"
+            test -n "$TRIGGER_HEAD_SHA"
+            RUN_ID="$TRIGGER_RUN_ID"
+            TARGET_SHA="${TRIGGER_HEAD_SHA,,}"
+          else
+            [[ "$REQUESTED_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+              echo "Manual PyPI recovery requires a stable vX.Y.Z tag." >&2
+              exit 1
+            }
+            TARGET_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/$REQUESTED_TAG" --jq '.sha')"
+            RUN_ID="$(gh run list --workflow release.yml --commit "$TARGET_SHA" --limit 30 \
+              --json databaseId,conclusion,createdAt \
+              --jq '[.[] | select(.conclusion == "success")] | sort_by(.createdAt) | last | .databaseId // empty')"
+            test -n "$RUN_ID" || {
+              echo "No successful canonical release run exists for $REQUESTED_TAG @ $TARGET_SHA" >&2
+              exit 1
+            }
+          fi
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Download canonical release artifact from successful release run
+        uses: actions/download-artifact@v5
+        with:
+          name: distributions
+          path: canonical-release
+          run-id: ${{ steps.release_run.outputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve and validate immutable release identity
+        id: metadata
+        env:
+          REQUESTED_TAG: ${{ inputs.tag || '' }}
+          EXPECTED_SOURCE: ${{ steps.release_run.outputs.target_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          path = Path('canonical-release/RELEASE-METADATA.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          tag = data.get('release_tag')
+          source = str(data.get('source_commit', '')).lower()
+          if data.get('schema') != 'gpbiometricspy-stable-release-artifact' or data.get('schema_version') != 2:
+              raise SystemExit('Canonical release metadata schema mismatch')
+          if not isinstance(tag, str) or re.fullmatch(r'v\d+\.\d+\.\d+', tag) is None:
+              raise SystemExit(f'Canonical release metadata has invalid stable tag: {tag!r}')
+          if source != os.environ['EXPECTED_SOURCE'].lower():
+              raise SystemExit(f'Canonical release source mismatch: {source} vs {os.environ["EXPECTED_SOURCE"]}')
+          requested = os.environ.get('REQUESTED_TAG', '')
+          if requested and requested != tag:
+              raise SystemExit(f'Manual recovery tag mismatch: requested {requested}, canonical {tag}')
+          with Path(os.environ['GITHUB_OUTPUT']).open('a', encoding='utf-8') as handle:
+              handle.write(f'tag={tag}\n')
+              handle.write(f'source_commit={source}\n')
+          PY
+
+      - name: Checkout exact canonical release tag
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ steps.metadata.outputs.tag }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Revalidate canonical package artifact and main ancestry
+        env:
+          PUBLISH_TAG: ${{ steps.metadata.outputs.tag }}
+          TARGET_SHA: ${{ steps.metadata.outputs.source_commit }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          test "$(git rev-parse "refs/tags/$PUBLISH_TAG^{commit}")" = "$TARGET_SHA"
+          git fetch origin main --force
+          git merge-base --is-ancestor "$TARGET_SHA" origin/main || {
+            echo "Canonical release commit is not reachable from main." >&2
+            exit 1
+          }
+          (
+            cd canonical-release
+            sha256sum -c SHA256SUMS.txt
+          )
+          python tools/release/validate_stable_release_artifact.py \
+            --root canonical-release \
+            --manifest canonical-release/RELEASE-METADATA.json \
+            --expected-tag "$PUBLISH_TAG" \
+            --expected-source-commit "$TARGET_SHA"
+
+      - name: Verify GitHub Release still matches canonical artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_TAG: ${{ steps.metadata.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${PUBLISH_TAG#v}"
+          gh release view "$PUBLISH_TAG" --json isDraft,tagName --jq 'select(.isDraft == false) | .tagName' | grep -Fx "$PUBLISH_TAG"
+          rm -rf release-assets
+          mkdir -p release-assets/dist
+          gh release download "$PUBLISH_TAG" \
+            --pattern "gpbiometricspy-${VERSION}-py3-none-any.whl" \
+            --pattern "gpbiometricspy-${VERSION}.tar.gz" \
+            --dir release-assets/dist
+          gh release download "$PUBLISH_TAG" \
+            --pattern "SHA256SUMS.txt" \
+            --pattern "RELEASE-METADATA.json" \
+            --dir release-assets
+          for rel in \
+            "dist/gpbiometricspy-${VERSION}-py3-none-any.whl" \
+            "dist/gpbiometricspy-${VERSION}.tar.gz" \
+            "SHA256SUMS.txt" \
+            "RELEASE-METADATA.json"; do
+            cmp --silent "canonical-release/$rel" "release-assets/$rel" || {
+              echo "GitHub Release asset drift detected: $rel" >&2
+              exit 1
+            }
+          done
+          echo "GitHub Release assets are byte-identical to the successful canonical release artifact."
 
       - name: Check whether version is already published
         id: existing
+        env:
+          PUBLISH_TAG: ${{ steps.metadata.outputs.tag }}
+        shell: bash
         run: |
           set -euo pipefail
           VERSION="${PUBLISH_TAG#v}"
@@ -45,51 +187,16 @@ jobs:
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Checkout exact release tag
-        if: steps.existing.outputs.published != 'true'
-        uses: actions/checkout@v7.0.1
-        with:
-          ref: ${{ github.event.release.tag_name || inputs.tag }}
-
-      - name: Download exact GitHub Release distributions
-        if: steps.existing.outputs.published != 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          gh release view "$PUBLISH_TAG" --json isDraft,tagName --jq 'select(.isDraft == false) | .tagName' | grep -Fx "$PUBLISH_TAG"
-          gh release download "$PUBLISH_TAG" --pattern '*.whl' --pattern '*.tar.gz' --dir dist
-
-      - name: Verify tag, version, and distributions
+      - name: Check canonical distribution metadata
         if: steps.existing.outputs.published != 'true'
         run: |
-          set -euo pipefail
-          case "$PUBLISH_TAG" in
-            v*) VERSION="${PUBLISH_TAG#v}" ;;
-            *) echo "Release tag must start with v: $PUBLISH_TAG" >&2; exit 1 ;;
-          esac
-          test -f "dist/gpbiometricspy-${VERSION}-py3-none-any.whl"
-          test -f "dist/gpbiometricspy-${VERSION}.tar.gz"
           python -m pip install "twine==7.0.0"
-          python -m twine check dist/*
-          python - <<'PY'
-          import os
-          import pathlib
-          import tomllib
+          python -m twine check canonical-release/dist/*
 
-          tag = os.environ["PUBLISH_TAG"]
-          version = tag.removeprefix("v")
-          project = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))["project"]
-          if project["name"] != "gpbiometricspy":
-              raise SystemExit(f"Unexpected project name: {project['name']}")
-          if project["version"] != version:
-              raise SystemExit(f"Tag/version mismatch: {tag} vs {project['version']}")
-          print(f"Verified gpbiometricspy {version} for PyPI publication")
-          PY
-
-      - name: Publish distributions to PyPI
+      - name: Publish canonical distributions to PyPI
         if: steps.existing.outputs.published != 'true'
         # PyPA gh-action-pypi-publish v1.14.2, pinned to its verified release commit.
         # Trusted Publishing also generates/uploads Sigstore attestations by default.
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        with:
+          packages-dir: canonical-release/dist/

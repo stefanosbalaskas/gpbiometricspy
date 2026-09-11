@@ -6,6 +6,27 @@ import pandas as pd
 from shiny import module, reactive, render, ui
 
 try:
+    from studio.config import studio_runtime_config
+    from studio.error_guidance import format_failure, recovery_guidance
+    from studio.recent_projects import record_recent_project
+    from studio.recent_projects_module import recent_projects_server, recent_projects_ui
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from config import studio_runtime_config
+    from error_guidance import format_failure, recovery_guidance
+    from recent_projects import record_recent_project
+    from recent_projects_module import recent_projects_server, recent_projects_ui
+
+try:
+    from studio.product_services import project_export_stem
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from product_services import project_export_stem
+
+try:
+    from studio.project_timeline import project_timeline as project_timeline_table
+except ModuleNotFoundError:  # Direct execution from inside studio/.
+    from project_timeline import project_timeline as project_timeline_table
+
+try:
     from studio.reporting_services import (
         analysis_inventory as analysis_inventory_table,
         annotations_frame,
@@ -41,10 +62,49 @@ except ModuleNotFoundError:  # Direct execution from inside studio/.
     )
 
 
+RECENT_PROJECTS_ENABLED = not studio_runtime_config().is_public_demo
+
+
 def _grid(table: pd.DataFrame | None, message: str, *, height: str = "360px"):
     if not isinstance(table, pd.DataFrame) or table.empty:
         table = pd.DataFrame({"status": [message]})
     return render.DataGrid(table, filters=True, height=height)
+
+
+def _report_state_identity(current) -> tuple[Any, ...]:
+    """Return the project-state identity that a built report or saved recipe represents."""
+    return (
+        current.project_name,
+        current.source_name,
+        current.loaded_at,
+        current.n_rows,
+        current.n_columns,
+        len(current.annotations),
+        tuple(sorted(map(str, current.analyses))),
+        len(current.provenance),
+    )
+
+
+def _recent_project_opt_in_ui():
+    if not RECENT_PROJECTS_ENABLED:
+        return ui.TagList()
+    return ui.TagList(
+        ui.input_checkbox(
+            "remember_recent",
+            "Remember this project in Recent projects on this device",
+            value=False,
+        ),
+        ui.tags.small(
+            "Optional. Stores only project name, save time, dataset fingerprint, coarse counts and the suggested recipe filename; never source paths, raw rows, column names, annotations, provenance payloads, parameters or analysis tables.",
+            class_="text-secondary d-block mb-3",
+        ),
+    )
+
+
+def _recent_projects_ui():
+    if not RECENT_PROJECTS_ENABLED:
+        return ui.TagList()
+    return recent_projects_ui("recent_projects")
 
 
 @module.ui
@@ -145,6 +205,14 @@ def reporting_ui():
                     col_widths=(5, 7),
                 ),
                 ui.navset_card_tab(
+                    ui.nav_panel(
+                        "Timeline",
+                        ui.p(
+                            "A readable metadata-only journey derived from the full provenance log. Source filenames, raw samples, and recorded parameter payloads are not repeated here.",
+                            class_="small text-secondary",
+                        ),
+                        ui.output_data_frame("project_timeline"),
+                    ),
                     ui.nav_panel("Provenance", ui.output_data_frame("provenance")),
                     ui.nav_panel("Annotations", ui.output_data_frame("annotations")),
                 ),
@@ -179,7 +247,25 @@ def reporting_ui():
                         ui.p(
                             "Download session metadata and analysis parameters without raw biometric samples. Analysis outputs are deliberately recomputed rather than restored from a cache."
                         ),
-                        ui.download_button("download_recipe", "Download Project Recipe JSON", class_="btn-primary w-100"),
+                        ui.div(
+                            ui.tags.strong(ui.output_text("project_save_state")),
+                            ui.tags.small(
+                                ui.output_text("project_save_detail"),
+                                class_="text-secondary d-block",
+                            ),
+                            class_="mb-3",
+                        ),
+                        _recent_project_opt_in_ui(),
+                        ui.download_button(
+                            "download_recipe",
+                            "Download Project Recipe JSON",
+                            class_="btn-primary w-100",
+                            onclick=(
+                                "window.Shiny.setInputValue(this.id + '_checkpoint', "
+                                "Date.now(), {priority: 'event'});"
+                            ),
+                        ),
+                        ui.tags.small(ui.output_text("project_file_name"), class_="text-secondary d-block mt-2"),
                     ),
                     ui.card(
                         ui.card_header("Restore project recipe"),
@@ -203,6 +289,7 @@ def reporting_ui():
                     ui.output_data_frame("recipe_checks"),
                     full_screen=True,
                 ),
+                _recent_projects_ui(),
             ),
             ui.nav_panel(
                 "Downloads",
@@ -227,11 +314,18 @@ def reporting_ui():
 @module.server
 def reporting_server(input, output, session, state, global_status):
     artifacts_value: reactive.Value[Any] = reactive.Value(None)
+    artifact_identity_value: reactive.Value[Any] = reactive.Value(None)
     recipe_value: reactive.Value[Any] = reactive.Value(None)
     recipe_checks_value: reactive.Value[Any] = reactive.Value(None)
     report_status_value = reactive.Value("Ready. Load data, run the desired workflows, then build reporting artifacts.")
     recipe_status_value = reactive.Value("No project recipe loaded.")
     dataset_identity_value: reactive.Value[Any] = reactive.Value(None)
+    saved_recipe_identity_value: reactive.Value[Any] = reactive.Value(None)
+    saved_recipe_source_value: reactive.Value[Any] = reactive.Value(None)
+    recent_refresh_value = reactive.Value(0)
+
+    if RECENT_PROJECTS_ENABLED:
+        recent_projects_server("recent_projects", state, recent_refresh_value)
 
     @reactive.effect
     def _invalidate_when_dataset_changes():
@@ -240,8 +334,24 @@ def reporting_server(input, output, session, state, global_status):
         if dataset_identity_value() != identity:
             dataset_identity_value.set(identity)
             artifacts_value.set(None)
+            artifact_identity_value.set(None)
             recipe_value.set(None)
             recipe_checks_value.set(None)
+            saved_recipe_identity_value.set(None)
+            saved_recipe_source_value.set(None)
+
+    @reactive.effect
+    def _invalidate_reporting_when_project_changes():
+        built_identity = artifact_identity_value()
+        if built_identity is None:
+            return
+        current_identity = _report_state_identity(state())
+        if built_identity != current_identity:
+            artifacts_value.set(None)
+            artifact_identity_value.set(None)
+            report_status_value.set(
+                "Project state changed. Rebuild reporting artifacts before export."
+            )
 
     def _artifact_or_build() -> dict[str, Any]:
         current = state()
@@ -275,10 +385,13 @@ def reporting_server(input, output, session, state, global_status):
             )
             state.set(recorded)
             artifacts_value.set(artifacts)
+            artifact_identity_value.set(_report_state_identity(recorded))
             report_status_value.set("Reporting artifacts built through public gpbiometricspy reporting APIs.")
             global_status.set("Reporting artifacts complete. Review methods, manifest, project recipe, and downloads.")
         except Exception as exc:
-            report_status_value.set(f"Reporting failed: {exc}")
+            message = format_failure("Reporting failed", exc, context="analysis failed reporting")
+            report_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.validate_recipe)
@@ -292,11 +405,21 @@ def reporting_server(input, output, session, state, global_status):
                 recipe_status_value.set("Recipe valid and dataset fingerprint matches. Metadata can be restored.")
             else:
                 failed = ", ".join(checks.loc[~checks["passed"], "check"].astype(str))
-                recipe_status_value.set(f"Recipe validation did not pass: {failed}.")
+                guidance = recovery_guidance(
+                    failed,
+                    context="project recipe source fingerprint validation",
+                )
+                recipe_status_value.set(f"Recipe validation did not pass: {failed}. {guidance}")
         except Exception as exc:
             recipe_value.set(None)
             recipe_checks_value.set(None)
-            recipe_status_value.set(f"Recipe validation failed: {exc}")
+            message = format_failure(
+                "Recipe validation failed",
+                exc,
+                context="project recipe source fingerprint validation external resource",
+            )
+            recipe_status_value.set(message)
+            global_status.set(message)
 
     @reactive.effect
     @reactive.event(input.restore_recipe)
@@ -311,14 +434,52 @@ def reporting_server(input, output, session, state, global_status):
             checks = recipe_validation_table(recipe, restored.data)
             state.set(restored)
             artifacts_value.set(None)
+            artifact_identity_value.set(None)
             recipe_value.set(recipe)
             recipe_checks_value.set(checks)
+            saved_recipe_identity_value.set(_report_state_identity(restored))
+            saved_recipe_source_value.set("restored")
             recipe_status_value.set(
                 "Project metadata restored. Analysis outputs were intentionally not restored; rerun analyses or use the replay script."
             )
-            global_status.set("Project recipe restored after exact dataset fingerprint verification.")
+            global_status.set(
+                f"Project {restored.project_name!r} restored after exact dataset fingerprint verification."
+            )
         except Exception as exc:
-            recipe_status_value.set(f"Project restore blocked: {exc}")
+            message = format_failure(
+                "Project restore blocked",
+                exc,
+                context="project recipe source fingerprint identity verification",
+            )
+            recipe_status_value.set(message)
+            global_status.set(message)
+
+    @reactive.effect
+    @reactive.event(input.download_recipe_checkpoint)
+    def _record_recipe_download_checkpoint():
+        current = state()
+        if current.data is None:
+            return
+        saved_recipe_identity_value.set(_report_state_identity(current))
+        saved_recipe_source_value.set("downloaded")
+        saved_message = "Project recipe downloaded. Current project metadata is saved."
+        if RECENT_PROJECTS_ENABLED and bool(input.remember_recent()):
+            try:
+                record_recent_project(current)
+                recent_refresh_value.set(recent_refresh_value() + 1)
+                recipe_status_value.set(
+                    f"{saved_message} Recent-project metadata was remembered on this device."
+                )
+            except Exception as exc:
+                recent_failure = format_failure(
+                    "Project recipe saved, but recent-project metadata was not recorded",
+                    exc,
+                    context="external resource recent-project metadata",
+                )
+                recipe_status_value.set(f"{saved_message} {recent_failure}")
+                global_status.set(recent_failure)
+            return
+        recipe_status_value.set(saved_message)
 
     @render.text
     def fingerprint():
@@ -347,6 +508,36 @@ def reporting_server(input, output, session, state, global_status):
     def recipe_status():
         return recipe_status_value()
 
+    @render.text
+    def project_save_state():
+        current = state()
+        if not current.loaded:
+            return "No project loaded"
+        saved_identity = saved_recipe_identity_value()
+        if saved_identity is None:
+            return "Unsaved"
+        if saved_identity == _report_state_identity(current):
+            return "Saved"
+        return "Unsaved changes"
+
+    @render.text
+    def project_save_detail():
+        current = state()
+        if not current.loaded:
+            return "Load a dataset before creating a project recipe."
+        saved_identity = saved_recipe_identity_value()
+        if saved_identity is None:
+            return "Download a project recipe to capture the current metadata checkpoint."
+        if saved_identity != _report_state_identity(current):
+            return "Project metadata changed after the last recipe checkpoint. Download again before closing the session."
+        if saved_recipe_source_value() == "restored":
+            return "The restored recipe is the current metadata checkpoint."
+        return "Current metadata matches the last downloaded project recipe."
+
+    @render.text
+    def project_file_name():
+        return f"Suggested file: {project_export_stem(state().project_name)}-project-recipe.json"
+
     @render.data_frame
     def package_report_overview():
         artifacts = artifacts_value()
@@ -361,6 +552,7 @@ def reporting_server(input, output, session, state, global_status):
         if current.data is None:
             return "No dataset loaded."
         return (
+            f"Project: {current.project_name}\n"
             f"Dataset: {current.source_name}\n"
             f"SHA-256: {dataset_fingerprint(current.data)}\n"
             f"Rows: {current.n_rows:,}\n"
@@ -401,6 +593,14 @@ def reporting_server(input, output, session, state, global_status):
     @render.data_frame
     def result_catalog():
         return _grid(result_table_catalog(state().analyses), "No analysis result tables are stored in this session.")
+
+    @render.data_frame
+    def project_timeline():
+        return _grid(
+            project_timeline_table(state()),
+            "No project operations have been recorded yet.",
+            height="430px",
+        )
 
     @render.data_frame
     def provenance():

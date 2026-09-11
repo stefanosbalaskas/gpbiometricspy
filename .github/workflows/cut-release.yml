@@ -26,9 +26,9 @@ concurrency:
 jobs:
   cut:
     if: >-
-      github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_branch == 'main' &&
-      github.event.workflow_run.conclusion == 'success'
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout triggering main commit
@@ -83,7 +83,7 @@ jobs:
           echo "current=true" >> "$GITHUB_OUTPUT"
           echo "sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Require every exact-main release gate
+      - name: Require every exact-main package release gate
         if: steps.release.outputs.eligible == 'true' && steps.current.outputs.current == 'true'
         id: gates
         env:
@@ -157,5 +157,5 @@ jobs:
         run: |
           set -euo pipefail
           TAG="${{ steps.release.outputs.tag }}"
-          gh workflow run release.yml --ref main -f tag="$TAG"
-          echo "Dispatched release.yml explicitly for $TAG; this avoids GITHUB_TOKEN tag-push recursion suppression."
+          gh workflow run release.yml --ref "$TAG" -f tag="$TAG"
+          echo "Dispatched release.yml on exact $TAG; the workflow run SHA is therefore the immutable release commit."

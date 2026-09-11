@@ -1,0 +1,83 @@
+name: studio-signing-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_signing_readiness_windows.ps1"
+      - ".github/workflows/studio-signing-readiness.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windows.ps1"
+      - ".github/scripts/test_studio_signing_readiness_windows.ps1"
+      - ".github/workflows/studio-signing-readiness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  authenticode-readiness:
+    name: ephemeral-authenticode (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Prove unsigned-to-signed provenance with ephemeral test certificate
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-signing-readiness"
+          ./.github/scripts/test_studio_signing_readiness_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts
+
+      - name: Upload signing-readiness evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-signing-readiness-evidence
+          path: |
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signing-provenance.json
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-sign.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-sign-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-verify.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/signing/signtool-verify-stderr.log
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/native-metrics.json
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/identity/windows-identity.json
+            ${{ runner.temp }}/gpbiometricspy-signing-readiness/native-build/identity/version-info.txt
+          if-no-files-found: warn
+
+      - name: Assert no signed executable is retained as evidence
+        shell: pwsh
+        run: |
+          $Evidence = Join-Path $env:RUNNER_TEMP "gpbiometricspy-signing-readiness/signing"
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Filter "*.exe" -ErrorAction SilentlyContinue) {
+            throw "Signing-readiness evidence directory must not retain test-signed executables."
+          }
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Filter "*.pfx" -ErrorAction SilentlyContinue) {
+            throw "Signing-readiness evidence directory must not retain ephemeral signing PFX files."
+          }
+          Write-Host "No test-signed executable or signing PFX is retained in signing evidence."

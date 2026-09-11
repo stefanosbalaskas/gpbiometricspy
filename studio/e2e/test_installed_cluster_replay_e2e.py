@@ -8,6 +8,7 @@ import subprocess
 import gpbiometricspy as gp
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 
 
@@ -53,13 +54,14 @@ def _load_uploaded_dataset(page: Page, path: Path) -> None:
     page.locator("#load_upload").click()
     expect(status).not_to_have_text(previous_status, timeout=60_000)
 
-    missing = "Import failed: Choose a Gazepoint CSV or TXT file first."
-    if status.inner_text() == missing:
+    missing_upload_message = "Choose a Gazepoint CSV or TXT file first."
+    if missing_upload_message in status.inner_text():
+        missing_status = status.inner_text()
         page.locator("#load_upload").click()
-        expect(status).not_to_have_text(missing, timeout=60_000)
+        expect(status).not_to_have_text(missing_status, timeout=60_000)
 
     expect(status).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("432", timeout=60_000)
@@ -115,7 +117,7 @@ def test_installed_cluster_permutation_replay_from_wheel_and_sdist(
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
     _load_uploaded_dataset(page, fixture)
 
-    page.get_by_text("Statistics & Modelling", exact=True).click()
+    open_nav(page, "statistics_modelling")
     expect(page.get_by_text("Model controls", exact=True)).to_be_visible()
     page.get_by_role("tab", name="Cluster permutation", exact=True).click()
     expect(page.get_by_text("Cluster controls", exact=True)).to_be_visible()
@@ -173,7 +175,7 @@ def test_installed_cluster_permutation_replay_from_wheel_and_sdist(
         timeout=60_000,
     )
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()

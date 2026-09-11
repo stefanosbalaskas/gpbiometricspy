@@ -8,6 +8,7 @@ import subprocess
 import gpbiometricspy as gp
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 
 
@@ -35,13 +36,14 @@ def _load_uploaded_dataset(page: Page, path: Path) -> None:
     page.locator("#load_upload").click()
     expect(status).not_to_have_text(previous_status, timeout=60_000)
 
-    missing = "Import failed: Choose a Gazepoint CSV or TXT file first."
-    if status.inner_text() == missing:
+    missing_upload_message = "Choose a Gazepoint CSV or TXT file first."
+    if missing_upload_message in status.inner_text():
+        missing_status = status.inner_text()
         page.locator("#load_upload").click()
-        expect(status).not_to_have_text(missing, timeout=60_000)
+        expect(status).not_to_have_text(missing_status, timeout=60_000)
 
     expect(status).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
@@ -91,7 +93,7 @@ def test_installed_multimodal_model_replay_from_wheel_and_sdist(
     expect(page.get_by_text("gpbiometricspy Studio", exact=True)).to_be_visible()
     _load_uploaded_dataset(page, participant_path)
 
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.locator("#event_alignment-run").click()
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -100,7 +102,7 @@ def test_installed_multimodal_model_replay_from_wheel_and_sdist(
     )
     assert int(page.locator("#event_alignment-event_count").inner_text().replace(",", "")) > 0
 
-    page.get_by_text("Multimodal Analysis", exact=True).click()
+    open_nav(page, "multimodal", group="Integrate")
     expect(page.get_by_text("Multimodal controls", exact=True)).to_be_visible()
     expect(page.locator("#multimodal-event_status")).to_contain_text(
         "Events & Alignment ready:",
@@ -120,7 +122,7 @@ def test_installed_multimodal_model_replay_from_wheel_and_sdist(
     assert int(page.locator("#multimodal-modality_count").inner_text().replace(",", "")) == 1
     assert int(page.locator("#multimodal-sample_count").inner_text().replace(",", "")) > 10
 
-    page.get_by_text("Statistics & Modelling", exact=True).click()
+    open_nav(page, "statistics_modelling")
     expect(page.get_by_text("Model controls", exact=True)).to_be_visible()
     source = page.locator("#statistics_modelling-model_source")
     expect(source.locator('option[value="multimodal_event_samples"]')).to_have_count(
@@ -150,7 +152,7 @@ def test_installed_multimodal_model_replay_from_wheel_and_sdist(
     assert "value ~" in formula
     assert "participant_id" in formula
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("3", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()

@@ -167,6 +167,7 @@ def project_recipe(state: ProjectState) -> dict[str, Any]:
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "gpbiometricspy_version": gp.__version__,
         "python_version": platform.python_version(),
+        "project": {"name": state.project_name},
         "source_name": state.source_name,
         "loaded_at": state.loaded_at,
         "dataset": {
@@ -277,10 +278,13 @@ def restore_project_recipe(state: ProjectState, recipe: dict[str, Any]) -> Proje
     if not bool(checks["passed"].all()):
         failed = ", ".join(checks.loc[~checks["passed"], "check"].astype(str))
         raise ValueError(f"Project recipe restore blocked: {failed}.")
+    project = recipe.get("project") or {}
+    project_name = project.get("name") if isinstance(project, dict) else None
     return state.with_restored_session_metadata(
         annotations=recipe.get("annotations") or (),
         provenance=recipe.get("provenance") or (),
         recipe_fingerprint=str(recipe["dataset"]["sha256"]),
+        project_name=project_name,
     )
 
 
@@ -322,6 +326,7 @@ def _manifest(state: ProjectState, fingerprint: str) -> dict[str, Any]:
         files=None,
         settings={
             "studio": "gpbiometricspy Studio",
+            "project_name": state.project_name,
             "dataset_sha256": fingerprint,
             "dataset_rows": state.n_rows,
             "dataset_columns": state.n_columns,
@@ -407,6 +412,7 @@ def build_reporting_artifacts(
     return {
         "title": clean_title,
         "subtitle": clean_subtitle,
+        "project_name": state.project_name,
         "dataset_fingerprint": fingerprint,
         "checklist": checklist,
         "methods_text": methods_text,
@@ -437,6 +443,7 @@ def report_markdown(artifacts: dict[str, Any]) -> str:
         "",
         "## Reproducibility identity",
         "",
+        f"- project: `{artifacts.get('project_name', 'Untitled project')}`",
         f"- gpbiometricspy version: `{gp.__version__}`",
         f"- dataset SHA-256: `{artifacts['dataset_fingerprint']}`",
         f"- raw data embedded in project recipe: `False`",
@@ -473,6 +480,7 @@ def report_markdown(artifacts: dict[str, Any]) -> str:
 def manifest_json(artifacts: dict[str, Any]) -> str:
     payload = {
         "studio": {
+            "project_name": artifacts.get("project_name", "Untitled project"),
             "dataset_sha256": artifacts["dataset_fingerprint"],
             "gpbiometricspy_version": gp.__version__,
             "python_version": platform.python_version(),

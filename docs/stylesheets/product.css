@@ -1,0 +1,38 @@
+.gp-card-product {
+  position: relative;
+  border-color: color-mix(in srgb, var(--md-accent-fg-color) 48%, var(--gp-card-border));
+  background:
+    radial-gradient(circle at 90% 12%, color-mix(in srgb, var(--md-accent-fg-color) 12%, transparent), transparent 32%),
+    linear-gradient(180deg, var(--gp-accent-bg), var(--md-default-bg-color));
+}
+
+.gp-card-product::after {
+  content: "Recommended for first-time users";
+  display: inline-flex;
+  margin-top: 0.35rem;
+  padding: 0.22rem 0.48rem;
+  border-radius: 999px;
+  background: var(--gp-accent-bg);
+  color: var(--md-accent-fg-color);
+  font-size: 0.66rem;
+  font-weight: 760;
+  letter-spacing: 0.02em;
+}
+
+.gp-flow-product > div {
+  min-height: 8.1rem;
+}
+
+.gp-flow-product > div strong {
+  letter-spacing: 0.08em;
+}
+
+.gp-flow-product > div span {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 900px) {
+  .gp-flow-product > div {
+    min-height: 0;
+  }
+}

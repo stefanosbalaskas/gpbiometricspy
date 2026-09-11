@@ -6,6 +6,7 @@ import zipfile
 
 import gpbiometricspy as gp
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 from shiny.pytest import create_app_fixture
 from shiny.run import ShinyAppProc
@@ -30,7 +31,7 @@ def _upload_participant(page: Page, participant_path: Path) -> None:
     controller.AppTestValues(page).expect_input("upload", _uploaded, timeout=30.0)
     page.locator("#load_upload").click()
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     assert int(page.locator("#row_count").inner_text().replace(",", "")) == 1_920
@@ -45,7 +46,7 @@ def _load_participant(page: Page, app: ShinyAppProc) -> Path:
 
 
 def _run_eda(page: Page) -> None:
-    page.get_by_text("EDA / SCR Analysis", exact=True).click()
+    open_nav(page, "eda_scr", group="Analyze")
     expect(page.get_by_text("EDA / SCR analysis controls", exact=True)).to_be_visible()
     page.locator("#eda_scr-run").click()
     expect(page.locator("#eda_scr-status")).to_contain_text(
@@ -56,7 +57,7 @@ def _run_eda(page: Page) -> None:
 
 
 def _open_reporting(page: Page) -> None:
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-fingerprint")).not_to_have_text("—")
 
@@ -64,7 +65,7 @@ def _open_reporting(page: Page) -> None:
 def _reset_session(page: Page) -> None:
     page.locator("#reset").click()
     expect(page.locator("#status")).to_contain_text(
-        "Session reset. No dataset is loaded.",
+        "Session reset. Load a dataset to begin a new project.",
         timeout=30_000,
     )
     page.get_by_role("tab", name="Home", exact=True).click()
@@ -150,6 +151,7 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
         timeout=60_000,
     )
     expect(page.locator("#reporting-result_catalog")).to_contain_text("eda_scr")
+    page.get_by_role("tab", name="Provenance", exact=True).click()
     expect(page.locator("#reporting-provenance")).to_be_visible()
 
     page.get_by_role("tab", name="Manifest", exact=True).click()
@@ -206,7 +208,24 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
         assert bundled_recipe["analysis_inventory"][0]["analysis"] == "eda_scr"
 
     page.get_by_role("tab", name="Project recipe", exact=True).click()
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Unsaved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "Download a project recipe"
+    )
     recipe_download = _download(page, "#reporting-download_recipe")
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Saved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "last downloaded project recipe"
+    )
+    expect(page.locator("#reporting-recipe_status")).to_contain_text(
+        "Current project metadata is saved."
+    )
     recipe = json.loads(recipe_download.read_text(encoding="utf-8"))
     assert recipe["raw_data_included"] is False
     assert recipe["analysis_outputs_included"] is False
@@ -214,6 +233,17 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
     assert len(recipe["dataset"]["sha256"]) == 64
     recipe_path = tmp_path / "reporting-project-recipe.json"
     recipe_path.write_text(json.dumps(recipe), encoding="utf-8")
+
+    page.locator("#project_name_input").fill("Reporting browser validation changed")
+    page.locator("#apply_project_name").click()
+    expect(page.locator("#status")).to_contain_text("Project name set to", timeout=30_000)
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Unsaved changes",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "changed after the last recipe checkpoint"
+    )
 
     # A different loaded dataset must fail the fingerprint gate.
     _reset_session(page)
@@ -261,11 +291,18 @@ def test_reporting_artifacts_downloads_and_recipe_restore(
         timeout=30_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Project recipe restored after exact dataset fingerprint verification."
+        "restored after exact dataset fingerprint verification."
+    )
+    expect(page.locator("#reporting-project_save_state")).to_have_text(
+        "Saved",
+        timeout=30_000,
+    )
+    expect(page.locator("#reporting-project_save_detail")).to_contain_text(
+        "restored recipe is the current metadata checkpoint"
     )
     expect(page.locator("#reporting-analysis_count")).to_have_text("0")
     expect(page.locator("#reporting-result_table_count")).to_have_text("0")
-    page.get_by_role("tab", name="Report", exact=True).click()
+    page.locator('a[data-value="Report"]:visible').click()
     expect(page.locator("#reporting-identity_summary")).to_contain_text(
         "Analyses: 0",
         timeout=30_000,

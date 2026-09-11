@@ -1,0 +1,82 @@
+name: studio-windowed-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windowed_windows.ps1"
+      - ".github/workflows/studio-windowed-readiness.yml"
+      - "tests/test_windowed_readiness_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_pyinstaller_native_windowed_windows.ps1"
+      - ".github/workflows/studio-windowed-readiness.yml"
+      - "tests/test_windowed_readiness_policy.py"
+
+permissions:
+  contents: read
+
+jobs:
+  windowed-readiness:
+    name: native-windowed-webview2 (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Build and exercise console-free native Studio
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-readiness"
+          ./.github/scripts/test_studio_pyinstaller_native_windowed_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts
+
+      - name: Assert windowed diagnostics are redistributable-binary-free
+        if: always()
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-readiness"
+          $Evidence = Join-Path $Artifacts "evidence"
+          if (-not (Test-Path -LiteralPath $Evidence -PathType Container)) {
+            throw "Windowed-readiness evidence directory is missing."
+          }
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
+            throw "Windowed-readiness evidence must not contain redistributable executables or signing-key material."
+          }
+          foreach ($Name in @("dist", "build", "venv")) {
+            if (Test-Path -LiteralPath (Join-Path $Artifacts $Name)) {
+              throw "Temporary windowed build payload survived readiness cleanup: $Name"
+            }
+          }
+          Write-Host "Windowed-readiness evidence contains diagnostics only."
+
+      - name: Upload windowed-readiness evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-windowed-readiness-evidence
+          path: ${{ runner.temp }}/gpbiometricspy-windowed-readiness/evidence/
+          if-no-files-found: error

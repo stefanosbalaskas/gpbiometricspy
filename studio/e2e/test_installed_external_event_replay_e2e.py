@@ -8,6 +8,7 @@ import gpbiometricspy as gp
 import numpy as np
 import pytest
 from playwright.sync_api import Page, expect
+from studio.e2e.navigation import open_nav
 from shiny.playwright import controller
 
 
@@ -63,7 +64,7 @@ def _click_with_upload_retry(
     *,
     action_id: str,
     status_id: str,
-    missing_upload_status: str,
+    missing_upload_fragment: str,
     timeout: int,
 ) -> None:
     action = page.locator(f"#{action_id}")
@@ -72,8 +73,9 @@ def _click_with_upload_retry(
 
     action.click()
     expect(status).not_to_have_text(previous_status, timeout=timeout)
-    if status.inner_text() == missing_upload_status:
-        previous_status = missing_upload_status
+    current_status = status.inner_text()
+    if missing_upload_fragment.casefold() in current_status.casefold():
+        previous_status = current_status
         action.click()
         expect(status).not_to_have_text(previous_status, timeout=timeout)
 
@@ -96,16 +98,16 @@ def test_installed_external_event_log_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
 
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
     _set_input_file(page, "event_alignment-event_upload", event_path)
@@ -113,10 +115,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
         page,
         action_id="event_alignment-run",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Events & alignment failed: "
-            "Choose a event log CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="event log CSV/TXT/TSV file first",
         timeout=120_000,
     )
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -125,7 +124,7 @@ def test_installed_external_event_log_replay_is_identity_bound(
     )
     assert int(page.locator("#event_alignment-event_count").inner_text().replace(",", "")) == 2
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()
@@ -209,25 +208,23 @@ def test_installed_target_stream_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
 
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     _set_input_file(page, "event_alignment-target_upload", target_path)
     _click_with_upload_retry(
         page,
         action_id="event_alignment-load_target",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="target stream CSV/TXT/TSV file first",
         timeout=60_000,
     )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
@@ -246,7 +243,7 @@ def test_installed_target_stream_replay_is_identity_bound(
     assert int(page.locator("#event_alignment-event_count").inner_text().replace(",", "")) >= 2
     assert int(page.locator("#event_alignment-pair_count").inner_text().replace(",", "")) >= 2
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()
@@ -332,16 +329,16 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="load_upload",
         status_id="status",
-        missing_upload_status="Import failed: Choose a Gazepoint CSV or TXT file first.",
+        missing_upload_fragment="Choose a Gazepoint CSV or TXT file first",
         timeout=60_000,
     )
     expect(page.locator("#status")).to_contain_text(
-        "Upload imported through gpbiometricspy.",
+        "Research file imported.",
         timeout=60_000,
     )
     expect(page.locator("#row_count")).to_have_text("1,920", timeout=60_000)
 
-    page.get_by_text("Events & Alignment", exact=True).click()
+    open_nav(page, "event_alignment", group="Integrate")
     expect(page.get_by_text("Events & alignment controls", exact=True)).to_be_visible()
     page.get_by_label("External event log", exact=True).check()
     _set_input_file(page, "event_alignment-event_upload", event_path)
@@ -350,9 +347,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="event_alignment-load_target",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Target load failed: Choose a target stream CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="target stream CSV/TXT/TSV file first",
         timeout=60_000,
     )
     expect(page.locator("#event_alignment-target_status")).to_contain_text(
@@ -367,10 +362,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
         page,
         action_id="event_alignment-run",
         status_id="event_alignment-status",
-        missing_upload_status=(
-            "Events & alignment failed: "
-            "Choose a event log CSV/TXT/TSV file first."
-        ),
+        missing_upload_fragment="event log CSV/TXT/TSV file first",
         timeout=120_000,
     )
     expect(page.locator("#event_alignment-status")).to_contain_text(
@@ -380,7 +372,7 @@ def test_installed_dual_secondary_resource_replay_is_identity_bound(
     assert int(page.locator("#event_alignment-event_count").inner_text().replace(",", "")) == 2
     assert int(page.locator("#event_alignment-pair_count").inner_text().replace(",", "")) >= 2
 
-    page.get_by_text("Reporting & Reproducibility", exact=True).click()
+    open_nav(page, "reporting")
     expect(page.get_by_text("Privacy-preserving project model", exact=True)).to_be_visible()
     expect(page.locator("#reporting-analysis_count")).to_have_text("1", timeout=60_000)
     page.get_by_role("tab", name="Downloads", exact=True).click()

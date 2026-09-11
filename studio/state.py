@@ -43,10 +43,20 @@ def _validated_provenance(provenance: Any) -> tuple[dict[str, Any], ...]:
     return tuple(rows)
 
 
+def _clean_project_name(value: Any) -> str:
+    name = str(value or "").strip()
+    if not name:
+        raise ValueError("Project name must be non-empty.")
+    if len(name) > 120:
+        raise ValueError("Project name must be 120 characters or fewer.")
+    return name
+
+
 @dataclass(frozen=True)
 class ProjectState:
     """Immutable per-session state for gpbiometricspy Studio."""
 
+    project_name: str = "Untitled project"
     data: pd.DataFrame | None = None
     source_name: str = "No dataset loaded"
     loaded_at: str | None = None
@@ -68,6 +78,19 @@ class ProjectState:
     def n_columns(self) -> int:
         return 0 if self.data is None else len(self.data.columns)
 
+    def with_project_name(self, name: str) -> "ProjectState":
+        clean = _clean_project_name(name)
+        if clean == self.project_name:
+            return self
+        event = _event(
+            "set_project_name",
+            self.source_name,
+            self.n_rows,
+            self.n_columns,
+            project_name=clean,
+        )
+        return replace(self, project_name=clean, provenance=(*self.provenance, event))
+
     def with_dataset(
         self,
         data: pd.DataFrame,
@@ -76,8 +99,9 @@ class ProjectState:
         validation: dict[str, Any],
         operation: str,
     ) -> "ProjectState":
-        event = _event(operation, source_name, len(data), len(data.columns))
+        event = _event(operation, source_name, len(data), len(data.columns), project_name=self.project_name)
         return ProjectState(
+            project_name=self.project_name,
             data=data,
             source_name=source_name,
             loaded_at=event["timestamp_utc"],
@@ -93,14 +117,14 @@ class ProjectState:
         key = str(operation).strip()
         if not key:
             raise ValueError("Operation must be non-empty.")
-        event = _event(key, self.source_name, self.n_rows, self.n_columns, **extra)
+        event = _event(key, self.source_name, self.n_rows, self.n_columns, project_name=self.project_name, **extra)
         return replace(self, provenance=(*self.provenance, event))
 
     def with_qc(self, qc: dict[str, Any], *, operation: str = "run_qc") -> "ProjectState":
         if self.data is None:
             raise ValueError("A dataset must be loaded before QC can be stored.")
         merged = {**(self.qc or {}), **qc}
-        event = _event(operation, self.source_name, self.n_rows, self.n_columns)
+        event = _event(operation, self.source_name, self.n_rows, self.n_columns, project_name=self.project_name)
         return replace(self, qc=merged, provenance=(*self.provenance, event))
 
     def with_analysis(
@@ -123,6 +147,7 @@ class ProjectState:
             self.source_name,
             self.n_rows,
             self.n_columns,
+            project_name=self.project_name,
             analysis=key,
             parameters_json=json.dumps(parameters or {}, sort_keys=True, default=str),
             analysis_count=len(merged),
@@ -142,6 +167,7 @@ class ProjectState:
             self.source_name,
             self.n_rows,
             self.n_columns,
+            project_name=self.project_name,
             annotation_type=annotation_type,
             annotation_count=len(self.annotations) + 1,
         )
@@ -160,6 +186,7 @@ class ProjectState:
             self.source_name,
             self.n_rows,
             self.n_columns,
+            project_name=self.project_name,
             annotation_count=len(kept),
         )
         return replace(self, annotations=kept, provenance=(*self.provenance, event))
@@ -170,6 +197,7 @@ class ProjectState:
             self.source_name,
             self.n_rows,
             self.n_columns,
+            project_name=self.project_name,
             annotation_count=0,
         )
         return replace(self, annotations=(), provenance=(*self.provenance, event))
@@ -180,17 +208,20 @@ class ProjectState:
         annotations: Any = (),
         provenance: Any = (),
         recipe_fingerprint: str | None = None,
+        project_name: str | None = None,
     ) -> "ProjectState":
         """Restore non-raw project metadata after an external fingerprint check."""
         if self.data is None:
             raise ValueError("Load the source dataset before restoring a Studio project recipe.")
         restored_annotations = _validated_annotations(annotations)
         restored_provenance = _validated_provenance(provenance)
+        restored_name = self.project_name if project_name is None else _clean_project_name(project_name)
         event = _event(
             "restore_project_recipe",
             self.source_name,
             self.n_rows,
             self.n_columns,
+            project_name=restored_name,
             restored_annotation_count=len(restored_annotations),
             restored_provenance_count=len(restored_provenance),
             recipe_fingerprint=recipe_fingerprint,
@@ -198,6 +229,7 @@ class ProjectState:
         )
         return replace(
             self,
+            project_name=restored_name,
             annotations=restored_annotations,
             analyses={},
             provenance=(*self.provenance, *restored_provenance, event),

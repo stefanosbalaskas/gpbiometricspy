@@ -1,0 +1,3 @@
+# Evaluation-only Windows freezer/compiler toolchain for Studio 0.1.6.
+# Nuitka 4.2.x is the first line with official Python 3.14 support.
+Nuitka==4.2.1
