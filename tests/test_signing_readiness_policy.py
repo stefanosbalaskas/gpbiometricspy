@@ -18,6 +18,8 @@ def test_signing_readiness_is_explicitly_test_only_and_hash_bound():
     assert 'release_artifact = $false' in SCRIPT
     assert 'certificate_ephemeral = $true' in SCRIPT
     assert 'certificate_persisted = $false' in SCRIPT
+    assert 'trust_store_mutated = $false' in SCRIPT
+    assert 'production_trusted_certificate_required = $true' in SCRIPT
     assert 'unsigned_sha256 = $UnsignedSha256' in SCRIPT
     assert 'signed_sha256 = $SignedSha256' in SCRIPT
     assert 'production_digest_algorithm = "SHA256"' in SCRIPT
@@ -58,5 +60,15 @@ def test_signing_readiness_uses_noninteractive_bounded_signtool_sha256_path():
     assert '@("verify", "/pa", "/v", $Executable)' in executable_script
     assert "-TimeoutSeconds 60" in executable_script
     assert "-TimeoutSeconds 30" in executable_script
-    assert "Remove-TestCertificate" in executable_script
     assert "Remove-Item -LiteralPath $PfxPath -Force" in executable_script
+
+
+def test_signing_readiness_never_mutates_windows_trust_stores():
+    executable_script = _executable_powershell(SCRIPT)
+    assert "X509Store" not in executable_script
+    assert "Cert:\\CurrentUser" not in executable_script
+    assert "Add-TestCertificateTrust" not in executable_script
+    assert "Remove-TestCertificate" not in executable_script
+    assert "CustomRootTrust" in executable_script
+    assert "CustomTrustStore.Add($Certificate)" in executable_script
+    assert 'trust_store_mutated = $false' in executable_script
