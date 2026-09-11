@@ -48,7 +48,7 @@ WizardStyle=modern
 VersionInfoCompany=Stefanos Balaskas
 VersionInfoDescription=gpbiometricspy Studio Installer
 VersionInfoProductName=gpbiometricspy Studio
-VersionInfoProductVersion={#AppVersion}
+VersionInfoProductVersion={#FileVersion}
 VersionInfoVersion={#FileVersion}
 
 [Files]
