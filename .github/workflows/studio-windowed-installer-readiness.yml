@@ -1,0 +1,80 @@
+name: studio-windowed-installer-readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_windowed_installer_windows.ps1"
+      - ".github/workflows/studio-windowed-installer-readiness.yml"
+      - "tests/test_windowed_installer_readiness_policy.py"
+  push:
+    branches:
+      - main
+    paths:
+      - "studio/**"
+      - "src/gpbiometricspy/**"
+      - "tools/pyinstaller/**"
+      - "tools/installer/**"
+      - "pyproject.toml"
+      - "LICENSE"
+      - ".github/scripts/assert_studio_windows_identity.ps1"
+      - ".github/scripts/test_studio_windowed_installer_windows.ps1"
+      - ".github/workflows/studio-windowed-installer-readiness.yml"
+      - "tests/test_windowed_installer_readiness_policy.py"
+
+permissions:
+  contents: read
+
+jobs:
+  windowed-installer-readiness:
+    name: windowed-per-user-install-uninstall (3.14)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      SHINY_OTEL_COLLECT: none
+      MPLBACKEND: Agg
+      PYTHONUTF8: "1"
+      PYWEBVIEW_LOG: debug
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Build, install, exercise and uninstall windowed Studio
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-installer-readiness"
+          ./.github/scripts/test_studio_windowed_installer_windows.ps1 `
+            -Python python `
+            -ArtifactsDir $Artifacts
+
+      - name: Assert diagnostics are binary-free
+        shell: pwsh
+        run: |
+          $Artifacts = Join-Path $env:RUNNER_TEMP "gpbiometricspy-windowed-installer-readiness"
+          $Evidence = Join-Path $Artifacts "evidence"
+          if (Get-ChildItem -LiteralPath $Evidence -Recurse -File -Include "*.exe", "*.pfx", "*.p12" -ErrorAction SilentlyContinue) {
+            throw "Windowed-installer evidence must not contain redistributable binaries or signing-key material."
+          }
+          foreach ($Path in @("installer-output", "dist", "build", "venv", "installed")) {
+            if (Test-Path -LiteralPath (Join-Path $Artifacts $Path)) {
+              throw "Temporary windowed-installer path survived cleanup: $Path"
+            }
+          }
+          Write-Host "Windowed-installer evidence contains diagnostics only."
+
+      - name: Upload windowed-installer evidence only
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: studio-windowed-installer-readiness-evidence
+          path: ${{ runner.temp }}/gpbiometricspy-windowed-installer-readiness/evidence/
+          if-no-files-found: error
