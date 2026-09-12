@@ -1,5 +1,5 @@
 site_name: gpbiometricspy
-site_description: Scientific Python workflows and gpbiometricspy Studio for Gazepoint EDA/SCR, PPG/HRV, pupil, gaze, AOI and multimodal research.
+site_description: Scientific Python workflows, Python-native methods and gpbiometricspy Studio for Gazepoint EDA/SCR, PPG/HRV, pupil, gaze, AOI and multimodal research.
 site_url: https://stefanosbalaskas.github.io/gpbiometricspy/
 site_author: Stefanos Balaskas
 repo_url: https://github.com/stefanosbalaskas/gpbiometricspy
@@ -118,6 +118,7 @@ nav:
           - Interoperability version testing: articles/interoperability-version-testing.md
           - gp3tools compatibility: articles/gp3tools-compatibility.md
   - Methods:
+      - Overview: methods/index.md
       - Hierarchical location–scale modelling: methods/hierarchical-location-scale.md
   - API:
       - Browse by domain: api/index.md
@@ -138,7 +139,9 @@ nav:
       - Interpretation guardrails: interpretation.md
   - Integrations: integrations.md
   - Citation & archival: citation.md
-  - Release 0.1.5: release-0.1.5.md
+  - Releases:
+      - Release 0.1.6: release-0.1.6.md
+      - Release 0.1.5: release-0.1.5.md
   - Development: development.md
 
 markdown_extensions:
