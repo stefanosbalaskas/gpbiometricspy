@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/recover-pypi-v0.1.6.yml
+      - .github/workflows/pypi.yml
 
 permissions:
   contents: read
