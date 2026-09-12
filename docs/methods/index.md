@@ -30,9 +30,9 @@ The implementation explicitly distinguishes the Student-t scale parameter from t
 
 ## Validation boundary
 
-The Gaussian methods code was exact-main certified at `d1e397c4d73819085584c924d8eb1a069f4fba3b`: **662 tests**, **10,847/10,847 statements = 100.00%**, **5,747/5,766 raw branches = 99.6705%**, and an audited 19-arc structural-debt contract with **0 unexpected, 0 stale and 0 unaudited branch debt**. That exact merged SHA completed **14/14 push workflow families successfully**.
+The current methods line is exact-main certified at merge SHA `1de9041aace7d5f0fd256b2e9b357308efd7798a` from #116. Fresh push-only certification completed **14/14 workflow families successfully**. Canonical Ubuntu/Python 3.12.14 evidence passed **687/687 tests**, **11,151/11,151 statements = 100.00%**, and retained the frozen export audit at **406/406 with 0 pending**. Exact-main branch coverage was **5,819/5,838 = 99.6745%**, with exactly **19 audited structural arcs**, **0 unexpected**, **0 stale**, and **0 unaudited branch debt**. The exact-main branch-coverage artifact is `10301085630` with digest `sha256:136f75c7edd6769142a62756ea7b7c0a291958d62277f79e0902792d7610ebc9`.
 
-The Student-t method is a later additive development tranche and must carry its own exact-head and exact-main qualification before being described as certified. Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts.
+This certification covers the additive Gaussian and robust Student-t methods present in that exact tree while preserving their scientific claim boundaries. Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; exact-main development certification does not retroactively alter the stable-release record.
 
 ## Scientific guardrails
 
