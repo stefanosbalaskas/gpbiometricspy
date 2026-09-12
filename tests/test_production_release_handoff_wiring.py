@@ -105,7 +105,7 @@ def test_pypi_can_only_publish_from_successful_canonical_package_artifact() -> N
     assert "actions: read" in workflow
     assert "id-token: write" in workflow
     assert "Resolve successful canonical release run" in workflow
-    assert "gh run list --workflow release.yml" in workflow
+    assert 'gh run list --repo "$GITHUB_REPOSITORY" --workflow release.yml' in workflow
     assert "Download canonical release artifact from successful release run" in workflow
     assert "run-id: ${{ steps.release_run.outputs.run_id }}" in workflow
     assert "RELEASE-METADATA.json" in workflow
