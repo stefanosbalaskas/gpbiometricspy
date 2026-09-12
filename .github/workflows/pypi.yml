@@ -56,7 +56,7 @@ jobs:
               exit 1
             }
             TARGET_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/$REQUESTED_TAG" --jq '.sha')"
-            RUN_ID="$(gh run list --workflow release.yml --commit "$TARGET_SHA" --limit 30 \
+            RUN_ID="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow release.yml --commit "$TARGET_SHA" --limit 30 \
               --json databaseId,conclusion,createdAt \
               --jq '[.[] | select(.conclusion == "success")] | sort_by(.createdAt) | last | .databaseId // empty')"
             test -n "$RUN_ID" || {
