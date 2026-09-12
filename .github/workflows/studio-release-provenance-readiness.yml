@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload release-provenance evidence only
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: studio-release-provenance-readiness-evidence
           path: ${{ runner.temp }}/gpbiometricspy-release-provenance-readiness/evidence/
