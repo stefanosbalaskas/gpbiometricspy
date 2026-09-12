@@ -131,20 +131,18 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 | Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Last exact-main-certified methods baseline | **#114 · `d1e397c4d73819085584c924d8eb1a069f4fba3b`** |
-| Baseline tests | **662 passed** |
-| Baseline statement coverage | **10,847 / 10,847 = 100.00%** |
-| Baseline raw branch coverage | **5,747 / 5,766 = 99.6705%** |
-| Hardened Student-t diagnostic tests | **686 / 686 passed** |
-| Hardened Student-t diagnostic statement coverage | **11,151 / 11,151 = 100.00%** |
-| Hardened Student-t diagnostic raw branch coverage | **5,819 / 5,838 = 99.6745%** |
-| Hardened Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
+| Current exact-main-certified methods baseline | **#116 · `1de9041aace7d5f0fd256b2e9b357308efd7798a`** |
+| Exact-main tests | **687 / 687 passed** |
+| Exact-main statement coverage | **11,151 / 11,151 = 100.00%** |
+| Exact-main raw branch coverage | **5,819 / 5,838 = 99.6745%** |
+| Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
+| Exact-main push workflows | **14 / 14 successful** |
 | Audited structural arcs | **19** |
 | Unexpected / stale / unaudited branch debt | **0 / 0 / 0** |
 | Supported Python | **3.11–3.14** |
 | Studio | **11 research workflows + Chromium E2E + installed wheel/sdist production validation** |
 
-The latest exact-main-certified methods baseline remains #114. The hardened Student-t source in #116 has separate diagnostic evidence: **686/686 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and zero unexpected, stale or unaudited branch debt. Those hardened-source diagnostic figures are deliberately not presented as exact-main certification before #116 is merged and its push workflows are certified.
+The current exact-main-certified methods baseline is #116 at `1de9041aace7d5f0fd256b2e9b357308efd7798a`. Fresh push-only certification on that merge SHA completed **14/14 workflow families successfully**. Canonical Ubuntu/Python 3.12.14 evidence passed **687/687 tests**, **11,151/11,151 statements = 100.00%**, and the frozen export audit remained **406/406 with 0 pending**. Exact-main branch coverage was **5,819/5,838 = 99.6745%**, with exactly the existing **19 audited structural arcs** and **0 unexpected, stale or unaudited branch debt**. The exact-main branch-coverage artifact is `10301085630` (`sha256:136f75c7edd6769142a62756ea7b7c0a291958d62277f79e0902792d7610ebc9`).
 
 Stable **0.1.6** remains a separate frozen release line. Its release qualification preserves **641 core tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line metrics above include post-release methods work and must not be read as retroactively changing the 0.1.6 artifacts.
 
@@ -203,4 +201,4 @@ Recommended citation:
 
 ## Development and provenance
 
-The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. The current methods line contains the Gaussian hierarchical location–scale model and the heavy-tailed Student-t extension developed in #116. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.
+The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. The current methods line contains the Gaussian hierarchical location–scale model and the heavy-tailed Student-t extension developed and exact-main certified in #116. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.
