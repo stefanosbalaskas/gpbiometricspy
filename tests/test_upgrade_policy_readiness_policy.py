@@ -63,8 +63,9 @@ def test_upgrade_policy_allows_repair_and_upgrade_but_blocks_downgrade_fail_clos
     assert "Upgrade policy: downgrade blocked" in ISS
     assert "existing installation has indeterminate version; setup blocked fail-closed" in ISS
     assert "RegKeyExists(HKCU, UninstallRegistrationKey)" in ISS
-    assert '$PreviousFileVersion = "0.1.5.0"' in SCRIPT
-    assert '$FutureFileVersion = "0.1.7.0"' in SCRIPT
+    assert '$PreviousFileVersion = "0.1.6.0"' in SCRIPT
+    assert '$TargetFileVersion -ne "0.1.7.0"' in SCRIPT
+    assert '$FutureFileVersion = "0.1.8.0"' in SCRIPT
     assert "$DowngradeProcess.ExitCode -ne 7" in SCRIPT
     assert "Blocked downgrade mutated the installed executable." in SCRIPT
     assert "Blocked downgrade mutated the installed version marker." in SCRIPT
