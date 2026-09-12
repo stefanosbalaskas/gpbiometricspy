@@ -20,11 +20,11 @@
 <div><span class="gp-status-value">0.1.6</span><span class="gp-status-label">stable release</span></div>
 <div><span class="gp-status-value">0.1.7.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">662</span><span class="gp-status-label">last exact-main-certified methods baseline tests</span></div>
-<div><span class="gp-status-value">686</span><span class="gp-status-label">hardened Student-t diagnostic tests</span></div>
-<div><span class="gp-status-value">100%</span><span class="gp-status-label">hardened diagnostic statement coverage</span></div>
-<div><span class="gp-status-value">99.6745%</span><span class="gp-status-label">hardened diagnostic raw branch coverage</span></div>
-<div><span class="gp-status-value">72 / 72</span><span class="gp-status-label">hardened Student-t module branches</span></div>
+<div><span class="gp-status-value">687</span><span class="gp-status-label">exact-main-certified development tests</span></div>
+<div><span class="gp-status-value">100%</span><span class="gp-status-label">exact-main statement coverage</span></div>
+<div><span class="gp-status-value">99.6745%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
+<div><span class="gp-status-value">72 / 72</span><span class="gp-status-label">Student-t module branches</span></div>
+<div><span class="gp-status-value">14 / 14</span><span class="gp-status-label">exact-main push workflow families</span></div>
 <div><span class="gp-status-value">19</span><span class="gp-status-label">audited structural arcs</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">supported Python</span></div>
 </div>
@@ -79,7 +79,7 @@ The robust extension keeps the same location/log-scale architecture but replaces
 
 [Open the robust Student-t location–scale guide →](methods/robust-hierarchical-location-scale.md)
 
-The hardened Student-t source has diagnostic evidence of **686/686 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and **304/304 statements plus 72/72 branches** in the Student-t module, with exactly the existing 19 audited structural arcs and zero unexpected, stale or unaudited branch debt. These are hardened-source diagnostic results, not exact-main certification before merge and post-merge push validation.
+The Student-t methods tranche is exact-main certified at `1de9041aace7d5f0fd256b2e9b357308efd7798a`: **687/687 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and **304/304 statements plus 72/72 branches** in the Student-t module, with exactly 19 audited structural arcs and zero unexpected, stale or unaudited branch debt. All **14/14 exact-main push workflow families** succeeded, and the documentation/Pages publication chain is green.
 
 !!! info "Scientific boundary"
     These are distributional heterogeneity models. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. Neither implementation identifies motion or physiological artifacts, performs artifact correction or sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states. Random slopes, crossed random effects, skewed heavy-tail families, mixture models and Bayesian priors remain outside the current family.
@@ -178,7 +178,7 @@ Then open `http://127.0.0.1:8765`.
 </div>
 <div class="gp-pillar">
 <h3>Validation is part of the product</h3>
-<p>The last exact-main-certified methods baseline (#114) passed 662 tests with 10,847/10,847 statements and 5,747/5,766 raw branches. The hardened Student-t source has diagnostic evidence of 686/686 tests, 11,151/11,151 statements and 5,819/5,838 raw branches while retaining exactly 19 audited structural arcs and zero unexpected, stale or unaudited branch debt.</p>
+<p>The current exact-main-certified methods baseline (#116) passed 687 tests with 11,151/11,151 statements and 5,819/5,838 raw branches. The Student-t module is covered at 304/304 statements and 72/72 branches, while the repository retains exactly 19 audited structural arcs and zero unexpected, stale or unaudited branch debt. All 14/14 exact-main push workflow families succeeded.</p>
 <a href="deep-validation/">Inspect validation →</a>
 </div>
 <div class="gp-pillar">
