@@ -141,8 +141,19 @@
 - [x] Record release date **2026-09-11** and deliberately omit a `0.1.6` Zenodo version DOI before ingestion.
 - [x] Retain software concept DOI `10.5281/zenodo.22150872`, previous 0.1.5 DOI `10.5281/zenodo.22672823`, and R-reference DOI `10.5281/zenodo.21434608` only in their correct roles.
 - [x] Keep optional Windows PyInstaller/signing/installer/handoff evidence separate from the normal Python/GitHub/PyPI/Zenodo release gate.
-- [ ] Require all ten exact-main package/scientific release-gate families to pass on the merged stable commit.
-- [ ] Create immutable annotated `v0.1.6` only from that exact current-main commit.
-- [ ] Confirm canonical GitHub Release wheel/sdist, `SHA256SUMS.txt`, and `RELEASE-METADATA.json`.
-- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.6` only from the canonical successful release workflow artifact.
+- [x] Require all ten exact-main package/scientific release-gate families to pass on the merged stable commit.
+- [x] Create immutable annotated `v0.1.6` only from that exact current-main commit.
+- [x] Confirm canonical GitHub Release wheel/sdist, `SHA256SUMS.txt`, and `RELEASE-METADATA.json`.
+- [x] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.6` only from the canonical successful release workflow artifact.
 - [ ] Wait for Zenodo ingestion, record the genuine 0.1.6 version DOI, and complete the post-release citation/metadata closeout without altering immutable release artifacts.
+
+### 0.1.6 post-release publication evidence
+
+- [x] Immutable annotated `v0.1.6` resolves to exact qualified source commit `a3ad2d82447011284da8ea97d35bb7aea2ee8206`.
+- [x] Canonical release run `34657425240` succeeded after requiring successful package validation runs on that exact stable `main` commit; it built/checks both distributions, verified Studio packaging, smoke-installed wheel/sdist, validated canonical release metadata, created/verified the GitHub Release, and uploaded the canonical downstream publication artifact.
+- [x] GitHub Release and public PyPI wheel SHA-256 match: `087645e8fccd0885c0cd99fe1e0362f2d234f68f975b148cc9b8c64a2b8e2970`.
+- [x] GitHub Release and public PyPI sdist SHA-256 match: `c57ec464bbbb4b9444646e26e2abd02ff20e0a00e2b1ab8385bdf867eaa2eb25`.
+- [x] Protected PyPI publication run `34679563693` used the canonical release artifact, passed `twine check`, generated Sigstore/Rekor attestations, and received HTTP 200 for both distribution uploads.
+- [x] Fresh public-index consumer run `34680369123` passed **4/4** clean environments: Ubuntu/Windows × Python 3.11/3.14. Every job independently verified PyPI metadata and downloaded bytes against the canonical hashes, installed `gpbiometricspy[studio]==0.1.6` only from `pypi.org`, passed `pip check`, preserved the frozen **406/406 implemented, 0 pending** scientific export contract, verified all 36 packaged synthetic demo files / 69,120 rows, passed `gpbiometricspy-studio-doctor`, and exercised both installed full/public Studio launchers.
+- [x] Return live repository package identity to the `0.1.7.dev0` development line without modifying the frozen `v0.1.6` source or release artifacts.
+- [ ] Record the 0.1.6 Zenodo version DOI only after an actual Zenodo record can be independently verified; do not reuse the concept DOI or a prior-version DOI as a substitute.
