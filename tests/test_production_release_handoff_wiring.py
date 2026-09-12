@@ -62,6 +62,9 @@ def test_cut_release_requires_package_matrix_but_not_desktop_handoff() -> None:
     assert "Final production handoff is not yet validated" not in workflow
     assert "steps.gates.outputs.ready == '1'" in workflow
     assert 'gh workflow run release.yml --ref "$TAG" -f tag="$TAG"' in workflow
+    assert 'gh run watch "$RUN_ID" --exit-status' in workflow
+    assert 'gh workflow run pypi.yml --ref main -f tag="$TAG"' in workflow
+    assert workflow.index('gh run watch "$RUN_ID" --exit-status') < workflow.index('gh workflow run pypi.yml --ref main -f tag="$TAG"')
     assert 'gh workflow run release.yml --ref main' not in workflow
 
 

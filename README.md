@@ -126,6 +126,7 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 | Area | Current state |
 |---|---|
 | Stable release | **0.1.6** |
+| Development head | **0.1.7.dev0** |
 | Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
