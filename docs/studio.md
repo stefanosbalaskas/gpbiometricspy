@@ -29,10 +29,10 @@ The public boundary is fail-closed. It removes file-input affordances **and** re
 
 ## Install the stable application
 
-Studio is included in the stable `0.1.5` distribution and requires the optional Shiny dependencies.
+Studio is included in the stable `0.1.6` distribution and requires the optional Shiny dependencies.
 
 ```bash
-python -m pip install "gpbiometricspy[studio]==0.1.5"
+python -m pip install "gpbiometricspy[studio]==0.1.6"
 ```
 
 Verify the installed package:
@@ -44,8 +44,10 @@ python -c "import gpbiometricspy; print(gpbiometricspy.__version__)"
 Expected output:
 
 ```text
-0.1.5
+0.1.6
 ```
+
+The public `0.1.6` distribution has also been clean-install certified from `pypi.org` on Ubuntu and Windows with Python 3.11 and 3.14, including the installed Studio doctor and full/public launchers.
 
 ## Launch Studio
 
@@ -80,7 +82,7 @@ A clean virtual environment can also be created with the Python executable itsel
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install "gpbiometricspy[studio]==0.1.5"
+.\.venv\Scripts\python.exe -m pip install "gpbiometricspy[studio]==0.1.6"
 .\.venv\Scripts\python.exe -m studio.cli --host 127.0.0.1 --port 8765
 ```
 
@@ -206,9 +208,9 @@ The repository-root `app.py` imports the synthetic-only public boundary. The ful
 
 See [`DEPLOYMENT.md`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/DEPLOYMENT.md) for current production-hardening details.
 
-## Product direction for 0.1.6
+## 0.1.6 release
 
-The `0.1.6` development line is moving Studio from a scientifically complete application toward a more polished standalone research product. Current priorities are:
+The stable `0.1.6` release moved Studio from a scientifically complete application toward a more polished standalone research product, including:
 
 - clearer onboarding and “next step” guidance;
 - stronger information hierarchy and visual consistency;
@@ -228,7 +230,8 @@ Studio has independent validation layers on Python 3.11 and 3.14:
 - **Studio smoke** — install, Ruff, compilation, and Studio unit/service tests;
 - **Chromium E2E** — browser loading, synthetic workflow interactions, public upload suppression, accessibility and viewport checks;
 - **Production smoke** — deployment-style dependency reconstruction, fail-closed runtime policy, installed-distribution checks, source-distribution deployment assets and synthetic runtime metrics;
-- **Installed replay** — wheel/sdist replay paths for physiology, gaze/pupil, alignment, multimodal/modelling and cluster-permutation workflows with fingerprint guards.
+- **Installed replay** — wheel/sdist replay paths for physiology, gaze/pupil, alignment, multimodal/modelling and cluster-permutation workflows with fingerprint guards;
+- **Public PyPI consumer smoke** — exact public-index bytes/hashes, clean installs, dependency consistency, frozen 406/406 scientific exports, packaged synthetic data, Studio doctor and installed launchers on Ubuntu/Windows with Python 3.11/3.14.
 
 The scientific package continues to run its separate platform/Python matrix, deep R↔Python parity, optional-backend interoperability, private real-data validation and CodeQL layers.
 
