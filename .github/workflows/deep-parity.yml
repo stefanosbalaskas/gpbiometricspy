@@ -25,7 +25,7 @@ jobs:
         run: Rscript reference/golden/generate_r_golden.R artifacts/golden/r.json
       - name: Compare golden fixtures
         run: python scripts/compare_golden_fixtures.py artifacts/golden/r.json artifacts/golden/python.json
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: golden-fixtures

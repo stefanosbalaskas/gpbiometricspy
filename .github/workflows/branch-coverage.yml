@@ -59,7 +59,7 @@ jobs:
             | tee structural-branch-debt-audit.txt
       - name: Upload branch-coverage evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: branch-coverage-python-3.13
           path: |

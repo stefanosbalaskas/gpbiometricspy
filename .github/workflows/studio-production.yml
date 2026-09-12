@@ -226,7 +226,7 @@ jobs:
           exercise_artifact sdist "$sdist" 8766 8768
       - name: Upload installed browser diagnostics
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: studio-production-browser-diagnostics-py${{ matrix.python-version }}
           path: ${{ runner.temp }}/gpbiometricspy-studio-production-diagnostics
@@ -234,7 +234,7 @@ jobs:
       - name: Synthetic runtime smoke profile
         run: python -m studio.production --json studio-production-metrics.json
       - name: Upload runtime metrics
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: studio-production-metrics-py${{ matrix.python-version }}
           path: studio-production-metrics.json

@@ -295,7 +295,7 @@ jobs:
           fi
 
       - name: Upload canonical release artifact for downstream trusted publication
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: distributions
           path: |

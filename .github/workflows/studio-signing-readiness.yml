@@ -56,7 +56,7 @@ jobs:
 
       - name: Upload signing-readiness evidence only
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: studio-signing-readiness-evidence
           path: |
