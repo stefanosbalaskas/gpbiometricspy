@@ -113,16 +113,24 @@ def test_pypi_can_only_publish_from_successful_canonical_package_artifact() -> N
     assert "validate_stable_release_artifact.py" in workflow
     assert "validate_desktop_release_evidence.py" not in workflow
     assert "release-handoff" not in workflow
-    assert "git merge-base --is-ancestor" in workflow
+    assert "path: canonical-source" in workflow
+    assert 'git -C canonical-source rev-parse HEAD' in workflow
+    assert 'git -C canonical-source fetch origin main --force' in workflow
+    assert 'git -C canonical-source merge-base --is-ancestor' in workflow
+    assert "python canonical-source/tools/release/validate_stable_release_artifact.py" in workflow
+    assert 'gh release view "$PUBLISH_TAG" --repo "$GITHUB_REPOSITORY"' in workflow
+    assert workflow.count('--repo "$GITHUB_REPOSITORY"') >= 4
     assert "Verify GitHub Release still matches canonical artifact" in workflow
     assert "GitHub Release asset drift detected" in workflow
     assert "packages-dir: canonical-release/dist/" in workflow
     assert "gh release download" in workflow
     assert "release:\n    types: [published]" not in workflow
+    download = workflow.index("Download canonical release artifact from successful release run")
+    checkout = workflow.index("Checkout exact canonical release tag")
     canonical_validation = workflow.index("Revalidate canonical package artifact and main ancestry")
     release_match = workflow.index("Verify GitHub Release still matches canonical artifact")
     publish = workflow.index("Publish canonical distributions to PyPI")
-    assert canonical_validation < release_match < publish
+    assert download < checkout < canonical_validation < release_match < publish
 
 
 def test_readiness_gate_still_covers_package_release_wiring_changes() -> None:

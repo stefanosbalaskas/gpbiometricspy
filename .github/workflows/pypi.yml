@@ -112,6 +112,7 @@ jobs:
         with:
           ref: ${{ steps.metadata.outputs.tag }}
           fetch-depth: 0
+          path: canonical-source
 
       - uses: actions/setup-python@v6
         with:
@@ -124,10 +125,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
-          test "$(git rev-parse "refs/tags/$PUBLISH_TAG^{commit}")" = "$TARGET_SHA"
-          git fetch origin main --force
-          git merge-base --is-ancestor "$TARGET_SHA" origin/main || {
+          test "$(git -C canonical-source rev-parse HEAD)" = "$TARGET_SHA"
+          test "$(git -C canonical-source rev-parse "refs/tags/$PUBLISH_TAG^{commit}")" = "$TARGET_SHA"
+          git -C canonical-source fetch origin main --force
+          git -C canonical-source merge-base --is-ancestor "$TARGET_SHA" origin/main || {
             echo "Canonical release commit is not reachable from main." >&2
             exit 1
           }
@@ -135,7 +136,7 @@ jobs:
             cd canonical-release
             sha256sum -c SHA256SUMS.txt
           )
-          python tools/release/validate_stable_release_artifact.py \
+          python canonical-source/tools/release/validate_stable_release_artifact.py \
             --root canonical-release \
             --manifest canonical-release/RELEASE-METADATA.json \
             --expected-tag "$PUBLISH_TAG" \
@@ -149,14 +150,16 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${PUBLISH_TAG#v}"
-          gh release view "$PUBLISH_TAG" --json isDraft,tagName --jq 'select(.isDraft == false) | .tagName' | grep -Fx "$PUBLISH_TAG"
+          gh release view "$PUBLISH_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,tagName --jq 'select(.isDraft == false) | .tagName' | grep -Fx "$PUBLISH_TAG"
           rm -rf release-assets
           mkdir -p release-assets/dist
           gh release download "$PUBLISH_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --pattern "gpbiometricspy-${VERSION}-py3-none-any.whl" \
             --pattern "gpbiometricspy-${VERSION}.tar.gz" \
             --dir release-assets/dist
           gh release download "$PUBLISH_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --pattern "SHA256SUMS.txt" \
             --pattern "RELEASE-METADATA.json" \
             --dir release-assets
