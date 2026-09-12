@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "0532d204ede93335e8a789d9035f02470767877c",
-  "coverage_denominator": 5838,
-  "raw_covered_branches": 5819,
-  "raw_branch_coverage_percent": 99.6745,
+  "baseline_commit": "568886cda040fb3a065bcda9b4975d9b6649db15",
+  "coverage_denominator": 5928,
+  "raw_covered_branches": 5909,
+  "raw_branch_coverage_percent": 99.6795,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10299827126,
-    "workflow_artifact_digest": "sha256:1c906786c2aa0ff673656d6d4cc06a331f63aead346c3057a73e8bd3f361073e",
-    "diagnostic_note": "The hardened source-identical branch-coverage diagnostic recorded 686/686 tests passing with 2 warnings, 11,151/11,151 statements, 5,819/5,838 covered branches (99.6745%), 19 raw missing branches exactly matching the existing audited entries, zero unexpected missing arcs, zero stale contract entries, and zero unaudited branch debt. The robust_hierarchical_location_scale.py module recorded 304/304 statements and 72/72 branches. This artifact establishes the hardened structural-debt denominator and provenance; final merge authority remains the terminal-green exact-head workflow generation of the final candidate."
+    "workflow_artifact_id": 10301169258,
+    "workflow_artifact_digest": "sha256:bccc2bd8817c6ffb6dcb7b6b5f95fbbccb63e7e4bc97bb4ecf7f3521ce0d6311",
+    "diagnostic_note": "Source-identical diagnostic head 568886cda040fb3a065bcda9b4975d9b6649db15 completed branch-coverage run 34705234838 on Ubuntu 24.04.5 / CPython 3.13.15. Ruff and byte-compilation were clean; 694/694 tests passed with 2 warnings; 11,504/11,504 statements were covered; raw branch coverage was 5,909/5,928 = 99.6795%; exactly 19 raw missing branches matched the existing audited structural entries; unexpected missing arcs, stale contract entries and unaudited debt were all zero; audited accounting was 5,928/5,928 = 100%. The new hierarchical_location_scale_random_slope.py module recorded 353/353 statements and 90/90 branches. Artifact 10301169258 has digest sha256:bccc2bd8817c6ffb6dcb7b6b5f95fbbccb63e7e4bc97bb4ecf7f3521ce0d6311. This diagnostic artifact establishes source-identical denominator and debt provenance only; final merge authority requires a fresh terminal-green exact-head generation of the normalized candidate."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
