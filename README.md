@@ -131,18 +131,22 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 | Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Development-main tests | **662 passed** on Ubuntu / Python 3.12 reference CI |
-| Development-main statement coverage | **10,847 / 10,847 = 100.00%** |
-| Development-main raw branch coverage | **5,747 / 5,766 = 99.6705%** |
+| Last exact-main-certified methods baseline | **#114 · `d1e397c4d73819085584c924d8eb1a069f4fba3b`** |
+| Baseline tests | **662 passed** |
+| Baseline statement coverage | **10,847 / 10,847 = 100.00%** |
+| Baseline raw branch coverage | **5,747 / 5,766 = 99.6705%** |
+| Hardened Student-t diagnostic tests | **686 / 686 passed** |
+| Hardened Student-t diagnostic statement coverage | **11,151 / 11,151 = 100.00%** |
+| Hardened Student-t diagnostic raw branch coverage | **5,819 / 5,838 = 99.6745%** |
+| Hardened Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
 | Audited structural arcs | **19** |
 | Unexpected / stale / unaudited branch debt | **0 / 0 / 0** |
-| Exact-main workflow certification | **14 / 14 push workflow families successful** at `d1e397c4d73819085584c924d8eb1a069f4fba3b` |
 | Supported Python | **3.11–3.14** |
 | Studio | **11 research workflows + Chromium E2E + installed wheel/sdist production validation** |
 
-The current development-main raw branch metric is **99.6705%**. The 19 remaining arcs are explicitly reviewed structural/caller-dominated paths; audited accounting is separate and does not relabel the raw coverage percentage as 100%.
+The latest exact-main-certified methods baseline remains #114. The hardened Student-t source in #116 has separate diagnostic evidence: **686/686 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and zero unexpected, stale or unaudited branch debt. Those hardened-source diagnostic figures are deliberately not presented as exact-main certification before #116 is merged and its push workflows are certified.
 
-Stable **0.1.6** remains a separate frozen release line. Its release qualification preserves **641 core tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-main metrics above include post-release methods work and must not be read as retroactively changing the 0.1.6 artifacts.
+Stable **0.1.6** remains a separate frozen release line. Its release qualification preserves **641 core tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line metrics above include post-release methods work and must not be read as retroactively changing the 0.1.6 artifacts.
 
 ### Scientific scope
 
@@ -155,11 +159,12 @@ Stable **0.1.6** remains a separate frozen release line. Its release qualificati
 - TTL/event alignment, synchronization drift and secondary streams;
 - multimodal summaries and model-ready tables;
 - cluster permutation and statistical/design guardrails;
-- Python-native hierarchical location–scale modelling with correlated participant/group random intercepts in mean and log-scale equations;
+- Python-native Gaussian hierarchical location–scale modelling with correlated participant/group random intercepts in mean and log-scale equations;
+- Python-native robust Student-t hierarchical location–scale modelling with jointly estimated finite-variance degrees of freedom;
 - MNE, LSL/XDF, BIDS-oriented and external-toolbox interoperability;
 - reproducibility, provenance, reporting and synthetic simulation.
 
-The package preserves conservative interpretation boundaries: physiological and eye-tracking measurements are not direct proof of emotion, stress, trust, preference, cognition, health status, or diagnosis. The hierarchical location–scale model is a distributional heterogeneity model; it does not by itself identify artifacts, establish sensor validity, or support causal interpretation.
+The package preserves conservative interpretation boundaries: physiological and eye-tracking measurements are not direct proof of emotion, stress, trust, preference, cognition, health status, or diagnosis. The location–scale models estimate distributional heterogeneity. The Student-t extension provides heavy-tailed distributional robustness; a low fitted degrees-of-freedom parameter is **not** an artifact score. Neither model by itself identifies artifacts, establishes sensor validity, or supports causal interpretation.
 
 ---
 
@@ -169,10 +174,11 @@ The package preserves conservative interpretation boundaries: physiological and 
 - **[Studio](https://stefanosbalaskas.github.io/gpbiometricspy/studio/)** — application workflow, local/public boundaries and launch options.
 - **[Workflow map](https://stefanosbalaskas.github.io/gpbiometricspy/workflows/)** — choose a path from your recorded signals.
 - **[Methods](https://stefanosbalaskas.github.io/gpbiometricspy/methods/)** — Python-native methodological extensions outside the frozen 406-export R parity surface.
-- **[Hierarchical location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/hierarchical-location-scale/)** — joint mean/log-scale modelling, adaptive Gauss–Hermite quadrature, empirical-Bayes group effects, prediction semantics and reproducibility certificates.
+- **[Hierarchical location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/hierarchical-location-scale/)** — Gaussian joint mean/log-scale modelling, adaptive Gauss–Hermite quadrature, empirical-Bayes group effects, prediction semantics and reproducibility certificates.
+- **[Robust Student-t location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/robust-hierarchical-location-scale/)** — heavy-tailed conditional outcomes, estimated degrees of freedom, scale-vs-SD semantics, canonical empirical-Bayes certificate binding, defensive numerical validation and fail-closed certificates.
 - **[Examples](https://stefanosbalaskas.github.io/gpbiometricspy/examples/)** — EDA, HRV, pupil/gaze, multimodal, QC/reporting and interoperability.
 - **[Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/)** — figures generated by the package.
-- **[API by scientific domain](https://stefanosbalaskas.github.io/gpbiometricspy/api/)** — task-oriented navigation of all 406 functions.
+- **[API by scientific domain](https://stefanosbalaskas.github.io/gpbiometricspy/api/)** — task-oriented navigation of all 406 frozen-parity functions plus separately documented Python-native methods.
 - **[Validation](https://stefanosbalaskas.github.io/gpbiometricspy/deep-validation/)** — parity, coverage, real-data and application validation layers.
 
 ---
@@ -197,4 +203,4 @@ Recommended citation:
 
 ## Development and provenance
 
-The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.
+The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. The current methods line contains the Gaussian hierarchical location–scale model and the heavy-tailed Student-t extension developed in #116. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.

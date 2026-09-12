@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "1ed43a28050ef0501a8ec50b8e923d12fa5f40cc",
-  "coverage_denominator": 5766,
-  "raw_covered_branches": 5747,
-  "raw_branch_coverage_percent": 99.6705,
+  "baseline_commit": "0532d204ede93335e8a789d9035f02470767877c",
+  "coverage_denominator": 5838,
+  "raw_covered_branches": 5819,
+  "raw_branch_coverage_percent": 99.6745,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10297404403,
-    "workflow_artifact_digest": "sha256:fd149b433a6c71525626bc0b64041015157ba0981e1893827e377332281c7b33",
-    "diagnostic_note": "The baseline artifact contains the hardened source plus dedicated guardrail tests. It recorded 5,747/5,766 covered branches, 19 raw missing branches, zero unexpected missing arcs, zero stale contract entries, and zero unaudited branch debt. The workflow failed only because the then-frozen contract denominator was still 5,762."
+    "workflow_artifact_id": 10299827126,
+    "workflow_artifact_digest": "sha256:1c906786c2aa0ff673656d6d4cc06a331f63aead346c3057a73e8bd3f361073e",
+    "diagnostic_note": "The hardened source-identical branch-coverage diagnostic recorded 686/686 tests passing with 2 warnings, 11,151/11,151 statements, 5,819/5,838 covered branches (99.6745%), 19 raw missing branches exactly matching the existing audited entries, zero unexpected missing arcs, zero stale contract entries, and zero unaudited branch debt. The robust_hierarchical_location_scale.py module recorded 304/304 statements and 72/72 branches. This artifact establishes the hardened structural-debt denominator and provenance; final merge authority remains the terminal-green exact-head workflow generation of the final candidate."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [

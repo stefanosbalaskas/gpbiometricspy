@@ -19,11 +19,13 @@
 <div class="gp-status-grid">
 <div><span class="gp-status-value">0.1.6</span><span class="gp-status-label">stable release</span></div>
 <div><span class="gp-status-value">0.1.7.dev0</span><span class="gp-status-label">development head</span></div>
-<div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">R exports implemented</span></div>
-<div><span class="gp-status-value">662</span><span class="gp-status-label">development-main tests</span></div>
-<div><span class="gp-status-value">100%</span><span class="gp-status-label">statement coverage</span></div>
-<div><span class="gp-status-value">99.6705%</span><span class="gp-status-label">development raw branch coverage</span></div>
-<div><span class="gp-status-value">14 / 14</span><span class="gp-status-label">exact-main push workflows green</span></div>
+<div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
+<div><span class="gp-status-value">662</span><span class="gp-status-label">last exact-main-certified methods baseline tests</span></div>
+<div><span class="gp-status-value">686</span><span class="gp-status-label">hardened Student-t diagnostic tests</span></div>
+<div><span class="gp-status-value">100%</span><span class="gp-status-label">hardened diagnostic statement coverage</span></div>
+<div><span class="gp-status-value">99.6745%</span><span class="gp-status-label">hardened diagnostic raw branch coverage</span></div>
+<div><span class="gp-status-value">72 / 72</span><span class="gp-status-label">hardened Student-t module branches</span></div>
+<div><span class="gp-status-value">19</span><span class="gp-status-label">audited structural arcs</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">supported Python</span></div>
 </div>
 
@@ -41,7 +43,7 @@
 <a class="gp-card gp-card-link" href="getting-started/">
 <span class="gp-card-icon">⌨</span>
 <h3>Python API</h3>
-<p>Use the complete 406-function scientific surface from scripts, notebooks, packages, pipelines, or custom research applications.</p>
+<p>Use the complete 406-function frozen-parity scientific surface from scripts, notebooks, packages, pipelines, or custom research applications.</p>
 <span class="gp-card-cta">Start coding →</span>
 </a>
 
@@ -55,20 +57,32 @@
 <a class="gp-card gp-card-link" href="methods/">
 <span class="gp-card-icon">Σ</span>
 <h3>Methods</h3>
-<p>Explore Python-native methodological extensions that are additive to, and explicitly separated from, the frozen 406-export R semantic-parity surface.</p>
+<p>Explore additive Python-native methods, including Gaussian and robust Student-t hierarchical location–scale modelling, without blurring the frozen R-parity contract.</p>
 <span class="gp-card-cta">Open methods →</span>
 </a>
 
 </div>
 
-## Current Python-native methods extension
+## Current Python-native methods
 
-The development line now includes **hierarchical location–scale modelling** for jointly modelling outcome location and log residual scale with correlated participant/group random intercepts. The implementation uses two-dimensional adaptive Gauss–Hermite quadrature, empirical-Bayes group-effect summaries, explicit unseen-group prediction semantics, immutable fitted metadata and SHA-256 reproducibility certificates.
+The development line contains two explicitly separate location–scale modelling paths.
 
-[Open the hierarchical location–scale method guide →](methods/hierarchical-location-scale.md)
+### Gaussian hierarchical location–scale model
+
+The Gaussian method jointly models outcome location and log residual scale with correlated participant/group random intercepts. It uses two-dimensional adaptive Gauss–Hermite quadrature, empirical-Bayes group-effect summaries, explicit unseen-group prediction semantics, immutable fitted metadata and SHA-256 reproducibility certificates.
+
+[Open the Gaussian hierarchical location–scale guide →](methods/hierarchical-location-scale.md)
+
+### Robust Student-t hierarchical location–scale model
+
+The robust extension keeps the same location/log-scale architecture but replaces the conditional Gaussian outcome model with a symmetric Student-t distribution and estimates its degrees of freedom jointly with the remaining parameters. Fitting and known-truth simulation share the same `2.05 ≤ ν ≤ 200` domain. Reproducibility certificates also bind a canonical, row-order-invariant fingerprint of the empirical-Bayes random-effects table used for conditional prediction.
+
+[Open the robust Student-t location–scale guide →](methods/robust-hierarchical-location-scale.md)
+
+The hardened Student-t source has diagnostic evidence of **686/686 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and **304/304 statements plus 72/72 branches** in the Student-t module, with exactly the existing 19 audited structural arcs and zero unexpected, stale or unaudited branch debt. These are hardened-source diagnostic results, not exact-main certification before merge and post-merge push validation.
 
 !!! info "Scientific boundary"
-    This is a distributional heterogeneity model. It does **not** identify motion artifacts, perform artifact correction or sensor-validity weighting, establish causal effects, or infer latent psychological or clinical states. Random slopes, crossed random effects, non-Gaussian outcomes and Bayesian priors remain outside the current tranche.
+    These are distributional heterogeneity models. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. Neither implementation identifies motion or physiological artifacts, performs artifact correction or sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states. Random slopes, crossed random effects, skewed heavy-tail families, mixture models and Bayesian priors remain outside the current family.
 
 ## Studio: the end-user research product
 
@@ -164,18 +178,18 @@ Then open `http://127.0.0.1:8765`.
 </div>
 <div class="gp-pillar">
 <h3>Validation is part of the product</h3>
-<p>Current development main passes 662 tests, preserves 10,847/10,847 package statements = 100.00%, 5,747/5,766 raw branches = 99.6705%, and zero unexpected, stale or unaudited branch debt. The exact merged SHA was certified by 14/14 push workflow families.</p>
+<p>The last exact-main-certified methods baseline (#114) passed 662 tests with 10,847/10,847 statements and 5,747/5,766 raw branches. The hardened Student-t source has diagnostic evidence of 686/686 tests, 11,151/11,151 statements and 5,819/5,838 raw branches while retaining exactly 19 audited structural arcs and zero unexpected, stale or unaudited branch debt.</p>
 <a href="deep-validation/">Inspect validation →</a>
 </div>
 <div class="gp-pillar">
 <h3>Conservative interpretation</h3>
-<p>Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis.</p>
+<p>Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Heavy-tailed robustness is not automatic artifact classification.</p>
 <a href="interpretation/">Read the guardrails →</a>
 </div>
 </div>
 
 !!! success "Stable archival record"
-    Stable `gpbiometricspy 0.1.6` was released on **2026-09-11**. Its frozen release qualification remains separate from development main: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Its version DOI remains pending until Zenodo ingests `v0.1.6`; the software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.5 version DOI is [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823).
+    Stable `gpbiometricspy 0.1.6` was released on **2026-09-11**. Its frozen release qualification remains separate from development work: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Its version DOI remains pending until Zenodo ingests `v0.1.6`; the software concept DOI is [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872), and the previous 0.1.5 version DOI is [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823).
 
 ## Generated by the package
 
@@ -203,10 +217,11 @@ Every gallery image is regenerated from the Python API during the documentation 
 <a href="getting-started/">5-minute Python start</a>
 <a href="workflows/">Workflow map</a>
 <a href="methods/">Python-native methods</a>
+<a href="methods/robust-hierarchical-location-scale/">Robust Student-t location–scale</a>
 <a href="measurement-accountability/">Measurement accountability</a>
 <a href="articles/">26 article companions</a>
 <a href="integrations/">Integrations</a>
 <a href="citation/">Citation + DOI</a>
-<a href="api/reference/">406-function API</a>
+<a href="api/reference/">406-function frozen-parity API</a>
 <a href="development/">Development</a>
 </div>

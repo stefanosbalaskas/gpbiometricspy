@@ -120,6 +120,7 @@ nav:
   - Methods:
       - Overview: methods/index.md
       - Hierarchical location–scale modelling: methods/hierarchical-location-scale.md
+      - Robust Student-t location–scale modelling: methods/robust-hierarchical-location-scale.md
   - API:
       - Browse by domain: api/index.md
       - EDA / GSR / SCR: api/eda-scr.md
