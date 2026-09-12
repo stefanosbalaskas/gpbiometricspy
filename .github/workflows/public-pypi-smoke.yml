@@ -8,12 +8,14 @@ on:
     paths:
       - ".github/workflows/public-pypi-smoke.yml"
       - "scripts/public_pypi_smoke.py"
+      - "tests/test_public_pypi_smoke_wiring.py"
       - "RELEASE_CHECKLIST.md"
       - "docs/studio.md"
   pull_request:
     paths:
       - ".github/workflows/public-pypi-smoke.yml"
       - "scripts/public_pypi_smoke.py"
+      - "tests/test_public_pypi_smoke_wiring.py"
       - "RELEASE_CHECKLIST.md"
       - "docs/studio.md"
 
