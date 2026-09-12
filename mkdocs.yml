@@ -117,6 +117,8 @@ nav:
           - External toolbox bridges: articles/toolbox-bridges-workflow.md
           - Interoperability version testing: articles/interoperability-version-testing.md
           - gp3tools compatibility: articles/gp3tools-compatibility.md
+  - Methods:
+      - Hierarchical location–scale modelling: methods/hierarchical-location-scale.md
   - API:
       - Browse by domain: api/index.md
       - EDA / GSR / SCR: api/eda-scr.md
