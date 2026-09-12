@@ -131,20 +131,18 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 | Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Last exact-main-certified methods baseline | **#114 · `d1e397c4d73819085584c924d8eb1a069f4fba3b`** |
-| Baseline tests | **662 passed** |
-| Baseline statement coverage | **10,847 / 10,847 = 100.00%** |
-| Baseline raw branch coverage | **5,747 / 5,766 = 99.6705%** |
-| Hardened Student-t diagnostic tests | **686 / 686 passed** |
-| Hardened Student-t diagnostic statement coverage | **11,151 / 11,151 = 100.00%** |
-| Hardened Student-t diagnostic raw branch coverage | **5,819 / 5,838 = 99.6745%** |
-| Hardened Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
+| Exact-main-certified methods baseline | **#116 · `1de9041aace7d5f0fd256b2e9b357308efd7798a`** |
+| Exact-main tests | **687 / 687 passed** |
+| Exact-main statement coverage | **11,151 / 11,151 = 100.00%** |
+| Exact-main raw branch coverage | **5,819 / 5,838 = 99.6745%** |
+| Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
 | Audited structural arcs | **19** |
 | Unexpected / stale / unaudited branch debt | **0 / 0 / 0** |
+| Exact-main workflow certification | **14 / 14 push workflow families successful** |
 | Supported Python | **3.11–3.14** |
 | Studio | **11 research workflows + Chromium E2E + installed wheel/sdist production validation** |
 
-The latest exact-main-certified methods baseline remains #114. The hardened Student-t source in #116 has separate diagnostic evidence: **686/686 tests**, **11,151/11,151 statements**, **5,819/5,838 raw branches = 99.6745%**, and zero unexpected, stale or unaudited branch debt. Those hardened-source diagnostic figures are deliberately not presented as exact-main certification before #116 is merged and its push workflows are certified.
+The current exact-main-certified methods baseline is #116 at `1de9041aace7d5f0fd256b2e9b357308efd7798a`. Its exact-main branch-coverage run passed **687/687 tests**, covered **11,151/11,151 statements** and **5,819/5,838 raw branches = 99.6745%**, and retained exactly 19 audited structural arcs with zero unexpected, stale or unaudited branch debt. The robust Student-t module itself is covered at **304/304 statements and 72/72 branches**. All **14/14 exact-main push workflow families** completed successfully, and the documentation/Pages publication chain is green.
 
 Stable **0.1.6** remains a separate frozen release line. Its release qualification preserves **641 core tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line metrics above include post-release methods work and must not be read as retroactively changing the 0.1.6 artifacts.
 
