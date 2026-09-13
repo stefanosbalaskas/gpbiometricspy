@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "568886cda040fb3a065bcda9b4975d9b6649db15",
-  "coverage_denominator": 5928,
-  "raw_covered_branches": 5909,
-  "raw_branch_coverage_percent": 99.6795,
+  "baseline_commit": "4e1dbe4527ce8ad0b1bc7b353d9c8b93cc71d515",
+  "coverage_denominator": 6014,
+  "raw_covered_branches": 5995,
+  "raw_branch_coverage_percent": 99.6841,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10301169258,
-    "workflow_artifact_digest": "sha256:bccc2bd8817c6ffb6dcb7b6b5f95fbbccb63e7e4bc97bb4ecf7f3521ce0d6311",
-    "diagnostic_note": "Source-identical diagnostic head 568886cda040fb3a065bcda9b4975d9b6649db15 completed branch-coverage run 34705234838 on Ubuntu 24.04.5 / CPython 3.13.15. Ruff and byte-compilation were clean; 694/694 tests passed with 2 warnings; 11,504/11,504 statements were covered; raw branch coverage was 5,909/5,928 = 99.6795%; exactly 19 raw missing branches matched the existing audited structural entries; unexpected missing arcs, stale contract entries and unaudited debt were all zero; audited accounting was 5,928/5,928 = 100%. The new hierarchical_location_scale_random_slope.py module recorded 353/353 statements and 90/90 branches. Artifact 10301169258 has digest sha256:bccc2bd8817c6ffb6dcb7b6b5f95fbbccb63e7e4bc97bb4ecf7f3521ce0d6311. This diagnostic artifact establishes source-identical denominator and debt provenance only; final merge authority requires a fresh terminal-green exact-head generation of the normalized candidate."
+    "workflow_artifact_id": 10315766766,
+    "workflow_artifact_digest": "sha256:5ba0fbc56f2a74d3b27f1952c9440170884f54f865328a1f2643b2dc9757e116",
+    "diagnostic_note": "Candidate head 4e1dbe4527ce8ad0b1bc7b353d9c8b93cc71d515 completed the full branch-coverage test step in run 34751569119 on Ubuntu 24.04.5 / CPython 3.13.15. Ruff and byte-compilation were clean; 701/701 tests passed with 2 warnings; 11,836/11,836 statements were covered; raw branch coverage was 5,995/6,014 = 99.6841%; exactly 19 raw missing branches matched the existing audited structural entries; unexpected missing arcs, stale contract entries and unaudited debt were all zero; audited accounting was 6,014/6,014 = 100%. The new hierarchical_location_scale_random_scale_slope.py module recorded 332/332 statements and 86/86 branches. Artifact 10315766766 has digest sha256:5ba0fbc56f2a74d3b27f1952c9440170884f54f865328a1f2643b2dc9757e116. The run failed only because the previous ledger intentionally froze the older 5,928-branch denominator; this update advances denominator provenance without changing any of the 19 audited debt entries. Final merge authority still requires a fresh terminal-green exact-head generation of the normalized candidate."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [

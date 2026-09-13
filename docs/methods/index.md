@@ -36,13 +36,21 @@ The random-slope variable must also enter the fixed mean equation and must vary 
 
 [Open the random-slope location–scale guide →](random-slope-location-scale.md)
 
+### Random scale-slope hierarchical location–scale modelling
+
+The Gaussian random scale-slope extension adds **one participant/group-specific numeric slope in the log-scale equation** while retaining the location random intercept. Its latent state is `(location intercept, log-scale intercept, log-scale slope)` with a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
+
+The scale-slope variable must also enter the fixed log-scale equation and must vary within every group. This makes participant/group differences in residual-variability associations estimable without interpreting them as artifact, sensor-validity or causal effects.
+
+[Open the random scale-slope location–scale guide →](random-scale-slope-location-scale.md)
+
 ## Validation boundary
 
-The latest merged methods baseline is PR **#119**, merge SHA `0245dd99d2ca8aa44b26c3740f332628f9ba83e4`. Its merge tree is identical to the qualified PR head tree. The PR candidate completed **14/14 exact-head workflow families successfully** before merge.
+The latest fully certified public methods baseline is PR **#120**, merge SHA `ac7127283ed9c9ce11e83d081d8a1519c723dcbd`. Its merge tree is identical to the qualified PR head tree, and all six exact-main push workflow families were terminal green after merge.
 
-Fresh exact-main software evidence on the merge SHA passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,909/5,928 = 99.6795%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. The random-slope module itself passes **353/353 statements** and **90/90 branches**.
+The certified baseline passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,909/5,928 = 99.6795%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. The location-random-slope module itself passes **353/353 statements** and **90/90 branches**.
 
-Full exact-main certification is intentionally stricter than source, test, or coverage success alone: it is declared only when every required push workflow for the merge SHA is terminal green. This page therefore distinguishes the **latest merged baseline** from the stronger **fully certified baseline** rather than substituting pre-merge evidence for post-merge evidence.
+The random scale-slope implementation documented above is a development candidate until its own exact-head qualification and post-merge exact-main certification complete. Pre-merge evidence is never substituted for post-merge evidence.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; development-line method work does not retroactively alter the stable-release record.
 
@@ -56,4 +64,4 @@ The methods section documents statistical and computational methods, not automat
 - identifies causal effects; or
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
 
-The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. Additional random slopes, random slopes in the log-scale equation, crossed random effects, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
+The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. Additional random slopes, simultaneous location-and-scale random slopes, crossed random effects, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
