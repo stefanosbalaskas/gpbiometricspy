@@ -52,6 +52,16 @@ Each slope variable must enter the corresponding fixed equation and vary within 
 
 [Open the joint random-slope location–scale guide →](joint-random-slopes-location-scale.md)
 
+### Crossed participant–item hierarchical location–scale modelling — candidate
+
+The crossed Gaussian candidate adds **participant and item/stimulus random intercepts in both the location and log-scale equations**. Participant effects and item effects each use their own correlated 2 × 2 covariance matrix, allowing both clustering factors to contribute location heterogeneity and residual-scale heterogeneity.
+
+Because crossed participant and item effects cannot be integrated independently group by group, the implementation uses a **joint Laplace approximation** over the complete crossed latent field with an analytic gradient/Hessian, explicit incidence-connectivity and replication guards, a dense-latent complexity ceiling, population-versus-conditional prediction semantics for unseen participants/items, and deterministic reproducibility certificates.
+
+This method is intentionally labelled a **development candidate** until its own pinned exact-head qualification, merge-object verification, and fresh exact-main certification are complete. It does not alter the latest certified PR #122 methods baseline or the frozen 406-export R-parity contract.
+
+[Open the crossed participant–item location–scale guide →](crossed-location-scale.md)
+
 ## Validation boundary
 
 The latest fully certified public methods baseline is PR **#122**, merge SHA `17cb7c38de2b811b9b2fde407800465351d8b5c2`. Its merge tree `e26816c809762d31079cac2c9ccd4c3566afc774` is identical to the qualified PR head tree, its sole parent is the certified PR #121 baseline, its GitHub signature is verified/valid, and all **14/14 exact-main push workflow families** completed successfully after merge with **0 failures** and **0 cancellations**.
@@ -72,4 +82,4 @@ The methods section documents statistical and computational methods, not automat
 - identifies causal effects; or
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
 
-The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. Additional random slopes, crossed random effects, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
+The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. The crossed candidate adds participant and item/stimulus random intercepts in both equations while retaining the same conservative interpretation boundary. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
