@@ -131,18 +131,20 @@ Extras are also available for `heartpy`, `biosppy`, `pyhrv`, `neurokit`, `mne`, 
 | Release date | **2026-09-11** |
 | Frozen semantic reference | **gpbiometrics 2.0.0** |
 | API parity | **406 / 406 implemented · 0 pending** |
-| Current exact-main-certified methods baseline | **#116 · `1de9041aace7d5f0fd256b2e9b357308efd7798a`** |
-| Exact-main tests | **687 / 687 passed** |
-| Exact-main statement coverage | **11,151 / 11,151 = 100.00%** |
-| Exact-main raw branch coverage | **5,819 / 5,838 = 99.6745%** |
-| Student-t module coverage | **304 / 304 statements · 72 / 72 branches** |
-| Exact-main push workflows | **14 / 14 successful** |
+| Latest merged methods baseline | **#119 · `0245dd99d2ca8aa44b26c3740f332628f9ba83e4`** |
+| Exact-main tests | **694 / 694 passed** |
+| Exact-main statement coverage | **11,504 / 11,504 = 100.00%** |
+| Exact-main raw branch coverage | **5,909 / 5,928 = 99.6795%** |
+| Random-slope module coverage | **353 / 353 statements · 90 / 90 branches** |
+| PR #119 exact-head qualification | **14 / 14 workflow families successful** |
 | Audited structural arcs | **19** |
 | Unexpected / stale / unaudited branch debt | **0 / 0 / 0** |
 | Supported Python | **3.11–3.14** |
 | Studio | **11 research workflows + Chromium E2E + installed wheel/sdist production validation** |
 
-The current exact-main-certified methods baseline is #116 at `1de9041aace7d5f0fd256b2e9b357308efd7798a`. Fresh push-only certification on that merge SHA completed **14/14 workflow families successfully**. Canonical Ubuntu/Python 3.12.14 evidence passed **687/687 tests**, **11,151/11,151 statements = 100.00%**, and the frozen export audit remained **406/406 with 0 pending**. Exact-main branch coverage was **5,819/5,838 = 99.6745%**, with exactly the existing **19 audited structural arcs** and **0 unexpected, stale or unaudited branch debt**. The exact-main branch-coverage artifact is `10301085630` (`sha256:136f75c7edd6769142a62756ea7b7c0a291958d62277f79e0902792d7610ebc9`).
+The latest merged methods baseline is PR #119 at `0245dd99d2ca8aa44b26c3740f332628f9ba83e4`. Its merge tree exactly matches the qualified PR head tree, whose exact-head qualification completed **14/14 workflow families successfully**. Fresh exact-main software evidence passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,909/5,928 = 99.6795%**, with all **19** uncovered arcs explicitly audited as structural debt and **0 unexpected, stale or unaudited branch debt**. The random-slope module itself passes **353/353 statements** and **90/90 branches**. The exact-main branch-coverage artifact is `10315436253` (`sha256:135149ca560da1e9163b3591efb3e97ae6e37464f4b2862c5f2b2ecbdb77a9c5`).
+
+Full exact-main certification is deliberately stricter than test and coverage success: it is declared only after every required post-merge push workflow for the exact merge SHA is terminal green. Pre-merge qualification is never substituted for post-merge evidence.
 
 Stable **0.1.6** remains a separate frozen release line. Its release qualification preserves **641 core tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line metrics above include post-release methods work and must not be read as retroactively changing the 0.1.6 artifacts.
 
@@ -159,10 +161,11 @@ Stable **0.1.6** remains a separate frozen release line. Its release qualificati
 - cluster permutation and statistical/design guardrails;
 - Python-native Gaussian hierarchical location–scale modelling with correlated participant/group random intercepts in mean and log-scale equations;
 - Python-native robust Student-t hierarchical location–scale modelling with jointly estimated finite-variance degrees of freedom;
+- Python-native Gaussian random-slope location–scale modelling with one group-specific numeric slope in the location equation, a log-scale random intercept, full 3 × 3 latent covariance, and three-dimensional adaptive Gauss–Hermite quadrature;
 - MNE, LSL/XDF, BIDS-oriented and external-toolbox interoperability;
 - reproducibility, provenance, reporting and synthetic simulation.
 
-The package preserves conservative interpretation boundaries: physiological and eye-tracking measurements are not direct proof of emotion, stress, trust, preference, cognition, health status, or diagnosis. The location–scale models estimate distributional heterogeneity. The Student-t extension provides heavy-tailed distributional robustness; a low fitted degrees-of-freedom parameter is **not** an artifact score. Neither model by itself identifies artifacts, establishes sensor validity, or supports causal interpretation.
+The package preserves conservative interpretation boundaries: physiological and eye-tracking measurements are not direct proof of emotion, stress, trust, preference, cognition, health status, or diagnosis. The location–scale models estimate distributional heterogeneity. The Student-t extension provides heavy-tailed distributional robustness; a low fitted degrees-of-freedom parameter is **not** an artifact score. The random-slope extension estimates association heterogeneity, not a causal effect or an error-free participant trait. None of these models by itself identifies artifacts, establishes sensor validity, performs sensor-validity weighting, or supports causal interpretation.
 
 ---
 
@@ -174,6 +177,7 @@ The package preserves conservative interpretation boundaries: physiological and 
 - **[Methods](https://stefanosbalaskas.github.io/gpbiometricspy/methods/)** — Python-native methodological extensions outside the frozen 406-export R parity surface.
 - **[Hierarchical location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/hierarchical-location-scale/)** — Gaussian joint mean/log-scale modelling, adaptive Gauss–Hermite quadrature, empirical-Bayes group effects, prediction semantics and reproducibility certificates.
 - **[Robust Student-t location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/robust-hierarchical-location-scale/)** — heavy-tailed conditional outcomes, estimated degrees of freedom, scale-vs-SD semantics, canonical empirical-Bayes certificate binding, defensive numerical validation and fail-closed certificates.
+- **[Random-slope location–scale modelling](https://stefanosbalaskas.github.io/gpbiometricspy/methods/random-slope-location-scale/)** — one group-specific numeric slope in the Gaussian location equation, full 3 × 3 latent covariance, three-dimensional adaptive quadrature, conditional/population prediction and reproducibility certificates.
 - **[Examples](https://stefanosbalaskas.github.io/gpbiometricspy/examples/)** — EDA, HRV, pupil/gaze, multimodal, QC/reporting and interoperability.
 - **[Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/)** — figures generated by the package.
 - **[API by scientific domain](https://stefanosbalaskas.github.io/gpbiometricspy/api/)** — task-oriented navigation of all 406 frozen-parity functions plus separately documented Python-native methods.
@@ -201,4 +205,4 @@ Recommended citation:
 
 ## Development and provenance
 
-The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. The current methods line contains the Gaussian hierarchical location–scale model and the heavy-tailed Student-t extension developed and exact-main certified in #116. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.
+The R `gpbiometrics 2.0.0` source, tests, documentation and article material are retained under `reference/` as the frozen semantic reference used for parity work. Python-native methodological extensions are additive and documented separately under **Methods** so they do not alter the completed 406/406 semantic-parity contract. The current methods line contains the Gaussian random-intercept location–scale model, the robust Student-t extension, and the Gaussian random-slope extension merged in PR #119. See [`VALIDATION.md`](VALIDATION.md), the documentation site, and the machine-readable export inventory for the deeper validation contract.

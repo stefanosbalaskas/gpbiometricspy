@@ -126,10 +126,6 @@ jobs:
               else:
                   assert cff_doi == version_doi
           else:
-              # A development head may legitimately follow a newly released stable
-              # version before Zenodo has minted that stable version's DOI. In that
-              # pre-ingestion window, both VersionDOI and the stable CFF DOI remain
-              # unset. Once the DOI is known, they must agree exactly.
               if version_doi is None:
                   assert cff_doi is None
               else:
@@ -145,4 +141,19 @@ jobs:
       - run: mkdocs build --strict
       - name: Deploy GitHub Pages from main only
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: mkdocs gh-deploy --force
+        shell: bash
+        run: |
+          set -euo pipefail
+          attempts=3
+          for attempt in $(seq 1 "$attempts"); do
+            if mkdocs gh-deploy --force; then
+              exit 0
+            fi
+            if [ "$attempt" -eq "$attempts" ]; then
+              echo "::error::GitHub Pages deployment failed after ${attempts} attempts."
+              exit 1
+            fi
+            delay=$((attempt * 10))
+            echo "::warning::GitHub Pages deployment attempt ${attempt} failed; retrying in ${delay}s."
+            sleep "$delay"
+          done
