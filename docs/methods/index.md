@@ -30,7 +30,7 @@ The implementation explicitly distinguishes the Student-t scale parameter from t
 
 ### Random-slope hierarchical location–scale modelling
 
-The Gaussian random-slope extension adds **one participant/group-specific numeric slope in the location equation** while retaining the log-scale random intercept. The latent state is therefore `(location intercept, location slope, log-scale intercept)` with a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
+The Gaussian random-slope extension adds **one participant/group-specific numeric slope in the location equation** while retaining the log-scale random intercept. The latent state is `(location intercept, location slope, log-scale intercept)` with a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
 
 The random-slope variable must also enter the fixed mean equation and must vary within every group. This preserves the hierarchical principle and rejects unidentified random-slope specifications before optimization.
 
@@ -44,13 +44,21 @@ The scale-slope variable must also enter the fixed log-scale equation and must v
 
 [Open the random scale-slope location–scale guide →](random-scale-slope-location-scale.md)
 
+### Joint random-slope hierarchical location–scale modelling
+
+The joint Gaussian extension adds **one participant/group-specific numeric slope in each equation**. Its latent state is `(location intercept, location slope, log-scale intercept, log-scale slope)` with a full positive-definite 4 × 4 covariance matrix and four-dimensional adaptive Gauss–Hermite quadrature.
+
+Each slope variable must enter the corresponding fixed equation and vary within every group. The location and scale slope variables may be the same observed variable or different variables. The implementation explicitly reports the `q^4` quadrature cost and uses a bounded 3–7 point range.
+
+[Open the joint random-slope location–scale guide →](joint-random-slopes-location-scale.md)
+
 ## Validation boundary
 
-The latest fully certified public methods baseline is PR **#120**, merge SHA `ac7127283ed9c9ce11e83d081d8a1519c723dcbd`. Its merge tree is identical to the qualified PR head tree, and all six exact-main push workflow families were terminal green after merge.
+The latest fully certified public methods baseline is PR **#121**, merge SHA `67337b0a38a70c9383f478321443f63e42f69234`. Its merge tree is identical to the qualified PR head tree, its GitHub signature is verified/valid, and all **14/14 exact-main push workflow families** completed successfully after merge.
 
-The certified baseline passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,909/5,928 = 99.6795%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. The location-random-slope module itself passes **353/353 statements** and **90/90 branches**.
+The certified baseline passes **701/701 tests**, **11,836/11,836 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,995/6,014 = 99.6841%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,014/6,014 = 100.0000%**. The random scale-slope module itself passes **332/332 statements** and **86/86 branches**.
 
-The random scale-slope implementation documented above is a development candidate until its own exact-head qualification and post-merge exact-main certification complete. Pre-merge evidence is never substituted for post-merge evidence.
+The joint random-slope implementation documented above is a development candidate until its own exact-head qualification and post-merge exact-main certification complete. Pre-merge evidence is never substituted for post-merge evidence.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; development-line method work does not retroactively alter the stable-release record.
 
@@ -64,4 +72,4 @@ The methods section documents statistical and computational methods, not automat
 - identifies causal effects; or
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
 
-The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. Additional random slopes, simultaneous location-and-scale random slopes, crossed random effects, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
+The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. Additional random slopes, crossed random effects, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
