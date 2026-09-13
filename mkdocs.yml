@@ -119,6 +119,7 @@ nav:
           - gp3tools compatibility: articles/gp3tools-compatibility.md
   - Methods:
       - Overview: methods/index.md
+      - Timebase provenance and multimodal alignment: methods/timebase-provenance.md
       - Hierarchical location–scale modelling: methods/hierarchical-location-scale.md
       - Robust Student-t location–scale modelling: methods/robust-hierarchical-location-scale.md
       - Random-slope location–scale modelling: methods/random-slope-location-scale.md

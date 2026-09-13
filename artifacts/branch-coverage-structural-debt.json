@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "9fdbda7abe96e820ce8893f59232ae029c88493d",
-  "coverage_denominator": 6272,
-  "raw_covered_branches": 6253,
-  "raw_branch_coverage_percent": 99.6971,
+  "baseline_commit": "eb8c737f93e952f7bec0e6d7958336f1ecf469f5",
+  "coverage_denominator": 6422,
+  "raw_covered_branches": 6403,
+  "raw_branch_coverage_percent": 99.7041,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10327112216,
-    "workflow_artifact_digest": "sha256:9fc27555f5354d03a94b02de79c6eacc98f43cfeff7c6c3ccfa8ebb5ebbb1fd1",
-    "diagnostic_note": "Exploratory candidate head 9fdbda7abe96e820ce8893f59232ae029c88493d completed the full branch-coverage test step in run 34787500703 on Ubuntu 24.04.5 / CPython 3.13.15. Ruff and byte-compilation were clean; 719/719 tests passed with 2 warnings; 12,651/12,651 statements were covered; raw branch coverage was 6,253/6,272 = 99.6971%; exactly 19 raw missing branches matched the existing audited structural entries; unexpected missing arcs, stale contract entries and unaudited debt were all zero; audited accounting was 6,272/6,272 = 100%. The new hierarchical_location_scale_crossed.py module recorded 444/444 statements and 168/168 branches. Artifact 10327112216 has digest sha256:9fc27555f5354d03a94b02de79c6eacc98f43cfeff7c6c3ccfa8ebb5ebbb1fd1. The run failed only because the ledger intentionally froze the previous 6,104-branch denominator; this update advances denominator provenance without changing any of the 19 audited debt entries. Final merge authority still requires a fresh terminal-green exact-head generation after this contract update and branch renormalization."
+    "workflow_artifact_id": 10327582259,
+    "workflow_artifact_digest": "sha256:1082754804bfeaf90b0b75dbc11ed69c5b5507a4354407a698dd4d6a01d28d4a",
+    "diagnostic_note": "Normalization combines verified main eb8c737f93e952f7bec0e6d7958336f1ecf469f5, whose crossed-model ledger freezes 6,272 total branches with 6,253 raw covered and the same 19 audited structural arcs, with the exact qualified timebase-provenance implementation. PR #125 exact-head branch run 34788005671 and artifact 10327582259 established 6,235/6,254 raw branches on the pre-#124 base, 0 unexpected missing arcs, 0 stale entries, 0 unaudited debt, 6,254/6,254 audited accounting, and timebase_provenance.py at 377/377 statements and 150/150 branches. Because #124 and the timebase tranche add disjoint source modules and neither changes the 19 audited debt locations, the normalized combined denominator advances deterministically from 6,272 to 6,422 and raw covered branches from 6,253 to 6,403. Fresh CI on the normalized exact head remains final authority before merge promotion."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
