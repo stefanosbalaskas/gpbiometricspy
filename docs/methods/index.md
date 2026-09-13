@@ -54,11 +54,11 @@ Each slope variable must enter the corresponding fixed equation and vary within 
 
 ## Validation boundary
 
-The latest fully certified public methods baseline is PR **#121**, merge SHA `67337b0a38a70c9383f478321443f63e42f69234`. Its merge tree is identical to the qualified PR head tree, its GitHub signature is verified/valid, and all **14/14 exact-main push workflow families** completed successfully after merge.
+The latest fully certified public methods baseline is PR **#122**, merge SHA `17cb7c38de2b811b9b2fde407800465351d8b5c2`. Its merge tree `e26816c809762d31079cac2c9ccd4c3566afc774` is identical to the qualified PR head tree, its sole parent is the certified PR #121 baseline, its GitHub signature is verified/valid, and all **14/14 exact-main push workflow families** completed successfully after merge with **0 failures** and **0 cancellations**.
 
-The certified baseline passes **701/701 tests**, **11,836/11,836 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,995/6,014 = 99.6841%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,014/6,014 = 100.0000%**. The random scale-slope module itself passes **332/332 statements** and **86/86 branches**.
+The certified baseline passes **708/708 tests**, **12,207/12,207 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **6,085/6,104 = 99.6887%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,104/6,104 = 100.0000%**. The joint random-slope module itself passes **371/371 statements** and **90/90 branches**.
 
-The joint random-slope implementation documented above is a development candidate until its own exact-head qualification and post-merge exact-main certification complete. Pre-merge evidence is never substituted for post-merge evidence.
+This certification uses fresh post-merge evidence from the exact merge SHA. Pre-merge qualification was not substituted for exact-main evidence. Docs strict-build and main-branch Pages deployment, CodeQL, interoperability, and all Studio packaging/installer/readiness families were terminal green.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; development-line method work does not retroactively alter the stable-release record.
 
