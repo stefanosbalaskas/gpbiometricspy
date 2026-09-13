@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from hashlib import sha256
-from typing import Mapping, Sequence
+from typing import Mapping
 import json
 import re
 
@@ -38,17 +38,18 @@ def _validate_positive_number(value, name: str, *, allow_zero: bool = False) -> 
 
 
 def _validate_clock_id(value, name: str) -> str:
-    out = str(value).strip()
-    if not out:
+    if not isinstance(value, str) or not value.strip():
         raise ValueError(f"`{name}` must be a non-empty string.")
-    return out
+    return value.strip()
 
 
 def _guess_time_column(data: pd.DataFrame) -> str:
-    lower = {str(column).lower(): column for column in data.columns}
     for candidate in _TIME_COLUMNS:
-        if candidate.lower() in lower:
-            return lower[candidate.lower()]
+        matches = [column for column in data.columns if str(column).lower() == candidate.lower()]
+        if len(matches) > 1:
+            raise ValueError(f"Ambiguous time columns match `{candidate}`; supply `time_col` explicitly.")
+        if matches:
+            return matches[0]
     raise ValueError("Could not identify a time column. Supply `time_col` explicitly.")
 
 
@@ -97,7 +98,7 @@ def _resolve_time_unit(
         return "samples", "column_name"
     if label.endswith("_ms") or label in {"mstimer", "time_ms", "timestamp_ms"}:
         return "milliseconds", "column_name"
-    if label.endswith("_s") or label in {"time", "timestamp"}:
+    if label.endswith("_s") or label == "time":
         return "seconds", "column_name"
     positive = _positive_differences(raw)
     if positive.size and float(np.median(positive)) > 5.0:
@@ -116,8 +117,16 @@ def _to_seconds(raw: np.ndarray, unit: str, nominal_rate_hz: float | None) -> np
 
 
 def _hash_numeric(values: np.ndarray) -> str:
-    tokens = ["nan" if not np.isfinite(value) else format(float(value), ".17g") for value in values]
-    return sha256(("\n".join(tokens) + "\n").encode("utf-8")).hexdigest()
+    def token(value: float) -> str:
+        if np.isnan(value):
+            return "nan"
+        if np.isposinf(value):
+            return "+inf"
+        if np.isneginf(value):
+            return "-inf"
+        return format(float(value), ".17g")
+
+    return sha256(("\n".join(token(value) for value in values) + "\n").encode("utf-8")).hexdigest()
 
 
 def _finite_or_none(value: float | int | None):
@@ -273,7 +282,7 @@ def audit_gazepoint_timebase(
         )
 
     diffs = np.diff(finite)
-    duplicate_count = int(np.sum(diffs == 0))
+    duplicate_count = int(n_finite - np.unique(finite).size)
     backward_count = int(np.sum(diffs < 0))
     positive = diffs[diffs > 0]
     if positive.size == 0:
@@ -493,7 +502,9 @@ def fit_gazepoint_clock_alignment(
     )
     ref = _to_seconds(ref_raw, ref_unit, reference_nominal_rate_hz)
     tar = _to_seconds(tar_raw, tar_unit, target_nominal_rate_hz)
-    n_pairs = min(len(ref), len(tar))
+    if len(ref) != len(tar):
+        raise ValueError("Matched reference and target anchor sequences must have equal length.")
+    n_pairs = len(ref)
     if max_pairs is not None:
         if int(max_pairs) != max_pairs or int(max_pairs) < 2:
             raise ValueError("`max_pairs` must be an integer of at least 2 when supplied.")
@@ -507,8 +518,8 @@ def fit_gazepoint_clock_alignment(
     tar = tar[finite]
     if ref.size < 2:
         raise ValueError("At least two finite matched timestamp anchors are required.")
-    if float(np.ptp(ref)) <= 0:
-        raise ValueError("Reference anchors must span more than one distinct time point.")
+    if np.any(np.diff(ref) <= 0) or np.any(np.diff(tar) <= 0):
+        raise ValueError("Finite matched anchors must be strictly increasing in both clocks.")
 
     if method == "offset":
         slope = 1.0
@@ -609,9 +620,9 @@ def create_gazepoint_multimodal_alignment_certificate(
     if not isinstance(alignment, GazepointClockAlignment):
         raise TypeError("`alignment` must be returned by fit_gazepoint_clock_alignment().")
     tolerance_s = _validate_positive_number(tolerance_s, "tolerance_s", allow_zero=True)
-    resampling_operation = str(resampling_operation).strip()
-    if not resampling_operation:
-        raise ValueError("`resampling_operation` must be a non-empty description.")
+    if not isinstance(resampling_operation, str) or not resampling_operation.strip():
+        raise ValueError("`resampling_operation` must be a non-empty string description.")
+    resampling_operation = resampling_operation.strip()
     if reference_audit.clock_id != alignment.reference_clock:
         raise ValueError("Reference audit clock does not match the alignment reference clock.")
     if target_audit.clock_id != alignment.target_clock:
@@ -623,6 +634,10 @@ def create_gazepoint_multimodal_alignment_certificate(
         alignment_warnings.append("alignment_reference_unit_heuristic")
     if alignment.target_unit_source == "interval_heuristic":
         alignment_warnings.append("alignment_target_unit_heuristic")
+    if alignment.reference_time_unit == "samples":
+        alignment_warnings.append("alignment_reference_counter_scaled")
+    if alignment.target_time_unit == "samples":
+        alignment_warnings.append("alignment_target_counter_scaled")
     warnings = tuple(
         dict.fromkeys([*reference_audit.issues, *target_audit.issues, *alignment_warnings])
     )
@@ -641,6 +656,8 @@ def create_gazepoint_multimodal_alignment_certificate(
     overlap_start = max(reference_start, target_start)
     overlap_end = min(reference_end, target_end)
     overlap_duration = max(0.0, overlap_end - overlap_start)
+    if overlap_duration <= 0:
+        raise ValueError("Corrected streams have no positive temporal overlap for multimodal fusion.")
     correction_applied = not (
         np.isclose(alignment.intercept_s, 0.0, atol=1e-15, rtol=0.0)
         and np.isclose(alignment.slope_target_per_reference, 1.0, atol=1e-15, rtol=0.0)
@@ -681,8 +698,13 @@ def validate_gazepoint_multimodal_alignment_certificate(
     try:
         supplied_payload = dict(certificate["payload"])
         tolerance = float(supplied_payload["tolerance_s"])
-        allow_warnings = bool(supplied_payload["allow_timebase_warnings"])
-        resampling_operation = str(supplied_payload["resampling_operation"])
+        raw_allow_warnings = supplied_payload["allow_timebase_warnings"]
+        if not isinstance(raw_allow_warnings, bool):
+            return False
+        allow_warnings = raw_allow_warnings
+        resampling_operation = supplied_payload["resampling_operation"]
+        if not isinstance(resampling_operation, str):
+            return False
         if max_tolerance_s is not None:
             max_tolerance_s = _validate_positive_number(max_tolerance_s, "max_tolerance_s", allow_zero=True)
             if tolerance > max_tolerance_s:
