@@ -6,6 +6,14 @@ Keeping these methods separate is deliberate: new methodological research should
 
 ## Available methods
 
+### Timebase provenance and multimodal alignment certification
+
+The timebase-provenance layer makes timing evidence explicit before multimodal fusion. It distinguishes nominal sampling specifications from timestamp-derived rates, records jitter, gaps, duplicates, backward steps and counter-derived timing, estimates offset or affine relationships between matched clock anchors, and binds the resulting evidence into deterministic SHA-256 certificates.
+
+Certification is deliberately fail-closed: failed timebase audits cannot be certified, warnings require explicit acceptance, clock identities must agree, alignment residuals must satisfy a declared tolerance, and corrected streams must have positive temporal overlap. Clock correction is kept separate from interpolation or resampling, and the method does not interpret small anchor residuals as proof of sub-millisecond hardware synchronization.
+
+[Open the timebase provenance and multimodal alignment guide →](timebase-provenance.md)
+
 ### Hierarchical location–scale modelling
 
 The Gaussian hierarchical location–scale model jointly estimates:
@@ -81,5 +89,7 @@ The methods section documents statistical and computational methods, not automat
 - performs sensor-validity weighting;
 - identifies causal effects; or
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
+
+The timebase-provenance layer likewise characterizes and binds recorded timing evidence; it does not establish sensor validity, reconstruct unsampled physiological information, prove hardware synchronization beyond the supplied anchors, or justify causal ordering beyond the temporal accuracy supported by the acquisition design.
 
 The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. The crossed candidate adds participant and item/stimulus random intercepts in both equations while retaining the same conservative interpretation boundary. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
