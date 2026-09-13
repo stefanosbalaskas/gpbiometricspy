@@ -145,6 +145,8 @@ def test_timebase_warning_and_fail_states_cover_anomalies():
 def test_timebase_parameter_and_input_guardrails():
     with pytest.raises(ValueError, match="clock_id"):
         tb.audit_gazepoint_timebase([0, 1], clock_id=" ")
+    with pytest.raises(ValueError, match="clock_id"):
+        tb.audit_gazepoint_timebase([0, 1], clock_id=None)
     with pytest.raises(ValueError, match="gap_factor"):
         tb.audit_gazepoint_timebase([0, 1], gap_factor=1)
     with pytest.raises(ValueError, match="positive"):
@@ -161,6 +163,8 @@ def test_timebase_parameter_and_input_guardrails():
         tb.audit_gazepoint_timebase(pd.DataFrame({"CNT": [0, 1, 2]}))
     with pytest.raises(ValueError, match="Could not identify"):
         tb.audit_gazepoint_timebase(pd.DataFrame({"x": [0, 1]}))
+    with pytest.raises(ValueError, match="Ambiguous time columns"):
+        tb.audit_gazepoint_timebase(pd.DataFrame([[0, 0], [1, 1]], columns=["time_s", "TIME_S"]))
     with pytest.raises(ValueError, match="not found"):
         tb.audit_gazepoint_timebase(pd.DataFrame({"time": [0, 1]}), time_col="missing")
     with pytest.raises(ValueError, match="only be used"):
@@ -259,13 +263,19 @@ def test_alignment_guardrails_cover_invalid_cases(monkeypatch):
         tb.fit_gazepoint_clock_alignment([0, 1, 2], [0, 1, 2], max_pairs=1)
     with pytest.raises(ValueError, match="max_pairs"):
         tb.fit_gazepoint_clock_alignment([0, 1, 2], [0, 1, 2], max_pairs=2.5)
+    with pytest.raises(ValueError, match="equal length"):
+        tb.fit_gazepoint_clock_alignment(
+            [0, 1, 2], [0, 1], reference_time_unit="seconds", target_time_unit="seconds"
+        )
     with pytest.raises(ValueError, match="At least two matched"):
         tb.fit_gazepoint_clock_alignment([0], [0])
     with pytest.raises(ValueError, match="finite matched"):
         tb.fit_gazepoint_clock_alignment([0, np.nan], [0, np.nan])
-    with pytest.raises(ValueError, match="distinct time point"):
-        tb.fit_gazepoint_clock_alignment([1, 1], [2, 3])
-    with pytest.raises(ValueError, match="positive"):
+    with pytest.raises(ValueError, match="strictly increasing"):
+        tb.fit_gazepoint_clock_alignment(
+            [1, 1], [2, 3], reference_time_unit="seconds", target_time_unit="seconds"
+        )
+    with pytest.raises(ValueError, match="strictly increasing"):
         tb.fit_gazepoint_clock_alignment(
             [0, 1, 2],
             [2, 1, 0],
@@ -285,17 +295,11 @@ def test_alignment_guardrails_cover_invalid_cases(monkeypatch):
     monkeypatch.setattr(np.linalg, "lstsq", original_lstsq)
 
 
-def test_alignment_constant_target_sets_r_squared_none():
-    alignment = tb.fit_gazepoint_clock_alignment(
-        [0, 1, 2],
-        [5, 5, 5],
-        reference_time_unit="seconds",
-        target_time_unit="seconds",
-        reference_clock="r",
-        target_clock="t",
-        method="offset",
-    )
-    assert alignment.r_squared is None
+def test_hash_distinguishes_nonfinite_timestamp_kinds():
+    nan_hash = tb._hash_numeric(np.array([0.0, np.nan]))
+    posinf_hash = tb._hash_numeric(np.array([0.0, np.inf]))
+    neginf_hash = tb._hash_numeric(np.array([0.0, -np.inf]))
+    assert len({nan_hash, posinf_hash, neginf_hash}) == 3
 
 
 def test_alignment_certificate_clean_case_and_fail_closed_gate():
@@ -369,6 +373,16 @@ def test_alignment_certificate_warning_override_and_identity_correction():
     )
     assert "alignment_reference_unit_heuristic" in heuristic_cert["payload"]["timebase_warnings"]
     assert "alignment_target_unit_heuristic" in heuristic_cert["payload"]["timebase_warnings"]
+    counter_alignment = replace(
+        alignment,
+        reference_time_unit="samples",
+        target_time_unit="samples",
+    )
+    counter_cert = tb.create_gazepoint_multimodal_alignment_certificate(
+        ref, tar, counter_alignment, tolerance_s=1e-9, allow_timebase_warnings=True
+    )
+    assert "alignment_reference_counter_scaled" in counter_cert["payload"]["timebase_warnings"]
+    assert "alignment_target_counter_scaled" in counter_cert["payload"]["timebase_warnings"]
     assert cert["payload"]["status"] == "certified_with_warnings"
     assert cert["payload"]["correction_applied"] is False
     assert cert["payload"]["timebase_warnings"] == ["duplicate_timestamps"]
@@ -386,6 +400,10 @@ def test_alignment_certificate_guardrails_and_tampering():
     with pytest.raises(ValueError, match="resampling_operation"):
         tb.create_gazepoint_multimodal_alignment_certificate(
             ref, tar, alignment, tolerance_s=1, resampling_operation=" "
+        )
+    with pytest.raises(ValueError, match="resampling_operation"):
+        tb.create_gazepoint_multimodal_alignment_certificate(
+            ref, tar, alignment, tolerance_s=1, resampling_operation=None
         )
     with pytest.raises(ValueError, match="Reference audit clock"):
         tb.create_gazepoint_multimodal_alignment_certificate(
@@ -414,6 +432,12 @@ def test_alignment_certificate_guardrails_and_tampering():
     bad_tolerance = copy.deepcopy(cert)
     bad_tolerance["payload"]["tolerance_s"] = "not-a-number"
     assert not tb.validate_gazepoint_multimodal_alignment_certificate(ref, tar, alignment, bad_tolerance)
+    bad_bool = copy.deepcopy(cert)
+    bad_bool["payload"]["allow_timebase_warnings"] = 1
+    assert not tb.validate_gazepoint_multimodal_alignment_certificate(ref, tar, alignment, bad_bool)
+    bad_resampling_type = copy.deepcopy(cert)
+    bad_resampling_type["payload"]["resampling_operation"] = 1
+    assert not tb.validate_gazepoint_multimodal_alignment_certificate(ref, tar, alignment, bad_resampling_type)
     with pytest.raises(TypeError):
         tb._alignment_payload(object())
 
@@ -436,8 +460,8 @@ def test_no_overlap_is_recorded_as_zero_duration():
         reference_anchor_sha256="a" * 64,
         target_anchor_sha256="b" * 64,
     )
-    cert = tb.create_gazepoint_multimodal_alignment_certificate(ref, tar, identity, tolerance_s=0)
-    assert cert["payload"]["overlap_duration_s"] == 0
+    with pytest.raises(ValueError, match="no positive temporal overlap"):
+        tb.create_gazepoint_multimodal_alignment_certificate(ref, tar, identity, tolerance_s=0)
 
 
 def test_internal_helpers_cover_remaining_edge_branches():
