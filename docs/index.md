@@ -20,10 +20,10 @@
 <div><span class="gp-status-value">0.1.6</span><span class="gp-status-label">stable release</span></div>
 <div><span class="gp-status-value">0.1.7.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">694 / 694</span><span class="gp-status-label">exact-main tests</span></div>
+<div><span class="gp-status-value">708 / 708</span><span class="gp-status-label">exact-main tests</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">exact-main statement coverage</span></div>
-<div><span class="gp-status-value">99.6795%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
-<div><span class="gp-status-value">90 / 90</span><span class="gp-status-label">random-slope module branches</span></div>
+<div><span class="gp-status-value">99.6887%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
+<div><span class="gp-status-value">90 / 90</span><span class="gp-status-label">joint random-slope module branches</span></div>
 <div><span class="gp-status-value">19</span><span class="gp-status-label">audited structural arcs</span></div>
 <div><span class="gp-status-value">0 / 0 / 0</span><span class="gp-status-label">unexpected / stale / unaudited branch debt</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">supported Python</span></div>
@@ -57,7 +57,7 @@
 <a class="gp-card gp-card-link" href="methods/">
 <span class="gp-card-icon">Σ</span>
 <h3>Methods</h3>
-<p>Explore additive Python-native Gaussian, robust Student-t and random-slope hierarchical location–scale methods without blurring the frozen R-parity contract.</p>
+<p>Explore additive Python-native Gaussian, robust Student-t, location-random-slope, scale-random-slope and joint random-slope hierarchical location–scale methods without blurring the frozen R-parity contract.</p>
 <span class="gp-card-cta">Open methods →</span>
 </a>
 
@@ -65,7 +65,7 @@
 
 ## Current Python-native methods
 
-The development line contains three explicitly separate location–scale modelling paths.
+The development line contains five explicitly separate location–scale modelling paths.
 
 ### Gaussian hierarchical location–scale model
 
@@ -81,16 +81,28 @@ The robust extension keeps the same location/log-scale architecture but replaces
 
 ### Gaussian random-slope hierarchical location–scale model
 
-The random-slope extension adds one participant/group-specific numeric slope to the Gaussian location equation while retaining the log-scale random intercept. The latent state is `(location intercept, location slope, log-scale intercept)` with a full positive-definite **3 × 3 covariance matrix** and **three-dimensional adaptive Gauss–Hermite quadrature**. The random-slope variable must also be present as a fixed mean effect and must vary within every group.
+The location-random-slope extension adds one participant/group-specific numeric slope to the Gaussian location equation while retaining the log-scale random intercept. The latent state is `(location intercept, location slope, log-scale intercept)` with a full positive-definite **3 × 3 covariance matrix** and **three-dimensional adaptive Gauss–Hermite quadrature**. The random-slope variable must also be present as a fixed mean effect and must vary within every group.
 
 [Open the random-slope location–scale guide →](methods/random-slope-location-scale.md)
 
-The latest merged methods baseline is PR **#119**, merge SHA `0245dd99d2ca8aa44b26c3740f332628f9ba83e4`, whose merge tree exactly matches the qualified PR head tree. The candidate completed **14/14 exact-head workflow families successfully**. Fresh exact-main software evidence passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, retains **406/406 frozen exports with 0 pending**, and records **5,909/5,928 raw branches = 99.6795%**. The random-slope module itself passes **353/353 statements** and **90/90 branches**; all **19** uncovered branch arcs are audited structural debt with zero unexpected, stale or unaudited branch debt.
+### Gaussian random scale-slope hierarchical location–scale model
 
-Full exact-main certification remains stricter than source, test, and coverage success: it is declared only when every required post-merge push workflow for the exact merge SHA is terminal green.
+The scale-random-slope extension adds one participant/group-specific numeric slope to the Gaussian log-scale equation while retaining the location random intercept. The latent state is `(location intercept, log-scale intercept, log-scale slope)` with a full positive-definite **3 × 3 covariance matrix** and **three-dimensional adaptive Gauss–Hermite quadrature**. The random-slope variable must also be present as a fixed log-scale effect and must vary within every group.
+
+[Open the random scale-slope location–scale guide →](methods/random-scale-slope-location-scale.md)
+
+### Gaussian joint random-slope hierarchical location–scale model
+
+The joint extension adds one participant/group-specific numeric slope to **each** equation. The latent state is `(location intercept, location slope, log-scale intercept, log-scale slope)` with a full positive-definite **4 × 4 covariance matrix** and **four-dimensional adaptive Gauss–Hermite quadrature**. The location and scale slope variables may be the same observed variable or different variables; each must enter its corresponding fixed equation and vary within every group.
+
+[Open the joint random-slope location–scale guide →](methods/joint-random-slopes-location-scale.md)
+
+The latest fully certified methods baseline is PR **#122**, merge SHA `17cb7c38de2b811b9b2fde407800465351d8b5c2`, tree `e26816c809762d31079cac2c9ccd4c3566afc774`. Its merge tree exactly matches the qualified candidate tree, the GitHub signature is verified/valid, and **14/14 fresh exact-main push workflow families** completed successfully. Exact-main software evidence passes **708/708 tests**, **12,207/12,207 statements = 100.00%**, retains **406/406 frozen exports with 0 pending**, and records **6,085/6,104 raw branches = 99.6887%**. The joint random-slope module itself passes **371/371 statements** and **90/90 branches**; all **19** uncovered branch arcs are audited structural debt with zero unexpected, stale or unaudited branch debt and **6,104/6,104 audited accounting**.
+
+Full exact-main certification is deliberately stricter than source, test, and coverage success: it is declared only when every required post-merge push workflow for the exact merge SHA is terminal green. Pre-merge qualification is never substituted for post-merge evidence.
 
 !!! info "Scientific boundary"
-    These are distributional heterogeneity models. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. The random-slope extension estimates association heterogeneity, not a causal effect or an error-free participant trait. None of these implementations identifies motion or physiological artifacts, performs artifact correction or sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states. Additional random slopes, random slopes in the log-scale equation, crossed random effects, skewed heavy-tail families, mixture models and Bayesian priors remain outside the current family.
+    These are distributional heterogeneity models. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. Location random slopes estimate association heterogeneity; log-scale random slopes estimate residual-heterogeneity association. Neither is a causal effect, an artifact score, a sensor-validity measure, or an error-free participant trait. The joint extension combines one slope in each equation under the same conservative boundary. None of these implementations identifies motion or physiological artifacts, performs artifact correction or sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states. Additional random slopes, crossed random effects, skewed heavy-tail families, mixture models and Bayesian priors remain outside the current family.
 
 ## Studio: the end-user research product
 
@@ -186,7 +198,7 @@ Then open `http://127.0.0.1:8765`.
 </div>
 <div class="gp-pillar">
 <h3>Validation is part of the product</h3>
-<p>The latest merged methods tree passes 694 exact-main tests, 11,504/11,504 statements, and 5,909/5,928 raw branches. All 19 uncovered branch arcs are audited structural debt, with zero unexpected, stale or unaudited debt. PR #119 itself completed all 14 exact-head workflow families before merge; full exact-main certification additionally requires every post-merge workflow to finish green.</p>
+<p>The latest certified methods tree passes 708 exact-main tests, 12,207/12,207 statements, and 6,085/6,104 raw branches. All 19 uncovered branch arcs are audited structural debt, with zero unexpected, stale or unaudited debt and 6,104/6,104 audited accounting. PR #122 completed all 14 exact-head workflow families before merge and all 14 fresh exact-main push families after merge.</p>
 <a href="deep-validation/">Inspect validation →</a>
 </div>
 <div class="gp-pillar">
@@ -227,6 +239,8 @@ Every gallery image is regenerated from the Python API during the documentation 
 <a href="methods/">Python-native methods</a>
 <a href="methods/robust-hierarchical-location-scale/">Robust Student-t location–scale</a>
 <a href="methods/random-slope-location-scale/">Random-slope location–scale</a>
+<a href="methods/random-scale-slope-location-scale/">Random scale-slope location–scale</a>
+<a href="methods/joint-random-slopes-location-scale/">Joint random-slope location–scale</a>
 <a href="measurement-accountability/">Measurement accountability</a>
 <a href="articles/">26 article companions</a>
 <a href="integrations/">Integrations</a>
