@@ -124,6 +124,7 @@ nav:
       - Random-slope location–scale modelling: methods/random-slope-location-scale.md
       - Random scale-slope location–scale modelling: methods/random-scale-slope-location-scale.md
       - Joint random-slope location–scale modelling: methods/joint-random-slopes-location-scale.md
+      - Crossed participant–item location–scale modelling: methods/crossed-location-scale.md
   - API:
       - Browse by domain: api/index.md
       - EDA / GSR / SCR: api/eda-scr.md
