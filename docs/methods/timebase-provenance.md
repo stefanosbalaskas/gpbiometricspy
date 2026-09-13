@@ -48,7 +48,7 @@ The audit keeps nominal and timestamp-derived quantities separate. Its principal
 | `interval_jitter_sd_s` | SD of positive inter-sample intervals. |
 | `interval_jitter_mad_s` | Median absolute deviation of positive inter-sample intervals around their median. |
 | `interval_cv` | Inter-sample interval SD divided by the mean interval. |
-| `n_duplicate_timestamps` | Number of zero-length adjacent timestamp steps. |
+| `n_duplicate_timestamps` | Number of repeated finite timestamp values beyond their first occurrence. |
 | `n_backward_timestamps` | Number of negative timestamp steps. |
 | `n_large_gaps` | Positive intervals exceeding `gap_factor × median_interval_s`. |
 | `estimated_missing_samples` | Approximate missing samples implied by unusually long intervals. |
@@ -148,7 +148,7 @@ The alignment object records:
 
 ### Anchor correspondence is a scientific assumption
 
-Version 1 fits anchors in the order supplied. It does **not** infer whether two events truly correspond. Event-ID matching, protocol validation, or another justified matching procedure should therefore occur before `fit_gazepoint_clock_alignment()` is called.
+Version 1 fits anchors in the order supplied. It does **not** infer whether two events truly correspond. The two supplied anchor sequences must have equal length and be strictly increasing in both clocks. Event-ID matching, protocol validation, or another justified matching procedure should therefore occur before `fit_gazepoint_clock_alignment()` is called.
 
 The alignment residual describes agreement of the supplied matched anchors with the selected mapping. It is not, by itself, a hardware synchronization-accuracy specification.
 
@@ -203,8 +203,9 @@ Certification is **fail-closed** when:
 
 - either timebase audit has status `fail`;
 - audit warnings exist but were not explicitly accepted;
-- clock identities do not agree across the audits and alignment object; or
-- the maximum anchor residual exceeds `tolerance_s`.
+- clock identities do not agree across the audits and alignment object;
+- the maximum anchor residual exceeds `tolerance_s`; or
+- the corrected streams have no positive temporal overlap.
 
 If a warning is scientifically acceptable for a particular analysis, it must be made explicit:
 
@@ -268,6 +269,8 @@ The stream remains characterizable, but one or more conditions require explicit 
 - nominal-rate mismatch;
 - heuristic time-unit inference; or
 - a counter-derived rather than timestamp-observed timebase.
+
+Counter-scaled anchor units used in the clock fit are also retained as alignment warnings and require explicit acceptance.
 
 ### `fail`
 
