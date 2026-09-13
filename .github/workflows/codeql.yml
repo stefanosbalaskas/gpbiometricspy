@@ -20,4 +20,26 @@ jobs:
       - uses: github/codeql-action/init@v4
         with:
           languages: python
-      - uses: github/codeql-action/analyze@v4
+      - name: Analyze CodeQL database
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: ../results
+          upload: never
+      - name: Upload CodeQL results (attempt 1)
+        id: upload_sarif_1
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ../results
+      - name: Upload CodeQL results (attempt 2)
+        id: upload_sarif_2
+        if: steps.upload_sarif_1.outcome == 'failure'
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ../results
+      - name: Upload CodeQL results (attempt 3)
+        if: steps.upload_sarif_1.outcome == 'failure' && steps.upload_sarif_2.outcome == 'failure'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ../results

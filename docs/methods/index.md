@@ -38,9 +38,13 @@ The random-slope variable must also enter the fixed mean equation and must vary 
 
 ## Validation boundary
 
-The last exact-main-certified methods baseline is merge SHA `1de9041aace7d5f0fd256b2e9b357308efd7798a` from #116. Fresh push-only certification completed **14/14 workflow families successfully**. Canonical Ubuntu/Python 3.12.14 evidence passed **687/687 tests**, **11,151/11,151 statements = 100.00%**, and retained the frozen export audit at **406/406 with 0 pending**. Exact-main branch coverage was **5,819/5,838 = 99.6745%**, with exactly **19 audited structural arcs**, **0 unexpected**, **0 stale**, and **0 unaudited branch debt**. The exact-main branch-coverage artifact is `10301085630` with digest `sha256:136f75c7edd6769142a62756ea7b7c0a291958d62277f79e0902792d7610ebc9`.
+The latest merged methods baseline is PR **#119**, merge SHA `0245dd99d2ca8aa44b26c3740f332628f9ba83e4`. Its merge tree is identical to the qualified PR head tree. The PR candidate completed **14/14 exact-head workflow families successfully** before merge.
 
-That certification covers the Gaussian and robust Student-t **random-intercept** methods in the certified #116 tree. The random-slope method is a later additive development tranche and must complete its own exact-head and exact-main qualification before being described as certified. Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; development-line method work does not retroactively alter the stable-release record.
+Fresh exact-main software evidence on the merge SHA passes **694/694 tests**, **11,504/11,504 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **5,909/5,928 = 99.6795%**. All **19** uncovered branch arcs are explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt. The random-slope module itself passes **353/353 statements** and **90/90 branches**.
+
+Full exact-main certification is intentionally stricter than source, test, or coverage success alone: it is declared only when every required push workflow for the merge SHA is terminal green. This page therefore distinguishes the **latest merged baseline** from the stronger **fully certified baseline** rather than substituting pre-merge evidence for post-merge evidence.
+
+Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts; development-line method work does not retroactively alter the stable-release record.
 
 ## Scientific guardrails
 
