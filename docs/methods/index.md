@@ -22,6 +22,14 @@ Its fail-closed operation contract prevents uncleaned RR from being silently rel
 
 [Open the cardiac variability source provenance guide →](cardiac-source-provenance.md)
 
+### Grouped mixed-effects boosting
+
+The grouped mixed-effects boosting method combines deterministic shallow regression-tree boosting with shrinkage-estimated random intercepts for nonlinear prediction of continuous outcomes observed repeatedly within one grouping factor.
+
+It explicitly separates conditional prediction for groups observed during training from marginal prediction for unseen groups, performs whole-group rather than row-wise cross-validation, and uses level-aware permutation importance: within-group predictors are shuffled within groups, while group-constant predictors are permuted at the group level. The implementation is a narrow dependency-free research analogue, not an implementation of XGBoost and not a causal-inference method.
+
+[Open the grouped mixed-effects boosting guide →](grouped-mixed-boosting.md)
+
 ### Hierarchical location–scale modelling
 
 The Gaussian hierarchical location–scale model jointly estimates:
@@ -74,19 +82,19 @@ The crossed Gaussian extension adds **participant and item/stimulus random inter
 
 Because crossed participant and item effects cannot be integrated independently group by group, the implementation uses a **joint Laplace approximation** over the complete crossed latent field with an analytic gradient/Hessian, explicit incidence-connectivity and replication guards, a dense-latent complexity ceiling, population-versus-conditional prediction semantics for unseen participants/items, and deterministic reproducibility certificates.
 
-The method was exact-main certified through PR **#124** and remains part of the current PR #125 certified development baseline. It is additive to, and does not modify, the frozen 406-export R-parity contract.
+The method was exact-main certified through PR **#124** and remains part of the current PR #126 certified development baseline. It is additive to, and does not modify, the frozen 406-export R-parity contract.
 
 [Open the crossed participant–item location–scale guide →](crossed-location-scale.md)
 
 ## Validation boundary
 
-The latest fully certified development baseline is PR **#125**, merge SHA `1464e46cd75373eb634c3df12dedd5e7764af395`, tree `2b4d4f532a2414179fe916fcae208ba20e063461`. The merge tree is identical to the qualified candidate tree at exact PR head `aafeab90e9b863746f60cd018accb1d336cc8a5d`, and its GitHub signature is verified/valid. PR #125 is a **two-parent merge commit**, with parents `eb8c737f93e952f7bec0e6d7958336f1ecf469f5` and `aafeab90e9b863746f60cd018accb1d336cc8a5d`; that topology is recorded explicitly rather than described as a squash. There was no merge-tree drift.
+The latest fully certified development baseline is PR **#126**, exact-main SHA `ad70f7ec87ae11237049c635dde098e077c2c925`, tree `84b33c9f841bbb339b6d9e066e6178b2be43bb30`. The tree is identical to the qualified candidate tree at exact PR head `40cb38336a619f3b12533c451fafc2ad56cbd401`, and the GitHub signature on the exact-main commit is verified/valid. GitHub produced a **single-parent signed commit** with sole parent `ebbb13e07f98733e53014fb595b2d9562662bb2e`; that actual topology is recorded explicitly rather than being described as a two-parent merge. There was no content drift.
 
-Both the candidate and exact-main generations completed **14/14 workflow families successfully**. The fresh exact-main generation had **0 failures, 0 cancellations, 0 queued and 0 in-progress runs** at certification. The certified baseline passes **733/733 tests**, **13,028/13,028 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **6,403/6,422 = 99.7041%**. All **19** uncovered branch arcs remain explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,422/6,422 = 100.0000%**.
+Both the candidate and exact-main generations completed **14/14 workflow families successfully** with **0 failures** and **0 cancellations**. The certified exact-main baseline passes **748/748 tests**, **13,223/13,223 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **6,481/6,500 = 99.7077%**. All **19** uncovered branch arcs remain explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,500/6,500 = 100.0000%**.
 
-The crossed participant–item module passes **444/444 statements and 168/168 branches**. The timebase-provenance module passes **377/377 statements and 150/150 branches**. Exact-main branch evidence is archived as artifact **10328745378**, SHA-256 `c0e767e4a9c6cad4ed87a3368e29ee778bf32a89e1809e1515c6581b29949108`. PR **#124**, merge SHA `eb8c737f93e952f7bec0e6d7958336f1ecf469f5`, is the certified predecessor that introduced the crossed participant–item model.
+The crossed participant–item module passes **444/444 statements and 168/168 branches**. The timebase-provenance module passes **377/377 statements and 150/150 branches**. The cardiac-source provenance module passes **195/195 statements and 78/78 branches**. Exact-main branch evidence is archived as artifact **10328554989**, SHA-256 `b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400`. PR **#125**, merge SHA `1464e46cd75373eb634c3df12dedd5e7764af395`, is the certified predecessor that introduced timebase provenance.
 
-This certification uses fresh post-merge evidence from the exact merge SHA. Pre-merge qualification was not substituted for exact-main evidence. Docs strict-build and main-branch Pages deployment, CodeQL, interoperability, Deep Parity, private real-data validation, and all triggered Studio packaging/installer/readiness families were terminal green.
+This certification uses fresh post-merge evidence from the exact main SHA. Pre-merge qualification was not substituted for exact-main evidence. Docs strict-build and main-branch Pages deployment, CodeQL, interoperability, Deep Parity, private real-data validation, and all triggered Studio packaging/installer/readiness families were terminal green.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line method work does not retroactively alter the stable-release record.
 
@@ -103,5 +111,7 @@ The methods section documents statistical and computational methods, not automat
 The timebase-provenance layer likewise characterizes and binds recorded timing evidence; it does not establish sensor validity, reconstruct unsampled physiological information, prove hardware synchronization beyond the supplied anchors, or justify causal ordering beyond the temporal accuracy supported by the acquisition design.
 
 The cardiac-source provenance layer characterizes and binds the scientific identity of cardiac inputs; it does not prove manufacturer claims, infer undocumented beat-processing algorithms, convert PPG-PRV into ECG-HRV, or recreate unobserved beat intervals from sampled HR.
+
+The grouped mixed-effects boosting method is a nonlinear predictive model. Its random intercepts account for one grouping factor in prediction; feature importance is predictive rather than causal; conditional performance applies to observed groups; and population/new-group generalization requires group-held-out evaluation. It does not provide likelihood-based p-values, confidence intervals, crossed random effects, or random slopes.
 
 The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. The crossed model adds participant and item/stimulus random intercepts in both equations while retaining the same conservative interpretation boundary. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
