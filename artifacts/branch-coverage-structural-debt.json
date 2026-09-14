@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "aafeab90e9b863746f60cd018accb1d336cc8a5d",
-  "coverage_denominator": 6500,
-  "raw_covered_branches": 6481,
-  "raw_branch_coverage_percent": 99.7077,
+  "baseline_commit": "ad70f7ec87ae11237049c635dde098e077c2c925",
+  "coverage_denominator": 6628,
+  "raw_covered_branches": 6609,
+  "raw_branch_coverage_percent": 99.7133,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10327582259,
-    "workflow_artifact_digest": "sha256:1082754804bfeaf90b0b75dbc11ed69c5b5507a4354407a698dd4d6a01d28d4a",
-    "diagnostic_note": "The normalized timebase-provenance parent aafeab90e9b863746f60cd018accb1d336cc8a5d freezes a combined crossed-model plus timebase candidate denominator of 6,422 total branches with 6,403 raw covered and the same 19 audited structural arcs. The additive cardiac-source provenance tranche changes no pre-existing source module and adds one Python-native module, cardiac_provenance.py, locally validated on CPython 3.13 at 195/195 statements and 78/78 branches with 15/15 focused tests. Therefore this stacked candidate advances deterministically by 78 branches to 6,500 total and 6,481 raw covered, without adding, removing, waiving, or relocating any structural-debt entry. Parent timebase artifact 10327582259 has digest sha256:1082754804bfeaf90b0b75dbc11ed69c5b5507a4354407a698dd4d6a01d28d4a. Fresh CI on a normalized cardiac exact head remains the final authority before merge promotion."
+    "workflow_artifact_id": 10328554989,
+    "workflow_artifact_digest": "sha256:b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400",
+    "diagnostic_note": "The fully exact-main-certified cardiac-source provenance baseline ad70f7ec87ae11237049c635dde098e077c2c925 freezes 6,500 total branches with 6,481 raw covered and the same 19 audited structural arcs. Its exact-main branch artifact is 10328554989 with digest sha256:b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400. The additive grouped mixed-effects boosting tranche changes no pre-existing source module and adds one Python-native source module, grouped_mixed_boosting.py, previously focused-validated on CPython 3.13 at 357/357 statements and 128/128 branches with 17/17 focused tests after hardening seed semantics. Therefore this normalized candidate advances deterministically by 128 branches to 6,628 total and 6,609 raw covered, without adding, removing, waiving, or relocating any structural-debt entry. Fresh exact-head CI on the normalized grouped candidate remains the final authority before merge promotion."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
