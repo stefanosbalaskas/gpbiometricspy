@@ -14,6 +14,14 @@ Certification is deliberately fail-closed: failed timebase audits cannot be cert
 
 [Open the timebase provenance and multimodal alignment guide →](timebase-provenance.md)
 
+### Cardiac variability source provenance
+
+The cardiac-source provenance layer separates ECG-NN HRV, ECG-RR variability, PPG pulse-rate variability, incompletely documented device intervals, vendor-precomputed variability metrics, and sampled heart-rate series before downstream analysis.
+
+Its fail-closed operation contract prevents uncleaned RR from being silently relabelled NN-HRV, prevents PPG-PRV from being treated as globally interchangeable with ECG-HRV, keeps vendor metrics metric-only, and blocks reconstruction of beat-to-beat HRV/PRV from sampled HR. Immutable source declarations are bound to deterministic SHA-256 provenance certificates and can be attached to metric-specific agreement workflows.
+
+[Open the cardiac variability source provenance guide →](cardiac-source-provenance.md)
+
 ### Hierarchical location–scale modelling
 
 The Gaussian hierarchical location–scale model jointly estimates:
@@ -93,5 +101,7 @@ The methods section documents statistical and computational methods, not automat
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
 
 The timebase-provenance layer likewise characterizes and binds recorded timing evidence; it does not establish sensor validity, reconstruct unsampled physiological information, prove hardware synchronization beyond the supplied anchors, or justify causal ordering beyond the temporal accuracy supported by the acquisition design.
+
+The cardiac-source provenance layer characterizes and binds the scientific identity of cardiac inputs; it does not prove manufacturer claims, infer undocumented beat-processing algorithms, convert PPG-PRV into ECG-HRV, or recreate unobserved beat intervals from sampled HR.
 
 The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. The crossed model adds participant and item/stimulus random intercepts in both equations while retaining the same conservative interpretation boundary. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.

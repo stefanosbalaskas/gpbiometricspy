@@ -1,6 +1,10 @@
 # Measurement accountability for multimodal physiology
 
-The `gpbiometricspy.measurement_accountability` module adds four conservative diagnostics motivated by the September 2026 methods-surveillance tranche.
+The `gpbiometricspy.measurement_accountability` module adds four conservative diagnostics motivated by the September 2026 methods-surveillance tranche. The Python-native `gpbiometricspy.cardiac_provenance` layer complements these diagnostics by declaring the scientific identity of cardiac inputs before HRV/PRV computation or agreement testing.
+
+## Cardiac source provenance before HRV/PRV analysis
+
+Use [`cardiac_provenance`](methods/cardiac-source-provenance.md) when a workflow must distinguish ECG-NN HRV, ECG-RR variability, PPG-PRV, incompletely documented device intervals, precomputed vendor metrics, and sampled heart-rate series. The provenance contract prevents sampled HR or vendor metrics from being silently promoted to beat-to-beat HRV and can bind source certificates to the metric-specific agreement workflow below.
 
 ## Metric-level HRV/PRV agreement
 
