@@ -132,4 +132,8 @@ The model does not:
 
 ## Current validation status
 
-This page documents a development candidate. The latest fully certified public methods baseline remains PR **#122**, merge SHA `17cb7c38de2b811b9b2fde407800465351d8b5c2`, until this crossed-effects tranche completes pinned exact-head qualification, merge-object verification, and fresh exact-main certification. Pre-merge results are not a substitute for that post-merge evidence.
+The crossed participant–item method is **exact-main certified**. It was introduced and certified through PR **#124**, merge SHA `eb8c737f93e952f7bec0e6d7958336f1ecf469f5`, and remains unchanged in the current certified PR **#125** development baseline at `1464e46cd75373eb634c3df12dedd5e7764af395`.
+
+On the current exact-main baseline, the module passes **444/444 statements** and **168/168 branches**. The full package passes **733/733 tests**, **13,028/13,028 statements**, and **6,403/6,422 raw branches = 99.7041%**, with all **19** uncovered branch arcs audited as structural debt and **0 unexpected, stale or unaudited** branch debt. The frozen `gpbiometrics 2.0.0` export contract remains **406/406 implemented with 0 pending**.
+
+Certification is based on fresh post-merge evidence from the exact merge SHA; pre-merge qualification is not substituted for exact-main evidence.
