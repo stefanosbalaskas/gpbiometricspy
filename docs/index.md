@@ -20,10 +20,11 @@
 <div><span class="gp-status-value">0.1.6</span><span class="gp-status-label">stable release</span></div>
 <div><span class="gp-status-value">0.1.7.dev0</span><span class="gp-status-label">development head</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">708 / 708</span><span class="gp-status-label">exact-main tests</span></div>
+<div><span class="gp-status-value">733 / 733</span><span class="gp-status-label">exact-main tests</span></div>
 <div><span class="gp-status-value">100%</span><span class="gp-status-label">exact-main statement coverage</span></div>
-<div><span class="gp-status-value">99.6887%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
-<div><span class="gp-status-value">90 / 90</span><span class="gp-status-label">joint random-slope module branches</span></div>
+<div><span class="gp-status-value">99.7041%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
+<div><span class="gp-status-value">168 / 168</span><span class="gp-status-label">crossed-model branches</span></div>
+<div><span class="gp-status-value">150 / 150</span><span class="gp-status-label">timebase-provenance branches</span></div>
 <div><span class="gp-status-value">19</span><span class="gp-status-label">audited structural arcs</span></div>
 <div><span class="gp-status-value">0 / 0 / 0</span><span class="gp-status-label">unexpected / stale / unaudited branch debt</span></div>
 <div><span class="gp-status-value">3.11–3.14</span><span class="gp-status-label">supported Python</span></div>
@@ -57,7 +58,7 @@
 <a class="gp-card gp-card-link" href="methods/">
 <span class="gp-card-icon">Σ</span>
 <h3>Methods</h3>
-<p>Explore additive Python-native Gaussian, robust Student-t, location-random-slope, scale-random-slope and joint random-slope hierarchical location–scale methods without blurring the frozen R-parity contract.</p>
+<p>Explore additive Python-native location–scale modelling, crossed participant–item effects, and timing-provenance/alignment certification without blurring the frozen R-parity contract.</p>
 <span class="gp-card-cta">Open methods →</span>
 </a>
 
@@ -65,7 +66,13 @@
 
 ## Current Python-native methods
 
-The development line contains five explicitly separate location–scale modelling paths.
+The certified development line contains **seven explicitly separate Python-native method paths**: six location–scale modelling families plus a timebase-provenance and multimodal-alignment certification layer.
+
+### Timebase provenance and multimodal alignment certification
+
+The timing-provenance layer separates nominal acquisition settings from timing characteristics actually observed in recorded timestamps. It audits jitter, gaps, duplicates, backward steps and counter-derived timing; estimates offset or affine clock mappings from matched anchors; and binds clock identity, residual tolerance, overlap, warning acceptance and resampling history into deterministic certificates. Clock correction is deliberately kept separate from signal interpolation or resampling.
+
+[Open the timebase provenance and multimodal alignment guide →](methods/timebase-provenance.md)
 
 ### Gaussian hierarchical location–scale model
 
@@ -97,12 +104,18 @@ The joint extension adds one participant/group-specific numeric slope to **each*
 
 [Open the joint random-slope location–scale guide →](methods/joint-random-slopes-location-scale.md)
 
-The latest fully certified methods baseline is PR **#122**, merge SHA `17cb7c38de2b811b9b2fde407800465351d8b5c2`, tree `e26816c809762d31079cac2c9ccd4c3566afc774`. Its merge tree exactly matches the qualified candidate tree, the GitHub signature is verified/valid, and **14/14 fresh exact-main push workflow families** completed successfully. Exact-main software evidence passes **708/708 tests**, **12,207/12,207 statements = 100.00%**, retains **406/406 frozen exports with 0 pending**, and records **6,085/6,104 raw branches = 99.6887%**. The joint random-slope module itself passes **371/371 statements** and **90/90 branches**; all **19** uncovered branch arcs are audited structural debt with zero unexpected, stale or unaudited branch debt and **6,104/6,104 audited accounting**.
+### Crossed participant–item hierarchical location–scale model
+
+The crossed Gaussian extension adds participant and item/stimulus random intercepts in both the location and log-scale equations. Participant effects and item effects have separate correlated **2 × 2 covariance matrices**. Because the two crossed latent families cannot be integrated independently group by group, the implementation uses a joint Laplace approximation with analytic latent derivatives, explicit connectivity and replication guards, a dense-latent complexity ceiling, population-versus-conditional prediction semantics, and deterministic reproducibility certificates.
+
+[Open the crossed participant–item location–scale guide →](methods/crossed-location-scale.md)
+
+The latest fully certified development baseline is PR **#125**, merge SHA `1464e46cd75373eb634c3df12dedd5e7764af395`, tree `2b4d4f532a2414179fe916fcae208ba20e063461`. The merge tree exactly matches the qualified candidate tree at head `aafeab90e9b863746f60cd018accb1d336cc8a5d`, and the GitHub signature is verified/valid. PR #125 used a **two-parent merge commit**—parents `eb8c737f93e952f7bec0e6d7958336f1ecf469f5` and `aafeab90e9b863746f60cd018accb1d336cc8a5d`—with no tree drift. Both the exact-head candidate generation and the fresh exact-main push generation completed **14/14 workflow families successfully**. Exact-main software evidence passes **733/733 tests**, **13,028/13,028 statements = 100.00%**, retains **406/406 frozen exports with 0 pending**, and records **6,403/6,422 raw branches = 99.7041%**. All **19** uncovered branch arcs remain audited structural debt with **0 unexpected, 0 stale and 0 unaudited** debt and **6,422/6,422 audited accounting**. The crossed model passes **444/444 statements and 168/168 branches**; timebase provenance passes **377/377 statements and 150/150 branches**. PR #124 is the certified crossed-effects predecessor at `eb8c737f93e952f7bec0e6d7958336f1ecf469f5`.
 
 Full exact-main certification is deliberately stricter than source, test, and coverage success: it is declared only when every required post-merge push workflow for the exact merge SHA is terminal green. Pre-merge qualification is never substituted for post-merge evidence.
 
 !!! info "Scientific boundary"
-    These are distributional heterogeneity models. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. Location random slopes estimate association heterogeneity; log-scale random slopes estimate residual-heterogeneity association. Neither is a causal effect, an artifact score, a sensor-validity measure, or an error-free participant trait. The joint extension combines one slope in each equation under the same conservative boundary. None of these implementations identifies motion or physiological artifacts, performs artifact correction or sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states. Additional random slopes, crossed random effects, skewed heavy-tail families, mixture models and Bayesian priors remain outside the current family.
+    These are statistical and timing-lineage methods, not automatic scientific interpretations. The Student-t extension adds heavy-tailed robustness, but a low fitted degrees-of-freedom parameter is **not** an artifact score. Location random slopes estimate association heterogeneity; log-scale random slopes estimate residual-heterogeneity association. Crossed participant/item effects model heterogeneity rather than participant traits or stimulus-quality scores. Timing certificates bind recorded timebase and anchor evidence under stated tolerances; they do **not** prove sensor validity, reconstruct unsampled physiology, establish hardware synchronization beyond the supplied evidence, or justify causal ordering beyond acquisition accuracy. None of these implementations by itself identifies or corrects artifacts, performs sensor-validity weighting, establishes causal effects, or infers latent psychological or clinical states.
 
 ## Studio: the end-user research product
 
@@ -198,12 +211,12 @@ Then open `http://127.0.0.1:8765`.
 </div>
 <div class="gp-pillar">
 <h3>Validation is part of the product</h3>
-<p>The latest certified methods tree passes 708 exact-main tests, 12,207/12,207 statements, and 6,085/6,104 raw branches. All 19 uncovered branch arcs are audited structural debt, with zero unexpected, stale or unaudited debt and 6,104/6,104 audited accounting. PR #122 completed all 14 exact-head workflow families before merge and all 14 fresh exact-main push families after merge.</p>
+<p>The latest certified development tree passes 733 exact-main tests, 13,028/13,028 statements, and 6,403/6,422 raw branches. All 19 uncovered branch arcs are audited structural debt, with zero unexpected, stale or unaudited debt and 6,422/6,422 audited accounting. PR #125 completed all 14 exact-head workflow families before merge and all 14 fresh exact-main push families after merge.</p>
 <a href="deep-validation/">Inspect validation →</a>
 </div>
 <div class="gp-pillar">
 <h3>Conservative interpretation</h3>
-<p>Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Heavy-tailed robustness and random-slope heterogeneity are not automatic artifact classification or causal evidence.</p>
+<p>Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Heavy-tailed robustness, random-slope/crossed heterogeneity and timing-lineage certificates are not automatic artifact classification, sensor-validity evidence or causal evidence.</p>
 <a href="interpretation/">Read the guardrails →</a>
 </div>
 </div>
@@ -237,10 +250,12 @@ Every gallery image is regenerated from the Python API during the documentation 
 <a href="getting-started/">5-minute Python start</a>
 <a href="workflows/">Workflow map</a>
 <a href="methods/">Python-native methods</a>
+<a href="methods/timebase-provenance/">Timebase provenance + alignment</a>
 <a href="methods/robust-hierarchical-location-scale/">Robust Student-t location–scale</a>
 <a href="methods/random-slope-location-scale/">Random-slope location–scale</a>
 <a href="methods/random-scale-slope-location-scale/">Random scale-slope location–scale</a>
 <a href="methods/joint-random-slopes-location-scale/">Joint random-slope location–scale</a>
+<a href="methods/crossed-location-scale/">Crossed participant–item location–scale</a>
 <a href="measurement-accountability/">Measurement accountability</a>
 <a href="articles/">26 article companions</a>
 <a href="integrations/">Integrations</a>
