@@ -1,6 +1,6 @@
 # Crossed participant–item random-slope location–scale modelling
 
-This development method extends the crossed participant × item/stimulus Gaussian location–scale model with **one location random slope for each crossed factor**.
+This method extends the crossed participant × item/stimulus Gaussian location–scale model with **one location random slope for each crossed factor**.
 
 For observation \(n\), participant \(p[n]\), and item \(i[n]\),
 
@@ -183,8 +183,12 @@ pred = predict_gazepoint_crossed_hierarchical_location_scale_random_slopes(
 
 ## Current validation status
 
-This page documents a **development candidate**. The last independently certified scientific baseline remains PR **#127**, exact-main SHA `e8721b945954f75c98d1d6e5f5b57ce4db9a77dc`, until this candidate completes exact-head qualification, merge-object verification, and fresh exact-main certification.
+PR **#129** is **fully exact-main certified**. The canonical merge is `d078e0366ace49c3ebeb2f6800bad6394d70631e`, tree `50fc42f90cd53aafa81bf277da6f82045a3cd75d`. That tree exactly matches the final qualified candidate head `5c35f1d4ec20eaeb3cbd71e0d0cae30f2367c162`, and the GitHub merge signature is verified/valid.
 
-The candidate was mathematically preflighted by comparing its analytic latent gradient and Hessian against central finite differences and by fitting a minimum 6 × 6 synthetic crossed design. Focused local validation measured the new module at **435/435 statements and 148/148 branches**. Repository CI remains authoritative for the final denominator, full-suite coverage, parity, documentation, interoperability, CodeQL, packaging, and readiness evidence.
+The candidate completed **14/14 exact-head workflow families** before merge. The fresh post-merge generation then completed **14/14 exact-main push workflow families**, with **0 failures, 0 cancellations, 0 skipped, 0 queued, and 0 in-progress** at certification. The exact-main Tests workflow is **12/12 lanes green** across Ubuntu, macOS, and Windows with Python 3.11–3.14.
 
-The frozen **406/406** `gpbiometrics 2.0.0` R-parity export surface is unchanged.
+Exact-main scientific evidence is **782/782 tests**, **14,015/14,015 statements**, and **435/435 statements plus 148/148 branches** in this module. Repository-wide raw branch coverage is **6,757/6,776 = 99.7196%**. The remaining **19** branch arcs are the audited structural/caller-dominated debt set, with **0 unexpected**, **0 stale**, and **0 unaudited** debt; audited accounting is **6,776/6,776 = 100.0000%** without redefining raw branch coverage as 100%.
+
+The exact-main Branch Coverage evidence is run `34836939921`, job `103952785151`, artifact **10344881054**, SHA-256 `3db0de45be9371c32673a37c510b6997b0cbce017dba06e751589d31a8ce7ee2`.
+
+The frozen **406/406** `gpbiometrics 2.0.0` R-parity export surface is unchanged. This method is additive Python-native functionality and does not retroactively alter the stable `gpbiometricspy 0.1.6` release record.
