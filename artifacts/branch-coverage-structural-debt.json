@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "ad70f7ec87ae11237049c635dde098e077c2c925",
-  "coverage_denominator": 6628,
-  "raw_covered_branches": 6609,
-  "raw_branch_coverage_percent": 99.7133,
+  "baseline_commit": "e8721b945954f75c98d1d6e5f5b57ce4db9a77dc",
+  "coverage_denominator": 6776,
+  "raw_covered_branches": 6757,
+  "raw_branch_coverage_percent": 99.7196,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10328554989,
-    "workflow_artifact_digest": "sha256:b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400",
-    "diagnostic_note": "The fully exact-main-certified cardiac-source provenance baseline ad70f7ec87ae11237049c635dde098e077c2c925 freezes 6,500 total branches with 6,481 raw covered and the same 19 audited structural arcs. Its exact-main branch artifact is 10328554989 with digest sha256:b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400. The additive grouped mixed-effects boosting tranche changes no pre-existing source module and adds one Python-native source module, grouped_mixed_boosting.py, previously focused-validated on CPython 3.13 at 357/357 statements and 128/128 branches with 17/17 focused tests after hardening seed semantics. Therefore this normalized candidate advances deterministically by 128 branches to 6,628 total and 6,609 raw covered, without adding, removing, waiving, or relocating any structural-debt entry. Fresh exact-head CI on the normalized grouped candidate remains the final authority before merge promotion."
+    "workflow_artifact_id": 10343700921,
+    "workflow_artifact_digest": "sha256:1ca0d33b50121319241eec8609d1795537094114e0ae456a1f9e8819a491e1ef",
+    "diagnostic_note": "The fully exact-main-certified PR #127 baseline is e8721b945954f75c98d1d6e5f5b57ce4db9a77dc, tree f30bce832732bb9cf73096cea8be826076f75ff1, with 6,628 total branches, 6,609 raw covered, and the same 19 audited structural arcs. The additive crossed participant-item random-slope diagnostic generation b105f22542bf796f243725b48a9e7ac8efc3d226 completed the full CPython 3.13.15 branch-coverage suite with 779/779 tests, 14,015/14,015 statements, and 435/435 statements plus 148/148 branches in hierarchical_location_scale_crossed_random_slopes.py. Exact diagnostic accounting was 6,757/6,776 raw branches = 99.7196%, with 19 raw missing branches, 19 matching audited structural entries, 0 unexpected, 0 stale, and 0 unaudited debt; audited accounting was 6,776/6,776. The diagnostic Branch Coverage job failed solely because this contract still froze the prior denominator 6,628. Evidence is artifact 10343700921 with digest sha256:1ca0d33b50121319241eec8609d1795537094114e0ae456a1f9e8819a491e1ef. This ledger promotion adds no waiver and changes no structural-debt entry; fresh exact-head CI on the normalized PR #129 candidate remains authoritative before merge promotion."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
