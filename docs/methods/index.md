@@ -26,92 +26,82 @@ Its fail-closed operation contract prevents uncleaned RR from being silently rel
 
 The grouped mixed-effects boosting method combines deterministic shallow regression-tree boosting with shrinkage-estimated random intercepts for nonlinear prediction of continuous outcomes observed repeatedly within one grouping factor.
 
-It explicitly separates conditional prediction for groups observed during training from marginal prediction for unseen groups, performs whole-group rather than row-wise cross-validation, and uses level-aware permutation importance: within-group predictors are shuffled within groups, while group-constant predictors are permuted at the group level. The implementation is a narrow dependency-free research analogue, not an implementation of XGBoost and not a causal-inference method.
+It explicitly separates conditional prediction for groups observed during training from marginal prediction for unseen groups, performs whole-group rather than row-wise cross-validation, and uses level-aware permutation importance. The method was exact-main certified through PR **#127** and is additive to, rather than part of, the frozen 406-export R-parity contract.
 
 [Open the grouped mixed-effects boosting guide →](grouped-mixed-boosting.md)
 
+### Grouped ordinal mixed-effects boosting — candidate
+
+The grouped ordinal candidate extends the same deterministic, group-aware philosophy to **ordered outcomes**. It combines a proportional-odds cumulative-logit model with shallow-tree score boosting and shrinkage-estimated group intercepts, requires an explicit scientifically meaningful category order, distinguishes marginal new-group prediction from conditional seen-group prediction, and evaluates new-group generalization with whole-group cross-validation.
+
+Its permutation importance uses ranked probability score and preserves the predictor's level: within-group predictors are shuffled within groups, while group-constant predictors are permuted at the group level. The implementation is an independent boosting analogue; it is **not** OMERF, mixfabOF, a random forest, XGBoost, or a fully integrated CLMM.
+
+This method remains a **development candidate** until its own pinned exact-head qualification, merge-object verification and fresh exact-main certification are complete. It does not alter the certified #127 baseline or the frozen 406-export R-parity contract.
+
+[Open the grouped ordinal mixed-effects boosting guide →](grouped-ordinal-boosting.md)
+
 ### Hierarchical location–scale modelling
 
-The Gaussian hierarchical location–scale model jointly estimates:
-
-- a fixed-effects **mean equation**;
-- a fixed-effects **log residual-scale equation**;
-- correlated participant/group random intercepts in both equations;
-- group marginal likelihoods using **two-dimensional adaptive Gauss–Hermite quadrature**;
-- empirical-Bayes summaries for seen groups;
-- explicit population-level prediction semantics for unseen groups;
-- deterministic design encoding, convergence diagnostics and reproducibility certificates.
+The Gaussian hierarchical location–scale model jointly estimates a fixed-effects mean equation, a fixed-effects log residual-scale equation, correlated participant/group random intercepts in both equations, two-dimensional adaptive Gauss–Hermite marginal likelihoods, empirical-Bayes summaries for seen groups, explicit population-level prediction semantics for unseen groups, and deterministic diagnostics/certificates.
 
 [Open the Gaussian hierarchical location–scale guide →](hierarchical-location-scale.md)
 
 ### Robust Student-t hierarchical location–scale modelling
 
-The robust extension replaces the conditional Gaussian outcome distribution with a symmetric Student-t distribution while retaining the same mean/log-scale structure and correlated participant/group random intercepts. Its degrees of freedom are estimated jointly with the other model parameters under a finite-variance constraint.
+The robust extension replaces the conditional Gaussian outcome distribution with a symmetric Student-t distribution while retaining the same mean/log-scale structure and correlated participant/group random intercepts. Its degrees of freedom are estimated jointly under a finite-variance constraint.
 
-The implementation explicitly distinguishes the Student-t scale parameter from the implied residual standard deviation and treats heavy tails as **distributional robustness**, not evidence that specific observations are artifacts or sensor failures.
+The implementation distinguishes the Student-t scale parameter from the implied residual standard deviation and treats heavy tails as **distributional robustness**, not evidence that specific observations are artifacts or sensor failures.
 
 [Open the robust Student-t location–scale guide →](robust-hierarchical-location-scale.md)
 
 ### Random-slope hierarchical location–scale modelling
 
-The Gaussian random-slope extension adds **one participant/group-specific numeric slope in the location equation** while retaining the log-scale random intercept. The latent state is `(location intercept, location slope, log-scale intercept)` with a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
-
-The random-slope variable must also enter the fixed mean equation and must vary within every group. This preserves the hierarchical principle and rejects unidentified random-slope specifications before optimization.
+The Gaussian random-slope extension adds **one participant/group-specific numeric slope in the location equation** while retaining the log-scale random intercept. Its latent state has a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
 
 [Open the random-slope location–scale guide →](random-slope-location-scale.md)
 
 ### Random scale-slope hierarchical location–scale modelling
 
-The Gaussian random scale-slope extension adds **one participant/group-specific numeric slope in the log-scale equation** while retaining the location random intercept. Its latent state is `(location intercept, log-scale intercept, log-scale slope)` with a full positive-definite 3 × 3 covariance matrix and three-dimensional adaptive Gauss–Hermite quadrature.
-
-The scale-slope variable must also enter the fixed log-scale equation and must vary within every group. This makes participant/group differences in residual-variability associations estimable without interpreting them as artifact, sensor-validity or causal effects.
+The Gaussian random scale-slope extension adds **one participant/group-specific numeric slope in the log-scale equation** while retaining the location random intercept. The scale-slope variable must enter the fixed log-scale equation and vary within every group.
 
 [Open the random scale-slope location–scale guide →](random-scale-slope-location-scale.md)
 
 ### Joint random-slope hierarchical location–scale modelling
 
-The joint Gaussian extension adds **one participant/group-specific numeric slope in each equation**. Its latent state is `(location intercept, location slope, log-scale intercept, log-scale slope)` with a full positive-definite 4 × 4 covariance matrix and four-dimensional adaptive Gauss–Hermite quadrature.
-
-Each slope variable must enter the corresponding fixed equation and vary within every group. The location and scale slope variables may be the same observed variable or different variables. The implementation explicitly reports the `q^4` quadrature cost and uses a bounded 3–7 point range.
+The joint Gaussian extension adds **one participant/group-specific numeric slope in each equation**. Its latent state uses a full positive-definite 4 × 4 covariance matrix with four-dimensional adaptive Gauss–Hermite quadrature.
 
 [Open the joint random-slope location–scale guide →](joint-random-slopes-location-scale.md)
 
 ### Crossed participant–item hierarchical location–scale modelling
 
-The crossed Gaussian extension adds **participant and item/stimulus random intercepts in both the location and log-scale equations**. Participant effects and item effects each use their own correlated 2 × 2 covariance matrix, allowing both clustering factors to contribute location heterogeneity and residual-scale heterogeneity.
+The crossed Gaussian extension adds **participant and item/stimulus random intercepts in both the location and log-scale equations**. It uses a joint Laplace approximation over the crossed latent field with analytic gradient/Hessian, incidence-connectivity and replication guards, a dense-latent complexity ceiling, population-versus-conditional prediction semantics, and deterministic certificates.
 
-Because crossed participant and item effects cannot be integrated independently group by group, the implementation uses a **joint Laplace approximation** over the complete crossed latent field with an analytic gradient/Hessian, explicit incidence-connectivity and replication guards, a dense-latent complexity ceiling, population-versus-conditional prediction semantics for unseen participants/items, and deterministic reproducibility certificates.
-
-The method was exact-main certified through PR **#124** and remains part of the current PR #126 certified development baseline. It is additive to, and does not modify, the frozen 406-export R-parity contract.
+The method was exact-main certified through PR **#124** and remains part of the current certified development baseline.
 
 [Open the crossed participant–item location–scale guide →](crossed-location-scale.md)
 
 ## Validation boundary
 
-The latest fully certified development baseline is PR **#126**, exact-main SHA `ad70f7ec87ae11237049c635dde098e077c2c925`, tree `84b33c9f841bbb339b6d9e066e6178b2be43bb30`. The tree is identical to the qualified candidate tree at exact PR head `40cb38336a619f3b12533c451fafc2ad56cbd401`, and the GitHub signature on the exact-main commit is verified/valid. GitHub produced a **single-parent signed commit** with sole parent `ebbb13e07f98733e53014fb595b2d9562662bb2e`; that actual topology is recorded explicitly rather than being described as a two-parent merge. There was no content drift.
+The latest fully certified development baseline is PR **#127**, exact-main SHA `e8721b945954f75c98d1d6e5f5b57ce4db9a77dc`, tree `f30bce832732bb9cf73096cea8be826076f75ff1`. The merge tree is exactly equal to the qualified candidate tree at exact PR head `37aa98c4d602bc74fe99ea80b48d78fb4191dad1`. GitHub produced a **two-parent signed merge commit** with parents certified `ad70f7ec87ae11237049c635dde098e077c2c925` and qualified head `37aa98c4d602bc74fe99ea80b48d78fb4191dad1`; that actual topology is recorded explicitly, and the GitHub signature is verified/valid. There was no merge-tree drift.
 
-Both the candidate and exact-main generations completed **14/14 workflow families successfully** with **0 failures** and **0 cancellations**. The certified exact-main baseline passes **748/748 tests**, **13,223/13,223 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **6,481/6,500 = 99.7077%**. All **19** uncovered branch arcs remain explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,500/6,500 = 100.0000%**.
+Both the final candidate and the fresh exact-main generation completed **14/14 workflow families successfully**. The exact-main negative-state audit closed at **0 failures, 0 cancellations, 0 queued and 0 in-progress runs**. The certified baseline passes **766/766 tests**, **13,580/13,580 statements = 100.00%**, and the frozen export audit remains **406/406 with 0 pending**. Exact-main raw branch coverage is **6,609/6,628 = 99.7133%**. All **19** uncovered branch arcs remain explicitly audited structural debt, with **0 unexpected**, **0 stale**, and **0 unaudited** branch debt; audited accounting is **6,628/6,628 = 100.0000%**.
 
-The crossed participant–item module passes **444/444 statements and 168/168 branches**. The timebase-provenance module passes **377/377 statements and 150/150 branches**. The cardiac-source provenance module passes **195/195 statements and 78/78 branches**. Exact-main branch evidence is archived as artifact **10328554989**, SHA-256 `b681799f10c3d622729b061daa308e092e677a0f14a3f1e5b2a6356e654eb400`. PR **#125**, merge SHA `1464e46cd75373eb634c3df12dedd5e7764af395`, is the certified predecessor that introduced timebase provenance.
+The grouped mixed-effects boosting module passes **357/357 statements and 128/128 branches**. The crossed participant–item module passes **444/444 statements and 168/168 branches**. The timebase-provenance module passes **377/377 statements and 150/150 branches**. The cardiac-source provenance module passes **195/195 statements and 78/78 branches**. Exact-main branch evidence is archived as artifact **10337621839**, SHA-256 `58ae977e911eba725ccb0d0d3173b46c952c73f14c5ca309216a392cc37a7383`.
 
-This certification uses fresh post-merge evidence from the exact main SHA. Pre-merge qualification was not substituted for exact-main evidence. Docs strict-build and main-branch Pages deployment, CodeQL, interoperability, Deep Parity, private real-data validation, and all triggered Studio packaging/installer/readiness families were terminal green.
+This certification uses fresh post-merge evidence from the exact merge SHA. Pre-merge qualification was not substituted for exact-main evidence. Docs strict-build and main-branch Pages deployment, CodeQL, interoperability, Deep Parity, private real-data validation, and all triggered Studio release/packaging/signing/installer/readiness families were terminal green.
+
+The grouped ordinal mixed-effects boosting method documented above is a **candidate beyond this boundary**. Its local focused development checks do not promote it into the certified baseline; fresh immutable-candidate GitHub evidence is required.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line method work does not retroactively alter the stable-release record.
 
 ## Scientific guardrails
 
-The methods section documents statistical and computational methods, not automatic scientific interpretation. None of the location–scale implementations by itself:
+The methods section documents statistical and computational methods, not automatic scientific interpretation. None of the location–scale implementations by itself identifies or corrects artifacts, establishes sensor validity/reliability, performs sensor-validity weighting, identifies causal effects, or infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
 
-- identifies or corrects motion, eye-tracking, or physiological artifacts;
-- establishes sensor validity or reliability;
-- performs sensor-validity weighting;
-- identifies causal effects; or
-- infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from physiological or eye-tracking measurements.
-
-The timebase-provenance layer likewise characterizes and binds recorded timing evidence; it does not establish sensor validity, reconstruct unsampled physiological information, prove hardware synchronization beyond the supplied anchors, or justify causal ordering beyond the temporal accuracy supported by the acquisition design.
-
-The cardiac-source provenance layer characterizes and binds the scientific identity of cardiac inputs; it does not prove manufacturer claims, infer undocumented beat-processing algorithms, convert PPG-PRV into ECG-HRV, or recreate unobserved beat intervals from sampled HR.
+The timebase-provenance layer characterizes and binds recorded timing evidence; it does not prove hardware synchronization beyond supplied anchors or establish sensor validity. The cardiac-source provenance layer characterizes cardiac-input identity; it does not convert PPG-PRV into ECG-HRV or recreate unobserved beat intervals from sampled HR.
 
 The grouped mixed-effects boosting method is a nonlinear predictive model. Its random intercepts account for one grouping factor in prediction; feature importance is predictive rather than causal; conditional performance applies to observed groups; and population/new-group generalization requires group-held-out evaluation. It does not provide likelihood-based p-values, confidence intervals, crossed random effects, or random slopes.
 
-The Gaussian random-intercept method covers Gaussian conditional outcomes. The robust extension adds symmetric Student-t conditional outcomes. The location-random-slope extension adds one participant/group-specific numeric slope in the Gaussian location equation and treats it as association heterogeneity, not a causal effect or error-free participant trait. The random scale-slope extension adds one participant/group-specific numeric slope in the Gaussian log-scale equation and treats it as residual-heterogeneity association, not an artifact or sensor-validity score. The joint extension combines one slope in each equation while retaining the same conservative interpretation boundary. The crossed model adds participant and item/stimulus random intercepts in both equations while retaining the same conservative interpretation boundary. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.
+The grouped ordinal candidate is likewise predictive. Its cumulative-logit thresholds encode ordered outcome structure, while its fitted group offsets are shrinkage estimates rather than stable participant traits. It is not a full integrated-likelihood cumulative-link mixed model and does not inherit inferential claims from OMERF, mixfabOF, random forests, or generalized boosting frameworks.
+
+The Gaussian random-intercept location–scale method covers Gaussian conditional outcomes; the robust extension adds symmetric Student-t conditional outcomes; the slope extensions model association heterogeneity; and the crossed model adds participant and item/stimulus random intercepts. Crossed random slopes, further random-slope structures, skewed heavy-tail families, mixture models, Bayesian priors and causal interpretation remain outside the current location–scale implementation family.

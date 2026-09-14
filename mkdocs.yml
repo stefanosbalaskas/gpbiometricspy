@@ -122,6 +122,7 @@ nav:
       - Timebase provenance and multimodal alignment: methods/timebase-provenance.md
       - Cardiac variability source provenance: methods/cardiac-source-provenance.md
       - Grouped mixed-effects boosting: methods/grouped-mixed-boosting.md
+      - Grouped ordinal mixed-effects boosting: methods/grouped-ordinal-boosting.md
       - Hierarchical location–scale modelling: methods/hierarchical-location-scale.md
       - Robust Student-t location–scale modelling: methods/robust-hierarchical-location-scale.md
       - Random-slope location–scale modelling: methods/random-slope-location-scale.md
