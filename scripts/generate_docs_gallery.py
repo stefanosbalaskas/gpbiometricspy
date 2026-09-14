@@ -46,7 +46,7 @@ def _save(obj: Any, path: Path) -> None:
         dpi=160,
         bbox_inches="tight",
         metadata={
-            "Date": "2026-08-28",
+            "Date": "2026-09-14",
             "Creator": f"gpbiometricspy {gp.__version__}",
             "Description": "Generated from bundled synthetic/public demonstration data.",
         },
@@ -70,7 +70,7 @@ def generate(output_dir: Path) -> list[dict[str, str]]:
         (
             "missingness",
             "Missingness overview",
-            "Missingness across EDA, heart-rate and IBI channels.",
+            "Missingness across EDA, heart-rate, IBI and pupil channels.",
             gp.plot_gazepoint_missingness(
                 demo,
                 cols=["GSR_US", "HR", "IBI", "LPMM"],
@@ -90,6 +90,21 @@ def generate(output_dir: Path) -> list[dict[str, str]]:
                 time_col="TIME",
                 standardize=True,
                 main="Standardised EDA and heart-rate signals",
+            ),
+        )
+    )
+
+    entries.append(
+        (
+            "biometric-quality",
+            "Biometric quality overview",
+            "Signal-level quality view across EDA, heart-rate, IBI and pupil channels.",
+            gp.plot_gazepoint_biometric_quality(
+                demo,
+                signal_cols=["GSR_US", "HR", "IBI", "LPMM"],
+                time_col="TIME",
+                group_col="participant_id",
+                main="Biometric quality overview",
             ),
         )
     )
@@ -279,6 +294,63 @@ def generate(output_dir: Path) -> list[dict[str, str]]:
                 peak_velocity_col="peak_velocity_dps",
                 main="Saccade main-sequence diagnostic",
             ),
+        )
+    )
+
+    design_data = demo.rename(
+        columns={
+            "participant_id": "participant",
+            "MEDIA_ID": "trial",
+            "interface_complexity": "condition",
+        }
+    )
+    design = gp.audit_gazepoint_experiment_design(
+        design_data,
+        participant_col="participant",
+        trial_col="trial",
+        condition_col="condition",
+    )
+    entries.append(
+        (
+            "design-coverage",
+            "Design coverage",
+            "Condition and trial coverage from the deterministic demonstration design audit.",
+            gp.plot_gazepoint_design_coverage(design),
+        )
+    )
+
+    cluster_data = gp.simulate_gazepoint_cluster_timecourse_data(
+        n_subjects=12,
+        n_time=60,
+        effect_start=25,
+        effect_end=38,
+        effect_size=1.2,
+        noise_sd=0.18,
+        seed=103,
+    )
+    cluster = gp.run_gazepoint_cluster_permutation(
+        cluster_data,
+        outcome_col="value",
+        time_col="time",
+        condition_col="condition",
+        participant_col="subject",
+        n_permutations=99,
+        seed=303,
+    )
+    entries.append(
+        (
+            "cluster-permutation",
+            "Cluster-permutation time course",
+            "Two-condition synthetic time course with detected cluster information.",
+            gp.plot_gazepoint_cluster_permutation(cluster),
+        )
+    )
+    entries.append(
+        (
+            "cluster-null-distribution",
+            "Cluster null distribution",
+            "Permutation null distribution for the deterministic synthetic cluster example.",
+            gp.plot_gazepoint_cluster_null_distribution(cluster),
         )
     )
 

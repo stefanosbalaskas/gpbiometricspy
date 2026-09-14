@@ -10,6 +10,7 @@ on:
       - "pyproject.toml"
       - "scripts/generate_reference_docs.py"
       - "scripts/generate_docs_gallery.py"
+      - "scripts/validate_docs_site.py"
       - "scripts/audit_release_identity.py"
       - ".github/workflows/docs.yml"
   push:
@@ -136,8 +137,10 @@ jobs:
           PY
       - name: Audit package/release identity
         run: python scripts/audit_release_identity.py
-      - run: PYTHONPATH=src python scripts/generate_docs_gallery.py
-      - run: python -c "import json, pathlib; p=pathlib.Path('docs/assets/generated/manifest.json'); d=json.loads(p.read_text()); assert len(d['figures']) == 13"
+      - name: Generate documentation gallery
+        run: PYTHONPATH=src python scripts/generate_docs_gallery.py
+      - name: Validate documentation experience and gallery contract
+        run: python scripts/validate_docs_site.py
       - run: mkdocs build --strict
       - name: Deploy GitHub Pages from main only
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')

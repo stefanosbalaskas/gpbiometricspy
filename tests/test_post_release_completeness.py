@@ -68,6 +68,8 @@ def test_visual_documentation_surface_is_committed_and_navigable():
     manifest_path=ROOT/'docs/assets/generated/manifest.json'
     manifest=json.loads(manifest_path.read_text())
     assert manifest['package_version']=='0.1.7.dev0'
+    # Thirteen seed images remain committed; docs CI deterministically regenerates
+    # the expanded 17-figure live gallery before strict site validation/build.
     assert len(manifest['figures'])==13
     for entry in manifest['figures']:
         image=ROOT/'docs/assets/generated'/entry['file']
@@ -76,6 +78,14 @@ def test_visual_documentation_surface_is_committed_and_navigable():
         assert image.stat().st_size>1000, entry['file']
 
     required_pages=[
+        'docs/start-here.md',
+        'docs/guides/index.md',
+        'docs/guides/first-analysis.md',
+        'docs/guides/validate-dataset.md',
+        'docs/guides/timebase-alignment.md',
+        'docs/guides/reporting-reproducibility.md',
+        'docs/guides/model-selection.md',
+        'docs/articles/python-native/index.md',
         'docs/plot-gallery.md',
         'docs/examples/index.md',
         'docs/examples/eda-scr.md',
@@ -89,9 +99,12 @@ def test_visual_documentation_surface_is_committed_and_navigable():
         assert (ROOT/rel).exists(), rel
 
     nav=(ROOT/'mkdocs.yml').read_text()
+    assert 'Start here: start-here.md' in nav
+    assert 'Guides:' in nav
     assert 'Plot gallery: plot-gallery.md' in nav
     assert 'Examples:' in nav
     assert 'Articles:' in nav
+    assert 'Python-native explanations:' in nav
     article_pages=list((ROOT/'docs/articles').glob('*.md'))
     assert len([p for p in article_pages if p.name!='index.md'])==26
     for page in article_pages:
@@ -101,8 +114,13 @@ def test_visual_documentation_surface_is_committed_and_navigable():
 
 def test_docs_workflow_regenerates_visual_gallery():
     workflow=(ROOT/'.github/workflows/docs.yml').read_text()
+    validator=(ROOT/'scripts/validate_docs_site.py').read_text()
     assert 'scripts/generate_docs_gallery.py' in workflow
-    assert "len(d['figures']) == 13" in workflow
+    assert 'scripts/validate_docs_site.py' in workflow
+    assert 'Validate documentation experience and gallery contract' in workflow
+    assert 'len(figures) == 17' in validator
+    assert 'cluster-permutation' in validator
+    assert 'design-coverage' in validator
 
 def test_reference_docs_generator_preserves_curated_articles():
     generator = (ROOT / "scripts/generate_reference_docs.py").read_text(encoding="utf-8")
