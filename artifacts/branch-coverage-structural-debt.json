@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "eb8c737f93e952f7bec0e6d7958336f1ecf469f5",
-  "coverage_denominator": 6422,
-  "raw_covered_branches": 6403,
-  "raw_branch_coverage_percent": 99.7041,
+  "baseline_commit": "aafeab90e9b863746f60cd018accb1d336cc8a5d",
+  "coverage_denominator": 6500,
+  "raw_covered_branches": 6481,
+  "raw_branch_coverage_percent": 99.7077,
   "structural_missing_count": 19,
   "evidence": {
     "workflow_artifact_id": 10327582259,
     "workflow_artifact_digest": "sha256:1082754804bfeaf90b0b75dbc11ed69c5b5507a4354407a698dd4d6a01d28d4a",
-    "diagnostic_note": "Normalization combines verified main eb8c737f93e952f7bec0e6d7958336f1ecf469f5, whose crossed-model ledger freezes 6,272 total branches with 6,253 raw covered and the same 19 audited structural arcs, with the exact qualified timebase-provenance implementation. PR #125 exact-head branch run 34788005671 and artifact 10327582259 established 6,235/6,254 raw branches on the pre-#124 base, 0 unexpected missing arcs, 0 stale entries, 0 unaudited debt, 6,254/6,254 audited accounting, and timebase_provenance.py at 377/377 statements and 150/150 branches. Because #124 and the timebase tranche add disjoint source modules and neither changes the 19 audited debt locations, the normalized combined denominator advances deterministically from 6,272 to 6,422 and raw covered branches from 6,253 to 6,403. Fresh CI on the normalized exact head remains final authority before merge promotion."
+    "diagnostic_note": "The normalized timebase-provenance parent aafeab90e9b863746f60cd018accb1d336cc8a5d freezes a combined crossed-model plus timebase candidate denominator of 6,422 total branches with 6,403 raw covered and the same 19 audited structural arcs. The additive cardiac-source provenance tranche changes no pre-existing source module and adds one Python-native module, cardiac_provenance.py, locally validated on CPython 3.13 at 195/195 statements and 78/78 branches with 15/15 focused tests. Therefore this stacked candidate advances deterministically by 78 branches to 6,500 total and 6,481 raw covered, without adding, removing, waiving, or relocating any structural-debt entry. Parent timebase artifact 10327582259 has digest sha256:1082754804bfeaf90b0b75dbc11ed69c5b5507a4354407a698dd4d6a01d28d4a. Fresh CI on a normalized cardiac exact head remains the final authority before merge promotion."
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
   "entries": [
