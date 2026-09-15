@@ -94,23 +94,23 @@ PR **#129** is exact-main certified at merge SHA `d078e0366ace49c3ebeb2f6800bad6
 
 ### Crossed participant–item random scale-slope location–scale modelling
 
-The development candidate adds **one log-scale random slope for each crossed factor**. Each participant and each item/stimulus receives a trivariate random-effects block `(location intercept, log-scale intercept, log-scale slope)` with its own unrestricted positive-definite 3 × 3 covariance matrix. The complete latent field has dimension `3(P + I)` and is integrated jointly with analytic latent derivatives and a dense Laplace correction.
+The crossed random scale-slope method adds **one log-scale random slope for each crossed factor**. Each participant and each item/stimulus receives a trivariate random-effects block `(location intercept, log-scale intercept, log-scale slope)` with its own unrestricted positive-definite 3 × 3 covariance matrix. The complete latent field has dimension `3(P + I)` and is integrated jointly with analytic latent derivatives and a dense Laplace correction.
 
 Each scale-slope predictor must also enter the fixed log-scale equation and must vary within every level of its corresponding crossed factor. Prediction keeps conditional and population semantics explicit for seen and unseen participants/items. The method does not treat log-scale effects as artifacts, reliability scores, sensor-validity weights or causal effects.
 
-This method is **not yet exact-main certified**. It is being qualified from certified base `1ff7569f7046325b50a15f0138137f6765182c0c`; GitHub exact-head evidence is authoritative before merge promotion.
+PR **#133** introduced the method from qualified head `52334c6ac4ecfb344abbd9e6d8b04570b86d721a`. PR **#134** added a test-only deterministic regression for one private loop-exhaustion branch and changed no production code or scientific semantics. The final exact-main state is formally certified at `33175e1d0507109c2af1f526b460f0f3ba6a7063`.
 
 [Open the crossed participant–item random scale-slope guide →](crossed-random-scale-slopes-location-scale.md)
 
 ## Validation boundary
 
-The latest fully certified development baseline is PR **#132**, exact-main SHA `1ff7569f7046325b50a15f0138137f6765182c0c`, tree `4559f41fcf233bb93054b8ceaadef610bc8ac61b`. The GitHub merge signature is verified/valid, and formal certification checkpoint `5670781372` records the exact-main state.
+The latest fully certified development baseline is PR **#134**, exact-main SHA `33175e1d0507109c2af1f526b460f0f3ba6a7063`, tree `37a038b74c8e4cf5a547105b027f588cbc307440`. Its sole parent is PR #133 merge SHA `f4ee2c7ac73c062c53682cf8be67f40b8768c63a`, the GitHub signature is verified/valid, and formal certification checkpoint comment **5676677748** records the exact-main state.
 
-The certified baseline passes **799/799 tests**, **14,402/14,402 statements**, and the frozen export audit remains **406/406 with 0 pending**. Raw branch coverage is **6,895/6,914 = 99.7252%**. All **19** uncovered branch arcs are explicitly audited structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** entries; audited structural accounting is **6,914/6,914 = 100.0000%** without redefining raw branch coverage as 100%.
+The certified baseline passes **824/824 tests**, **14,757/14,757 statements**, and the frozen export audit remains **406/406 with 0 pending**. Tests #626 is **12/12 platform/Python lanes green**. Raw branch coverage is **7,025/7,044 = 99.7303%**. All **19** uncovered branch arcs are explicitly audited structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** entries; audited structural accounting is **7,044/7,044 = 100.0000%** without redefining raw branch coverage as 100%.
 
-Exact-main branch evidence is Branch Coverage run **34892700825**, artifact **10367592353**, SHA-256 `b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e`.
+Exact-main branch evidence is Branch Coverage #406, run **34941909652**, artifact **10385841209**, SHA-256 `621c8d8c724323426af32c7d7bb5f3631a0b5a7188422b99e7647ed8036a84d4`. Docs #389 also passes `mkdocs build --strict` and the main-only GitHub Pages deployment on the certified SHA.
 
-The current crossed random scale-slope candidate now contains **24 focused tests** and adds **355 statements** plus **130 branches** across its two new source modules. Superseded repaired-head Branch Coverage #396 established the production-source denominator at **14,757 statements** and **7,044 branches**, passing **820/820 tests**; three direct numerical-guard tests were then added to cover the only four uncovered defensive statements and the two corresponding unexpected branch arcs. Analytic latent gradient/Hessian checks against finite differences remain part of the focused validation. These are development figures only; the immutable GitHub exact-head Branch Coverage and Tests workflows must reproduce the complete repository contract before promotion.
+The crossed random scale-slope implementation was promoted only after exact-head qualification, merge-tree verification, and fresh exact-main evidence. The follow-up PR #134 makes the formerly optimizer-dependent private loop-exhaustion branch deterministic under direct testing; the production implementation, scientific interpretation boundaries, and the original 19-entry structural-debt ledger are unchanged.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line method work does not retroactively alter the stable-release record.
 
