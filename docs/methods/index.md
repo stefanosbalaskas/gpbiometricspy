@@ -84,7 +84,7 @@ Because crossed participant and item effects cannot be integrated independently 
 
 ### Crossed participant–item random-slope location–scale modelling
 
-The certified crossed random-slope extension adds **one location random slope for each crossed factor**. Each participant and each item/stimulus has a trivariate random-effects block `(location intercept, location slope, log-scale intercept)` with its own unrestricted positive-definite 3 × 3 covariance matrix. The complete latent field has dimension `3(P + I)` and is integrated with the same joint dense-Laplace strategy.
+The crossed random-slope extension adds **one location random slope for each crossed factor**. Each participant and each item/stimulus has a trivariate random-effects block `(location intercept, location slope, log-scale intercept)` with its own unrestricted positive-definite 3 × 3 covariance matrix. The complete latent field has dimension `3(P + I)` and is integrated with the same joint dense-Laplace strategy.
 
 Each random-slope predictor must also enter the fixed mean equation and must vary within every level of the corresponding crossed factor. The method retains explicit population semantics for unseen participants/items and deterministic certificates. It deliberately does not add log-scale random slopes, participant × item interaction effects, a general random-effects grammar, mixture distributions, Bayesian priors, or causal interpretation.
 
@@ -92,15 +92,25 @@ PR **#129** is exact-main certified at merge SHA `d078e0366ace49c3ebeb2f6800bad6
 
 [Open the crossed participant–item random-slope guide →](crossed-random-slopes-location-scale.md)
 
+### Crossed participant–item random scale-slope location–scale modelling
+
+The development candidate adds **one log-scale random slope for each crossed factor**. Each participant and each item/stimulus receives a trivariate random-effects block `(location intercept, log-scale intercept, log-scale slope)` with its own unrestricted positive-definite 3 × 3 covariance matrix. The complete latent field has dimension `3(P + I)` and is integrated jointly with analytic latent derivatives and a dense Laplace correction.
+
+Each scale-slope predictor must also enter the fixed log-scale equation and must vary within every level of its corresponding crossed factor. Prediction keeps conditional and population semantics explicit for seen and unseen participants/items. The method does not treat log-scale effects as artifacts, reliability scores, sensor-validity weights or causal effects.
+
+This method is **not yet exact-main certified**. It is being qualified from certified base `1ff7569f7046325b50a15f0138137f6765182c0c`; GitHub exact-head evidence is authoritative before merge promotion.
+
+[Open the crossed participant–item random scale-slope guide →](crossed-random-scale-slopes-location-scale.md)
+
 ## Validation boundary
 
-The latest fully certified development baseline is PR **#130**, exact-main SHA `36d413f5dfa5f42acb1c6c80295b6904162402e8`, tree `8256d5bc047b3da3ebe6e244d6bbaa5edb60f0f5`. The merge tree exactly matches the qualified candidate tree at head `89ea07a3cf38b59d3486f58453b327b2952174b4`, and the GitHub merge signature is verified/valid. Its parents are the independently certified PR #129 baseline `d078e0366ace49c3ebeb2f6800bad6394d70631e` and the exact qualified PR #130 head.
+The latest fully certified development baseline is PR **#132**, exact-main SHA `1ff7569f7046325b50a15f0138137f6765182c0c`, tree `4559f41fcf233bb93054b8ceaadef610bc8ac61b`. The GitHub merge signature is verified/valid, and formal certification checkpoint `5670781372` records the exact-main state.
 
-PR #130 completed **14/14 exact-head workflow families** before merge and **14/14 fresh exact-main push workflow families** after merge, with no evidence waiver, cancellation, rerun substitution or stale-run substitution. The exact-main Tests workflow is **12/12 matrix lanes green** across Ubuntu, macOS, and Windows with Python 3.11–3.14. The certified exact-main baseline passes **799/799 tests**, **14,402/14,402 statements**, and the frozen export audit remains **406/406 with 0 pending**.
+The certified baseline passes **799/799 tests**, **14,402/14,402 statements**, and the frozen export audit remains **406/406 with 0 pending**. Raw branch coverage is **6,895/6,914 = 99.7252%**. All **19** uncovered branch arcs are explicitly audited structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** entries; audited structural accounting is **6,914/6,914 = 100.0000%** without redefining raw branch coverage as 100%.
 
-Raw branch coverage is **6,895/6,914 = 99.7252%**. All **19** uncovered branch arcs are explicitly audited structural/caller-dominated debt, with **0 unexpected**, **0 stale**, and **0 unaudited** entries; audited structural accounting is **6,914/6,914 = 100.0000%** without redefining raw branch coverage as 100%. The grouped ordinal implementation passes **387/387 statements and 138/138 branches**. Exact-main branch evidence is archived as artifact **10365022445**, SHA-256 `5009ad7cd50a112a612cab71c44b56ca8b55f9905ce22694328d62fdbc5379d0`.
+Exact-main branch evidence is Branch Coverage run **34892700825**, artifact **10367592353**, SHA-256 `b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e`.
 
-The grouped mixed-effects boosting module passes **357/357 statements and 128/128 branches**. The crossed participant–item random-slope module passes **435/435 statements and 148/148 branches**. The crossed participant–item random-intercept module passes **444/444 statements and 168/168 branches**. The timebase-provenance module passes **377/377 statements and 150/150 branches**. The cardiac-source provenance module passes **195/195 statements and 78/78 branches**.
+The current crossed random scale-slope candidate now contains **24 focused tests** and adds **355 statements** plus **130 branches** across its two new source modules. Superseded repaired-head Branch Coverage #396 established the production-source denominator at **14,757 statements** and **7,044 branches**, passing **820/820 tests**; three direct numerical-guard tests were then added to cover the only four uncovered defensive statements and the two corresponding unexpected branch arcs. Analytic latent gradient/Hessian checks against finite differences remain part of the focused validation. These are development figures only; the immutable GitHub exact-head Branch Coverage and Tests workflows must reproduce the complete repository contract before promotion.
 
 Stable `0.1.6` remains a distinct frozen release with its own release evidence and artifacts: **641 tests**, **10,456/10,456 statements = 100.00%**, and **5,629/5,648 raw branches = 99.6636%**. Development-line method work does not retroactively alter the stable-release record.
 
@@ -122,4 +132,4 @@ The grouped mixed-effects boosting method is a nonlinear predictive model. Its f
 
 The grouped ordinal mixed-effects boosting method is likewise predictive rather than causal. Its thresholds and random intercepts do not identify latent traits or diagnoses; ranked probability score and permutation importance are predictive diagnostics rather than inferential tests; and the implementation does not provide p-values, confidence intervals, random slopes, crossed random effects or a fully integrated cumulative-link mixed-model likelihood.
 
-The Gaussian, robust Student-t, random-slope, scale-slope, joint-slope, crossed and crossed-random-slope location–scale models estimate conditional distributional or association heterogeneity under their stated specifications. Random slopes are not causal effects or error-free traits; log-scale effects are not artifact or sensor-validity scores. Crossed log-scale random slopes, richer crossed random-effect structures, skewed heavy-tail families, mixtures, Bayesian priors and causal interpretation remain outside the current implementation family.
+The Gaussian, robust Student-t, random-slope, scale-slope, joint-slope, crossed, crossed-random-slope and crossed-random-scale-slope location–scale models estimate conditional distributional or association heterogeneity under their stated specifications. Random slopes are not causal effects or error-free traits; log-scale effects are not artifact, reliability or sensor-validity scores. Richer crossed random-effect structures, skewed heavy-tail families, mixtures, Bayesian priors and causal interpretation remain outside the current implementation family.

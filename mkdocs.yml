@@ -148,6 +148,7 @@ nav:
       - Joint random-slope location–scale modelling: methods/joint-random-slopes-location-scale.md
       - Crossed participant–item location–scale modelling: methods/crossed-location-scale.md
       - Crossed participant–item random-slope location–scale modelling: methods/crossed-random-slopes-location-scale.md
+      - Crossed participant–item random scale-slope location–scale modelling: methods/crossed-random-scale-slopes-location-scale.md
   - API:
       - Browse by domain: api/index.md
       - EDA / GSR / SCR: api/eda-scr.md

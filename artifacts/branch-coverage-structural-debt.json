@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "d078e0366ace49c3ebeb2f6800bad6394d70631e",
-  "coverage_denominator": 6914,
-  "raw_covered_branches": 6895,
-  "raw_branch_coverage_percent": 99.7252,
+  "baseline_commit": "1ff7569f7046325b50a15f0138137f6765182c0c",
+  "coverage_denominator": 7044,
+  "raw_covered_branches": 7025,
+  "raw_branch_coverage_percent": 99.7303,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10344881054,
-    "workflow_artifact_digest": "sha256:3db0de45be9371c32673a37c510b6997b0cbce017dba06e751589d31a8ce7ee2",
-    "diagnostic_note": "The fully exact-main-certified PR #129 baseline is d078e0366ace49c3ebeb2f6800bad6394d70631e, tree 50fc42f90cd53aafa81bf277da6f82045a3cd75d, with 6,776 total branches, 6,757 raw covered, and the same 19 audited structural arcs. Its exact-main branch artifact is 10344881054 with digest sha256:3db0de45be9371c32673a37c510b6997b0cbce017dba06e751589d31a8ce7ee2. The additive grouped ordinal mixed-effects boosting candidate changes no pre-existing source module and adds two Python-native source modules, grouped_ordinal_core.py and grouped_ordinal_boosting.py, focused-validated jointly on CPython 3.13 at 387/387 statements and 138/138 branches with 17/17 focused tests, including deterministic known-truth recovery. Therefore the rebuilt candidate advances deterministically by 138 branches to 6,914 total and 6,895 raw covered, without adding, removing, waiving, or relocating any structural-debt entry. Fresh exact-head CI on the immutable rebuilt ordinal candidate remains authoritative before merge promotion.",
+    "workflow_artifact_id": 10367592353,
+    "workflow_artifact_digest": "sha256:b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e",
+    "diagnostic_note": "The fully exact-main-certified base is 1ff7569f7046325b50a15f0138137f6765182c0c, with 6,914 total branches, 6,895 raw covered, and the same 19 audited structural/caller-dominated arcs. Exact-main Branch Coverage run 34892700825 produced artifact 10367592353 with digest sha256:b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e. The additive crossed participant-item random scale-slope location-scale candidate adds two Python-native source modules and changes no pre-existing scientific source module. Superseded repaired-head Branch Coverage run 34919179689 (#396) established the final production-source denominator: 14,757 statements and 7,044 branches; its full suite passed 820/820 tests and 7,023/7,044 branches, with the only two unexpected missing arcs being the private numerical guards 151->152 and 180->181 in hierarchical_location_scale_crossed_random_scale_core.py. Three direct guard tests were then added to exercise linear-solve failure, non-finite Newton direction, and non-finite final Laplace value. The final candidate therefore contains 24 focused tests, adds 355 statements and 130 branches over the certified base, and is expected to restore 7,025/7,044 raw covered branches while retaining exactly the original 19 audited residual arcs. Fresh exact-head Branch Coverage CI on the immutable normalized candidate is authoritative before merge promotion.",
     "candidate_expected_increment": {
       "source_modules": [
-        "src/gpbiometricspy/grouped_ordinal_core.py",
-        "src/gpbiometricspy/grouped_ordinal_boosting.py"
+        "src/gpbiometricspy/hierarchical_location_scale_crossed_random_scale_core.py",
+        "src/gpbiometricspy/hierarchical_location_scale_crossed_random_scale_slopes.py"
       ],
-      "focused_tests": 17,
-      "statements": 387,
-      "branches": 138
+      "focused_tests": 24,
+      "statements": 355,
+      "branches": 130
     }
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
