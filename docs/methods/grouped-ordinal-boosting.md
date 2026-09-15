@@ -2,7 +2,7 @@
 
 ## Status
 
-**Development candidate.** This method is additive to the frozen 406-export `gpbiometrics 2.0.0` parity surface and is not part of a stable release. It must complete its own pinned exact-head qualification, merge-object audit, and fresh exact-main certification before it is promoted to the certified development baseline.
+**Certified development method.** The method was introduced through PR **#130** and exact-main certified at merge SHA `36d413f5dfa5f42acb1c6c80295b6904162402e8`, tree `8256d5bc047b3da3ebe6e244d6bbaa5edb60f0f5`. It is additive to the frozen **406/406** `gpbiometrics 2.0.0` parity surface and is not part of stable release `gpbiometricspy 0.1.6`.
 
 ## Why this method exists
 
@@ -95,11 +95,15 @@ Permutation importance is predictive. It is not a causal estimand and does not e
 
 The certificate establishes reproducible object identity. It does not establish external validity, sensor validity, model adequacy, or truth of scientific interpretation.
 
-## Candidate validation evidence
+## Certified validation evidence
 
-Before opening the GitHub candidate, focused CPython 3.13 validation covered **17/17 focused tests**, **387/387 statements**, and **138/138 branches** for the new module. The synthetic known-truth check injects monotonic group heterogeneity, requires strong recovery of the group ordering, and requires fitted conditional RPS to improve over a class-frequency null.
+PR **#130** was qualified on immutable candidate head `89ea07a3cf38b59d3486f58453b327b2952174b4`; the certified merge tree exactly matches candidate tree `8256d5bc047b3da3ebe6e244d6bbaa5edb60f0f5`.
 
-These are **pre-PR development checks**, not certification evidence. Fresh exact-head GitHub Actions on the immutable candidate remains the authority for qualification.
+At certification, exact-main software evidence passed **799/799 tests** and **14,402/14,402 statements**. Repository-wide raw branch coverage was **6,895/6,914 = 99.7252%**, with exactly **19** audited structural/caller-dominated residual arcs and **0 unexpected, 0 stale, 0 unaudited** branch debt. The grouped ordinal implementation itself passed **387/387 statements** and **138/138 branches**.
+
+Those figures identify the historical certification point for this method. Later development-line certification adds other methods and therefore has larger repository-wide denominators; it does not retroactively change the PR #130 evidence.
+
+The synthetic known-truth validation injects monotonic group heterogeneity, requires strong recovery of the group ordering, and requires fitted conditional RPS to improve over a class-frequency null.
 
 ## Scientific guardrails
 

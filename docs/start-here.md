@@ -16,37 +16,37 @@ Choose the path that matches what you are trying to do. This page is intentional
 
 <div class="gp-route-grid">
 
-<a class="gp-route-card" href="guides/first-analysis/">
+<a class="gp-route-card" href="../guides/first-analysis/">
 <span class="gp-route-label">New user</span>
 <h3>Run a complete first analysis</h3>
 <p>Install the package, load the bundled synthetic dataset, inspect signals, run QC, create plots, and keep a reproducible record.</p>
 </a>
 
-<a class="gp-route-card" href="workflows/">
+<a class="gp-route-card" href="../workflows/">
 <span class="gp-route-label">Research workflow</span>
 <h3>Start from the data you recorded</h3>
 <p>Choose EDA/SCR, PPG/HRV, pupil/gaze/AOI, multimodal alignment, QC/reporting, or interoperability and follow the shortest defensible path.</p>
 </a>
 
-<a class="gp-route-card" href="studio/">
+<a class="gp-route-card" href="../studio/">
 <span class="gp-route-label">Visual workflow</span>
 <h3>Use gpbiometricspy Studio</h3>
 <p>Work through project, quality, analysis, alignment, modelling, and reporting in a guided application backed by the same scientific package functions.</p>
 </a>
 
-<a class="gp-route-card" href="guides/validate-dataset/">
+<a class="gp-route-card" href="../guides/validate-dataset/">
 <span class="gp-route-label">Bring your own data</span>
 <h3>Validate a new dataset before analysis</h3>
 <p>Check schema, sampling, missingness, resets, source provenance, event structure, and cross-stream timing before deriving substantive results.</p>
 </a>
 
-<a class="gp-route-card" href="guides/model-selection/">
+<a class="gp-route-card" href="../guides/model-selection/">
 <span class="gp-route-label">Statistics</span>
 <h3>Choose a modelling strategy</h3>
 <p>Compare grouped predictive models with hierarchical location–scale families, robust variants, random slopes, and crossed participant–item structures.</p>
 </a>
 
-<a class="gp-route-card" href="parity/">
+<a class="gp-route-card" href="../parity/">
 <span class="gp-route-label">Reviewer / auditor</span>
 <h3>Inspect validation and scientific boundaries</h3>
 <p>Trace frozen R parity, deep validation, private real-data smoke testing, measurement accountability, and explicit interpretation guardrails.</p>
@@ -110,5 +110,5 @@ graph LR
 ## Scientific boundary
 
 <div class="gp-science-boundary">
-The package measures, processes, audits, aligns, summarises, predicts, and models recorded signals. Those operations do not by themselves establish emotion, stress, trust, preference, cognition, diagnosis, sensor validity, or causal effects. Use the interpretation supported by the study design and measurement evidence, not the label of a software function.
+The package measures, processes, audits, aligns, summarises, predicts, and models recorded signals. Those operations do not by themselves establish emotion, stress, trust, preference, cognition, diagnosis, sensor validity, reliability, or causal effects. Use the interpretation supported by the study design and measurement evidence, not the label of a software function.
 </div>

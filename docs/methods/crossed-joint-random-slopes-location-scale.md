@@ -1,6 +1,6 @@
 # Crossed participant–item joint random-slope location–scale modelling
 
-> **Python-native development method.** This method is additive to the frozen **406/406** `gpbiometrics 2.0.0` parity surface. It is not an R-parity export and does not change that contract.
+> **Python-native certified development method.** This method is additive to the frozen **406/406** `gpbiometrics 2.0.0` parity surface. It is not an R-parity export and does not change that contract. The current scientific checkpoint is PR #136 at exact-main SHA `e761a931b00e646d6f12be3475a68cd524803893`.
 
 The crossed joint random-slope model is the richest member of the current Gaussian location–scale family. It allows both crossed factors—typically **participant** and **item/stimulus**—to vary in:
 
@@ -197,6 +197,12 @@ A dense Laplace Hessian scales with the full latent dimension. This method is th
 
 Model escalation should be driven by the scientific contrast and design support, not by a preference for the richest specification.
 
-## Validation status
+## Certified validation status
 
-This page documents the active development tranche. Exact-head and exact-main certification evidence will be recorded only after the implementation, tests, branch accounting, documentation build, and all applicable workflow families complete successfully. Until then, do not substitute this development page for a certified release claim.
+PR **#136** is formally exact-main certified at SHA **`e761a931b00e646d6f12be3475a68cd524803893`**, tree **`313ce0a801daf0ae7c4b9ce7a9e0af4610094994`**. Its sole parent is `0b7084352362d297dc05f127d4bcbc924cd24873`; the merge tree exactly matches the qualified candidate tree and the GitHub signature is verified/valid.
+
+The fresh post-merge generation is **14/14 workflow families green**. Tests #634 is **12/12 platform/Python lanes green**; the canonical Ubuntu 24.04.5 / CPython 3.12.14 lane passes **850/850 tests**, **15,171/15,171 statements**, Ruff/compile clean, and **406/406 frozen exports with 0 pending**. Branch Coverage #412 reports **7,159/7,178 = 99.7353% raw branches**, the same **19 audited** residual structural/caller-dominated arcs, and **0 unexpected / 0 stale / 0 unaudited** branch debt. The branch evidence artifact is **10389944415**, SHA-256 `9cc448013e4be26caf22de120089ba649c928aee0989728fdbf77e5409528abf`.
+
+Interoperability #622 is **14/14** across the real optional-backend matrix, and Deep Parity, private real-data validation, CodeQL, strict Docs/Pages, and all Studio readiness families are green. Formal certification checkpoint: PR #136 comment **5678239576**.
+
+A later documentation-only/site descendant may describe this state but does not replace `e761a931…` as the scientific certification anchor.

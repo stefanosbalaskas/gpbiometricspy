@@ -12,12 +12,21 @@
 
 .md-typeset a:focus-visible,
 .md-typeset button:focus-visible,
+.md-typeset .md-button:focus-visible,
 .gp-card-link:focus-visible,
 .gp-route-card:focus-visible,
-.gp-visual-card:focus-visible {
+.gp-visual-card:focus-visible,
+.gp-mini-grid a:focus-visible,
+.gp-jump-nav a:focus-visible {
   outline: 3px solid var(--gp-focus-ring);
   outline-offset: 3px;
   border-radius: 0.45rem;
+}
+
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  scroll-margin-top: 6rem;
 }
 
 .md-typeset table:not([class]) {
@@ -66,10 +75,15 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.gp-status-grid-home {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .gp-route-card,
 .gp-guide-card,
 .gp-visual-card,
-.gp-metric-card {
+.gp-metric-card,
+.gp-visual-grid > figure {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--gp-card-border);
@@ -151,6 +165,36 @@
   color: var(--md-default-fg-color--light);
 }
 
+.gp-jump-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.6rem;
+  padding: 0.7rem;
+  border: 1px solid var(--gp-soft-border);
+  border-radius: var(--gp-radius-lg);
+  background: var(--gp-surface-1);
+}
+
+.gp-jump-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--md-default-fg-color) !important;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.gp-jump-nav a:hover {
+  border-color: var(--gp-soft-border);
+  background: var(--md-default-bg-color);
+}
+
 .gp-visual-card {
   display: block;
   color: inherit !important;
@@ -158,12 +202,35 @@
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
-.gp-visual-card img {
+.gp-visual-card img,
+.gp-visual-grid > figure img {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   background: var(--gp-surface-1);
+}
+
+.gp-visual-grid > figure {
+  margin: 0;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.gp-visual-grid > figure:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--md-accent-fg-color) 45%, var(--gp-card-border));
+  box-shadow: var(--gp-shadow);
+}
+
+.gp-visual-grid > figure figcaption {
+  padding: 0.85rem 0.95rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--md-default-fg-color--light);
+}
+
+.gp-visual-grid > figure figcaption strong {
+  color: var(--md-default-fg-color);
 }
 
 .gp-visual-card-body {
@@ -200,6 +267,19 @@
   font-size: 0.73rem;
   line-height: 1.3;
   color: var(--md-default-fg-color--light);
+}
+
+.gp-actions .md-button {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gp-mini-grid a {
+  min-height: 2.9rem;
+  display: flex;
+  align-items: center;
 }
 
 .gp-steps {
@@ -266,6 +346,21 @@
   color: var(--md-default-fg-color);
 }
 
+.gp-gallery-next {
+  margin: -0.7rem 0 2rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 0.2rem solid var(--md-accent-fg-color);
+  border-radius: 0 0.65rem 0.65rem 0;
+  background: var(--gp-surface-1);
+  color: var(--md-default-fg-color--light);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.gp-gallery-next a {
+  font-weight: 700;
+}
+
 .gp-science-boundary {
   margin: 1.2rem 0;
   padding: 0.9rem 1rem;
@@ -275,6 +370,7 @@
 }
 
 @media (max-width: 900px) {
+  .gp-status-grid-home,
   .gp-guide-grid,
   .gp-metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -285,12 +381,41 @@
   .gp-route-grid,
   .gp-guide-grid,
   .gp-visual-grid,
-  .gp-metric-grid {
+  .gp-metric-grid,
+  .gp-status-grid-home {
     grid-template-columns: 1fr;
   }
 
   .gp-route-card {
     min-height: 0;
+  }
+
+  .gp-actions .md-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .gp-jump-nav {
+    gap: 0.4rem;
+    padding: 0.55rem;
+  }
+
+  .gp-jump-nav a {
+    flex: 1 1 calc(50% - 0.4rem);
+    justify-content: center;
+    min-height: 2.65rem;
+    text-align: center;
+  }
+
+  .gp-landing-hero h1 {
+    font-size: clamp(2rem, 12vw, 3rem);
+    line-height: 1.02;
+  }
+}
+
+@media (max-width: 420px) {
+  .gp-jump-nav a {
+    flex-basis: 100%;
   }
 }
 
@@ -298,16 +423,33 @@
   .gp-card-link,
   .gp-route-card,
   .gp-visual-card,
+  .gp-visual-grid > figure,
   .gp-gallery figure,
-  .gp-feature-gallery figure {
+  .gp-feature-gallery figure,
+  .gp-jump-nav a {
     transition: none;
   }
 
   .gp-card-link:hover,
   .gp-route-card:hover,
   .gp-visual-card:hover,
+  .gp-visual-grid > figure:hover,
   .gp-gallery figure:hover,
   .gp-feature-gallery figure:hover {
     transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .gp-route-card,
+  .gp-guide-card,
+  .gp-visual-card,
+  .gp-metric-card,
+  .gp-visual-grid > figure,
+  .gp-status-grid,
+  .gp-card,
+  .gp-pillar,
+  .gp-jump-nav {
+    border-color: currentColor;
   }
 }

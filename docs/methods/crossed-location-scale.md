@@ -130,10 +130,12 @@ The model does not:
 - establish causal effects; or
 - infer latent psychological states from physiological or gaze signals.
 
-## Current validation status
+## Validation status
 
-The crossed participant–item method is **exact-main certified**. It was introduced and certified through PR **#124**, merge SHA `eb8c737f93e952f7bec0e6d7958336f1ecf469f5`, and remains unchanged in the current certified PR **#125** development baseline at `1464e46cd75373eb634c3df12dedd5e7764af395`.
+The crossed participant–item random-intercept method is **exact-main certified**. It was introduced and certified through PR **#124**, merge SHA `eb8c737f93e952f7bec0e6d7958336f1ecf469f5`. Its scientific implementation remains unchanged by the later random-slope extensions.
 
-On the current exact-main baseline, the module passes **444/444 statements** and **168/168 branches**. The full package passes **733/733 tests**, **13,028/13,028 statements**, and **6,403/6,422 raw branches = 99.7041%**, with all **19** uncovered branch arcs audited as structural debt and **0 unexpected, stale or unaudited** branch debt. The frozen `gpbiometrics 2.0.0` export contract remains **406/406 implemented with 0 pending**.
+The method-specific source module is fully exercised at **444/444 statements** and **168/168 branches**. The frozen `gpbiometrics 2.0.0` export contract remains **406/406 implemented with 0 pending**.
+
+Repository-wide test and coverage totals evolve as new additive Python-native methods are introduced. For the current exact-main package baseline, use the [Methods overview](index.md) and [Deep validation](../deep-validation.md) rather than treating historical package-wide totals on an individual method page as live status.
 
 Certification is based on fresh post-merge evidence from the exact merge SHA; pre-merge qualification is not substituted for exact-main evidence.
