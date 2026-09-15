@@ -4,6 +4,7 @@ site_url: https://stefanosbalaskas.github.io/gpbiometricspy/
 site_author: Stefanos Balaskas
 repo_url: https://github.com/stefanosbalaskas/gpbiometricspy
 repo_name: stefanosbalaskas/gpbiometricspy
+edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2026 Stefanos Balaskas · MIT License
 
 theme:
@@ -29,21 +30,30 @@ theme:
         name: Switch to light mode
   features:
     - navigation.instant
+    - navigation.instant.prefetch
     - navigation.instant.progress
     - navigation.tracking
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.indexes
+    - navigation.path
     - navigation.top
     - navigation.footer
     - search.suggest
     - search.highlight
+    - search.share
+    - content.action.view
     - content.code.copy
     - content.code.annotate
     - content.tabs.link
     - content.tooltips
     - toc.follow
+
+plugins:
+  - search
+  - meta
+  - privacy
 
 extra:
   social:
@@ -56,6 +66,9 @@ extra:
     - icon: material/archive-outline
       link: https://doi.org/10.5281/zenodo.22150872
       name: gpbiometricspy on Zenodo
+    - icon: fontawesome/brands/orcid
+      link: https://orcid.org/0000-0003-2444-9796
+      name: Stefanos Balaskas on ORCID
 
 extra_css:
   - stylesheets/extra.css
