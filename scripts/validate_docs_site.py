@@ -64,6 +64,11 @@ RAW_ROUTE_PAGES = {
     "deep-validation.md",
 }
 
+SEARCH_META = {
+    "guides/.meta.yml": "boost: 1.2",
+    "methods/.meta.yml": "boost: 1.1",
+}
+
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -182,12 +187,32 @@ def main() -> None:
     assert "# Start here" in start
     assert 'href="../parity/"' in start
     assert "validation-trust/parity-validation" not in start
+    assert "boost: 1.5" in start
+    assert "description:" in start
 
     workflows = _text(DOCS / "workflows.md")
     assert "Recommended research pipeline" in workflows
     assert "Measurement-ready" in workflows
     assert "Analysis-ready" in workflows
     assert "Report-ready" in workflows
+    assert "boost: 1.4" in workflows
+    assert "description:" in workflows
+
+    recovery = DOCS / "404.md"
+    recovery_text = _text(recovery)
+    assert "# That page is not here" in recovery_text
+    assert "search:" in recovery_text and "exclude: true" in recovery_text
+    assert "<kbd>/</kbd>" in recovery_text
+    for destination in ["start-here/", "workflows/", "methods/", "api/", "plot-gallery/"]:
+        assert f"https://stefanosbalaskas.github.io/gpbiometricspy/{destination}" in recovery_text
+    _assert_html_images_have_alt(recovery)
+
+    for rel, expected in SEARCH_META.items():
+        metadata = DOCS / rel
+        assert metadata.exists(), metadata
+        metadata_text = _text(metadata)
+        assert "search:" in metadata_text
+        assert expected in metadata_text
 
     for name in RAW_ROUTE_PAGES:
         route_page = DOCS / name
@@ -196,10 +221,17 @@ def main() -> None:
 
     mkdocs = _text(ROOT / "mkdocs.yml")
     for required in [
+        "edit_uri: edit/main/docs/",
         "- Start here: start-here.md",
         "- Guides:",
         "- Python-native explanations:",
+        "- navigation.instant.prefetch",
         "- navigation.instant.progress",
+        "- navigation.path",
+        "- search.share",
+        "- content.action.view",
+        "- search\n  - meta\n  - privacy",
+        "https://orcid.org/0000-0003-2444-9796",
         "- content.code.annotate",
         "- stylesheets/experience.css",
         "- name: mermaid",
@@ -217,7 +249,8 @@ def main() -> None:
         f"({len(figures)} figures, {len(GUIDES)} guides, "
         f"{len(PYTHON_NATIVE_ARTICLES) - 1} Python-native explanation articles, "
         f"{len(frozen_companions)} frozen R companions, "
-        f"{len(RAW_ROUTE_PAGES)} raw-route pages)"
+        f"{len(RAW_ROUTE_PAGES)} raw-route pages, "
+        f"{len(SEARCH_META)} search-meta scopes, recovery 404)"
     )
 
 

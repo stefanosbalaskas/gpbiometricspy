@@ -1,3 +1,9 @@
+---
+description: Task-first entry point for gpbiometricspy research workflows, dataset validation, Studio, modelling, and validation evidence.
+search:
+  boost: 1.5
+---
+
 # Start here
 
 <div class="gp-page-intro">
