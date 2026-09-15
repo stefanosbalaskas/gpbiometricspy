@@ -9,10 +9,10 @@
 Start from the research task you need to complete—not from a list of functions.
 
 <div class="gp-actions">
-<a class="md-button md-button--primary" href="start-here/">Start here</a>
+<a class="md-button md-button--primary" href="guides/hands-on-eda-research/">Run a complete analysis</a>
+<a class="md-button" href="start-here/">Start here</a>
 <a class="md-button" href="studio/">Open the Studio guide</a>
 <a class="md-button" href="workflows/">Choose a workflow</a>
-<a class="md-button" href="plot-gallery/">Explore generated plots</a>
 </div>
 
 </div>
@@ -30,10 +30,10 @@ Start from the research task you need to complete—not from a list of functions
 
 <div class="gp-route-grid">
 
-<a class="gp-route-card" href="guides/first-analysis/">
-<span class="gp-route-label">First analysis</span>
-<h3>Learn the full path on synthetic data</h3>
-<p>Install the package, inspect channels, run QC, generate plots and retain a reproducible record before bringing in study data.</p>
+<a class="gp-route-card" href="guides/hands-on-eda-research/">
+<span class="gp-route-label">Hands-on analysis</span>
+<h3>Use the package from data to report</h3>
+<p>Run real package calls through QC, EDA processing, candidate events, plots, exports and methods evidence, then learn how to substitute your own research export.</p>
 </a>
 
 <a class="gp-route-card" href="guides/validate-dataset/">
@@ -82,7 +82,8 @@ Studio and the Python API call the same package implementation. Use the visual a
 </div>
 
 <div class="gp-actions">
-<a class="md-button md-button--primary" href="studio/">Use Studio</a>
+<a class="md-button md-button--primary" href="guides/hands-on-eda-research/">Follow the hands-on guide</a>
+<a class="md-button" href="studio/">Use Studio</a>
 <a class="md-button" href="getting-started/">Use the Python API</a>
 </div>
 
@@ -170,7 +171,9 @@ The current scientific development baseline is PR **#136**, exact-main SHA **`e7
 Stable **gpbiometricspy 0.1.6** remains an immutable release line from **11 September 2026**, with **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%** at release qualification. Development metrics above describe post-release work and do not retroactively change the 0.1.6 artifacts.
 
 <div class="gp-mini-grid">
-<a href="start-here/">Start here</a>
+<a href="guides/hands-on-eda-research/">Hands-on guide</a>
+<a href="workflows/end-to-end-eda-research/">End-to-end workflow</a>
+<a href="examples/end-to-end-eda/">Runnable example</a>
 <a href="studio/">Studio application</a>
 <a href="workflows/">Workflow map</a>
 <a href="methods/">Methods</a>

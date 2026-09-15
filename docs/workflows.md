@@ -14,10 +14,14 @@ Use this page as the shortest route from **what you recorded** to **what to do n
 A workflow is complete only when its measurement assumptions, QC, timing, transformations, analysis settings, and reporting evidence remain traceable—not merely when it produces a final feature table.
 </div>
 
+!!! success "New: follow one complete workflow"
+    If you want to see the package used from beginning to end before choosing a domain, open the [end-to-end EDA research workflow](workflows/end-to-end-eda-research.md). It connects real public package calls to measurement checks, decision gates, derived tables, figures, exported artifacts and reporting evidence. The companion script is executed in documentation CI.
+
 ## Choose by recorded data
 
 | You have | Establish first | Typical next steps | Go to |
 |---|---|---|---|
+| I want one complete worked workflow | package + data structure | QC → process → inspect → export → report | [End-to-end EDA workflow](workflows/end-to-end-eda-research.md) |
 | EDA / GSR | units, activity, missingness, timing | tonic/phasic decomposition, SCR detection, event summaries | [EDA / GSR / SCR](examples/eda-scr.md) |
 | PPG waveform | source + observed sampling + pulse quality | peak detection, intervals, PRV/HRV-ready diagnostics | [PPG / HRV](examples/ppg-hrv.md) |
 | IBI / RR / NN intervals | source identity, units, cleaning status | time/frequency/nonlinear variability, agreement checks | [PPG / HRV](examples/ppg-hrv.md) |
@@ -97,6 +101,7 @@ Retain at least:
 
 ## Need a guided path?
 
+- Full hands-on package use: [Data to report](guides/hands-on-eda-research.md)
 - New to the package: [First analysis](guides/first-analysis.md)
 - New research dataset: [Validate a new dataset](guides/validate-dataset.md)
 - Multiple clocks/streams: [Timebase and alignment](guides/timebase-alignment.md)

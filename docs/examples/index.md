@@ -5,6 +5,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 </div>
 
 <div class="gp-route-grid">
+<a class="gp-route-card" href="end-to-end-eda/"><span class="gp-route-label">Run first</span><h3>Complete EDA analysis bundle</h3><p>Execute one checked script from input through QC, decomposition, candidate events, figures, tables and methods text.</p></a>
 <a class="gp-route-card" href="eda-scr/"><span class="gp-route-label">EDA / SCR</span><h3>Conductance to response events</h3><p>Inspect quality, decompose EDA, detect candidate SCRs, and retain visual diagnostics.</p></a>
 <a class="gp-route-card" href="ppg-hrv/"><span class="gp-route-label">PPG / HRV</span><h3>Waveform to beat intervals</h3><p>Detect pulse peaks, inspect RR/IBI geometry, and generate standard HRV diagnostics with source guardrails.</p></a>
 <a class="gp-route-card" href="pupil-gaze/"><span class="gp-route-label">Eye tracking</span><h3>Pupil, gaze, AOI and saccades</h3><p>Inspect pupil/gaze channels, aggregate AOI-linked measures, and use gaze diagnostics without inferring latent states.</p></a>
@@ -17,6 +18,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 
 | Starting data | Example | Primary evidence produced |
 |---|---|---|
+| I want one complete working analysis first | [End-to-end EDA](end-to-end-eda.md) | QC, decomposition, event tables, figures, methods evidence |
 | EDA/GSR waveform | [EDA / GSR / SCR](eda-scr.md) | quality, decomposition, candidate response events |
 | PPG waveform or intervals | [PPG / HRV](ppg-hrv.md) | peak/interval diagnostics and HRV-ready series |
 | Pupil/gaze/AOI columns | [Pupil / gaze / AOI](pupil-gaze.md) | missingness/validity, AOI summaries, gaze diagnostics |
@@ -35,7 +37,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 
 ## From example to research workflow
 
-1. Reproduce the example unchanged.
+1. Reproduce the [checked end-to-end example](end-to-end-eda.md) unchanged.
 2. Replace only the input mapping—not the scientific meaning of variables.
 3. Run the [new-dataset validation guide](../guides/validate-dataset.md).
 4. Preserve QC/provenance evidence before preprocessing.

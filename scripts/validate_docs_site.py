@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
@@ -31,6 +35,7 @@ EXPECTED_FIGURES = {
 
 GUIDES = {
     "index.md",
+    "hands-on-eda-research.md",
     "first-analysis.md",
     "validate-dataset.md",
     "timebase-alignment.md",
@@ -47,6 +52,7 @@ PYTHON_NATIVE_ARTICLES = {
 }
 
 EXAMPLES = {
+    "end-to-end-eda.md",
     "eda-scr.md",
     "ppg-hrv.md",
     "pupil-gaze.md",
@@ -67,6 +73,18 @@ RAW_ROUTE_PAGES = {
 SEARCH_META = {
     "guides/.meta.yml": "boost: 1.2",
     "methods/.meta.yml": "boost: 1.1",
+}
+
+HANDS_ON_WORKFLOW = DOCS / "workflows" / "end-to-end-eda-research.md"
+HANDS_ON_SCRIPT = ROOT / "examples" / "tutorials" / "end-to-end-eda-research.py"
+HANDS_ON_OUTPUTS = {
+    "eda_decomposition.csv",
+    "scr_events.csv",
+    "scr_group_summary.csv",
+    "analysis_checklist_overview.csv",
+    "methods_text.txt",
+    "end-to-end-eda-research-01.png",
+    "end-to-end-eda-research-02.png",
 }
 
 
@@ -133,6 +151,42 @@ def _assert_raw_internal_targets(path: Path) -> None:
         )
 
 
+def _validate_hands_on_example() -> None:
+    assert HANDS_ON_SCRIPT.exists(), HANDS_ON_SCRIPT
+    source = _text(HANDS_ON_SCRIPT)
+    for required in [
+        "audit_gazepoint_gsr_units",
+        "audit_gazepoint_gsr_quality",
+        "decompose_gazepoint_eda",
+        "detect_gazepoint_scr_events",
+        "plot_gazepoint_eda_decomposition",
+        "plot_gazepoint_scr_events",
+        "create_gazepoint_biometrics_checklist",
+        "create_gazepoint_biometrics_methods_text",
+    ]:
+        assert required in source, required
+
+    with tempfile.TemporaryDirectory(prefix="gpbiometricspy-hands-on-") as tmp:
+        env = os.environ.copy()
+        env["GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR"] = tmp
+        run = subprocess.run(
+            [sys.executable, str(HANDS_ON_SCRIPT)],
+            cwd=ROOT,
+            env=env,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        lines = [line for line in run.stdout.splitlines() if line.strip()]
+        assert lines, "Hands-on example produced no stdout."
+        result = json.loads(lines[-1])
+        assert result["tutorial"] == "end-to-end-eda-research", result
+        assert result["status"] == "PASS", result
+        produced = {path.name for path in Path(tmp).iterdir()}
+        assert HANDS_ON_OUTPUTS <= produced, (sorted(HANDS_ON_OUTPUTS), sorted(produced))
+
+
 def main() -> None:
     assert MANIFEST.exists(), MANIFEST
     manifest = json.loads(_text(MANIFEST))
@@ -182,6 +236,20 @@ def main() -> None:
     assert "Scientific boundary" in _text(examples_dir / "pupil-gaze.md")
     assert "Scientific boundary" in _text(examples_dir / "multimodal.md")
     assert "Scientific boundary" in _text(examples_dir / "quality-reporting.md")
+    assert "What not to infer" in _text(examples_dir / "end-to-end-eda.md")
+
+    assert HANDS_ON_WORKFLOW.exists(), HANDS_ON_WORKFLOW
+    workflow_text = _text(HANDS_ON_WORKFLOW)
+    assert "Completion criteria" in workflow_text
+    assert "GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR" in workflow_text
+    assert "Scientific boundary" not in workflow_text or "gp-science-boundary" in workflow_text
+    _assert_html_images_have_alt(HANDS_ON_WORKFLOW)
+
+    hands_on_guide = DOCS / "guides" / "hands-on-eda-research.md"
+    hands_on_guide_text = _text(hands_on_guide)
+    assert "Move from demonstration data to your own file" in hands_on_guide_text
+    assert "Common mistakes" in hands_on_guide_text
+    assert "GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR" in hands_on_guide_text
 
     start = _text(DOCS / "start-here.md")
     assert "# Start here" in start
@@ -195,6 +263,7 @@ def main() -> None:
     assert "Measurement-ready" in workflows
     assert "Analysis-ready" in workflows
     assert "Report-ready" in workflows
+    assert "end-to-end EDA research workflow" in workflows
     assert "boost: 1.4" in workflows
     assert "description:" in workflows
 
@@ -223,6 +292,9 @@ def main() -> None:
     for required in [
         "edit_uri: edit/main/docs/",
         "- Start here: start-here.md",
+        "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
+        "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
+        "- End-to-end runnable EDA: examples/end-to-end-eda.md",
         "- Guides:",
         "- Python-native explanations:",
         "- navigation.instant.prefetch",
@@ -238,6 +310,8 @@ def main() -> None:
     ]:
         assert required in mkdocs, required
 
+    _validate_hands_on_example()
+
     # Preserve the frozen R-companion documentation boundary.
     top_level_articles = sorted((DOCS / "articles").glob("*.md"))
     frozen_companions = [p for p in top_level_articles if p.name != "index.md"]
@@ -247,6 +321,7 @@ def main() -> None:
     print(
         "docs-site validation: PASS "
         f"({len(figures)} figures, {len(GUIDES)} guides, "
+        f"{len(EXAMPLES)} focused examples, 1 executable hands-on workflow, "
         f"{len(PYTHON_NATIVE_ARTICLES) - 1} Python-native explanation articles, "
         f"{len(frozen_companions)} frozen R companions, "
         f"{len(RAW_ROUTE_PAGES)} raw-route pages, "
