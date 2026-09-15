@@ -1,0 +1,129 @@
+:root {
+  --gp-api-border: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.gp-api-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 1fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  margin: 1rem 0 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gp-card-border, var(--gp-api-border));
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, var(--gp-soft-bg, transparent), var(--md-default-bg-color));
+}
+
+.gp-api-toolbar label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.gp-api-toolbar input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--gp-card-border, var(--gp-api-border));
+  border-radius: 0.65rem;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font: inherit;
+}
+
+.gp-api-toolbar input:focus {
+  outline: 2px solid color-mix(in srgb, var(--md-accent-fg-color) 45%, transparent);
+  outline-offset: 1px;
+  border-color: var(--md-accent-fg-color);
+}
+
+.gp-api-result-count {
+  min-width: 6.5rem;
+  text-align: right;
+  font-size: 0.78rem;
+  font-weight: 740;
+  opacity: 0.7;
+}
+
+.gp-api-domain-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.gp-api-domain-card {
+  position: relative;
+}
+
+.gp-domain-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.35rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  background: var(--gp-accent-bg, color-mix(in srgb, var(--md-accent-fg-color) 9%, transparent));
+  color: var(--md-accent-fg-color);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.gp-api-table-wrap {
+  max-height: 42rem;
+  overflow: auto;
+  margin: 1rem 0 1.5rem;
+  border: 1px solid var(--gp-card-border, var(--gp-api-border));
+  border-radius: 0.85rem;
+}
+
+.gp-api-table {
+  width: 100%;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+.gp-api-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--md-default-bg-color);
+}
+
+.gp-api-table th,
+.gp-api-table td {
+  padding: 0.58rem 0.75rem !important;
+}
+
+.gp-api-table tr[hidden] {
+  display: none;
+}
+
+.gp-api-domain-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.gp-api-domain-links .md-button {
+  margin: 0;
+  border-radius: 999px;
+}
+
+@media (max-width: 1100px) {
+  .gp-api-domain-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .gp-api-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .gp-api-result-count {
+    text-align: left;
+  }
+
+  .gp-api-domain-grid {
+    grid-template-columns: 1fr;
+  }
+}
