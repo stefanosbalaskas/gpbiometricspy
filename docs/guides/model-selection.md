@@ -15,8 +15,10 @@ Use this guide to choose among the current Python-native modelling families. Sta
 | Participant/group-specific slope in the mean equation | [Random location slope](../methods/random-slope-location-scale.md) | Mean heterogeneity in a declared numeric predictor | causal individual differences |
 | Participant/group-specific slope in residual scale | [Random scale slope](../methods/random-scale-slope-location-scale.md) | Heterogeneity in the log-scale equation | sensor-validity or noise labels |
 | Random slopes in both mean and scale equations | [Joint random slopes](../methods/joint-random-slopes-location-scale.md) | Full 4×4 covariance among location/scale intercepts and slopes | unrestricted general random-effects grammar |
-| Participant and item/stimulus clustering | [Crossed location–scale](../methods/crossed-location-scale.md) | Separate participant/item random intercept structures | nested-only interpretations |
-| Participant and item-specific slopes in the mean equation | [Crossed random slopes](../methods/crossed-random-slopes-location-scale.md) | Crossed location slopes with joint Laplace integration | crossed log-scale slopes—the next documented gap |
+| Participant and item/stimulus clustering | [Crossed location–scale](../methods/crossed-location-scale.md) | Separate participant/item random-intercept structures | nested-only interpretations |
+| Participant and item-specific slopes in the mean equation | [Crossed random slopes](../methods/crossed-random-slopes-location-scale.md) | Crossed location slopes with joint Laplace integration | log-scale random-slope interpretation |
+| Participant and item-specific slopes in residual scale | [Crossed random scale slopes](../methods/crossed-random-scale-slopes-location-scale.md) | Crossed log-scale slopes with joint Laplace integration | artifact, reliability or sensor-validity scores |
+| Participant and item-specific slopes in both equations | [Crossed joint random slopes](../methods/crossed-joint-random-slopes-location-scale.md) | Separate 4×4 participant/item covariance blocks with explicit conditional/population prediction | causal random-slope effects or a general random-effects grammar |
 
 ## Decision path
 
@@ -33,9 +35,11 @@ graph TD
   F -->|Location only| J[Random location slope]
   F -->|Scale only| K[Random scale slope]
   F -->|Both| L[Joint random slopes]
-  E -->|Yes| M{Need crossed location slopes?}
-  M -->|No| N[Crossed location-scale]
-  M -->|Yes| O[Crossed random slopes]
+  E -->|Yes| M{Which crossed slopes are scientifically required?}
+  M -->|None| N[Crossed location-scale]
+  M -->|Location only| O[Crossed random slopes]
+  M -->|Scale only| P[Crossed random scale slopes]
+  M -->|Location + scale| Q[Crossed joint random slopes]
 ```
 
 ## Choose the validation unit before the model
@@ -55,7 +59,7 @@ Conditional and population predictions are not interchangeable.
 
 A random slope is not justified merely because a predictor is numeric. The slope variable must vary within the relevant grouping level and appear in the corresponding fixed equation. For crossed models, the predictor must vary within every level of the factor receiving that random slope.
 
-This requirement is particularly important for the next planned extension: **crossed participant–item log-scale random slopes**. A scale-slope predictor must vary within participants/items and must enter the fixed log-scale equation before a group-specific scale slope is scientifically interpretable.
+A scale-slope predictor must enter the fixed log-scale equation; a location-slope predictor must enter the fixed mean equation. The crossed joint model checks all four declarations independently and requires at least eight participant levels and eight item levels before estimating its 4×4 covariance blocks.
 
 ## When a simpler model is better
 
@@ -67,6 +71,8 @@ Prefer a simpler structure when:
 - covariance recovery is unstable in known-truth simulations;
 - the dense latent field exceeds the implementation's complexity ceiling;
 - the intended scientific claim does not require the added random-effect term.
+
+The crossed joint model should be the endpoint of a justified escalation path, not the default starting model. Its latent field grows as `4(P + I)` and its two 4×4 covariance blocks demand substantially more information than crossed random-intercept models.
 
 ## Model choice is not measurement validation
 

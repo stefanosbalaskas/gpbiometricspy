@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
-  "baseline_commit": "1ff7569f7046325b50a15f0138137f6765182c0c",
-  "coverage_denominator": 7044,
-  "raw_covered_branches": 7025,
-  "raw_branch_coverage_percent": 99.7303,
+  "baseline_commit": "33175e1d0507109c2af1f526b460f0f3ba6a7063",
+  "coverage_denominator": 7178,
+  "raw_covered_branches": 7159,
+  "raw_branch_coverage_percent": 99.7353,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10367592353,
-    "workflow_artifact_digest": "sha256:b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e",
-    "diagnostic_note": "The fully exact-main-certified base is 1ff7569f7046325b50a15f0138137f6765182c0c, with 6,914 total branches, 6,895 raw covered, and the same 19 audited structural/caller-dominated arcs. Exact-main Branch Coverage run 34892700825 produced artifact 10367592353 with digest sha256:b0b19958e96b7032c8fe3025e25a34533f8901b5e4f6e80930af3d2fdd2a495e. The additive crossed participant-item random scale-slope location-scale candidate adds two Python-native source modules and changes no pre-existing scientific source module. Superseded repaired-head Branch Coverage run 34919179689 (#396) established the final production-source denominator: 14,757 statements and 7,044 branches; its full suite passed 820/820 tests and 7,023/7,044 branches, with the only two unexpected missing arcs being the private numerical guards 151->152 and 180->181 in hierarchical_location_scale_crossed_random_scale_core.py. Three direct guard tests were then added to exercise linear-solve failure, non-finite Newton direction, and non-finite final Laplace value. The final candidate therefore contains 24 focused tests, adds 355 statements and 130 branches over the certified base, and is expected to restore 7,025/7,044 raw covered branches while retaining exactly the original 19 audited residual arcs. Fresh exact-head Branch Coverage CI on the immutable normalized candidate is authoritative before merge promotion.",
+    "workflow_artifact_id": 10388795823,
+    "workflow_artifact_digest": "sha256:2f941e8c5ca8130fb6b241b8363c4d918963efe5fa027ea7346a1f6f86347206",
+    "diagnostic_note": "The formal scientific certification base before this tranche is 33175e1d0507109c2af1f526b460f0f3ba6a7063, with 7,044 total branches, 7,025 raw covered, and the same 19 audited structural/caller-dominated arcs. PR #136 adds the crossed participant-item joint location+scale random-slope model plus its focused validation and documentation. Tree-equivalent diagnostic Branch Coverage run 34947682650 (#408) on tree dd038213b1c0b2db7d12b9ba69439becba93643d passed 850/850 tests, 15,171/15,171 statements, and 7,159/7,178 raw branches = 99.7353%. Both new production modules reached 100% statement and branch coverage. The only 19 missing arcs are exactly the pre-existing audited structural/caller-dominated entries below: 0 unexpected, 0 stale, 0 unaudited. Artifact 10388795823 has SHA-256 digest 2f941e8c5ca8130fb6b241b8363c4d918963efe5fa027ea7346a1f6f86347206. The final normalized candidate must reproduce this contract in fresh exact-head CI before merge promotion.",
     "candidate_expected_increment": {
       "source_modules": [
-        "src/gpbiometricspy/hierarchical_location_scale_crossed_random_scale_core.py",
-        "src/gpbiometricspy/hierarchical_location_scale_crossed_random_scale_slopes.py"
+        "src/gpbiometricspy/hierarchical_location_scale_crossed_joint_random_slopes.py",
+        "src/gpbiometricspy/hierarchical_location_scale_crossed_joint_random_slopes_core.py"
       ],
-      "focused_tests": 24,
-      "statements": 355,
-      "branches": 130
+      "focused_tests": 26,
+      "statements": 414,
+      "branches": 134
     }
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
