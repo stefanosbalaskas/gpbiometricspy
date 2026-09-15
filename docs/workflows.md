@@ -74,8 +74,8 @@ Retain at least:
 ## Visual workflow evidence
 
 <div class="gp-visual-grid">
-<a class="gp-visual-card" href="plot-gallery/#signal-overview-and-quality"><img src="assets/generated/biometric-signals.png" alt="Standardised EDA and heart-rate signal overview"><div class="gp-visual-card-body"><strong>Inspect before deriving</strong><span>Signal overview and quality evidence come before feature extraction.</span></div></a>
-<a class="gp-visual-card" href="plot-gallery/#multimodal-alignment"><img src="assets/generated/multimodal-timeline.png" alt="Multimodal EDA heart-rate pupil and event timeline"><div class="gp-visual-card-body"><strong>Align before windowing</strong><span>Define event windows only after the relevant timebases are defensible.</span></div></a>
+<a class="gp-visual-card" href="../plot-gallery/#signal-overview-and-quality"><img src="../assets/generated/biometric-signals.png" alt="Standardised EDA and heart-rate signal overview"><div class="gp-visual-card-body"><strong>Inspect before deriving</strong><span>Signal overview and quality evidence come before feature extraction.</span></div></a>
+<a class="gp-visual-card" href="../plot-gallery/#multimodal-alignment"><img src="../assets/generated/multimodal-timeline.png" alt="Multimodal EDA heart-rate pupil and event timeline"><div class="gp-visual-card-body"><strong>Align before windowing</strong><span>Define event windows only after the relevant timebases are defensible.</span></div></a>
 </div>
 
 ## Cross-toolbox validation
@@ -83,10 +83,10 @@ Retain at least:
 `gpbiometricspy` can work with or prepare workflows for several established ecosystems. These bridges are for **interoperability and cross-checking**, not for silently changing the package's declared analysis contract.
 
 <div class="gp-mini-grid">
-<a href="articles/toolbox-bridges-workflow/">External toolbox bridges</a>
-<a href="articles/mne-eeg-lsl-workflow/">MNE / EEG / LSL</a>
-<a href="articles/interoperability-version-testing/">Version testing</a>
-<a href="integrations/">Integration matrix</a>
+<a href="../articles/toolbox-bridges-workflow/">External toolbox bridges</a>
+<a href="../articles/mne-eeg-lsl-workflow/">MNE / EEG / LSL</a>
+<a href="../articles/interoperability-version-testing/">Version testing</a>
+<a href="../integrations/">Integration matrix</a>
 </div>
 
 ## Need a guided path?

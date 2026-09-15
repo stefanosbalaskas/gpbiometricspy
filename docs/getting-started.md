@@ -7,7 +7,7 @@ This page takes you from installation to a validated, event-aware biometric work
 === "Stable from PyPI"
 
     ```bash
-    python -m pip install gpbiometricspy
+    python -m pip install "gpbiometricspy==0.1.6"
     ```
 
 === "Development from GitHub"
@@ -17,7 +17,7 @@ This page takes you from installation to a validated, event-aware biometric work
       "gpbiometricspy @ git+https://github.com/stefanosbalaskas/gpbiometricspy.git@main"
     ```
 
-The package requires **Python 3.11 or newer**. `0.1.5` is the stable public release; this documentation is frozen from the validated release source.
+The package supports **Python 3.11–3.14**. Stable **0.1.6** is the current public release; the documentation site also records clearly labelled post-release `0.1.7.dev0` development methods and validation evidence without rewriting the frozen release record.
 
 ## 2. Load the packaged demo
 
@@ -92,7 +92,7 @@ pip install "gpbiometricspy[stats]"
 The core package does not require these external toolboxes. Interoperability functions report backend/version context so that optional-tool results remain auditable.
 
 !!! tip "Where to go next"
-    Use the [workflow map](../workflows/) if you know your data modality but not the exact function family. Use the [plot gallery](../plot-gallery/) if you want to see expected visual outputs first. Use the [API reference](../api/reference/) when you already know the function name.
+    Use the [workflow map](workflows.md) if you know your data modality but not the exact function family. Use the [plot gallery](plot-gallery.md) if you want to see expected visual outputs first. Use the [API reference](api/reference.md) when you already know the function name.
 
 !!! warning "Interpretation guardrail"
-    Physiological and eye-tracking measurements support signal-level and task-context analyses. They do not, by themselves, establish emotion, stress, preference, cognition, comprehension, clinical state, or diagnosis. See [Interpretation guardrails](../interpretation/).
+    Physiological and eye-tracking measurements support signal-level and task-context analyses. They do not, by themselves, establish emotion, stress, preference, cognition, comprehension, clinical state, or diagnosis. See [Interpretation guardrails](interpretation.md).

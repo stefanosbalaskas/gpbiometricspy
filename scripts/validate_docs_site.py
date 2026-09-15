@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from urllib.parse import urljoin, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
@@ -54,6 +55,15 @@ EXAMPLES = {
     "interoperability.md",
 }
 
+RAW_ROUTE_PAGES = {
+    "index.md",
+    "start-here.md",
+    "getting-started.md",
+    "workflows.md",
+    "plot-gallery.md",
+    "deep-validation.md",
+}
+
 
 def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
@@ -65,6 +75,56 @@ def _assert_html_images_have_alt(path: Path) -> None:
         tag = match.group(0)
         assert re.search(r"\balt\s*=\s*['\"][^'\"]+['\"]", tag, flags=re.IGNORECASE), (
             f"HTML image without non-empty alt text in {path.relative_to(ROOT)}: {tag}"
+        )
+
+
+def _output_dir_for_source(path: Path) -> str:
+    rel = path.relative_to(DOCS)
+    if rel.name == "index.md":
+        parent = rel.parent.as_posix()
+        return "/" if parent == "." else f"/{parent.strip('/')}/"
+    return f"/{rel.with_suffix('').as_posix().strip('/')}/"
+
+
+def _raw_target_exists(url_path: str) -> bool:
+    rel = url_path.lstrip("/")
+    if not rel:
+        return (DOCS / "index.md").exists()
+
+    raw = DOCS / rel
+    candidates = [raw]
+    if url_path.endswith("/"):
+        stripped = rel.rstrip("/")
+        candidates.extend(
+            [
+                DOCS / f"{stripped}.md",
+                DOCS / stripped / "index.md",
+            ]
+        )
+    elif not raw.suffix:
+        candidates.extend([DOCS / f"{rel}.md", DOCS / rel / "index.md"])
+
+    return any(candidate.exists() for candidate in candidates)
+
+
+def _assert_raw_internal_targets(path: Path) -> None:
+    text = _text(path)
+    base = f"https://docs.invalid{_output_dir_for_source(path)}"
+    pattern = re.compile(
+        r"<(?:a|img)\b[^>]*?\b(?:href|src)\s*=\s*['\"]([^'\"]+)['\"]",
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(text):
+        target = match.group(1).strip()
+        if not target or target.startswith("#"):
+            continue
+        parsed = urlsplit(target)
+        if parsed.scheme or parsed.netloc:
+            continue
+        resolved = urlsplit(urljoin(base, target)).path
+        assert _raw_target_exists(resolved), (
+            f"Broken raw HTML target in {path.relative_to(ROOT)}: "
+            f"{target!r} resolves to {resolved!r}"
         )
 
 
@@ -120,7 +180,7 @@ def main() -> None:
 
     start = _text(DOCS / "start-here.md")
     assert "# Start here" in start
-    assert 'href="parity/"' in start
+    assert 'href="../parity/"' in start
     assert "validation-trust/parity-validation" not in start
 
     workflows = _text(DOCS / "workflows.md")
@@ -128,6 +188,11 @@ def main() -> None:
     assert "Measurement-ready" in workflows
     assert "Analysis-ready" in workflows
     assert "Report-ready" in workflows
+
+    for name in RAW_ROUTE_PAGES:
+        route_page = DOCS / name
+        _assert_html_images_have_alt(route_page)
+        _assert_raw_internal_targets(route_page)
 
     mkdocs = _text(ROOT / "mkdocs.yml")
     for required in [
@@ -151,7 +216,8 @@ def main() -> None:
         "docs-site validation: PASS "
         f"({len(figures)} figures, {len(GUIDES)} guides, "
         f"{len(PYTHON_NATIVE_ARTICLES) - 1} Python-native explanation articles, "
-        f"{len(frozen_companions)} frozen R companions)"
+        f"{len(frozen_companions)} frozen R companions, "
+        f"{len(RAW_ROUTE_PAGES)} raw-route pages)"
     )
 
 
