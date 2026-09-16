@@ -84,12 +84,48 @@
     });
     tableWrap.insertAdjacentElement("beforebegin", facets);
 
+    const shareNote = document.createElement("p");
+    shareNote.className = "gp-api-share-note";
+    shareNote.dataset.apiShareNote = "";
+    shareNote.textContent =
+      "Filters update this page URL. Bookmark or share the current view to reopen the same domain and search.";
+    facets.insertAdjacentElement("afterend", shareNote);
+
     const facetButtons = Array.from(
       facets.querySelectorAll("[data-api-domain-filter]")
     );
+    const validDomains = new Set(domains);
     let activeDomain = "all";
 
-    function applyFilter() {
+    function readUrlState() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedDomain = params.get("domain") || "all";
+      return {
+        domain: validDomains.has(requestedDomain) ? requestedDomain : "all",
+        query: params.get("q") || "",
+      };
+    }
+
+    function writeUrlState(mode = "replace") {
+      const url = new URL(window.location.href);
+      const query = input.value.trim();
+
+      if (activeDomain === "all") {
+        url.searchParams.delete("domain");
+      } else {
+        url.searchParams.set("domain", activeDomain);
+      }
+      if (query) {
+        url.searchParams.set("q", query);
+      } else {
+        url.searchParams.delete("q");
+      }
+
+      const method = mode === "push" ? "pushState" : "replaceState";
+      window.history[method]({}, "", url);
+    }
+
+    function applyFilter(options = {}) {
       const query = input.value.trim().toLowerCase();
       let visible = 0;
 
@@ -112,30 +148,42 @@
       }
       clear.hidden = !query && activeDomain === "all";
       empty.hidden = visible !== 0;
+
+      if (options.syncUrl) writeUrlState(options.historyMode);
+    }
+
+    function restoreFromUrl() {
+      const state = readUrlState();
+      activeDomain = state.domain;
+      input.value = state.query;
+      applyFilter();
     }
 
     function resetFilters(options = {}) {
       activeDomain = "all";
       input.value = "";
-      applyFilter();
+      applyFilter({ syncUrl: true });
       if (options.focus) input.focus();
     }
 
     facetButtons.forEach((button) => {
       button.addEventListener("click", () => {
         activeDomain = button.dataset.apiDomainFilter || "all";
-        applyFilter();
+        applyFilter({ syncUrl: true, historyMode: "push" });
       });
     });
-    input.addEventListener("input", applyFilter);
+    input.addEventListener("input", () => applyFilter({ syncUrl: true }));
     input.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         event.preventDefault();
         resetFilters({ focus: true });
       }
     });
+    input.addEventListener("gp-api-restore", restoreFromUrl);
     clear.addEventListener("click", () => resetFilters({ focus: true }));
-    applyFilter();
+
+    restoreFromUrl();
+    writeUrlState();
   }
 
   if (document.documentElement.dataset.gpApiShortcutReady !== "true") {
@@ -155,6 +203,14 @@
           input.focus();
         }
       }
+    });
+  }
+
+  if (document.documentElement.dataset.gpApiHistoryReady !== "true") {
+    document.documentElement.dataset.gpApiHistoryReady = "true";
+    window.addEventListener("popstate", () => {
+      const input = document.querySelector("[data-api-filter]");
+      input?.dispatchEvent(new Event("gp-api-restore"));
     });
   }
 

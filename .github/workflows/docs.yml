@@ -65,6 +65,11 @@ jobs:
               'event.key === "/"',
               'event.key === "Escape"',
               "row.cells[1]",
+              "URLSearchParams",
+              'params.get("domain")',
+              'params.get("q")',
+              'mode === "push" ? "pushState" : "replaceState"',
+              'window.addEventListener("popstate"',
           ]:
               assert marker in api_filter_js, marker
 
@@ -164,6 +169,12 @@ jobs:
       - name: Validate documentation experience and gallery contract
         run: python scripts/validate_docs_site.py
       - run: mkdocs build --strict
+      - name: Install docs browser-test harness
+        run: python -m pip install "pytest-playwright>=0.9,<1"
+      - name: Install Chromium for docs interaction tests
+        run: python -m playwright install --with-deps chromium
+      - name: Browser-test API discovery interactions
+        run: pytest -q docs/e2e/test_api_browser.py
       - name: Deploy GitHub Pages from main only
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         shell: bash
