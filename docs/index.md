@@ -77,8 +77,9 @@ Studio and the Python API call the same package implementation. Use the visual a
 <div><strong>02</strong><span>Quality</span><small>Check schema, validity, missingness and provenance.</small></div>
 <div><strong>03</strong><span>Analyze</span><small>Process EDA, cardiac, pupil, gaze, fixation and AOIs.</small></div>
 <div><strong>04</strong><span>Align</span><small>Connect events, clocks, streams and experimental structure.</small></div>
-<div><strong>05</strong><span>Model</span><small>Choose guarded statistics that respect the generalisation unit.</small></div>
-<div><strong>06</strong><span>Report</span><small>Export results, diagnostics, provenance and replay information.</small></div>
+<div><strong>05</strong><span>Summarise</span><small>Derive analysis-ready features and grouped summaries while retaining denominators and QC context.</small></div>
+<div><strong>06</strong><span>Model</span><small>Choose guarded statistics that respect the generalisation unit.</small></div>
+<div><strong>07</strong><span>Report</span><small>Export results, diagnostics, provenance and replay information.</small></div>
 </div>
 
 <div class="gp-actions">

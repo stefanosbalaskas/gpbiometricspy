@@ -1,5 +1,5 @@
 ---
-description: Task-first workflow map from recorded signals and experimental structure to QC, processing, alignment, modelling, and reporting.
+description: Task-first workflow map from recorded signals and experimental structure to QC, processing, alignment, summarisation, modelling, and reporting.
 search:
   boost: 1.4
 ---
