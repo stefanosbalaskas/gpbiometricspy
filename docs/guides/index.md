@@ -7,6 +7,12 @@ The guides are organized by user need rather than package module. Tutorials help
 <div class="gp-guide-grid">
 
 <div class="gp-guide-card">
+<span class="gp-eyebrow">Hands-on tutorial</span>
+<h3><a href="hands-on-eda-research/">Use the package from data to report</a></h3>
+<p>Run a complete EDA/SCR analysis with real package calls, inspect every QC and processing object, save tables and figures, and learn how to substitute your own export.</p>
+</div>
+
+<div class="gp-guide-card">
 <span class="gp-eyebrow">Tutorial</span>
 <h3><a href="first-analysis/">First analysis</a></h3>
 <p>Go from installation to QC, generated figures, and a reproducible workflow using bundled synthetic data.</p>
@@ -48,7 +54,8 @@ The guides are organized by user need rather than package module. Tutorials help
 
 | Need | Documentation type | Start here |
 |---|---|---|
-| I want to learn the package | Tutorial | [First analysis](first-analysis.md) |
+| I want to use the package end to end | Hands-on tutorial | [Data to report](hands-on-eda-research.md) |
+| I want a shorter first tour | Tutorial | [First analysis](first-analysis.md) |
 | I have a research task to complete | How-to | [Workflow map](../workflows.md) and the guides above |
 | I need exact function behavior | Reference | [API browser](../api/index.md) |
 | I need to understand why the workflow is structured this way | Explanation | [Python-native articles](../articles/python-native/index.md) |

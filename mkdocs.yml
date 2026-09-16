@@ -90,8 +90,10 @@ nav:
       - Studio 0.1.6 roadmap: studio-product-roadmap.md
   - Workflows:
       - Workflow map: workflows.md
+      - Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md
       - Guides:
           - Guide map: guides/index.md
+          - Hands-on EDA research guide: guides/hands-on-eda-research.md
           - First analysis: guides/first-analysis.md
           - Validate a new dataset: guides/validate-dataset.md
           - Timebase and alignment: guides/timebase-alignment.md
@@ -99,6 +101,7 @@ nav:
           - Choose a modelling strategy: guides/model-selection.md
       - Examples:
           - Overview: examples/index.md
+          - End-to-end runnable EDA: examples/end-to-end-eda.md
           - EDA / GSR / SCR: examples/eda-scr.md
           - PPG / HRV: examples/ppg-hrv.md
           - Pupil / gaze / AOI: examples/pupil-gaze.md
