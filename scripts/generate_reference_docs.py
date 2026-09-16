@@ -142,9 +142,31 @@ DOMAIN_ORDER = (
     "core-io",
 )
 
+VENDOR_NAMESPACE_SEGMENTS = {"gazepoint"}
+
+CLASSIFICATION_PROBES = {
+    "audit_gazepoint_eda_artifacts": "eda-scr",
+    "audit_gazepoint_hr_quality": "ppg-hrv",
+    "baseline_correct_gazepoint_pupil": "pupil-gaze-aoi",
+    "align_gazepoint_biometrics_to_ttl": "alignment-multimodal",
+    "audit_gazepoint_dataset_structure": "qc-reporting",
+    "compare_gazepoint_conditions_bootstrap": "statistics-design",
+    "check_gazepoint_bids": "interoperability",
+    "assert_gazepoint_columns": "core-io",
+}
+
+
+def semantic_api_name(name: str) -> str:
+    """Return the scientific part of an API name without vendor namespace noise."""
+    return "_".join(
+        segment
+        for segment in name.lower().split("_")
+        if segment not in VENDOR_NAMESPACE_SEGMENTS
+    )
+
 
 def classify_api(name: str) -> str:
-    lowered = name.lower()
+    lowered = semantic_api_name(name)
     for slug in DOMAIN_ORDER:
         tokens = DOMAINS[slug]["tokens"]
         if tokens and any(token in lowered for token in tokens):
@@ -164,6 +186,17 @@ for name in gp.R_EXPORTS:
 
 if len(rows) != 406:
     raise RuntimeError(f"Expected 406 frozen exports, found {len(rows)}")
+
+row_domains = {name: slug for name, _, slug in rows}
+for name, expected_domain in CLASSIFICATION_PROBES.items():
+    if name not in row_domains:
+        raise RuntimeError(f"Classification probe is not a frozen export: {name}")
+    actual_domain = row_domains[name]
+    if actual_domain != expected_domain:
+        raise RuntimeError(
+            f"API-domain classification drift for {name}: "
+            f"expected {expected_domain}, got {actual_domain}"
+        )
 
 api_lines = [
     "# Complete frozen 406-function API reference",
@@ -193,6 +226,8 @@ api_index = [
     "# API by scientific domain",
     "",
     "The complete Python surface contains **406 implemented exports**. Use the domain cards when you know the research task, or filter the function finder when you know part of a function name.",
+    "",
+    "Domain routing uses the semantic part of each function name: vendor/package namespace segments such as `gazepoint` are ignored before scientific tokens are matched. Eight frozen-export probes guard this taxonomy in every documentation build.",
     "",
     '<div class="gp-api-toolbar">',
     '<label for="gp-api-filter"><strong>Find a function</strong></label>',
@@ -283,8 +318,8 @@ exports = sorted(gp.R_EXPORTS, key=len, reverse=True)
 article_rows = []
 for src in sorted((ROOT / "reference" / "vignettes").rglob("*.Rmd")):
     text = src.read_text(encoding="utf-8", errors="ignore")
-    m = re.search(r'^title:\s*["\\\']?(.*?)["\\\']?\s*$', text, re.M)
-    title = m.group(1).strip('"\\\'') if m else src.stem.replace("-", " ").title()
+    m = re.search(r'^title:\s*["\']?(.*?)["\']?\s*$', text, re.M)
+    title = m.group(1).strip('"\'') if m else src.stem.replace("-", " ").title()
     found = []
     for name in exports:
         if re.search(rf"(?<![A-Za-z0-9_.]){re.escape(name)}\s*\(", text):
