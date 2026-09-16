@@ -37,7 +37,7 @@ Choose the path that matches what you are trying to do. This page is intentional
 <a class="gp-route-card" href="../studio/">
 <span class="gp-route-label">Visual workflow</span>
 <h3>Use gpbiometricspy Studio</h3>
-<p>Work through project, quality, analysis, alignment, modelling, and reporting in a guided application backed by the same scientific package functions.</p>
+<p>Work through project, quality, analysis, alignment, summarisation, modelling, and reporting in a guided application backed by the same scientific package functions.</p>
 </a>
 
 <a class="gp-route-card" href="../guides/validate-dataset/">
@@ -65,16 +65,29 @@ Choose the path that matches what you are trying to do. This page is intentional
 
 ## The research path in one view
 
+The same seven stages organize the homepage, Start Here, Studio, workflows, and downstream API discovery.
+
+<div class="gp-flow gp-flow-product gp-flow-start-here" aria-label="Seven-stage research journey">
+<div data-research-stage="project"><strong>01</strong><span>Project</span><small>Import or generate data and identify channels.</small></div>
+<div data-research-stage="quality"><strong>02</strong><span>Quality</span><small>Check schema, validity, missingness and provenance.</small></div>
+<div data-research-stage="analyze"><strong>03</strong><span>Analyze</span><small>Process recorded signals with domain-appropriate methods.</small></div>
+<div data-research-stage="align"><strong>04</strong><span>Align</span><small>Connect events, clocks, streams and experimental structure.</small></div>
+<div data-research-stage="summarise"><strong>05</strong><span>Summarise</span><small>Derive analysis-ready features while retaining QC context.</small></div>
+<div data-research-stage="model"><strong>06</strong><span>Model</span><small>Choose guarded statistics that match the study design.</small></div>
+<div data-research-stage="report"><strong>07</strong><span>Report</span><small>Export results, diagnostics, provenance and replay information.</small></div>
+</div>
+
 ```mermaid
 graph LR
   A[Acquire / export] --> B[Ingest + schema]
   B --> C[Quality + provenance]
   C --> D[Process signals]
   D --> E[Align events / streams]
-  E --> F[Summarise / model]
-  F --> G[Report + archive]
-  C -. fail closed .-> H[Review acquisition or preprocessing]
-  E -. timing uncertainty .-> H
+  E --> F[Summarise]
+  F --> G[Model]
+  G --> H[Report + archive]
+  C -. fail closed .-> I[Review acquisition or preprocessing]
+  E -. timing uncertainty .-> I
 ```
 
 <div class="gp-decision">
