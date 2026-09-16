@@ -53,8 +53,9 @@ graph LR
 <div><strong>02</strong><span>Audit</span><small>Check timing, missingness, signal activity, events and design.</small></div>
 <div><strong>03</strong><span>Process</span><small>Apply modality-specific transformations with explicit settings.</small></div>
 <div><strong>04</strong><span>Align</span><small>Relate clocks, events, trials, AOIs and secondary streams.</small></div>
-<div><strong>05</strong><span>Model</span><small>Match validation unit and random structure to the scientific target.</small></div>
-<div><strong>06</strong><span>Report</span><small>Retain QC, provenance, plots, software identity and guardrails.</small></div>
+<div><strong>05</strong><span>Summarise</span><small>Derive analysis-ready features and grouped summaries while retaining denominators and QC context.</small></div>
+<div><strong>06</strong><span>Model</span><small>Match validation unit and random structure to the scientific target.</small></div>
+<div><strong>07</strong><span>Report</span><small>Retain QC, provenance, plots, software identity and guardrails.</small></div>
 </div>
 
 ## Three workflow checkpoints

@@ -266,6 +266,16 @@ def main() -> None:
     assert "end-to-end EDA research workflow" in workflows
     assert "boost: 1.4" in workflows
     assert "description:" in workflows
+    stage_names = ["Ingest", "Audit", "Process", "Align", "Summarise", "Model", "Report"]
+    stage_markers = [
+        f"<strong>{number:02d}</strong><span>{name}</span>"
+        for number, name in enumerate(stage_names, start=1)
+    ]
+    stage_positions = [workflows.index(marker) for marker in stage_markers]
+    assert stage_positions == sorted(stage_positions), stage_positions
+    assert len(re.findall(r"<div><strong>\d{2}</strong><span>", workflows)) == 7
+    for number, name in enumerate(stage_names, start=1):
+        assert f"[{number} · {name}]" in workflows, (number, name)
 
     recovery = DOCS / "404.md"
     recovery_text = _text(recovery)
