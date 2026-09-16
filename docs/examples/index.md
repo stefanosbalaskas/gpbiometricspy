@@ -5,6 +5,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 </div>
 
 <div class="gp-route-grid">
+<a class="gp-route-card" data-learning-route="research-recipes" href="#worked-research-recipes"><span class="gp-route-label">Cookbook</span><h3>Worked research recipes</h3><p>Combine verified event, multimodal, AOI and visual-inspection calls into compact recipes you can adapt without skipping QC or provenance.</p></a>
 <a class="gp-route-card" href="end-to-end-eda/"><span class="gp-route-label">Run first</span><h3>Complete EDA analysis bundle</h3><p>Execute one checked script from input through QC, decomposition, candidate events, figures, tables and methods text.</p></a>
 <a class="gp-route-card" href="eda-scr/"><span class="gp-route-label">EDA / SCR</span><h3>Conductance to response events</h3><p>Inspect quality, decompose EDA, detect candidate SCRs, and retain visual diagnostics.</p></a>
 <a class="gp-route-card" href="ppg-hrv/"><span class="gp-route-label">PPG / HRV</span><h3>Waveform to beat intervals</h3><p>Detect pulse peaks, inspect RR/IBI geometry, and generate standard HRV diagnostics with source guardrails.</p></a>
@@ -18,6 +19,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 
 | Starting data | Example | Primary evidence produced |
 |---|---|---|
+| I want short recipes that connect several stages | [Worked research recipes](#worked-research-recipes) | event tables, event-locked summaries, AOI summaries, shared-timeline figure |
 | I want one complete working analysis first | [End-to-end EDA](end-to-end-eda.md) | QC, decomposition, event tables, figures, methods evidence |
 | EDA/GSR waveform | [EDA / GSR / SCR](eda-scr.md) | quality, decomposition, candidate response events |
 | PPG waveform or intervals | [PPG / HRV](ppg-hrv.md) | peak/interval diagnostics and HRV-ready series |
@@ -25,6 +27,119 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 | TTL/task events + signals | [Multimodal](multimodal.md) | event identity, timebase/alignment evidence, event windows |
 | Any completed dataset | [QC + reporting](quality-reporting.md) | auditable QC, design coverage, figures, reporting inputs |
 | External analysis ecosystem | [Interoperability](interoperability.md) | explicit backend-ready structures and version-aware handoffs |
+
+## Worked research recipes
+
+The recipes below use the same bundled demonstration and exported functions exercised elsewhere in the documentation. They are intentionally short: each recipe shows one defensible transition in the research workflow, not a claim that the returned object is scientifically interpretable without the surrounding QC and design evidence.
+
+### 1. Load a bounded demonstration slice
+
+```python
+import gpbiometricspy as gp
+
+# Synthetic/public demonstration data only.
+dat = (
+    gp.load_kiosk_demo(participants=["synthetic_kiosk_p001"])
+    .copy()
+    .iloc[:1800]
+    .reset_index(drop=True)
+)
+```
+
+Before adapting the recipes to research data, use the [new-dataset validation guide](../guides/validate-dataset.md) to confirm schema, units, signal identity, timing and provenance.
+
+### 2. TTL events → event-relative physiology windows
+
+```python
+events = gp.extract_gazepoint_ttl_events(
+    dat,
+    ttl_columns=["TTL0"],
+    group_columns=["participant_id"],
+)
+
+aligned = gp.align_gazepoint_biometrics_to_ttl(
+    dat,
+    ttl_cols=["TTL0"],
+    time_col="TIME",
+    group_cols=["participant_id"],
+    pre_window_ms=250,
+    post_window_ms=500,
+)
+```
+
+Inspect the extracted event table before treating TTL edges as task events. Event identity, duplicate/missing markers and group coverage remain part of the evidence chain.
+
+### 3. Events + recorded channels → multimodal summaries
+
+```python
+summary = gp.summarize_gazepoint_eventlocked_multimodal(
+    dat,
+    events=events,
+    time_col="TIME",
+    event_time_col="TIME",
+    signal_cols=["GSR_US", "HR", "LPMM"],
+    group_cols=["participant_id"],
+)
+```
+
+This produces event-relative summaries for the requested recorded channels. Keep the event definition, baseline/summary window settings, missingness and group identifiers with the derived table.
+
+### 4. AOI labels → dwell summaries
+
+```python
+aoi = gp.summarize_gazepoint_aoi_dwell(
+    dat,
+    aoi_col="AOI",
+    group_cols=["participant_id"],
+)
+```
+
+AOI summaries depend on the AOI definitions, gaze-validity rules and denominator. Preserve those inputs when moving the table into modelling or reporting.
+
+### 5. Recorded channels → a shared visual timeline
+
+```python
+fig = gp.plot_gazepoint_multimodal_timeline(
+    dat,
+    time_col="TIME",
+    signal_cols=["GSR_US", "HR", "LPMM"],
+    group_cols=["participant_id"],
+    title="Multimodal Gazepoint timeline",
+)
+```
+
+<div class="gp-visual-grid">
+<a class="gp-visual-card" href="../plot-gallery/#multimodal-alignment"><img src="../assets/generated/multimodal-timeline.png" alt="Multimodal timeline with physiology pupil and event markers"><div class="gp-visual-card-body"><strong>Shared timeline</strong><span>Inspect recorded channels and event markers before relying on event-relative summaries.</span></div></a>
+<a class="gp-visual-card" href="../plot-gallery/#pupil-gaze-and-aois"><img src="../assets/generated/aoi-biometrics.png" alt="AOI-linked biometric summary visualization"><div class="gp-visual-card-body"><strong>AOI-linked evidence</strong><span>Use AOI summaries together with explicit AOI definitions, validity rules and denominators.</span></div></a>
+</div>
+
+### What each object can support
+
+| Object | Useful for | Inspect before reuse |
+|---|---|---|
+| `events` | event identity and coverage | marker semantics, duplicates, missing events, group coverage |
+| `aligned` | event-relative rows/windows | clock identity, time units, window definition, overlap |
+| `summary` | analysis-ready event/channel features | baseline/summary settings, missingness, group identifiers |
+| `aoi` | AOI dwell summaries | AOI definitions, gaze validity, denominator and grouping |
+| `fig` | visual temporal QC | scaling/standardisation, event markers, visible gaps and resets |
+
+### Adapt the recipes to your data
+
+Change inputs deliberately rather than mechanically:
+
+1. map your real time, participant/session/trial, signal and event columns;
+2. run QC before changing thresholds or deriving measures;
+3. establish clock relationships before event locking multiple streams;
+4. retain the settings used to produce every derived table or figure;
+5. move to [model selection](../guides/model-selection.md) only after the analysis unit and grouping structure are explicit;
+6. finish with [reporting and reproducibility](../guides/reporting-reproducibility.md).
+
+<div class="gp-science-boundary">
+<strong>Scientific boundary.</strong> These recipes transform and summarize recorded data. They do not by themselves identify emotion, stress, attention, trust, preference, diagnosis, causal effects, or hardware-level synchronization. Those interpretations require independent design, measurement and inferential justification.
+</div>
+
+!!! tip "Not sure which recipe belongs next?"
+    Use the [workflow chooser](../guides/index.md#choose-your-workflow) to start from the evidence you have and identify the next defensible stage.
 
 ## Visual outputs generated in CI
 
