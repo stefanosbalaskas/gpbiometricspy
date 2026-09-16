@@ -56,6 +56,28 @@ jobs:
           assert "data-api-filter" in index
           assert "406 functions" in index
 
+          api_filter_js = Path("docs/javascripts/api-filter.js").read_text(encoding="utf-8")
+          for marker in [
+              "dataset.apiDomainFilter",
+              "dataset.apiClear",
+              "dataset.apiEmpty",
+              "aria-pressed",
+              'event.key === "/"',
+              'event.key === "Escape"',
+              "row.cells[1]",
+          ]:
+              assert marker in api_filter_js, marker
+
+          api_css = Path("docs/stylesheets/api.css").read_text(encoding="utf-8")
+          for marker in [
+              ".gp-api-facets",
+              '.gp-api-facet[aria-pressed="true"]',
+              ".gp-api-clear",
+              ".gp-api-empty",
+              "overflow-x: auto",
+          ]:
+              assert marker in api_css, marker
+
           domain_total = 0
           for slug in domains:
               text = (api / f"{slug}.md").read_text(encoding="utf-8")

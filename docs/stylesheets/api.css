@@ -4,7 +4,7 @@
 
 .gp-api-toolbar {
   display: grid;
-  grid-template-columns: auto minmax(220px, 1fr) auto;
+  grid-template-columns: auto minmax(220px, 1fr) auto auto;
   gap: 0.8rem;
   align-items: center;
   margin: 1rem 0 1.25rem;
@@ -30,10 +30,25 @@
   font: inherit;
 }
 
-.gp-api-toolbar input:focus {
+.gp-api-toolbar input:focus,
+.gp-api-clear:focus-visible,
+.gp-api-facet:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--md-accent-fg-color) 45%, transparent);
-  outline-offset: 1px;
+  outline-offset: 2px;
   border-color: var(--md-accent-fg-color);
+}
+
+.gp-api-clear {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--gp-card-border, var(--gp-api-border));
+  border-radius: 999px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 720;
+  cursor: pointer;
 }
 
 .gp-api-result-count {
@@ -66,6 +81,47 @@
   font-weight: 800;
 }
 
+.gp-api-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.7rem 0 1rem;
+}
+
+.gp-api-facet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.2rem;
+  padding: 0.38rem 0.7rem;
+  border: 1px solid var(--gp-card-border, var(--gp-api-border));
+  border-radius: 999px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.gp-api-facet strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  height: 1.45rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-size: 0.67rem;
+}
+
+.gp-api-facet[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--md-accent-fg-color) 60%, transparent);
+  background: color-mix(in srgb, var(--md-accent-fg-color) 11%, var(--md-default-bg-color));
+  color: var(--md-accent-fg-color);
+  font-weight: 760;
+}
+
 .gp-api-table-wrap {
   max-height: 42rem;
   overflow: auto;
@@ -96,6 +152,15 @@
   display: none;
 }
 
+.gp-api-empty {
+  margin: -0.5rem 0 1.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px dashed var(--gp-card-border, var(--gp-api-border));
+  border-radius: 0.8rem;
+  background: var(--gp-soft-bg, transparent);
+  font-size: 0.82rem;
+}
+
 .gp-api-domain-links {
   display: flex;
   flex-wrap: wrap;
@@ -121,6 +186,17 @@
 
   .gp-api-result-count {
     text-align: left;
+  }
+
+  .gp-api-facets {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scrollbar-width: thin;
+  }
+
+  .gp-api-facet {
+    flex: 0 0 auto;
   }
 
   .gp-api-domain-grid {
