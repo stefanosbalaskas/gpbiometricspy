@@ -33,6 +33,21 @@ A workflow is complete only when its measurement assumptions, QC, timing, transf
 | Completed analysis | QC evidence + software identity + settings | visual audit, reproducibility, interpretation guardrails | [QC + reporting](examples/quality-reporting.md) |
 | Repeated/crossed outcome data | grouping structure + prediction target | grouped prediction or hierarchical location–scale modelling | [Model selection](guides/model-selection.md) |
 
+### Jump straight to the relevant API
+
+The function finder now preserves its selected domain in the page URL. These shortcuts open the matching API lens directly, so a workflow can move from **what to do** to **which functions implement it** without repeating the search. The resulting filtered view can also be bookmarked or shared.
+
+<div class="gp-mini-grid" data-workflow-api-handoffs>
+<a data-api-handoff="interoperability" href="../api/?domain=Interoperability%20%2F%20exchange%20formats">Interoperability / exchange formats</a>
+<a data-api-handoff="pupil-gaze" href="../api/?domain=Pupil%20%2F%20gaze%20%2F%20fixation%20%2F%20AOI">Pupil / gaze / fixation / AOI</a>
+<a data-api-handoff="eda" href="../api/?domain=EDA%20%2F%20GSR%20%2F%20SCR">EDA / GSR / SCR</a>
+<a data-api-handoff="ppg-hrv" href="../api/?domain=PPG%20%2F%20HR%20%2F%20IBI%20%2F%20HRV%20%2F%20respiration">PPG / HR / IBI / HRV / respiration</a>
+<a data-api-handoff="alignment" href="../api/?domain=Events%20%2F%20alignment%20%2F%20multimodal">Events / alignment / multimodal</a>
+<a data-api-handoff="qc-reporting" href="../api/?domain=QC%20%2F%20validation%20%2F%20reporting%20%2F%20governance">QC / validation / reporting / governance</a>
+<a data-api-handoff="statistics" href="../api/?domain=Statistics%20%2F%20design%20%2F%20simulation">Statistics / design / simulation</a>
+<a data-api-handoff="core-io" href="../api/?domain=Core%20I%2FO%20%2F%20schema%20%2F%20utilities">Core I/O / schema / utilities</a>
+</div>
+
 ## Recommended research pipeline
 
 ```mermaid
