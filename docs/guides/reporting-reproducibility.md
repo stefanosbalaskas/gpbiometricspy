@@ -13,6 +13,90 @@ A reproducible analysis is more than code that runs once. This guide focuses on 
 <div class="gp-metric-card"><strong>Software</strong><span>Package version, Python version, optional backend versions, certificates.</span></div>
 </div>
 
+## Run a reviewable evidence bundle
+
+<div class="gp-page-intro" data-research-evidence-bundle>
+The repository includes a checked, deterministic companion script that turns one bounded synthetic demonstration into a folder of **design, quality, event/alignment, derived-summary, visual, software, and reporting evidence**. Use it to learn what should survive a research analysis before replacing the synthetic input with private study exports.
+</div>
+
+From the repository root:
+
+```bash
+python examples/hands-on/research-evidence-bundle.py
+```
+
+A successful run ends with JSON containing:
+
+```json
+{"status": "PASS", "tutorial": "research-evidence-bundle"}
+```
+
+To retain the artifacts, choose an output directory.
+
+=== "macOS / Linux"
+
+    ```bash
+    GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR=outputs/research-evidence \
+      python examples/hands-on/research-evidence-bundle.py
+    ```
+
+=== "PowerShell"
+
+    ```powershell
+    $env:GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR = "outputs/research-evidence"
+    python examples/hands-on/research-evidence-bundle.py
+    ```
+
+<div class="gp-guide-grid" data-evidence-bundle-stages>
+<div class="gp-guide-card"><span class="gp-eyebrow">Input</span><h3>Recorded sample data</h3><p>Keep the bounded analysis input distinct from the study-design table and retain source/provenance information when adapting the example.</p></div>
+<div class="gp-guide-card"><span class="gp-eyebrow">Design</span><h3>Condition and task structure</h3><p>Export the participant-by-task design rather than reconstructing conditions from filenames, row order, or downstream summaries.</p></div>
+<div class="gp-guide-card"><span class="gp-eyebrow">Quality</span><h3>Signal activity and time resets</h3><p>Retain machine-readable QC tables before event locking or feature construction so exclusions and timing assumptions remain inspectable.</p></div>
+<div class="gp-guide-card"><span class="gp-eyebrow">Events</span><h3>TTL identity and alignment</h3><p>Save the extracted TTL table, alignment overview, alignment event table, and event-relative sample rows instead of reporting only a window definition.</p></div>
+<div class="gp-guide-card"><span class="gp-eyebrow">Derived</span><h3>Event-locked summaries</h3><p>Keep summary rows together with their event definitions, baseline/summary windows, recorded signal names, and grouping structure.</p></div>
+<div class="gp-guide-card"><span class="gp-eyebrow">Report</span><h3>Figure, software and methods evidence</h3><p>Export the shared timeline, software identity, reporting checklist, methods starting text, and an evidence manifest alongside derived tables.</p></div>
+</div>
+
+The saved directory is designed to be inspected rather than merely archived. It includes the structured audit components rather than collapsing them into ambiguous files:
+
+```text
+outputs/research-evidence/
+├── study_design.csv
+├── signal_activity_overview.csv
+├── signal_activity_by_group.csv
+├── time_reset_overview.csv
+├── time_reset_segments.csv
+├── time_reset_flags.csv
+├── ttl_events.csv
+├── alignment_overview.csv
+├── alignment_events.csv
+├── aligned_data.csv
+├── eventlocked_summary.csv
+├── eventlocked_samples.csv
+├── analysis_checklist_overview.csv
+├── software.json
+├── methods_text.txt
+├── evidence_manifest.json
+└── research-evidence-bundle-01.png
+```
+
+### How to review the bundle
+
+| Artifact family | Question it should let you answer | Do not substitute |
+|---|---|---|
+| Design | Which participant/task/condition rows define the analysis context? | Filename or row-order inference |
+| Signal activity | Which requested channels were active within each analysis group? | A single undocumented “quality passed” flag |
+| Time-reset audit | Were resets, duplicate times, non-finite values, or segment boundaries visible? | A statement that timestamps were “checked” |
+| TTL/event evidence | What marker changes were detected and where? | An undocumented event index |
+| Alignment | Which rows entered each event-relative window and under which settings? | A claim of synchronization based only on successful code execution |
+| Event-locked summaries | How were recorded channels summarized around explicit events? | A table detached from windows, events, and grouping |
+| Software/reporting | Which software identity and reporting objects reproduce the run? | Package name without version or settings |
+
+The example intentionally uses the bundled synthetic kiosk data. Before substituting a research export, first use [Validate a new dataset](validate-dataset.md), inspect the [synthetic demo guide](../demo.md), and resolve clock assumptions with [Timebase and alignment](timebase-alignment.md). The evidence bundle is a **retention pattern**, not a shortcut around modality-specific QC.
+
+<div class="gp-science-boundary">
+<strong>Evidence boundary.</strong> A complete evidence folder can show what was recorded, transformed, aligned, summarized, plotted, and reported. It does not by itself establish emotion, stress, attention, trust, preference, diagnosis, causal effects, sensor validity, or hardware-level synchronization. Those claims require appropriate measurement, acquisition, design, validation, and inference beyond file completeness.
+</div>
+
 ## Capture software identity early
 
 ```python
@@ -44,6 +128,8 @@ resets = gp.audit_gazepoint_time_resets(
     group_cols=["participant_id"],
 )
 ```
+
+Both calls return structured audit objects. Retain their named tables—for example `activity["overview"]`, `activity["signal_by_group"]`, `resets["overview"]`, `resets["segment_summary"]`, and `resets["row_flags"]`—rather than treating the outer object as one flat table.
 
 ![Missingness overview](../assets/generated/missingness.png)
 
