@@ -38,6 +38,7 @@ GUIDES = {
     "hands-on-eda-research.md",
     "first-analysis.md",
     "validate-dataset.md",
+    "research-project-scaffold.md",
     "bring-your-own-export.md",
     "signal-column-glossary.md",
     "troubleshooting.md",
@@ -254,6 +255,16 @@ def main() -> None:
     assert "Common mistakes" in hands_on_guide_text
     assert "GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR" in hands_on_guide_text
 
+    scaffold = DOCS / "guides" / "research-project-scaffold.md"
+    scaffold_text = _text(scaffold)
+    assert "# Research project scaffold" in scaffold_text
+    assert "data-project-scaffold-stages" in scaffold_text
+    assert "Private-data boundary" in scaffold_text
+    assert "Common project-structure failures" in scaffold_text
+    assert "analysis-config.json" in scaffold_text
+    assert "project-scaffold.json" in scaffold_text
+    assert "examples/hands-on/create-research-project-scaffold.py" in scaffold_text
+
     adaptation = DOCS / "guides" / "bring-your-own-export.md"
     adaptation_text = _text(adaptation)
     assert "# Bring your own export safely" in adaptation_text
@@ -347,6 +358,7 @@ def main() -> None:
         "- Start here: start-here.md",
         "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
         "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
+        "- Research project scaffold: guides/research-project-scaffold.md",
         "- Bring your own export safely: guides/bring-your-own-export.md",
         "- Signal and column glossary: guides/signal-column-glossary.md",
         "- Troubleshooting and diagnostics: guides/troubleshooting.md",
