@@ -96,6 +96,7 @@ nav:
           - Hands-on EDA research guide: guides/hands-on-eda-research.md
           - First analysis: guides/first-analysis.md
           - Validate a new dataset: guides/validate-dataset.md
+          - Troubleshooting and diagnostics: guides/troubleshooting.md
           - Timebase and alignment: guides/timebase-alignment.md
           - Reporting and reproducibility: guides/reporting-reproducibility.md
           - Choose a modelling strategy: guides/model-selection.md
