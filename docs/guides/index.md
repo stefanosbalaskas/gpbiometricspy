@@ -30,6 +30,12 @@ The guides are organized by user need rather than package module. Tutorials help
 <p>Run schema, timing, missingness, signal, event, and provenance checks before substantive analysis.</p>
 </div>
 
+<div class="gp-guide-card" data-learning-route="research-project-scaffold">
+<span class="gp-eyebrow">Project setup</span>
+<h3><a href="research-project-scaffold/">Research project scaffold</a></h3>
+<p>Create a checked raw/metadata/mappings/QC/events/derived/models/figures/reports/manifests/logs structure before private research data enter the workflow.</p>
+</div>
+
 <div class="gp-guide-card" data-learning-route="bring-your-own-export">
 <span class="gp-eyebrow">Hands-on adaptation</span>
 <h3><a href="bring-your-own-export/">Bring your own export safely</a></h3>
@@ -81,6 +87,7 @@ The guides are organized by user need rather than package module. Tutorials help
 | I do not yet know which workflow fits | Decision guide | [Choose your workflow](#choose-your-workflow) |
 | I want to use the package end to end | Hands-on tutorial | [Data to report](hands-on-eda-research.md) |
 | I want a shorter first tour | Tutorial | [First analysis](first-analysis.md) |
+| I am setting up a new research project | Project setup | [Research project scaffold](research-project-scaffold.md) |
 | I have an unfamiliar CSV/export to adapt | Hands-on adaptation | [Bring your own export safely](bring-your-own-export.md) |
 | I know a column name but not its role | Reference guide | [Signal and column glossary](signal-column-glossary.md) |
 | Something failed or the evidence looks wrong | Diagnostics | [Troubleshooting and diagnostics](troubleshooting.md) |
@@ -97,6 +104,7 @@ The guides are organized by user need rather than package module. Tutorials help
 
 | What you have now | First question | Recommended route | Evidence to retain |
 |---|---|---|---|
+| A new project before data intake | How will source data, mappings, QC, events, derived outputs, models and reporting evidence remain separated and traceable? | [Research project scaffold](research-project-scaffold.md) | project structure, configuration template, mapping template, manifests/log policy |
 | A new or unfamiliar Gazepoint export | Can I map source columns without losing their original meaning, then verify schema, units and time? | [Bring your own export safely](bring-your-own-export.md), then [Validate a new dataset](validate-dataset.md) and [Signal/column glossary](signal-column-glossary.md) | source-to-standard map, schema/QC tables, source identity, timebase evidence |
 | EDA/GSR waveform | Is the conductance signal usable before decomposition or event detection? | [EDA / GSR / SCR example](../examples/eda-scr.md) | unit audit, signal QC, decomposition settings, candidate-event criteria |
 | PPG waveform or IBI/RR series | What is the source of each interval and are rejected beats visible? | [PPG / HRV example](../examples/ppg-hrv.md) | source provenance, peak/interval QC, rejection rules |
