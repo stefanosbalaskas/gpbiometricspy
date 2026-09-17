@@ -103,6 +103,7 @@ nav:
           - Troubleshooting and diagnostics: guides/troubleshooting.md
           - Timebase and alignment: guides/timebase-alignment.md
           - Reporting and reproducibility: guides/reporting-reproducibility.md
+          - Reproducible notebook workflow: reproducible-notebook-workflow.md
           - Choose a modelling strategy: guides/model-selection.md
       - Examples:
           - Overview: examples/index.md
