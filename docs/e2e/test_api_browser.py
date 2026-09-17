@@ -74,9 +74,16 @@ def test_api_filter_updates_url_and_restores_history(page: Page, docs_base_url: 
     ppg = page.locator(f'[data-api-domain-filter="{domain}"]')
     ppg.click()
     expect(ppg).to_have_attribute("aria-pressed", "true")
+    page.wait_for_function(
+        "expected => new URLSearchParams(window.location.search).get('domain') === expected",
+        arg=domain,
+    )
     assert "domain=PPG" in page.url
 
     search.fill("hrv")
+    page.wait_for_function(
+        "() => new URLSearchParams(window.location.search).get('q') === 'hrv'"
+    )
     assert "q=hrv" in page.url
     assert page.locator("[data-api-row]:visible").count() > 0
 
