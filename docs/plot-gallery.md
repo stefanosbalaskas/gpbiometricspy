@@ -31,6 +31,23 @@ python scripts/validate_docs_site.py
 <div class="gp-metric-card"><strong>CI</strong><span>gallery manifest and site references validated on every docs build</span></div>
 </div>
 
+## From figure to workflow
+
+Use a plot as an evidence checkpoint, then continue into the workflow that produced it. Each route below connects a visual domain to a worked example and to the matching shareable API lens.
+
+<div class="gp-guide-grid" data-gallery-handoffs>
+<div class="gp-guide-card" data-gallery-handoff="quality"><span class="gp-eyebrow">Quality</span><h3><a href="../examples/quality-reporting/">Inspect quality and reporting</a></h3><p>Start from missingness, signal activity and report-ready diagnostics.</p><p><a href="../api/?domain=QC%20%2F%20validation%20%2F%20reporting%20%2F%20governance">Open filtered QC API →</a></p></div>
+<div class="gp-guide-card" data-gallery-handoff="eda"><span class="gp-eyebrow">EDA / SCR</span><h3><a href="../examples/eda-scr/">Reproduce conductance diagnostics</a></h3><p>Move from recorded conductance through decomposition and candidate response events.</p><p><a href="../api/?domain=EDA%20%2F%20GSR%20%2F%20SCR">Open filtered EDA API →</a></p></div>
+<div class="gp-guide-card" data-gallery-handoff="cardiac"><span class="gp-eyebrow">PPG / HRV</span><h3><a href="../examples/ppg-hrv/">Reproduce cardiac diagnostics</a></h3><p>Inspect pulse peaks, interval provenance and variability diagnostics.</p><p><a href="../api/?domain=PPG%20%2F%20HR%20%2F%20IBI%20%2F%20HRV%20%2F%20respiration">Open filtered cardiac API →</a></p></div>
+<div class="gp-guide-card" data-gallery-handoff="eye"><span class="gp-eyebrow">Eye tracking</span><h3><a href="../examples/pupil-gaze/">Reproduce pupil, gaze and AOI diagnostics</a></h3><p>Connect validity, AOI definitions and gaze-derived visual checks.</p><p><a href="../api/?domain=Pupil%20%2F%20gaze%20%2F%20fixation%20%2F%20AOI">Open filtered eye-tracking API →</a></p></div>
+<div class="gp-guide-card" data-gallery-handoff="alignment"><span class="gp-eyebrow">Alignment</span><h3><a href="../examples/multimodal/">Reproduce the multimodal timeline</a></h3><p>Inspect events and streams on an explicit shared coordinate system.</p><p><a href="../api/?domain=Events%20%2F%20alignment%20%2F%20multimodal">Open filtered alignment API →</a></p></div>
+<div class="gp-guide-card" data-gallery-handoff="inference"><span class="gp-eyebrow">Design / inference</span><h3><a href="../guides/model-selection/">Choose the next modelling step</a></h3><p>Use design coverage and inferential diagnostics before adding model complexity.</p><p><a href="../api/?domain=Statistics%20%2F%20design%20%2F%20simulation">Open filtered statistics API →</a></p></div>
+</div>
+
+<div class="gp-science-boundary">
+<strong>Interpretation boundary.</strong> A generated plot documents recorded data, processing or an inferential diagnostic. It is not, by itself, evidence of emotion, stress, trust, attention, preference, diagnosis, sensor validity, causal effects or hardware-level synchronization.
+</div>
+
 ## Signal overview and quality
 
 <div class="gp-gallery">
