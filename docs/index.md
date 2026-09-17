@@ -10,6 +10,7 @@ Start from the research task you need to complete—not from a list of functions
 
 <div class="gp-actions">
 <a class="md-button md-button--primary" href="guides/hands-on-eda-research/">Run a complete analysis</a>
+<a class="md-button" href="guides/bring-your-own-export/">Bring your own export</a>
 <a class="md-button" href="start-here/">Start here</a>
 <a class="md-button" href="studio/">Open the Studio guide</a>
 <a class="md-button" href="workflows/">Choose a workflow</a>
@@ -29,6 +30,18 @@ Start from the research task you need to complete—not from a list of functions
 ## Start from your research task
 
 <div class="gp-route-grid">
+
+<a class="gp-route-card" href="guides/research-project-scaffold/" data-home-route="new-project">
+<span class="gp-route-label">New project</span>
+<h3>Create a reproducible project structure</h3>
+<p>Separate raw files, metadata, mappings, QC evidence, events, derived tables, models, figures, reports, manifests and logs before analysis begins.</p>
+</a>
+
+<a class="gp-route-card" href="guides/bring-your-own-export/" data-home-route="own-export">
+<span class="gp-route-label">Unfamiliar export</span>
+<h3>Adapt your CSV without hiding provenance</h3>
+<p>Preserve the source, preview column mappings, verify time and event assumptions, and retain a reviewable adaptation manifest.</p>
+</a>
 
 <a class="gp-route-card" href="guides/hands-on-eda-research/">
 <span class="gp-route-label">Hands-on analysis</span>
@@ -66,6 +79,24 @@ Start from the research task you need to complete—not from a list of functions
 <p>Trace frozen parity, exact-main coverage, real-data smoke testing, cross-toolbox validation and interpretation boundaries.</p>
 </a>
 
+</div>
+
+## From a new project to reviewable evidence
+
+The shortest safe path is not “load → model.” Make each handoff inspectable so a later result can be traced back to the source export, measurement assumptions and QC evidence.
+
+<div class="gp-flow gp-flow-product" data-home-research-journey>
+<div><strong>01</strong><span><a href="guides/research-project-scaffold/">Scaffold</a></span><small>Create a project structure that keeps raw data immutable and evidence separated from derived outputs.</small></div>
+<div><strong>02</strong><span><a href="guides/bring-your-own-export/">Adapt</a></span><small>Map unfamiliar source columns deliberately and keep the original names and mapping decisions reviewable.</small></div>
+<div><strong>03</strong><span><a href="guides/validate-dataset/">Validate</a></span><small>Check schema, channels, units, missingness, timebase, events and provenance before feature extraction.</small></div>
+<div><strong>04</strong><span><a href="workflows/">Analyze</a></span><small>Choose a modality-specific workflow only after the recorded evidence supports it.</small></div>
+<div><strong>05</strong><span><a href="guides/reporting-reproducibility/">Report</a></span><small>Retain QC tables, settings, software identity, figures, manifests and interpretation boundaries with the results.</small></div>
+</div>
+
+<div class="gp-actions">
+<a class="md-button md-button--primary" href="guides/research-project-scaffold/">Create the project structure</a>
+<a class="md-button" href="guides/bring-your-own-export/">Adapt an export</a>
+<a class="md-button" href="guides/reporting-reproducibility/">Build reviewable evidence</a>
 </div>
 
 ## One research path, two interfaces
@@ -172,9 +203,12 @@ The current scientific development baseline is PR **#136**, exact-main SHA **`e7
 Stable **gpbiometricspy 0.1.6** remains an immutable release line from **11 September 2026**, with **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%** at release qualification. Development metrics above describe post-release work and do not retroactively change the 0.1.6 artifacts.
 
 <div class="gp-mini-grid">
+<a href="guides/research-project-scaffold/">Project scaffold</a>
+<a href="guides/bring-your-own-export/">Bring your own export</a>
 <a href="guides/hands-on-eda-research/">Hands-on guide</a>
 <a href="workflows/end-to-end-eda-research/">End-to-end workflow</a>
 <a href="examples/end-to-end-eda/">Runnable example</a>
+<a href="guides/reporting-reproducibility/">Reporting + reproducibility</a>
 <a href="studio/">Studio application</a>
 <a href="workflows/">Workflow map</a>
 <a href="methods/">Methods</a>
