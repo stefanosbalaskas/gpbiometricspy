@@ -97,6 +97,7 @@ nav:
           - First analysis: guides/first-analysis.md
           - Validate a new dataset: guides/validate-dataset.md
           - Research project scaffold: guides/research-project-scaffold.md
+          - Study metadata and data dictionary: guides/study-metadata-data-dictionary.md
           - Bring your own export safely: guides/bring-your-own-export.md
           - Signal and column glossary: guides/signal-column-glossary.md
           - Troubleshooting and diagnostics: guides/troubleshooting.md

@@ -1,5 +1,5 @@
 ---
-description: Task-first entry point for gpbiometricspy research workflows, project setup, export adaptation, dataset validation, Studio, modelling, and validation evidence.
+description: Task-first entry point for gpbiometricspy research workflows, project setup, study metadata, export adaptation, dataset validation, Studio, modelling, and validation evidence.
 search:
   boost: 1.5
 ---
@@ -30,8 +30,14 @@ Choose the path that matches what you are trying to do. This page is intentional
 
 <a class="gp-route-card" data-learning-route="research-project-onboarding" href="../guides/research-project-scaffold/">
 <span class="gp-route-label">New research project</span>
-<h3>Set up, adapt, validate, then analyze</h3>
-<p>Create a reviewable project structure first, preserve and map your own export, verify measurement and timing evidence, then enter the modality-specific workflow.</p>
+<h3>Set up, define, adapt, validate, then analyze</h3>
+<p>Create a reviewable project structure, define field roles/units/clocks and event semantics, preserve and map your own export, verify measurement evidence, then enter the modality-specific workflow.</p>
+</a>
+
+<a class="gp-route-card" data-learning-route="study-metadata-dictionary" href="../guides/study-metadata-data-dictionary/">
+<span class="gp-route-label">Study contract</span>
+<h3>Define variables, clocks and events explicitly</h3>
+<p>Create a reviewable metadata and data-dictionary contract that separates observed file properties from researcher-declared roles, units, provenance and event meaning.</p>
 </a>
 
 <a class="gp-route-card" href="../workflows/">
@@ -70,13 +76,14 @@ Choose the path that matches what you are trying to do. This page is intentional
 
 <div class="gp-steps" data-research-onboarding-sequence>
 <div class="gp-step"><strong>1 · Project</strong>Create the <a href="../guides/research-project-scaffold/">research project scaffold</a> so source data, mappings, QC, events, derived outputs, models and reports remain distinct.</div>
-<div class="gp-step"><strong>2 · Adapt</strong>Use <a href="../guides/bring-your-own-export/">Bring your own export safely</a> to preserve source names, inspect mappings and record adaptation evidence.</div>
-<div class="gp-step"><strong>3 · Validate</strong>Run <a href="../guides/validate-dataset/">new-dataset validation</a> for schema, timing, signal activity, missingness, resets, provenance and event coverage.</div>
-<div class="gp-step"><strong>4 · Analyze</strong>Choose the relevant <a href="../workflows/">signal workflow</a> or follow the <a href="../guides/hands-on-eda-research/">complete hands-on analysis</a> once the required evidence is defensible.</div>
+<div class="gp-step"><strong>2 · Define</strong>Use <a href="../guides/study-metadata-data-dictionary/">Study metadata and data dictionary</a> to declare variable roles, units, clock ownership, identifiers, provenance and event semantics without guessing from labels.</div>
+<div class="gp-step"><strong>3 · Adapt</strong>Use <a href="../guides/bring-your-own-export/">Bring your own export safely</a> to preserve source names, inspect mappings and record adaptation evidence.</div>
+<div class="gp-step"><strong>4 · Validate</strong>Run <a href="../guides/validate-dataset/">new-dataset validation</a> for schema, timing, signal activity, missingness, resets, provenance and event coverage.</div>
+<div class="gp-step"><strong>5 · Analyze</strong>Choose the relevant <a href="../workflows/">signal workflow</a> or follow the <a href="../guides/hands-on-eda-research/">complete hands-on analysis</a> once the required evidence is defensible.</div>
 </div>
 
 <div class="gp-decision">
-<strong>Do not collapse these stages.</strong> Standardising a column name is not validation; a present channel is not necessarily active; a parsed timestamp does not establish its unit or clock; and a successful model does not repair uncertain measurement provenance.
+<strong>Do not collapse these stages.</strong> A familiar column label is not a scientific definition; standardising a name is not validation; a present channel is not necessarily active; a parsed timestamp does not establish its unit or clock; and a successful model does not repair uncertain measurement provenance.
 </div>
 
 !!! note "One scientific engine, several interfaces"
@@ -118,6 +125,7 @@ graph LR
 | Goal | Best next page | Why |
 |---|---|---|
 | Set up a new research project | [Research project scaffold](guides/research-project-scaffold.md) | Separates source data, mappings, QC, events, derived outputs, models and reports before analysis begins. |
+| Define variable roles, units, clocks and event semantics | [Study metadata and data dictionary](guides/study-metadata-data-dictionary.md) | Creates a reviewable measurement contract before column standardisation and analysis code depend on field meaning. |
 | Adapt an unfamiliar export | [Bring your own export safely](guides/bring-your-own-export.md) | Preserves source semantics and records mapping, schema, timing and event evidence before standardisation. |
 | Learn by doing | [First analysis](guides/first-analysis.md) | A short successful path using bundled synthetic data. |
 | Work with a specific signal | [Workflow map](workflows.md) | Routes by EDA, PPG/HRV, pupil/gaze, events, or external tools. |

@@ -36,6 +36,12 @@ The guides are organized by user need rather than package module. Tutorials help
 <p>Create a checked raw/metadata/mappings/QC/events/derived/models/figures/reports/manifests/logs structure before private research data enter the workflow.</p>
 </div>
 
+<div class="gp-guide-card" data-learning-route="study-metadata-dictionary">
+<span class="gp-eyebrow">Metadata contract</span>
+<h3><a href="study-metadata-data-dictionary/">Study metadata and data dictionary</a></h3>
+<p>Declare variable roles, units, clock ownership, provenance, identifiers and event semantics before source columns are standardized or analysis code depends on them.</p>
+</div>
+
 <div class="gp-guide-card" data-learning-route="bring-your-own-export">
 <span class="gp-eyebrow">Hands-on adaptation</span>
 <h3><a href="bring-your-own-export/">Bring your own export safely</a></h3>
@@ -88,6 +94,7 @@ The guides are organized by user need rather than package module. Tutorials help
 | I want to use the package end to end | Hands-on tutorial | [Data to report](hands-on-eda-research.md) |
 | I want a shorter first tour | Tutorial | [First analysis](first-analysis.md) |
 | I am setting up a new research project | Project setup | [Research project scaffold](research-project-scaffold.md) |
+| I need to define field roles, units, clocks and event semantics | Metadata contract | [Study metadata and data dictionary](study-metadata-data-dictionary.md) |
 | I have an unfamiliar CSV/export to adapt | Hands-on adaptation | [Bring your own export safely](bring-your-own-export.md) |
 | I know a column name but not its role | Reference guide | [Signal and column glossary](signal-column-glossary.md) |
 | Something failed or the evidence looks wrong | Diagnostics | [Troubleshooting and diagnostics](troubleshooting.md) |
@@ -104,8 +111,8 @@ The guides are organized by user need rather than package module. Tutorials help
 
 | What you have now | First question | Recommended route | Evidence to retain |
 |---|---|---|---|
-| A new project before data intake | How will source data, mappings, QC, events, derived outputs, models and reporting evidence remain separated and traceable? | [Research project scaffold](research-project-scaffold.md) | project structure, configuration template, mapping template, manifests/log policy |
-| A new or unfamiliar Gazepoint export | Can I map source columns without losing their original meaning, then verify schema, units and time? | [Bring your own export safely](bring-your-own-export.md), then [Validate a new dataset](validate-dataset.md) and [Signal/column glossary](signal-column-glossary.md) | source-to-standard map, schema/QC tables, source identity, timebase evidence |
+| A new project before data intake | How will source data, mappings, QC, events, derived outputs, models and reporting evidence remain separated and traceable? | [Research project scaffold](research-project-scaffold.md), then [Study metadata and data dictionary](study-metadata-data-dictionary.md) | project structure, configuration template, metadata/dictionary contract, manifests/log policy |
+| A new or unfamiliar Gazepoint export | Can I map source columns without losing their original meaning, then verify schema, units and time? | [Study metadata and data dictionary](study-metadata-data-dictionary.md), [Bring your own export safely](bring-your-own-export.md), then [Validate a new dataset](validate-dataset.md) and [Signal/column glossary](signal-column-glossary.md) | reviewed field roles/units/clocks, source-to-standard map, schema/QC tables, source identity, timebase evidence |
 | EDA/GSR waveform | Is the conductance signal usable before decomposition or event detection? | [EDA / GSR / SCR example](../examples/eda-scr.md) | unit audit, signal QC, decomposition settings, candidate-event criteria |
 | PPG waveform or IBI/RR series | What is the source of each interval and are rejected beats visible? | [PPG / HRV example](../examples/ppg-hrv.md) | source provenance, peak/interval QC, rejection rules |
 | Pupil, gaze, fixation or AOI fields | Which columns are measured, derived, validity-coded or interpolated? | [Pupil / gaze / AOI example](../examples/pupil-gaze.md) | validity/missingness evidence, preprocessing choices, AOI definitions |
@@ -144,7 +151,7 @@ Do not advance a workflow merely because a function can run. Stop and resolve th
 ## Safe defaults
 
 - Start from bundled synthetic/public demonstration data when learning or testing a pipeline.
-- Treat QC and provenance as evidence-producing stages, not hidden preprocessing details.
+- Treat metadata, QC and provenance as evidence-producing stages, not hidden preprocessing details.
 - Hold out whole groups when the scientific target is generalisation to unseen groups.
 - Keep conditional predictions for observed participants/items separate from population predictions for unseen levels.
 - Report timing uncertainty and source identity explicitly when multimodal or cardiac measures depend on them.
