@@ -38,6 +38,7 @@ GUIDES = {
     "hands-on-eda-research.md",
     "first-analysis.md",
     "validate-dataset.md",
+    "bring-your-own-export.md",
     "signal-column-glossary.md",
     "troubleshooting.md",
     "timebase-alignment.md",
@@ -253,6 +254,17 @@ def main() -> None:
     assert "Common mistakes" in hands_on_guide_text
     assert "GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR" in hands_on_guide_text
 
+    adaptation = DOCS / "guides" / "bring-your-own-export.md"
+    adaptation_text = _text(adaptation)
+    assert "# Bring your own export safely" in adaptation_text
+    assert "standardise_gazepoint_biometric_names" in adaptation_text
+    assert "Recognition is not validation" in adaptation_text
+    assert "A minimum acceptance checklist" in adaptation_text
+    assert "Common adaptation mistakes" in adaptation_text
+    assert "adaptation_manifest.json" in adaptation_text
+    assert "data-export-adaptation-stages" in adaptation_text
+    assert "examples/hands-on/bring-your-own-export.py" in adaptation_text
+
     glossary = DOCS / "guides" / "signal-column-glossary.md"
     glossary_text = _text(glossary)
     assert "# Signal and column glossary" in glossary_text
@@ -335,6 +347,7 @@ def main() -> None:
         "- Start here: start-here.md",
         "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
         "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
+        "- Bring your own export safely: guides/bring-your-own-export.md",
         "- Signal and column glossary: guides/signal-column-glossary.md",
         "- Troubleshooting and diagnostics: guides/troubleshooting.md",
         "- End-to-end runnable EDA: examples/end-to-end-eda.md",
