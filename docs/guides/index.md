@@ -30,6 +30,12 @@ The guides are organized by user need rather than package module. Tutorials help
 <p>Run schema, timing, missingness, signal, event, and provenance checks before substantive analysis.</p>
 </div>
 
+<div class="gp-guide-card" data-learning-route="bring-your-own-export">
+<span class="gp-eyebrow">Hands-on adaptation</span>
+<h3><a href="bring-your-own-export/">Bring your own export safely</a></h3>
+<p>Preserve an unfamiliar CSV, preview source-to-standard column mappings, verify time and event assumptions, and export a reviewable adaptation manifest before analysis.</p>
+</div>
+
 <div class="gp-guide-card" data-learning-route="signal-column-glossary">
 <span class="gp-eyebrow">Reference guide</span>
 <h3><a href="signal-column-glossary/">Signal and column glossary</a></h3>
@@ -75,6 +81,7 @@ The guides are organized by user need rather than package module. Tutorials help
 | I do not yet know which workflow fits | Decision guide | [Choose your workflow](#choose-your-workflow) |
 | I want to use the package end to end | Hands-on tutorial | [Data to report](hands-on-eda-research.md) |
 | I want a shorter first tour | Tutorial | [First analysis](first-analysis.md) |
+| I have an unfamiliar CSV/export to adapt | Hands-on adaptation | [Bring your own export safely](bring-your-own-export.md) |
 | I know a column name but not its role | Reference guide | [Signal and column glossary](signal-column-glossary.md) |
 | Something failed or the evidence looks wrong | Diagnostics | [Troubleshooting and diagnostics](troubleshooting.md) |
 | I have a research task to complete | How-to | [Workflow map](../workflows.md) and the guides above |
@@ -90,7 +97,7 @@ The guides are organized by user need rather than package module. Tutorials help
 
 | What you have now | First question | Recommended route | Evidence to retain |
 |---|---|---|---|
-| A new or unfamiliar Gazepoint export | Are schema, units, timing, missingness and channel identity defensible? | [Validate a new dataset](validate-dataset.md) and [Signal/column glossary](signal-column-glossary.md) | schema/QC tables, source identity, timebase evidence |
+| A new or unfamiliar Gazepoint export | Can I map source columns without losing their original meaning, then verify schema, units and time? | [Bring your own export safely](bring-your-own-export.md), then [Validate a new dataset](validate-dataset.md) and [Signal/column glossary](signal-column-glossary.md) | source-to-standard map, schema/QC tables, source identity, timebase evidence |
 | EDA/GSR waveform | Is the conductance signal usable before decomposition or event detection? | [EDA / GSR / SCR example](../examples/eda-scr.md) | unit audit, signal QC, decomposition settings, candidate-event criteria |
 | PPG waveform or IBI/RR series | What is the source of each interval and are rejected beats visible? | [PPG / HRV example](../examples/ppg-hrv.md) | source provenance, peak/interval QC, rejection rules |
 | Pupil, gaze, fixation or AOI fields | Which columns are measured, derived, validity-coded or interpolated? | [Pupil / gaze / AOI example](../examples/pupil-gaze.md) | validity/missingness evidence, preprocessing choices, AOI definitions |

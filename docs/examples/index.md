@@ -8,6 +8,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 <a class="gp-route-card" data-learning-route="research-recipes" href="#worked-research-recipes"><span class="gp-route-label">Cookbook</span><h3>Worked research recipes</h3><p>Combine verified event, multimodal, AOI and visual-inspection calls into compact recipes you can adapt without skipping QC or provenance.</p></a>
 <a class="gp-route-card" href="end-to-end-eda/"><span class="gp-route-label">Run first</span><h3>Complete EDA analysis bundle</h3><p>Execute one checked script from input through QC, decomposition, candidate events, figures, tables and methods text.</p></a>
 <a class="gp-route-card" data-learning-route="research-evidence-bundle" href="../guides/reporting-reproducibility/#run-a-reviewable-evidence-bundle"><span class="gp-route-label">Reproduce</span><h3>Research evidence bundle</h3><p>Run a checked cross-domain example that retains design, structured QC, TTL/alignment, event-locked, visual, software and reporting evidence.</p></a>
+<a class="gp-route-card" data-learning-route="bring-your-own-export" href="../guides/bring-your-own-export/"><span class="gp-route-label">Adapt</span><h3>Adapt an unfamiliar export</h3><p>Run a checked source-to-standard mapping workflow that preserves original names, verifies schema/time/event evidence, and writes an adaptation manifest.</p></a>
 <a class="gp-route-card" href="eda-scr/"><span class="gp-route-label">EDA / SCR</span><h3>Conductance to response events</h3><p>Inspect quality, decompose EDA, detect candidate SCRs, and retain visual diagnostics.</p></a>
 <a class="gp-route-card" href="ppg-hrv/"><span class="gp-route-label">PPG / HRV</span><h3>Waveform to beat intervals</h3><p>Detect pulse peaks, inspect RR/IBI geometry, and generate standard HRV diagnostics with source guardrails.</p></a>
 <a class="gp-route-card" href="pupil-gaze/"><span class="gp-route-label">Eye tracking</span><h3>Pupil, gaze, AOI and saccades</h3><p>Inspect pupil/gaze channels, aggregate AOI-linked measures, and use gaze diagnostics without inferring latent states.</p></a>
@@ -23,6 +24,7 @@ These examples are the practical front door to `gpbiometricspy`. Every route use
 | I want short recipes that connect several stages | [Worked research recipes](#worked-research-recipes) | event tables, event-locked summaries, AOI summaries, shared-timeline figure |
 | I want one complete working analysis first | [End-to-end EDA](end-to-end-eda.md) | QC, decomposition, event tables, figures, methods evidence |
 | I want a reviewable cross-domain evidence folder | [Research evidence bundle](../guides/reporting-reproducibility.md#run-a-reviewable-evidence-bundle) | design, structured QC, events/alignment, summaries, figure, software and manifest |
+| I have an unfamiliar CSV/export to map | [Bring your own export safely](../guides/bring-your-own-export.md) | source-to-standard map, schema/timebase evidence, TTL events, adaptation manifest |
 | EDA/GSR waveform | [EDA / GSR / SCR](eda-scr.md) | quality, decomposition, candidate response events |
 | PPG waveform or intervals | [PPG / HRV](ppg-hrv.md) | peak/interval diagnostics and HRV-ready series |
 | Pupil/gaze/AOI columns | [Pupil / gaze / AOI](pupil-gaze.md) | missingness/validity, AOI summaries, gaze diagnostics |
@@ -48,7 +50,7 @@ dat = (
 )
 ```
 
-Before adapting the recipes to research data, use the [new-dataset validation guide](../guides/validate-dataset.md) to confirm schema, units, signal identity, timing and provenance.
+Before adapting the recipes to research data, use the [bring-your-own-export guide](../guides/bring-your-own-export.md) to make the source-to-analysis mapping explicit, then use the [new-dataset validation guide](../guides/validate-dataset.md) to confirm schema, units, signal identity, timing and provenance.
 
 ### 2. TTL events → event-relative physiology windows
 
@@ -129,12 +131,13 @@ fig = gp.plot_gazepoint_multimodal_timeline(
 
 Change inputs deliberately rather than mechanically:
 
-1. map your real time, participant/session/trial, signal and event columns;
-2. run QC before changing thresholds or deriving measures;
-3. establish clock relationships before event locking multiple streams;
-4. retain the settings used to produce every derived table or figure;
-5. move to [model selection](../guides/model-selection.md) only after the analysis unit and grouping structure are explicit;
-6. finish with [reporting and reproducibility](../guides/reporting-reproducibility.md).
+1. preserve the original export and record the [source-to-standard mapping](../guides/bring-your-own-export.md);
+2. map your real time, participant/session/trial, signal and event columns;
+3. run QC before changing thresholds or deriving measures;
+4. establish clock relationships before event locking multiple streams;
+5. retain the settings used to produce every derived table or figure;
+6. move to [model selection](../guides/model-selection.md) only after the analysis unit and grouping structure are explicit;
+7. finish with [reporting and reproducibility](../guides/reporting-reproducibility.md).
 
 <div class="gp-science-boundary">
 <strong>Scientific boundary.</strong> These recipes transform and summarize recorded data. They do not by themselves identify emotion, stress, attention, trust, preference, diagnosis, causal effects, or hardware-level synchronization. Those interpretations require independent design, measurement and inferential justification.
@@ -155,7 +158,7 @@ Change inputs deliberately rather than mechanically:
 ## From example to research workflow
 
 1. Reproduce the [checked end-to-end example](end-to-end-eda.md) unchanged.
-2. Replace only the input mapping—not the scientific meaning of variables.
+2. Preserve and map your source with [Bring your own export safely](../guides/bring-your-own-export.md).
 3. Run the [new-dataset validation guide](../guides/validate-dataset.md).
 4. Preserve QC/provenance evidence before preprocessing.
 5. Move to the deeper article linked from the example.
