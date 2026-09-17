@@ -129,6 +129,7 @@ nav:
       - Crossed participant–item random scale-slope location–scale modelling: methods/crossed-random-scale-slopes-location-scale.md
       - Crossed participant–item joint random-slope location–scale modelling: methods/crossed-joint-random-slopes-location-scale.md
   - Learn & reference:
+      - Learning paths: learning-paths.md
       - Plot gallery: plot-gallery.md
       - Articles:
           - Overview: articles/index.md
