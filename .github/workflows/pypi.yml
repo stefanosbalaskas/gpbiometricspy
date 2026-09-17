@@ -68,7 +68,7 @@ jobs:
           echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Download canonical release artifact from successful release run
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: distributions
           path: canonical-release
