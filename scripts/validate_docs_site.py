@@ -38,6 +38,7 @@ GUIDES = {
     "hands-on-eda-research.md",
     "first-analysis.md",
     "validate-dataset.md",
+    "troubleshooting.md",
     "timebase-alignment.md",
     "reporting-reproducibility.md",
     "model-selection.md",
@@ -251,6 +252,23 @@ def main() -> None:
     assert "Common mistakes" in hands_on_guide_text
     assert "GPBIOMETRICSPY_TUTORIAL_OUTPUT_DIR" in hands_on_guide_text
 
+    troubleshooting = DOCS / "guides" / "troubleshooting.md"
+    troubleshooting_text = _text(troubleshooting)
+    assert "# Troubleshooting and diagnostics" in troubleshooting_text
+    assert "Symptom → diagnostic → action" in troubleshooting_text
+    assert "Minimal triage scaffold" in troubleshooting_text
+    assert "Build a useful diagnostic report" in troubleshooting_text
+    assert "Stop rather than patch around missing evidence" in troubleshooting_text
+    for required_call in [
+        "detect_gazepoint_biometric_schema",
+        "detect_gazepoint_biometric_timebase",
+        "summarize_gazepoint_missingness",
+        "audit_gazepoint_signal_activity",
+        "audit_gazepoint_time_resets",
+        "run_gazepoint_biometrics_real_data_readiness",
+    ]:
+        assert required_call in troubleshooting_text, required_call
+
     start = _text(DOCS / "start-here.md")
     assert "# Start here" in start
     assert 'href="../parity/"' in start
@@ -304,6 +322,7 @@ def main() -> None:
         "- Start here: start-here.md",
         "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
         "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
+        "- Troubleshooting and diagnostics: guides/troubleshooting.md",
         "- End-to-end runnable EDA: examples/end-to-end-eda.md",
         "- Guides:",
         "- Python-native explanations:",

@@ -30,6 +30,12 @@ The guides are organized by user need rather than package module. Tutorials help
 <p>Run schema, timing, missingness, signal, event, and provenance checks before substantive analysis.</p>
 </div>
 
+<div class="gp-guide-card" data-learning-route="troubleshooting">
+<span class="gp-eyebrow">Diagnostics</span>
+<h3><a href="troubleshooting/">Troubleshoot a workflow</a></h3>
+<p>Start from the symptom, find the earliest broken assumption, preserve diagnostic evidence, and avoid patching around schema, timing, signal, event, model, or reporting failures.</p>
+</div>
+
 <div class="gp-guide-card">
 <span class="gp-eyebrow">How-to</span>
 <h3><a href="timebase-alignment/">Timebase and alignment</a></h3>
@@ -63,6 +69,7 @@ The guides are organized by user need rather than package module. Tutorials help
 | I do not yet know which workflow fits | Decision guide | [Choose your workflow](#choose-your-workflow) |
 | I want to use the package end to end | Hands-on tutorial | [Data to report](hands-on-eda-research.md) |
 | I want a shorter first tour | Tutorial | [First analysis](first-analysis.md) |
+| Something failed or the evidence looks wrong | Diagnostics | [Troubleshooting and diagnostics](troubleshooting.md) |
 | I have a research task to complete | How-to | [Workflow map](../workflows.md) and the guides above |
 | I need exact function behavior | Reference | [API browser](../api/index.md) |
 | I need to understand why the workflow is structured this way | Explanation | [Python-native articles](../articles/python-native/index.md) |
@@ -81,6 +88,7 @@ The guides are organized by user need rather than package module. Tutorials help
 | PPG waveform or IBI/RR series | What is the source of each interval and are rejected beats visible? | [PPG / HRV example](../examples/ppg-hrv.md) | source provenance, peak/interval QC, rejection rules |
 | Pupil, gaze, fixation or AOI fields | Which columns are measured, derived, validity-coded or interpolated? | [Pupil / gaze / AOI example](../examples/pupil-gaze.md) | validity/missingness evidence, preprocessing choices, AOI definitions |
 | TTL/task events or multiple sensor streams | Which clock owns each timestamp and what alignment evidence exists? | [Timebase and alignment](timebase-alignment.md) then [Multimodal example](../examples/multimodal.md) | event identity, clock mapping, offsets/drift, overlap and residuals |
+| A warning, empty output, or implausible result | Which earlier assumption failed first? | [Troubleshooting and diagnostics](troubleshooting.md) | minimal reproduction, schema/time/QC evidence, exact warning/error, settings |
 | Analysis-ready repeated observations | What is the scientific generalisation unit and prediction target? | [Choose a modelling strategy](model-selection.md) | grouping structure, holdout unit, model assumptions, uncertainty |
 | Completed analysis | Can another researcher replay the decisions and inspect QC? | [Reporting and reproducibility](reporting-reproducibility.md) | software identity, settings, exclusions, figures, tables, provenance |
 | An external analysis ecosystem | What representation and metadata does the downstream tool require? | [Interoperability example](../examples/interoperability.md) | explicit conversion, version identity, retained source columns |
