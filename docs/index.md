@@ -10,6 +10,7 @@ Start from the research task you need to complete—not from a list of functions
 
 <div class="gp-actions">
 <a class="md-button md-button--primary" href="guides/hands-on-eda-research/">Run a complete analysis</a>
+<a class="md-button" href="guides/research-project-scaffold/">Set up a research project</a>
 <a class="md-button" href="start-here/">Start here</a>
 <a class="md-button" href="studio/">Open the Studio guide</a>
 <a class="md-button" href="workflows/">Choose a workflow</a>
@@ -24,6 +25,40 @@ Start from the research task you need to complete—not from a list of functions
 <div><span class="gp-status-value">850 / 850</span><span class="gp-status-label">exact-main tests</span></div>
 <div><span class="gp-status-value">99.7353%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
 <div><span class="gp-status-value">14 / 14</span><span class="gp-status-label">exact-main workflow families green</span></div>
+</div>
+
+## Start a research project safely
+
+<div class="gp-route-grid" data-research-onboarding-path>
+
+<a class="gp-route-card" data-onboarding-step="project" href="guides/research-project-scaffold/">
+<span class="gp-route-label">1 · Project</span>
+<h3>Create a reviewable project structure</h3>
+<p>Separate raw exports, metadata, mappings, QC, events, derived tables, models, figures, reports, manifests and logs before private research data enter the workflow.</p>
+</a>
+
+<a class="gp-route-card" data-onboarding-step="adapt" href="guides/bring-your-own-export/">
+<span class="gp-route-label">2 · Adapt</span>
+<h3>Map your own export without hiding provenance</h3>
+<p>Preserve source names, preview proposed mappings, verify units, timing and event semantics, and retain an adaptation manifest before standardising fields.</p>
+</a>
+
+<a class="gp-route-card" data-onboarding-step="validate" href="guides/validate-dataset/">
+<span class="gp-route-label">3 · Validate</span>
+<h3>Establish measurement readiness</h3>
+<p>Audit schema, sampling, missingness, signal activity, resets, source provenance and event structure before deriving substantive results.</p>
+</a>
+
+<a class="gp-route-card" data-onboarding-step="analyze" href="guides/hands-on-eda-research/">
+<span class="gp-route-label">4 · Analyze</span>
+<h3>Run a complete checked workflow</h3>
+<p>Move from retained QC evidence into processing, candidate events, plots, exports and report-ready methods evidence using real package calls.</p>
+</a>
+
+</div>
+
+<div class="gp-decision">
+<strong>New research data?</strong> Preserve the source first. A successful rename, parser, plot or model does not establish units, channel activity, event meaning, synchronization, measurement validity or inferential support.
 </div>
 
 ## Start from your research task
@@ -172,6 +207,9 @@ The current scientific development baseline is PR **#136**, exact-main SHA **`e7
 Stable **gpbiometricspy 0.1.6** remains an immutable release line from **11 September 2026**, with **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%** at release qualification. Development metrics above describe post-release work and do not retroactively change the 0.1.6 artifacts.
 
 <div class="gp-mini-grid">
+<a href="guides/research-project-scaffold/">Research project scaffold</a>
+<a href="guides/bring-your-own-export/">Bring your own export</a>
+<a href="guides/signal-column-glossary/">Signal and column glossary</a>
 <a href="guides/hands-on-eda-research/">Hands-on guide</a>
 <a href="workflows/end-to-end-eda-research/">End-to-end workflow</a>
 <a href="examples/end-to-end-eda/">Runnable example</a>
