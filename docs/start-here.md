@@ -1,5 +1,5 @@
 ---
-description: Task-first entry point for gpbiometricspy research workflows, dataset validation, Studio, modelling, and validation evidence.
+description: Task-first entry point for gpbiometricspy research workflows, project setup, export adaptation, dataset validation, Studio, modelling, and validation evidence.
 search:
   boost: 1.5
 ---
@@ -7,7 +7,7 @@ search:
 # Start here
 
 <div class="gp-page-intro">
-Choose the path that matches what you are trying to do. This page is intentionally task-first: it routes new users to a successful first analysis, experienced researchers to the right workflow, and reviewers or collaborators to the validation evidence behind the package.
+Choose the path that matches what you are trying to do. This page is intentionally task-first: it routes new users to a successful first analysis, researchers bringing their own data through a provenance-first onboarding path, experienced users to the right workflow, and reviewers or collaborators to the validation evidence behind the package.
 </div>
 
 <div class="gp-chip-row">
@@ -28,6 +28,12 @@ Choose the path that matches what you are trying to do. This page is intentional
 <p>Install the package, load the bundled synthetic dataset, inspect signals, run QC, create plots, and keep a reproducible record.</p>
 </a>
 
+<a class="gp-route-card" data-learning-route="research-project-onboarding" href="../guides/research-project-scaffold/">
+<span class="gp-route-label">New research project</span>
+<h3>Set up, adapt, validate, then analyze</h3>
+<p>Create a reviewable project structure first, preserve and map your own export, verify measurement and timing evidence, then enter the modality-specific workflow.</p>
+</a>
+
 <a class="gp-route-card" href="../workflows/">
 <span class="gp-route-label">Research workflow</span>
 <h3>Start from the data you recorded</h3>
@@ -40,10 +46,10 @@ Choose the path that matches what you are trying to do. This page is intentional
 <p>Work through project, quality, analysis, alignment, summarisation, modelling, and reporting in a guided application backed by the same scientific package functions.</p>
 </a>
 
-<a class="gp-route-card" href="../guides/validate-dataset/">
-<span class="gp-route-label">Bring your own data</span>
-<h3>Validate a new dataset before analysis</h3>
-<p>Check schema, sampling, missingness, resets, source provenance, event structure, and cross-stream timing before deriving substantive results.</p>
+<a class="gp-route-card" href="../guides/bring-your-own-export/">
+<span class="gp-route-label">Existing export</span>
+<h3>Adapt an unfamiliar file safely</h3>
+<p>Keep the original source intact, preview source-to-standard mappings, verify time and event assumptions, and retain an adaptation manifest before analysis.</p>
 </a>
 
 <a class="gp-route-card" href="../guides/model-selection/">
@@ -58,6 +64,19 @@ Choose the path that matches what you are trying to do. This page is intentional
 <p>Trace frozen R parity, deep validation, private real-data smoke testing, measurement accountability, and explicit interpretation guardrails.</p>
 </a>
 
+</div>
+
+## Bringing your own research data
+
+<div class="gp-steps" data-research-onboarding-sequence>
+<div class="gp-step"><strong>1 · Project</strong>Create the <a href="../guides/research-project-scaffold/">research project scaffold</a> so source data, mappings, QC, events, derived outputs, models and reports remain distinct.</div>
+<div class="gp-step"><strong>2 · Adapt</strong>Use <a href="../guides/bring-your-own-export/">Bring your own export safely</a> to preserve source names, inspect mappings and record adaptation evidence.</div>
+<div class="gp-step"><strong>3 · Validate</strong>Run <a href="../guides/validate-dataset/">new-dataset validation</a> for schema, timing, signal activity, missingness, resets, provenance and event coverage.</div>
+<div class="gp-step"><strong>4 · Analyze</strong>Choose the relevant <a href="../workflows/">signal workflow</a> or follow the <a href="../guides/hands-on-eda-research/">complete hands-on analysis</a> once the required evidence is defensible.</div>
+</div>
+
+<div class="gp-decision">
+<strong>Do not collapse these stages.</strong> Standardising a column name is not validation; a present channel is not necessarily active; a parsed timestamp does not establish its unit or clock; and a successful model does not repair uncertain measurement provenance.
 </div>
 
 !!! note "One scientific engine, several interfaces"
@@ -98,6 +117,8 @@ graph LR
 
 | Goal | Best next page | Why |
 |---|---|---|
+| Set up a new research project | [Research project scaffold](guides/research-project-scaffold.md) | Separates source data, mappings, QC, events, derived outputs, models and reports before analysis begins. |
+| Adapt an unfamiliar export | [Bring your own export safely](guides/bring-your-own-export.md) | Preserves source semantics and records mapping, schema, timing and event evidence before standardisation. |
 | Learn by doing | [First analysis](guides/first-analysis.md) | A short successful path using bundled synthetic data. |
 | Work with a specific signal | [Workflow map](workflows.md) | Routes by EDA, PPG/HRV, pupil/gaze, events, or external tools. |
 | See outputs before reading code | [Plot gallery](plot-gallery.md) | Generated figures from the package's plotting surface. |
