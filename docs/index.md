@@ -207,6 +207,7 @@ The current scientific development baseline is PR **#136**, exact-main SHA **`e7
 Stable **gpbiometricspy 0.1.6** remains an immutable release line from **11 September 2026**, with **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%** at release qualification. Development metrics above describe post-release work and do not retroactively change the 0.1.6 artifacts.
 
 <div class="gp-mini-grid">
+<a href="learning-paths/">Learning paths</a>
 <a href="guides/research-project-scaffold/">Research project scaffold</a>
 <a href="guides/bring-your-own-export/">Bring your own export</a>
 <a href="guides/signal-column-glossary/">Signal and column glossary</a>
