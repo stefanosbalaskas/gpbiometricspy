@@ -10,6 +10,7 @@ copyright: Copyright &copy; 2026 Stefanos Balaskas · MIT License
 theme:
   name: material
   language: en
+  font: false
   logo: assets/python-suite-logo.png
   icon:
     repo: fontawesome/brands/github

@@ -368,6 +368,7 @@ def main() -> None:
     mkdocs = _text(ROOT / "mkdocs.yml")
     for required in [
         "edit_uri: edit/main/docs/",
+        "  font: false",
         "- Start here: start-here.md",
         "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
         "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
