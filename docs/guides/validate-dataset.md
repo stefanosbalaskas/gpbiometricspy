@@ -71,6 +71,16 @@ fig = gp.plot_gazepoint_design_coverage(design)
 
 The generated documentation includes a design-coverage example in the [Plot gallery](../plot-gallery.md#design-and-inference).
 
+## QC findings are not automatic exclusions
+
+Validation can produce warnings, failed checks, dropout flags, invalid samples, missing events, or sparse design cells. Preserve those findings before deciding what they mean for a specific analysis. A local channel problem does not automatically justify participant-wide removal, and a warning label should not silently change the denominator.
+
+Use the [QC and exclusion decision ledger](../qc-exclusion-decision-ledger.md) to separate four things explicitly: the observed QC evidence, the decision criterion, the reviewed `RETAIN` / `EXCLUDE` / `REVIEW` state, and the before/after denominator consequence. Its checked synthetic example deliberately creates known QC issues and confirms that **zero automatic exclusions** are applied.
+
+<div class="gp-decision">
+<strong>Safe default:</strong> route unresolved QC findings to review. Apply exclusions only in a separate reproducible step with an explicit scope, reason, and denominator audit.
+</div>
+
 ## Fail-closed decisions are valid outcomes
 
 Validation is not a ritual that every dataset automatically passes. Stop or narrow the analysis when:
@@ -92,8 +102,9 @@ Validation is not a ritual that every dataset automatically passes. Stop or narr
 - design/event coverage tables;
 - generated QC figures;
 - explicit warnings and accepted exceptions;
-- exclusions and their reasons;
+- exclusion-decision ledger with scope and rationale where exclusions are considered or applied;
+- analysis-specific before/after denominator audit;
 - downstream preprocessing settings.
 
 !!! tip "Next"
-    If the dataset contains multiple clocks or streams, continue with [Timebase and alignment](timebase-alignment.md). Otherwise choose the appropriate [domain example](../examples/index.md).
+    If the dataset contains multiple clocks or streams, continue with [Timebase and alignment](timebase-alignment.md). If QC findings require inclusion/exclusion decisions, continue with the [QC and exclusion decision ledger](../qc-exclusion-decision-ledger.md). Otherwise choose the appropriate [domain example](../examples/index.md).
