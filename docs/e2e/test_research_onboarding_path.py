@@ -21,6 +21,7 @@ def onboarding_docs_base_url() -> str:
         "index.html",
         "start-here/index.html",
         "guides/research-project-scaffold/index.html",
+        "guides/study-metadata-data-dictionary/index.html",
         "guides/bring-your-own-export/index.html",
         "guides/validate-dataset/index.html",
         "guides/hands-on-eda-research/index.html",
@@ -64,18 +65,29 @@ def test_homepage_project_entry_routes_to_scaffold(
     )
 
 
-def test_start_here_exposes_staged_bring_your_own_data_path(
+def test_start_here_exposes_five_stage_bring_your_own_data_path(
     page: Page, onboarding_docs_base_url: str
 ) -> None:
     page.goto(f"{onboarding_docs_base_url}/start-here/")
     card = page.locator('[data-learning-route="research-project-onboarding"]')
     expect(card).to_be_visible()
-    expect(card).to_contain_text("Set up, adapt, validate, then analyze")
+    expect(card).to_contain_text("Set up, define, adapt, validate, then analyze")
     sequence = page.locator("[data-research-onboarding-sequence]")
     expect(sequence).to_be_visible()
-    expect(sequence.locator(".gp-step")).to_have_count(4)
+    expect(sequence.locator(".gp-step")).to_have_count(5)
+    expect(sequence).to_contain_text("Study metadata and data dictionary")
     expect(sequence).to_contain_text("Bring your own export safely")
     expect(sequence).to_contain_text("new-dataset validation")
+
+
+def test_start_here_dictionary_route_is_navigable(
+    page: Page, onboarding_docs_base_url: str
+) -> None:
+    page.goto(f"{onboarding_docs_base_url}/start-here/")
+    page.get_by_role("link", name="Define variables, clocks and events explicitly").click()
+    expect(page).to_have_url(
+        f"{onboarding_docs_base_url}/guides/study-metadata-data-dictionary/"
+    )
 
 
 def test_start_here_existing_export_route_is_navigable(

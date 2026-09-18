@@ -39,6 +39,7 @@ GUIDES = {
     "first-analysis.md",
     "validate-dataset.md",
     "research-project-scaffold.md",
+    "study-metadata-data-dictionary.md",
     "bring-your-own-export.md",
     "signal-column-glossary.md",
     "troubleshooting.md",
@@ -265,6 +266,18 @@ def main() -> None:
     assert "project-scaffold.json" in scaffold_text
     assert "examples/hands-on/create-research-project-scaffold.py" in scaffold_text
 
+    dictionary = DOCS / "guides" / "study-metadata-data-dictionary.md"
+    dictionary_text = _text(dictionary)
+    assert "# Study metadata and data dictionary" in dictionary_text
+    assert "data-study-metadata-dictionary" in dictionary_text
+    assert "data-dictionary-evidence-grid" in dictionary_text
+    assert "Observed is not declared" in dictionary_text
+    assert "dictionary-manifest.json" in dictionary_text
+    assert "scientific declarations" in dictionary_text
+    assert "Acceptance conditions before analysis" in dictionary_text
+    assert "Common dictionary failures" in dictionary_text
+    assert "examples/hands-on/create-study-metadata-data-dictionary.py" in dictionary_text
+
     adaptation = DOCS / "guides" / "bring-your-own-export.md"
     adaptation_text = _text(adaptation)
     assert "# Bring your own export safely" in adaptation_text
@@ -359,6 +372,7 @@ def main() -> None:
         "- Hands-on end-to-end EDA: workflows/end-to-end-eda-research.md",
         "- Hands-on EDA research guide: guides/hands-on-eda-research.md",
         "- Research project scaffold: guides/research-project-scaffold.md",
+        "- Study metadata and data dictionary: guides/study-metadata-data-dictionary.md",
         "- Bring your own export safely: guides/bring-your-own-export.md",
         "- Signal and column glossary: guides/signal-column-glossary.md",
         "- Troubleshooting and diagnostics: guides/troubleshooting.md",
