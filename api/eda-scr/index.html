@@ -1,0 +1,6409 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Scientific Python workflows, Python-native methods and gpbiometricspy Studio for Gazepoint EDA/SCR, PPG/HRV, pupil, gaze, AOI and multimodal research.">
+      
+      
+        <meta name="author" content="Stefanos Balaskas">
+      
+      
+        <link rel="canonical" href="https://stefanosbalaskas.github.io/gpbiometricspy/api/eda-scr/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../ppg-hrv/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>EDA / GSR / SCR - gpbiometricspy</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/product.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/api.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/experience.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#eda-gsr-scr" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="gpbiometricspy" class="md-header__button md-logo" aria-label="gpbiometricspy" data-md-component="logo">
+      
+  <img src="../../assets/python-suite-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            gpbiometricspy
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              EDA / GSR / SCR
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/stefanosbalaskas/gpbiometricspy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    stefanosbalaskas/gpbiometricspy
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../start-here/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Start here
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../studio/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Studio
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../workflows/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Workflows
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../methods/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Methods
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../learning-paths/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Learn & reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../parity/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Validation & trust
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../release-0.1.7/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Release & development
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="gpbiometricspy" class="md-nav__button md-logo" aria-label="gpbiometricspy" data-md-component="logo">
+      
+  <img src="../../assets/python-suite-logo.png" alt="logo">
+
+    </a>
+    gpbiometricspy
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/stefanosbalaskas/gpbiometricspy" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    stefanosbalaskas/gpbiometricspy
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../start-here/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start here
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studio
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Studio
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../studio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studio overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting started with Python
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synthetic demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../studio-deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment & support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../studio-product-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Studio 0.1.6 roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflows/end-to-end-eda-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hands-on end-to-end EDA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../guides/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/hands-on-eda-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hands-on EDA research guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/first-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    First analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/validate-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validate a new dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/research-project-scaffold/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research project scaffold
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/study-metadata-data-dictionary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Study metadata and data dictionary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/bring-your-own-export/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bring your own export safely
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/signal-column-glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signal and column glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting and diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/timebase-alignment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timebase and alignment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/reporting-reproducibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting and reproducibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/model-selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choose a modelling strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../examples/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/end-to-end-eda/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    End-to-end runnable EDA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/eda-scr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA / GSR / SCR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/ppg-hrv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPG / HRV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pupil-gaze/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pupil / gaze / AOI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal alignment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/quality-reporting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality control + reporting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/interoperability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interoperability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../methods/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Methods
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Methods
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/timebase-provenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Timebase provenance and multimodal alignment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/cardiac-source-provenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cardiac variability source provenance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/grouped-mixed-boosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Grouped mixed-effects boosting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/grouped-ordinal-boosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Grouped ordinal mixed-effects boosting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/hierarchical-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hierarchical location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/robust-hierarchical-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Robust Student-t location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/random-slope-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Random-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/random-scale-slope-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Random scale-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/joint-random-slopes-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Joint random-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/crossed-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossed participant–item location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/crossed-random-slopes-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossed participant–item random-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/crossed-random-scale-slopes-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossed participant–item random scale-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/crossed-joint-random-slopes-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crossed participant–item joint random-slope location–scale modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learn & reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learn & reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learning-paths/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning paths
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research-faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research FAQ & decision clinic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot-gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plot gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../articles/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Articles
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_4" id="__nav_6_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Articles
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../articles/python-native/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python-native explanations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_4_2" id="__nav_6_4_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Python-native explanations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/python-native/research-pipeline-blueprint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research pipeline blueprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/python-native/measurement-before-modelling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Measurement before modelling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/python-native/model-selection-location-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing a location-scale model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/python-native/reproducible-multimodal-study/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reproducible multimodal studies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_3" id="__nav_6_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start + overview
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Start + overview
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/article-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Article roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/gpbiometrics-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gpbiometrics workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/synthetic-data-showcase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Synthetic data showcase
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/plot-gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Original plot-gallery companion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_4" id="__nav_6_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA / SCR
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    EDA / SCR
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/eda-scr-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA, GSR and SCR workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/eda-scr-visual-diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA and SCR visual diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/toolbox-crosscheck-visuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Toolbox crosscheck visuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_5" id="__nav_6_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPG / HRV
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    PPG / HRV
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/ppg-hrv-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPG, IBI, HRV and respiration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/ppg-hrv-visual-diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPG and HRV visual diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_6" id="__nav_6_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pupil / gaze / AOI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pupil / gaze / AOI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/pupil-qc-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pupil and gaze QC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/eye-tracking-ecosystem-bridges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Eye-tracking ecosystem bridges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/event-alignment-aoi-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event alignment and AOI-linked biometrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_7" id="__nav_6_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design + multimodal
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design + multimodal
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/multimodal-event-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal event dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/cluster-permutation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster-permutation workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/design-audit-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design audit workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/design-release-visual-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design release visual audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_8" id="__nav_6_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QC + reporting
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    QC + reporting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/qc-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality-control workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/visual-qc-dashboard-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual QC dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/reporting-reproducibility-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reporting and reproducibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/troubleshooting-readiness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/private-real-data-smoke-testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Private real-data smoke testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_4_9" id="__nav_6_4_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interoperability
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_6_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interoperability
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/bids-export-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BIDS export workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/mne-eeg-lsl-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MNE, EEG and LSL workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/toolbox-bridges-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External toolbox bridges
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/interoperability-version-testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interoperability version testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../articles/gp3tools-compatibility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gp3tools compatibility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_5" id="__nav_6_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA / GSR / SCR
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EDA / GSR / SCR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-articles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended articles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analyze_gazepoint_ac_susceptance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_gazepoint_ac_susceptance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analyze_gazepoint_skin_potential" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_gazepoint_skin_potential
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_eda_artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_eda_artifacts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_gsr_quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_gsr_quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_gsr_units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_gsr_units
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baseline_correct_gazepoint_gsr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        baseline_correct_gazepoint_gsr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classify_gazepoint_eda_response_pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classify_gazepoint_eda_response_pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classify_gazepoint_scr_intervals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classify_gazepoint_scr_intervals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combine_gazepoint_marker_channels_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        combine_gazepoint_marker_channels_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_gazepoint_scr_habituation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_gazepoint_scr_habituation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_gazepoint_scr_latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_gazepoint_scr_latency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_gazepoint_gsr_to_conductance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_gazepoint_gsr_to_conductance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct_gazepoint_eda_temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        correct_gazepoint_eda_temperature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_gazepoint_eda_analysis_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_gazepoint_eda_analysis_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_gazepoint_pspm_glm_design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_gazepoint_pspm_glm_design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decompose_gazepoint_eda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decompose_gazepoint_eda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denoise_gazepoint_eda_autoencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        denoise_gazepoint_eda_autoencoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denoise_gazepoint_eda_wavelet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        denoise_gazepoint_eda_wavelet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_gazepoint_scr_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detect_gazepoint_scr_events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_gazepoint_scr_peaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detect_gazepoint_scr_peaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epoch_gazepoint_scr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        epoch_gazepoint_scr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#estimate_gazepoint_eda_recovery_times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        estimate_gazepoint_eda_recovery_times
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export_gazepoint_pspm_model_estimates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        export_gazepoint_pspm_model_estimates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_bilateral_eda_asymmetry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_bilateral_eda_asymmetry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_complexity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_complexity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_events_biosppy_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_events_biosppy_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_spectral_power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_spectral_power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_tvsymp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_tvsymp
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_markerinfo_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_markerinfo_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_scr_recovery_times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_scr_recovery_times
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_segments_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_segments_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag_kleckner_eda_artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag_kleckner_eda_artifacts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge_gazepoint_recordings_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_gazepoint_recordings_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model_gazepoint_eda_point_process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_gazepoint_eda_point_process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize_gazepoint_scr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalize_gazepoint_scr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimize_gazepoint_cvxeda_tau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimize_gazepoint_cvxeda_tau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_eda_decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_eda_decomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_eda_gram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_eda_gram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_scr_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_scr_events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_scr_specification_curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_scr_specification_curve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_cvxeda_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_cvxeda_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_ledalab_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_ledalab_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_neurokit_eda_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_neurokit_eda_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_pspm_dcm_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_pspm_dcm_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_pspm_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_pspm_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_scr_hurdle_model_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_scr_hurdle_model_data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocess_gazepoint_scr_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preprocess_gazepoint_scr_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_biosppy_eda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_biosppy_eda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_eda_analysis_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_eda_analysis_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_neurokit_eda_crosscheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_neurokit_eda_crosscheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_scr_multiverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_scr_multiverse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_scr_threshold_sensitivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_scr_threshold_sensitivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#screen_gazepoint_eda_nonresponders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        screen_gazepoint_eda_nonresponders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#split_gazepoint_sessions_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        split_gazepoint_sessions_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_gsr_tonic_phasic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_gsr_tonic_phasic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_gsr_windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_gsr_windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_scr_event_windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_scr_event_windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarize_gazepoint_scr_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarize_gazepoint_scr_recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trim_gazepoint_biometrics_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        trim_gazepoint_biometrics_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ppg-hrv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPG / HRV / respiration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pupil-gaze-aoi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pupil / gaze / AOI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alignment-multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Events / alignment / multimodal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qc-reporting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QC / reporting / governance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../statistics-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Statistics / design / simulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interoperability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interoperability / exchange
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core-io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core I/O / schema
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complete 406-function reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../integrations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../citation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citation & archival
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation & trust
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Validation & trust
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../parity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parity & validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deep-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../real-data-validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Private real-data validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../qc-exclusion-decision-ledger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    QC & exclusion decision ledger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../measurement-accountability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Measurement accountability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interpretation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretation guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release & development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Release & development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release-0.1.7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release 0.1.7
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release-0.1.6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release 0.1.6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release-0.1.5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release 0.1.5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-articles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended articles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#analyze_gazepoint_ac_susceptance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_gazepoint_ac_susceptance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#analyze_gazepoint_skin_potential" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_gazepoint_skin_potential
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_eda_artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_eda_artifacts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_gsr_quality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_gsr_quality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit_gazepoint_gsr_units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        audit_gazepoint_gsr_units
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baseline_correct_gazepoint_gsr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        baseline_correct_gazepoint_gsr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classify_gazepoint_eda_response_pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classify_gazepoint_eda_response_pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#classify_gazepoint_scr_intervals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classify_gazepoint_scr_intervals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combine_gazepoint_marker_channels_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        combine_gazepoint_marker_channels_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_gazepoint_scr_habituation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_gazepoint_scr_habituation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute_gazepoint_scr_latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_gazepoint_scr_latency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert_gazepoint_gsr_to_conductance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        convert_gazepoint_gsr_to_conductance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct_gazepoint_eda_temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        correct_gazepoint_eda_temperature
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_gazepoint_eda_analysis_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_gazepoint_eda_analysis_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create_gazepoint_pspm_glm_design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_gazepoint_pspm_glm_design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decompose_gazepoint_eda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decompose_gazepoint_eda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denoise_gazepoint_eda_autoencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        denoise_gazepoint_eda_autoencoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#denoise_gazepoint_eda_wavelet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        denoise_gazepoint_eda_wavelet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_gazepoint_scr_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detect_gazepoint_scr_events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#detect_gazepoint_scr_peaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        detect_gazepoint_scr_peaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epoch_gazepoint_scr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        epoch_gazepoint_scr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#estimate_gazepoint_eda_recovery_times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        estimate_gazepoint_eda_recovery_times
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#export_gazepoint_pspm_model_estimates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        export_gazepoint_pspm_model_estimates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_bilateral_eda_asymmetry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_bilateral_eda_asymmetry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_complexity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_complexity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_events_biosppy_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_events_biosppy_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_spectral_power" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_spectral_power
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_eda_tvsymp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_eda_tvsymp
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_markerinfo_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_markerinfo_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_scr_recovery_times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_scr_recovery_times
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract_gazepoint_segments_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        extract_gazepoint_segments_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag_kleckner_eda_artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag_kleckner_eda_artifacts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#merge_gazepoint_recordings_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        merge_gazepoint_recordings_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model_gazepoint_eda_point_process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model_gazepoint_eda_point_process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#normalize_gazepoint_scr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalize_gazepoint_scr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimize_gazepoint_cvxeda_tau" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimize_gazepoint_cvxeda_tau
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_eda_decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_eda_decomposition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_eda_gram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_eda_gram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_scr_events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_scr_events
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plot_gazepoint_scr_specification_curve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_gazepoint_scr_specification_curve
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_cvxeda_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_cvxeda_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_ledalab_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_ledalab_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_neurokit_eda_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_neurokit_eda_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_pspm_dcm_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_pspm_dcm_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_pspm_input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_pspm_input
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prepare_gazepoint_scr_hurdle_model_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        prepare_gazepoint_scr_hurdle_model_data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocess_gazepoint_scr_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        preprocess_gazepoint_scr_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_biosppy_eda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_biosppy_eda
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_eda_analysis_pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_eda_analysis_pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_neurokit_eda_crosscheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_neurokit_eda_crosscheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_scr_multiverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_scr_multiverse
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run_gazepoint_scr_threshold_sensitivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_gazepoint_scr_threshold_sensitivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#screen_gazepoint_eda_nonresponders" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        screen_gazepoint_eda_nonresponders
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#split_gazepoint_sessions_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        split_gazepoint_sessions_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_gsr_tonic_phasic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_gsr_tonic_phasic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_gsr_windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_gsr_windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarise_gazepoint_scr_event_windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarise_gazepoint_scr_event_windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#summarize_gazepoint_scr_recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summarize_gazepoint_scr_recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trim_gazepoint_biometrics_pspm_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        trim_gazepoint_biometrics_pspm_style
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../learning-paths/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Learn & reference
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    API
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+    
+      
+    
+    <a href="https://github.com/stefanosbalaskas/gpbiometricspy/raw/main/docs/api/eda-scr.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="eda-gsr-scr">EDA / GSR / SCR<a class="headerlink" href="#eda-gsr-scr" title="Permanent link">&para;</a></h1>
+<p>Electrodermal preprocessing, artifacts, decomposition, response detection, event windows, and EDA-oriented toolbox bridges.</p>
+<p><strong>59 functions</strong> from the frozen 406-function contract are routed here by the documentation classifier.</p>
+<div class="gp-api-domain-links">
+<a class="md-button md-button--primary" href="../examples/eda-scr/">Open workflow</a>
+<a class="md-button" href="../">All API domains</a>
+<a class="md-button" href="../reference/">Complete reference</a>
+</div>
+
+<h2 id="recommended-articles">Recommended articles<a class="headerlink" href="#recommended-articles" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../articles/eda-scr-workflow/">EDA, GSR, and SCR workflow</a></li>
+<li><a href="../../articles/eda-scr-visual-diagnostics/">EDA and SCR visual diagnostics</a></li>
+<li><a href="../../articles/toolbox-bridges-workflow/">External toolbox bridges</a></li>
+</ul>
+<h2 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h2>
+<p><a id="analyze_gazepoint_ac_susceptance"></a></p>
+<h3 id="analyze_gazepoint_ac_susceptance"><code>analyze_gazepoint_ac_susceptance</code><a class="headerlink" href="#analyze_gazepoint_ac_susceptance" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">analyze_gazepoint_ac_susceptance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">conductance_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">susceptance_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">admittance_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phase_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frequency_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="analyze_gazepoint_skin_potential"></a></p>
+<h3 id="analyze_gazepoint_skin_potential"><code>analyze_gazepoint_skin_potential</code><a class="headerlink" href="#analyze_gazepoint_skin_potential" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">analyze_gazepoint_skin_potential</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">sp_col</span><span class="p">,</span> <span class="n">time_col</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_direction</span><span class="o">=</span><span class="s1">'both'</span><span class="p">,</span> <span class="n">response_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_response_distance_s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="audit_gazepoint_eda_artifacts"></a></p>
+<h3 id="audit_gazepoint_eda_artifacts"><code>audit_gazepoint_eda_artifacts</code><a class="headerlink" href="#audit_gazepoint_eda_artifacts" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">audit_gazepoint_eda_artifacts</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefer_gsr_us</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">jump_threshold_sd</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">slope_threshold_sd</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">flat_run_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">zero_run_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">saturation_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">saturation_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">negative_allowed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="audit_gazepoint_gsr_quality"></a></p>
+<h3 id="audit_gazepoint_gsr_quality"><code>audit_gazepoint_gsr_quality</code><a class="headerlink" href="#audit_gazepoint_gsr_quality" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">audit_gazepoint_gsr_quality</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">value_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validity_column</span><span class="o">=</span><span class="s1">'GSRV'</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">jump_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="audit_gazepoint_gsr_units"></a></p>
+<h3 id="audit_gazepoint_gsr_units"><code>audit_gazepoint_gsr_units</code><a class="headerlink" href="#audit_gazepoint_gsr_units" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">audit_gazepoint_gsr_units</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">gsr_col</span><span class="o">=</span><span class="s1">'GSR'</span><span class="p">,</span> <span class="n">convert</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resistance_to_us_factor</span><span class="o">=</span><span class="mi">1000000</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="baseline_correct_gazepoint_gsr"></a></p>
+<h3 id="baseline_correct_gazepoint_gsr"><code>baseline_correct_gazepoint_gsr</code><a class="headerlink" href="#baseline_correct_gazepoint_gsr" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">baseline_correct_gazepoint_gsr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">baseline_rows</span><span class="p">,</span> <span class="n">value_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validity_column</span><span class="o">=</span><span class="s1">'GSRV'</span><span class="p">,</span> <span class="n">group_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">exclude_zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="classify_gazepoint_eda_response_pattern"></a></p>
+<h3 id="classify_gazepoint_eda_response_pattern"><code>classify_gazepoint_eda_response_pattern</code><a class="headerlink" href="#classify_gazepoint_eda_response_pattern" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">classify_gazepoint_eda_response_pattern</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">response_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">summary_function</span><span class="o">=</span><span class="s1">'max_abs'</span><span class="p">,</span> <span class="n">no_response_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">low_response_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">moderate_response_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="classify_gazepoint_scr_intervals"></a></p>
+<h3 id="classify_gazepoint_scr_intervals"><code>classify_gazepoint_scr_intervals</code><a class="headerlink" href="#classify_gazepoint_scr_intervals" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">classify_gazepoint_scr_intervals</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">response_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stimulus_onset_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latency_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="s1">'scr_interval'</span><span class="p">,</span> <span class="n">latency_output_col</span><span class="o">=</span><span class="s1">'scr_latency_s'</span><span class="p">,</span> <span class="n">fir</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sir</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">tir</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div>
+<p><a id="combine_gazepoint_marker_channels_pspm_style"></a></p>
+<h3 id="combine_gazepoint_marker_channels_pspm_style"><code>combine_gazepoint_marker_channels_pspm_style</code><a class="headerlink" href="#combine_gazepoint_marker_channels_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">combine_gazepoint_marker_channels_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">marker_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">combined_col</span><span class="o">=</span><span class="s1">'pspm_marker'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="compute_gazepoint_scr_habituation"></a></p>
+<h3 id="compute_gazepoint_scr_habituation"><code>compute_gazepoint_scr_habituation</code><a class="headerlink" href="#compute_gazepoint_scr_habituation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">compute_gazepoint_scr_habituation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">amplitude_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trial_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">subject_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'linear'</span><span class="p">,</span> <span class="n">min_trials</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="compute_gazepoint_scr_latency"></a></p>
+<h3 id="compute_gazepoint_scr_latency"><code>compute_gazepoint_scr_latency</code><a class="headerlink" href="#compute_gazepoint_scr_latency" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">compute_gazepoint_scr_latency</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">baseline_window_s</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">response_window_s</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">onset_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">recovery_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="convert_gazepoint_gsr_to_conductance"></a></p>
+<h3 id="convert_gazepoint_gsr_to_conductance"><code>convert_gazepoint_gsr_to_conductance</code><a class="headerlink" href="#convert_gazepoint_gsr_to_conductance" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">convert_gazepoint_gsr_to_conductance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gsr_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">input_unit</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="correct_gazepoint_eda_temperature"></a></p>
+<h3 id="correct_gazepoint_eda_temperature"><code>correct_gazepoint_eda_temperature</code><a class="headerlink" href="#correct_gazepoint_eda_temperature" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">correct_gazepoint_eda_temperature</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">temperature_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="s1">'eda_temperature_adjusted'</span><span class="p">,</span> <span class="n">fitted_col</span><span class="o">=</span><span class="s1">'eda_temperature_fitted'</span><span class="p">,</span> <span class="n">model_by_group</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">add_intercept_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="create_gazepoint_eda_analysis_pipeline"></a></p>
+<h3 id="create_gazepoint_eda_analysis_pipeline"><code>create_gazepoint_eda_analysis_pipeline</code><a class="headerlink" href="#create_gazepoint_eda_analysis_pipeline" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">create_gazepoint_eda_analysis_pipeline</span><span class="p">(</span><span class="n">include_external_bridges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_model_templates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_reporting_guidance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">'compact'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="create_gazepoint_pspm_glm_design"></a></p>
+<h3 id="create_gazepoint_pspm_glm_design"><code>create_gazepoint_pspm_glm_design</code><a class="headerlink" href="#create_gazepoint_pspm_glm_design" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">create_gazepoint_pspm_glm_design</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">onset_col</span><span class="o">=</span><span class="s1">'onset_time_s'</span><span class="p">,</span> <span class="n">condition_col</span><span class="o">=</span><span class="s1">'condition'</span><span class="p">,</span> <span class="n">duration_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s1">'scr'</span><span class="p">,</span> <span class="n">response_length_s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">include_derivative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">add_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="decompose_gazepoint_eda"></a></p>
+<h3 id="decompose_gazepoint_eda"><code>decompose_gazepoint_eda</code><a class="headerlink" href="#decompose_gazepoint_eda" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">decompose_gazepoint_eda</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tonic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phasic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">output_prefix</span><span class="o">=</span><span class="s1">'eda'</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="denoise_gazepoint_eda_autoencoder"></a></p>
+<h3 id="denoise_gazepoint_eda_autoencoder"><code>denoise_gazepoint_eda_autoencoder</code><a class="headerlink" href="#denoise_gazepoint_eda_autoencoder" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">denoise_gazepoint_eda_autoencoder</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window_samples</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="denoise_gazepoint_eda_wavelet"></a></p>
+<h3 id="denoise_gazepoint_eda_wavelet"><code>denoise_gazepoint_eda_wavelet</code><a class="headerlink" href="#denoise_gazepoint_eda_wavelet" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">denoise_gazepoint_eda_wavelet</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">threshold_multiplier</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="detect_gazepoint_scr_events"></a></p>
+<h3 id="detect_gazepoint_scr_events"><code>detect_gazepoint_scr_events</code><a class="headerlink" href="#detect_gazepoint_scr_events" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">detect_gazepoint_scr_events</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">phasic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_peak_distance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">31</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="detect_gazepoint_scr_peaks"></a></p>
+<h3 id="detect_gazepoint_scr_peaks"><code>detect_gazepoint_scr_peaks</code><a class="headerlink" href="#detect_gazepoint_scr_peaks" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">detect_gazepoint_scr_peaks</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phasic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefer_vendor_phasic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">amplitude_min</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">recovery_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">smooth_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_peak_distance</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="epoch_gazepoint_scr"></a></p>
+<h3 id="epoch_gazepoint_scr"><code>epoch_gazepoint_scr</code><a class="headerlink" href="#epoch_gazepoint_scr" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">epoch_gazepoint_scr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">baseline_window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_amplitude</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">min_distance_s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="estimate_gazepoint_eda_recovery_times"></a></p>
+<h3 id="estimate_gazepoint_eda_recovery_times"><code>estimate_gazepoint_eda_recovery_times</code><a class="headerlink" href="#estimate_gazepoint_eda_recovery_times" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">estimate_gazepoint_eda_recovery_times</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recovery_prop</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_recovery_seconds</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="export_gazepoint_pspm_model_estimates"></a></p>
+<h3 id="export_gazepoint_pspm_model_estimates"><code>export_gazepoint_pspm_model_estimates</code><a class="headerlink" href="#export_gazepoint_pspm_model_estimates" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">export_gazepoint_pspm_model_estimates</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_predictions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_bilateral_eda_asymmetry"></a></p>
+<h3 id="extract_gazepoint_bilateral_eda_asymmetry"><code>extract_gazepoint_bilateral_eda_asymmetry</code><a class="headerlink" href="#extract_gazepoint_bilateral_eda_asymmetry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">extract_gazepoint_bilateral_eda_asymmetry</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">left_col</span><span class="p">,</span> <span class="n">right_col</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_prefix</span><span class="o">=</span><span class="s1">'beda'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_eda_complexity"></a></p>
+<h3 id="extract_gazepoint_eda_complexity"><code>extract_gazepoint_eda_complexity</code><a class="headerlink" href="#extract_gazepoint_eda_complexity" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">extract_gazepoint_eda_complexity</span><span class="p">(</span><span class="n">dat</span><span class="p">:</span> <span class="s1">'pd.DataFrame'</span><span class="p">,</span> <span class="n">eda_col</span><span class="p">:</span> <span class="s1">'str'</span> <span class="o">=</span> <span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">group_cols</span><span class="p">:</span> <span class="s1">'Iterable[str] | None'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">min_samples</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">sampen_m</span><span class="p">:</span> <span class="s1">'int'</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sampen_r_multiplier</span><span class="p">:</span> <span class="s1">'float'</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_eda_events_biosppy_style"></a></p>
+<h3 id="extract_gazepoint_eda_events_biosppy_style"><code>extract_gazepoint_eda_events_biosppy_style</code><a class="headerlink" href="#extract_gazepoint_eda_events_biosppy_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">extract_gazepoint_eda_events_biosppy_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smoothing_seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_distance_seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">onset_window_seconds</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_eda_spectral_power"></a></p>
+<h3 id="extract_gazepoint_eda_spectral_power"><code>extract_gazepoint_eda_spectral_power</code><a class="headerlink" href="#extract_gazepoint_eda_spectral_power" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">extract_gazepoint_eda_spectral_power</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="p">(</span><span class="mf">0.045</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span> <span class="n">min_samples</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_eda_tvsymp"></a></p>
+<h3 id="extract_gazepoint_eda_tvsymp"><code>extract_gazepoint_eda_tvsymp</code><a class="headerlink" href="#extract_gazepoint_eda_tvsymp" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">extract_gazepoint_eda_tvsymp</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="p">(</span><span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.24</span><span class="p">),</span> <span class="n">window_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">step_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_valid_fraction</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">normalise</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_markerinfo_pspm_style"></a></p>
+<h3 id="extract_gazepoint_markerinfo_pspm_style"><code>extract_gazepoint_markerinfo_pspm_style</code><a class="headerlink" href="#extract_gazepoint_markerinfo_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">extract_gazepoint_markerinfo_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">marker_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">'rising'</span><span class="p">,</span> <span class="n">nonzero_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_scr_recovery_times"></a></p>
+<h3 id="extract_gazepoint_scr_recovery_times"><code>extract_gazepoint_scr_recovery_times</code><a class="headerlink" href="#extract_gazepoint_scr_recovery_times" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">extract_gazepoint_scr_recovery_times</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">event_onset_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pre_onset_baseline_s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">peak_window_s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">recovery_window_s</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="extract_gazepoint_segments_pspm_style"></a></p>
+<h3 id="extract_gazepoint_segments_pspm_style"><code>extract_gazepoint_segments_pspm_style</code><a class="headerlink" href="#extract_gazepoint_segments_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">extract_gazepoint_segments_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">signal_col</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="s1">'onset_time_s'</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pre_s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">post_s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">baseline_window</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">baseline_correct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="flag_kleckner_eda_artifacts"></a></p>
+<h3 id="flag_kleckner_eda_artifacts"><code>flag_kleckner_eda_artifacts</code><a class="headerlink" href="#flag_kleckner_eda_artifacts" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">flag_kleckner_eda_artifacts</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_us</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_us</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_abs_percent_change_per_second</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">transition_padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_prefix</span><span class="o">=</span><span class="s1">'kleckner'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="merge_gazepoint_recordings_pspm_style"></a></p>
+<h3 id="merge_gazepoint_recordings_pspm_style"><code>merge_gazepoint_recordings_pspm_style</code><a class="headerlink" href="#merge_gazepoint_recordings_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">merge_gazepoint_recordings_pspm_style</span><span class="p">(</span><span class="n">recordings</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gap_seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">recording_col</span><span class="o">=</span><span class="s1">'pspm_recording'</span><span class="p">,</span> <span class="n">reset_first_time</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="model_gazepoint_eda_point_process"></a></p>
+<h3 id="model_gazepoint_eda_point_process"><code>model_gazepoint_eda_point_process</code><a class="headerlink" href="#model_gazepoint_eda_point_process" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">model_gazepoint_eda_point_process</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_indicator_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">derivative_mad_multiplier</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">min_event_distance_s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="normalize_gazepoint_scr"></a></p>
+<h3 id="normalize_gazepoint_scr"><code>normalize_gazepoint_scr</code><a class="headerlink" href="#normalize_gazepoint_scr" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">normalize_gazepoint_scr</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'z'</span><span class="p">,</span> <span class="n">amplitude_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_col</span><span class="o">=</span><span class="s1">'scr_amplitude_normalized'</span><span class="p">,</span> <span class="n">na_rm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="optimize_gazepoint_cvxeda_tau"></a></p>
+<h3 id="optimize_gazepoint_cvxeda_tau"><code>optimize_gazepoint_cvxeda_tau</code><a class="headerlink" href="#optimize_gazepoint_cvxeda_tau" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">optimize_gazepoint_cvxeda_tau</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tau0_grid</span><span class="o">=</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span>  <span class="p">,</span> <span class="mf">2.25</span><span class="p">,</span> <span class="mf">2.5</span> <span class="p">,</span> <span class="mf">2.75</span><span class="p">,</span> <span class="mf">3.</span>  <span class="p">,</span> <span class="mf">3.25</span><span class="p">,</span> <span class="mf">3.5</span> <span class="p">,</span> <span class="mf">3.75</span><span class="p">,</span> <span class="mf">4.</span>  <span class="p">]),</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ridge_lambda</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_irf_seconds</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="plot_gazepoint_eda_decomposition"></a></p>
+<h3 id="plot_gazepoint_eda_decomposition"><code>plot_gazepoint_eda_decomposition</code><a class="headerlink" href="#plot_gazepoint_eda_decomposition" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">plot_gazepoint_eda_decomposition</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">standardise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="plot_gazepoint_eda_gram"></a></p>
+<h3 id="plot_gazepoint_eda_gram"><code>plot_gazepoint_eda_gram</code><a class="headerlink" href="#plot_gazepoint_eda_gram" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">plot_gazepoint_eda_gram</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_id_to_plot</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">step_seconds</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">frequency_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">frequency_bins</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">log_power</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">main</span><span class="o">=</span><span class="s1">'EDA-gram'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="plot_gazepoint_scr_events"></a></p>
+<h3 id="plot_gazepoint_scr_events"><code>plot_gazepoint_scr_events</code><a class="headerlink" href="#plot_gazepoint_scr_events" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="n">plot_gazepoint_scr_events</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scr_peaks</span><span class="p">,</span> <span class="n">event_windows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phasic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_events</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_points</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="plot_gazepoint_scr_specification_curve"></a></p>
+<h3 id="plot_gazepoint_scr_specification_curve"><code>plot_gazepoint_scr_specification_curve</code><a class="headerlink" href="#plot_gazepoint_scr_specification_curve" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="n">plot_gazepoint_scr_specification_curve</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">estimate_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">specification_col</span><span class="o">=</span><span class="s1">'specification_id'</span><span class="p">,</span> <span class="n">add_zero_line</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">main</span><span class="o">=</span><span class="s1">'SCR specification curve'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_cvxeda_input"></a></p>
+<h3 id="prepare_gazepoint_cvxeda_input"><code>prepare_gazepoint_cvxeda_input</code><a class="headerlink" href="#prepare_gazepoint_cvxeda_input" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">prepare_gazepoint_cvxeda_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_ledalab_input"></a></p>
+<h3 id="prepare_gazepoint_ledalab_input"><code>prepare_gazepoint_ledalab_input</code><a class="headerlink" href="#prepare_gazepoint_ledalab_input" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">prepare_gazepoint_ledalab_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_neurokit_eda_input"></a></p>
+<h3 id="prepare_gazepoint_neurokit_eda_input"><code>prepare_gazepoint_neurokit_eda_input</code><a class="headerlink" href="#prepare_gazepoint_neurokit_eda_input" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">prepare_gazepoint_neurokit_eda_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">'gazepoint_neurokit_eda'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_pspm_dcm_input"></a></p>
+<h3 id="prepare_gazepoint_pspm_dcm_input"><code>prepare_gazepoint_pspm_dcm_input</code><a class="headerlink" href="#prepare_gazepoint_pspm_dcm_input" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="n">prepare_gazepoint_pspm_dcm_input</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'CNT'</span><span class="p">,</span> <span class="n">event_onset_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_duration_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_name_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">participant_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">'gazepoint_pspm_dcm'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_pspm_input"></a></p>
+<h3 id="prepare_gazepoint_pspm_input"><code>prepare_gazepoint_pspm_input</code><a class="headerlink" href="#prepare_gazepoint_pspm_input" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">prepare_gazepoint_pspm_input</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="prepare_gazepoint_scr_hurdle_model_data"></a></p>
+<h3 id="prepare_gazepoint_scr_hurdle_model_data"><code>prepare_gazepoint_scr_hurdle_model_data</code><a class="headerlink" href="#prepare_gazepoint_scr_hurdle_model_data" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">prepare_gazepoint_scr_hurdle_model_data</span><span class="p">(</span><span class="n">scr_event_windows</span><span class="p">,</span> <span class="n">response_col</span><span class="o">=</span><span class="s1">'response_flag'</span><span class="p">,</span> <span class="n">amplitude_col</span><span class="o">=</span><span class="s1">'scr_amplitude'</span><span class="p">,</span> <span class="n">latency_col</span><span class="o">=</span><span class="s1">'scr_latency'</span><span class="p">,</span> <span class="n">rise_time_col</span><span class="o">=</span><span class="s1">'scr_rise_time'</span><span class="p">,</span> <span class="n">recovery_time_col</span><span class="o">=</span><span class="s1">'scr_recovery_time'</span><span class="p">,</span> <span class="n">predictor_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">factor_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">numeric_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="s1">'event_id'</span><span class="p">,</span> <span class="n">amplitude_transform</span><span class="o">=</span><span class="s1">'none'</span><span class="p">,</span> <span class="n">amplitude_offset</span><span class="o">=</span><span class="mf">1e-06</span><span class="p">,</span> <span class="n">drop_missing_predictors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="preprocess_gazepoint_scr_pspm_style"></a></p>
+<h3 id="preprocess_gazepoint_scr_pspm_style"><code>preprocess_gazepoint_scr_pspm_style</code><a class="headerlink" href="#preprocess_gazepoint_scr_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">preprocess_gazepoint_scr_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">slope_limit_per_s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">clipping_tolerance</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">,</span> <span class="n">clipping_seconds</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_valid_island_seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">artifact_epoch_seconds</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">smoothing_seconds</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="run_gazepoint_biosppy_eda"></a></p>
+<h3 id="run_gazepoint_biosppy_eda"><code>run_gazepoint_biosppy_eda</code><a class="headerlink" href="#run_gazepoint_biosppy_eda" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="n">run_gazepoint_biosppy_eda</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate_hz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smoothing_seconds</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="run_gazepoint_eda_analysis_pipeline"></a></p>
+<h3 id="run_gazepoint_eda_analysis_pipeline"><code>run_gazepoint_eda_analysis_pipeline</code><a class="headerlink" href="#run_gazepoint_eda_analysis_pipeline" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="n">run_gazepoint_eda_analysis_pipeline</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">baseline_window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_windows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lag_signal_pair</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">convert_resistance_to_us</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prepare_external_bridges</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bridge_methods</span><span class="o">=</span><span class="p">(</span><span class="s1">'neurokit'</span><span class="p">,</span> <span class="s1">'cvxeda'</span><span class="p">,</span> <span class="s1">'ledalab'</span><span class="p">,</span> <span class="s1">'pspm'</span><span class="p">),</span> <span class="n">prepare_model_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">create_reports</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">'gazepoint_eda_pipeline'</span><span class="p">,</span> <span class="n">continue_on_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="run_gazepoint_neurokit_eda_crosscheck"></a></p>
+<h3 id="run_gazepoint_neurokit_eda_crosscheck"><code>run_gazepoint_neurokit_eda_crosscheck</code><a class="headerlink" href="#run_gazepoint_neurokit_eda_crosscheck" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="n">run_gazepoint_neurokit_eda_crosscheck</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">eda_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">python</span><span class="o">=</span><span class="s1">'python'</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">'gazepoint_neurokit_crosscheck'</span><span class="p">,</span> <span class="n">keep_files</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="run_gazepoint_scr_multiverse"></a></p>
+<h3 id="run_gazepoint_scr_multiverse"><code>run_gazepoint_scr_multiverse</code><a class="headerlink" href="#run_gazepoint_scr_multiverse" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="n">run_gazepoint_scr_multiverse</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="s1">'GSR_US'</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="s1">'time'</span><span class="p">,</span> <span class="n">trial_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">participant_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latency_windows</span><span class="o">=</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span> <span class="n">thresholds</span><span class="o">=</span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">baseline_methods</span><span class="o">=</span><span class="p">(</span><span class="s1">'median'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">),</span> <span class="n">baseline_window</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">response_metrics</span><span class="o">=</span><span class="p">(</span><span class="s1">'max_minus_baseline'</span><span class="p">,),</span> <span class="n">model_function</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="run_gazepoint_scr_threshold_sensitivity"></a></p>
+<h3 id="run_gazepoint_scr_threshold_sensitivity"><code>run_gazepoint_scr_threshold_sensitivity</code><a class="headerlink" href="#run_gazepoint_scr_threshold_sensitivity" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="n">run_gazepoint_scr_threshold_sensitivity</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">phasic_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitude_min_values</span><span class="o">=</span><span class="p">(</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">),</span> <span class="n">min_peak_distance_values</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="n">recovery_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">smooth_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_label_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ttl_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ttl_valid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_detection</span><span class="o">=</span><span class="s1">'rising'</span><span class="p">,</span> <span class="n">analysis_window</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">response_window</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">peak_selection</span><span class="o">=</span><span class="s1">'largest_amplitude'</span><span class="p">,</span> <span class="n">collapse_simultaneous_events</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_event_windows</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">keep_objects</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="screen_gazepoint_eda_nonresponders"></a></p>
+<h3 id="screen_gazepoint_eda_nonresponders"><code>screen_gazepoint_eda_nonresponders</code><a class="headerlink" href="#screen_gazepoint_eda_nonresponders" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="n">screen_gazepoint_eda_nonresponders</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">response_col</span><span class="o">=</span><span class="s1">'response_flag'</span><span class="p">,</span> <span class="n">amplitude_col</span><span class="o">=</span><span class="s1">'scr_amplitude'</span><span class="p">,</span> <span class="n">min_events</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_response_events</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_response_rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">min_detected_peaks</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="split_gazepoint_sessions_pspm_style"></a></p>
+<h3 id="split_gazepoint_sessions_pspm_style"><code>split_gazepoint_sessions_pspm_style</code><a class="headerlink" href="#split_gazepoint_sessions_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="n">split_gazepoint_sessions_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gap_seconds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">session_col</span><span class="o">=</span><span class="s1">'pspm_session'</span><span class="p">,</span> <span class="n">reset_time</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="summarise_gazepoint_gsr_tonic_phasic"></a></p>
+<h3 id="summarise_gazepoint_gsr_tonic_phasic"><code>summarise_gazepoint_gsr_tonic_phasic</code><a class="headerlink" href="#summarise_gazepoint_gsr_tonic_phasic" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a><span class="n">summarise_gazepoint_gsr_tonic_phasic</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gsr_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window_n</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">peak_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_prefix</span><span class="o">=</span><span class="s1">'gsr'</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="summarise_gazepoint_gsr_windows"></a></p>
+<h3 id="summarise_gazepoint_gsr_windows"><code>summarise_gazepoint_gsr_windows</code><a class="headerlink" href="#summarise_gazepoint_gsr_windows" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="n">summarise_gazepoint_gsr_windows</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">group_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validity_column</span><span class="o">=</span><span class="s1">'GSRV'</span><span class="p">,</span> <span class="n">exclude_zero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="summarise_gazepoint_scr_event_windows"></a></p>
+<h3 id="summarise_gazepoint_scr_event_windows"><code>summarise_gazepoint_scr_event_windows</code><a class="headerlink" href="#summarise_gazepoint_scr_event_windows" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="n">summarise_gazepoint_scr_event_windows</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scr_peaks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_label_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ttl_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ttl_valid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_detection</span><span class="o">=</span><span class="s1">'rising'</span><span class="p">,</span> <span class="n">analysis_window</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">response_window</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">amplitude_col</span><span class="o">=</span><span class="s1">'amplitude'</span><span class="p">,</span> <span class="n">peak_time_col</span><span class="o">=</span><span class="s1">'peak_time'</span><span class="p">,</span> <span class="n">onset_time_col</span><span class="o">=</span><span class="s1">'onset_time'</span><span class="p">,</span> <span class="n">rise_time_col</span><span class="o">=</span><span class="s1">'rise_time'</span><span class="p">,</span> <span class="n">recovery_time_col</span><span class="o">=</span><span class="s1">'recovery_time_after_peak'</span><span class="p">,</span> <span class="n">peak_status_col</span><span class="o">=</span><span class="s1">'status'</span><span class="p">,</span> <span class="n">peak_selection</span><span class="o">=</span><span class="s1">'largest_amplitude'</span><span class="p">,</span> <span class="n">collapse_simultaneous_events</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="summarize_gazepoint_scr_recovery"></a></p>
+<h3 id="summarize_gazepoint_scr_recovery"><code>summarize_gazepoint_scr_recovery</code><a class="headerlink" href="#summarize_gazepoint_scr_recovery" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a><span class="n">summarize_gazepoint_scr_recovery</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">signal_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_id_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">baseline_window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">peak_window</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">recovery_fraction</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</code></pre></div>
+<p><a id="trim_gazepoint_biometrics_pspm_style"></a></p>
+<h3 id="trim_gazepoint_biometrics_pspm_style"><code>trim_gazepoint_biometrics_pspm_style</code><a class="headerlink" href="#trim_gazepoint_biometrics_pspm_style" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a><span class="n">trim_gazepoint_biometrics_pspm_style</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start_s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reset_time</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Browse by domain">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Browse by domain
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../ppg-hrv/" class="md-footer__link md-footer__link--next" aria-label="Next: PPG / HRV / respiration">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                PPG / HRV / respiration
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Stefanos Balaskas · MIT License
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/stefanosbalaskas/gpbiometricspy" target="_blank" rel="noopener" title="gpbiometricspy on GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://pypi.org/project/gpbiometricspy/" target="_blank" rel="noopener" title="gpbiometricspy on PyPI" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://doi.org/10.5281/zenodo.22150872" target="_blank" rel="noopener" title="gpbiometricspy on Zenodo" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 21H4V10h2v9h12v-9h2zM3 3h18v6H3zm6.5 8h5c.28 0 .5.22.5.5V13H9v-1.5c0-.28.22-.5.5-.5M5 5v2h14V5z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://orcid.org/0000-0003-2444-9796" target="_blank" rel="noopener" title="Stefanos Balaskas on ORCID" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M294.7 188.2h-45.9V342h47.5c67.6 0 83.1-51.3 83.1-76.9 0-41.6-26.5-76.9-84.7-76.9M256 8a248 248 0 1 0 0 496 248 248 0 1 0 0-496m-80.8 360.8h-29.8V161.3h29.8zM160.3 98.5a19.6 19.6 0 1 1 0 39.2 19.6 19.6 0 1 1 0-39.2M300 369h-81V161.3h80.6c76.7 0 110.4 54.8 110.4 103.9 0 53.3-41.7 103.9-110 103.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.indexes", "navigation.path", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "search.share", "content.action.view", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/api-filter.js"></script>
+      
+    
+  </body>
+</html>
