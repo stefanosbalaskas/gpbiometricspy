@@ -7,6 +7,11 @@ from pathlib import Path
 Arc = tuple[str, int, int]
 
 
+def _normalize_path(path: object) -> str:
+    """Normalize coverage/ledger paths to repository-style POSIX separators."""
+    return str(path).replace("\\", "/")
+
+
 def _coverage_arcs(payload: dict[str, object]) -> set[Arc]:
     arcs: set[Arc] = set()
     files = payload.get("files")
@@ -18,7 +23,7 @@ def _coverage_arcs(payload: dict[str, object]) -> set[Arc]:
         for arc in entry.get("missing_branches", []):
             if not isinstance(arc, list) or len(arc) != 2:
                 raise ValueError(f"Malformed missing branch for {path!r}: {arc!r}")
-            arcs.add((str(path), int(arc[0]), int(arc[1])))
+            arcs.add((_normalize_path(path), int(arc[0]), int(arc[1])))
     return arcs
 
 
@@ -30,7 +35,7 @@ def _contract_arcs(contract: dict[str, object]) -> set[Arc]:
     for entry in entries:
         if not isinstance(entry, dict):
             raise ValueError(f"Malformed structural-debt entry: {entry!r}")
-        arc = (str(entry["file"]), int(entry["from"]), int(entry["to"]))
+        arc = (_normalize_path(entry["file"]), int(entry["from"]), int(entry["to"]))
         if arc in arcs:
             raise ValueError(f"Duplicate structural-debt entry: {arc!r}")
         rationale = entry.get("rationale")
