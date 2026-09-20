@@ -2,7 +2,7 @@
 
 Stable release **0.1.6** was published on **2026-09-11**.
 
-The release preserves the completed **406/406 implemented, 0 pending** R semantic-parity contract and freezes the stable scientific/application surface before subsequent `0.1.7.dev0` development.
+The release preserves the completed **406/406 implemented, 0 pending** R semantic-parity contract and freezes the stable scientific/application surface before subsequent `0.1.7` development.
 
 ## Frozen source and artifacts
 
@@ -60,4 +60,4 @@ Recommended release citation while the 0.1.6 version DOI is pending:
 
 ## Development after 0.1.6
 
-Repository development has returned to **`0.1.7.dev0`**. Post-release methods such as hierarchical location–scale modelling are development-line additions and do **not** retroactively modify the frozen 0.1.6 artifacts or its release evidence.
+Subsequent repository development moved to the **0.1.7** line. Post-release methods such as hierarchical location–scale modelling are development-line additions and do **not** retroactively modify the frozen 0.1.6 artifacts or its release evidence.

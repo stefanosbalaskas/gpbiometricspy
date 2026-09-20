@@ -1,3 +1,25 @@
+# Validation
+
+## 0.1.7 stable-freeze qualification — 2026-09-21
+
+Exact development-main source immediately before stable identity freeze:
+
+- commit: `4c52b7c5fa20ab4e9981c9770baa79481f46c39f`
+- exports: **406 / 406 implemented, 0 pending**
+- test matrix: **12 / 12** OS/Python lanes green
+- canonical scientific suite: **855 / 855 passed**
+- statement coverage: **15,171 / 15,171 = 100.00%**
+- raw branch coverage: **7,159 / 7,178 = 99.7353%**
+- reviewed residual branch arcs: **19**
+- unexpected / stale / unaudited debt: **0 / 0 / 0**
+- audited branch accounting: **7,178 / 7,178 = 100.0000%**
+- exact-main docs, CodeQL, deep parity, interoperability and privacy-safe real-data validation: **green**
+- Windows/POSIX structural-debt path normalization regression: **green**
+- scientific 19-arc ledger: **unchanged**
+
+The stable `0.1.7` source must still pass the protected release pull-request and exact-main workflow gates before immutable tag/publication.
+
+
 # gpbiometricspy validation status
 
 Frozen semantic reference: **gpbiometrics 2.0.0**.

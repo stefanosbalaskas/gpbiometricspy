@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.7 — 2026-09-21 — exact-main validation and cross-platform release hardening
+
+- preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports**;
+- freezes the exact-main scientific regression suite at **855 passing tests** and literal **15,171 / 15,171 = 100.00% statement coverage**;
+- retains honest raw branch coverage at **7,159 / 7,178 = 99.7353%**, exactly **19** reviewed residual arcs, **0 unexpected / 0 stale / 0 unaudited** branch debt, and **7,178 / 7,178 = 100.0000% audited branch accounting**;
+- hardens the structural branch-debt auditor so Windows and POSIX path separators are normalized before exact arc comparison, without changing scientific code or the frozen 19-arc ledger;
+- retains the post-0.1.6 Python-native modelling, timebase/provenance, cardiac-source, grouped-prediction, documentation, research-FAQ and workflow improvements already qualified on the development line;
+- preserves the Python 3.11–3.14 cross-platform matrix, R↔Python parity, optional-backend interoperability, privacy-safe real-data validation, CodeQL, documentation and Studio release boundaries;
+- freezes stable package/runtime/Zenodo/CFF/generated-documentation identity without inventing a 0.1.7 Zenodo version DOI before genuine ingestion.
+
+## 0.1.6 — 2026-09-11 — Studio product workflow and canonical publication
+
+- preserved the frozen **406 / 406** export contract with **0 pending exports**;
+- promoted Studio into the guided project/QC/analysis/alignment/modelling/reporting workflow while retaining package-backed scientific methods;
+- froze **641 core tests**, **10,456 / 10,456 statements = 100.00%**, and **5,629 / 5,648 raw branches = 99.6636%** at release qualification;
+- retained the exact audited 19-arc branch-debt contract and the protected GitHub Release → PyPI Trusted Publishing artifact chain;
+- published immutable GitHub/PyPI release artifacts while leaving the 0.1.6 Zenodo version DOI pending independent verification.
+
 ## 0.1.5 — 2026-09-08 — measurement accountability and installed-replay hardening
 
 - preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** while promoting the qualified release line to stable **0.1.5**;

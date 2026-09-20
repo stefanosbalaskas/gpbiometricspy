@@ -19,12 +19,12 @@ Start from the research task you need to complete—not from a list of functions
 </div>
 
 <div class="gp-status-grid gp-status-grid-home">
-<div><span class="gp-status-value">0.1.6</span><span class="gp-status-label">stable release</span></div>
-<div><span class="gp-status-value">0.1.7.dev0</span><span class="gp-status-label">development line</span></div>
+<div><span class="gp-status-value">0.1.7</span><span class="gp-status-label">stable release</span></div>
+<div><span class="gp-status-value">2026-09-21</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">850 / 850</span><span class="gp-status-label">exact-main tests</span></div>
+<div><span class="gp-status-value">855 / 855</span><span class="gp-status-label">exact-main tests</span></div>
 <div><span class="gp-status-value">99.7353%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
-<div><span class="gp-status-value">14 / 14</span><span class="gp-status-label">exact-main workflow families green</span></div>
+<div><span class="gp-status-value">12 / 12</span><span class="gp-status-label">platform/Python test lanes green</span></div>
 </div>
 
 ## Start a research project safely
@@ -185,7 +185,7 @@ Every figure below is generated from the checked-out Python package during docum
 ## Validation is part of the product
 
 <div class="gp-metric-grid">
-<div class="gp-metric-card"><strong>850 / 850</strong><span>exact-main tests</span></div>
+<div class="gp-metric-card"><strong>855 / 855</strong><span>exact-main tests</span></div>
 <div class="gp-metric-card"><strong>15,171 / 15,171</strong><span>statements exercised</span></div>
 <div class="gp-metric-card"><strong>7,159 / 7,178</strong><span>raw branches covered = 99.7353%</span></div>
 <div class="gp-metric-card"><strong>19</strong><span>audited structural/caller-dominated residual arcs</span></div>
@@ -195,16 +195,16 @@ Every figure below is generated from the checked-out Python package during docum
 <div class="gp-metric-card"><strong>14 / 14</strong><span>optional-backend interoperability lanes green</span></div>
 </div>
 
-The current scientific development baseline is PR **#136**, exact-main SHA **`e761a931b00e646d6f12be3475a68cd524803893`**. It adds crossed participant–item **joint location and log-scale random slopes** while leaving the frozen R-parity surface unchanged. All **14/14 post-merge workflow families** are green; Branch Coverage #412 evidence is artifact **10389944415**, SHA-256 `9cc448013e4be26caf22de120089ba649c928aee0989728fdbf77e5409528abf`. Formal checkpoint: PR #136 comment **5678239576**.
+The 0.1.7 release-preparation baseline is exact-main SHA **`4c52b7c5fa20ab4e9981c9770baa79481f46c39f`**. Tests #724 passed all 12 platform/Python lanes with 855/855 tests and 15,171/15,171 statements on the canonical Ubuntu/Python 3.12 lane. Branch Coverage #414 records 7,159/7,178 raw branches = 99.7353%, exactly 19 audited residual arcs, and 0 unexpected, stale, or unaudited branch debt. Docs #485, CodeQL #703, Deep Parity #713, Interoperability #712, and Private Real Data Validation #175 are green.
 
 [Inspect parity, exact-main evidence and validation layers →](deep-validation.md)
 
 !!! info "Scientific boundary"
     Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Random effects and random slopes describe modelled heterogeneity; predictive importance is not causal importance; provenance certificates bind declared evidence rather than proving sensor validity. Scientific interpretation remains constrained by acquisition quality, study design and model assumptions.
 
-## Stable release versus development line
+## Stable release 0.1.7
 
-Stable **gpbiometricspy 0.1.6** remains an immutable release line from **11 September 2026**, with **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%** at release qualification. Development metrics above describe post-release work and do not retroactively change the 0.1.6 artifacts.
+Stable **gpbiometricspy 0.1.7** is frozen on **20 September 2026** with **855 tests**, **15,171/15,171 statements = 100.00%**, **7,159/7,178 raw branches = 99.7353%**, exactly **19** audited residual arcs, and **0 unexpected / 0 stale / 0 unaudited** branch debt. Immutable GitHub/PyPI publication follows only after the stable source passes the protected release gates.
 
 <div class="gp-mini-grid">
 <a href="learning-paths/">Learning paths</a>

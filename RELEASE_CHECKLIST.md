@@ -155,5 +155,24 @@
 - [x] GitHub Release and public PyPI sdist SHA-256 match: `c57ec464bbbb4b9444646e26e2abd02ff20e0a00e2b1ab8385bdf867eaa2eb25`.
 - [x] Protected PyPI publication run `34679563693` used the canonical release artifact, passed `twine check`, generated Sigstore/Rekor attestations, and received HTTP 200 for both distribution uploads.
 - [x] Fresh public-index consumer run `34680369123` passed **4/4** clean environments: Ubuntu/Windows × Python 3.11/3.14. Every job independently verified PyPI metadata and downloaded bytes against the canonical hashes, installed `gpbiometricspy[studio]==0.1.6` only from `pypi.org`, passed `pip check`, preserved the frozen **406/406 implemented, 0 pending** scientific export contract, verified all 36 packaged synthetic demo files / 69,120 rows, passed `gpbiometricspy-studio-doctor`, and exercised both installed full/public Studio launchers.
-- [x] Return live repository package identity to the `0.1.7.dev0` development line without modifying the frozen `v0.1.6` source or release artifacts.
+- [x] Return live repository package identity to the `0.1.7` development line without modifying the frozen `v0.1.6` source or release artifacts.
 - [ ] Record the 0.1.6 Zenodo version DOI only after an actual Zenodo record can be independently verified; do not reuse the concept DOI or a prior-version DOI as a substitute.
+
+
+## 0.1.7 — stable release qualification
+
+- [x] Preserve the frozen `gpbiometrics 2.0.0` semantic contract at **406/406 implemented exports, 0 pending**.
+- [x] Exact development-main source `4c52b7c5fa20ab4e9981c9770baa79481f46c39f` passed the package/scientific release-critical workflows.
+- [x] Freeze validation evidence at **855 tests**, **15,171/15,171 statements = 100.00%**, **7,159/7,178 raw branches = 99.7353%**, exactly **19** reviewed residual arcs, and **0 unexpected / 0 stale / 0 unaudited** branch debt.
+- [x] Harden structural branch-debt path comparison across Windows and POSIX without changing scientific code or the 19-arc ledger.
+- [x] Freeze package/runtime/Zenodo/generated documentation identity to stable `0.1.7` and set `CITATION.cff` to **0.1.7 / 2026-09-21**.
+- [x] Do not invent a 0.1.7 Zenodo version DOI before genuine repository-release ingestion.
+- [ ] Require every stable-freeze pull-request workflow family to succeed on the exact stable candidate head.
+- [ ] Merge the stable freeze with a pinned expected-head SHA.
+- [ ] Require every stable-release gate to succeed on the exact merged stable `main` commit.
+- [ ] Create immutable annotated `v0.1.7` only from that exact qualified stable commit.
+- [ ] Verify canonical GitHub Release wheel, sdist, `SHA256SUMS.txt`, and `RELEASE-METADATA.json`.
+- [ ] Confirm protected PyPI Trusted Publishing publishes `gpbiometricspy==0.1.7` only from the canonical successful release artifact.
+- [ ] Verify GitHub Release and PyPI wheel/sdist SHA-256 equality.
+- [ ] Run fresh public-index installation checks.
+- [ ] Record a genuine 0.1.7 Zenodo version DOI only after independent verification.
