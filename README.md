@@ -33,7 +33,7 @@
 **Studio** is the guided application over the same scientific package functions used by the Python API:
 
 ```bash
-python -m pip install "gpbiometricspy[studio]==0.1.6"
+python -m pip install "gpbiometricspy[studio]==0.1.7"
 gpbiometricspy-studio
 ```
 
@@ -76,30 +76,25 @@ Additive Python-native methods sit outside the frozen `gpbiometrics 2.0.0` parit
 
 Use the **[model-selection guide](https://stefanosbalaskas.github.io/gpbiometricspy/guides/model-selection/)** to add complexity only when the design and scientific question require it.
 
-## Certified development baseline
+## Certified release-preparation baseline
 
-PR **#136** is formally exact-main certified at:
+The exact current-main source qualified immediately before the stable freeze is:
 
-- scientific SHA **`e761a931b00e646d6f12be3475a68cd524803893`**
-- tree **`313ce0a801daf0ae7c4b9ce7a9e0af4610094994`**
-- frozen R semantic reference **`gpbiometrics 2.0.0`**
-- **406/406** frozen exports, **0 pending**
-- Tests #634: **12/12** platform/Python lanes green
-- canonical Ubuntu 24.04.5 / CPython 3.12.14: **850/850 tests**, **15,171/15,171 statements**, Ruff/compile clean
-- Branch Coverage #412: **7,159/7,178 = 99.7353%** raw branches
-- **19** audited residual structural/caller-dominated arcs; **0 unexpected / 0 stale / 0 unaudited** debt
-- Interoperability #622: **14/14** real optional-backend lanes green
-- all **14/14 exact-main workflow families** green
-- branch artifact **10389944415**, SHA-256 **`9cc448013e4be26caf22de120089ba649c928aee0989728fdbf77e5409528abf`**
-- formal certification checkpoint: PR #136 comment **5678239576**
+- commit **`4c52b7c5fa20ab4e9981c9770baa79481f46c39f`**;
+- frozen semantic reference **`gpbiometrics 2.0.0`**;
+- **406 / 406** frozen exports implemented, **0 pending**;
+- Tests #724: **12 / 12** OS/Python matrix lanes green;
+- canonical Ubuntu / CPython 3.12.14: **855 / 855 tests**, **15,171 / 15,171 statements = 100.00%**;
+- Branch Coverage #414: **7,159 / 7,178 = 99.7353%** raw branch coverage;
+- exactly **19** reviewed residual arcs with **0 unexpected / 0 stale / 0 unaudited** branch debt;
+- audited branch accounting **7,178 / 7,178 = 100.0000%**;
+- Docs #485, CodeQL #703, Deep Parity #713, Interoperability #712 and Private Real Data Validation #175 all green.
 
-The scientific certification anchor remains `e761a931…` even when later documentation-only commits update the public website.
-
-For the evidence model and its limits, see **[Deep validation](https://stefanosbalaskas.github.io/gpbiometricspy/deep-validation/)**.
+The Windows structural-debt auditor now normalizes Windows and POSIX path separators before exact arc comparison. The audited 19-arc ledger and scientific implementation remain unchanged.
 
 ### Stable release record
 
-Stable **0.1.6** remains a separate immutable release line from **11 September 2026**. Its release qualification preserves **641 core tests**, **10,456/10,456 statements**, and **5,629/5,648 raw branches = 99.6636%**. Development metrics above do not rewrite those frozen artifacts.
+Stable **0.1.7** is frozen from this release source on **20 September 2026**. Public GitHub/PyPI publication remains fail-closed: the stable source must first pass the protected pull-request and exact-main release gates before immutable `v0.1.7` creation and Trusted Publishing.
 
 ## Interpretation boundary
 
@@ -121,9 +116,10 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 
 ## Citation and archival record
 
-Stable `gpbiometricspy 0.1.6` was released on **11 September 2026**.
+Stable `gpbiometricspy 0.1.7` is frozen on **20 September 2026**.
 
-- **0.1.6 version DOI:** pending Zenodo ingestion of `v0.1.6`; no DOI is fabricated before minting
+- **0.1.7 version DOI:** pending genuine Zenodo ingestion of `v0.1.7`; no DOI is fabricated before minting
+- **0.1.6 version DOI:** still pending independent Zenodo verification
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
 - **0.1.5 version DOI:** [10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)
 - **0.1.4 version DOI:** [10.5281/zenodo.22515782](https://doi.org/10.5281/zenodo.22515782)
@@ -132,8 +128,8 @@ Stable `gpbiometricspy 0.1.6` was released on **11 September 2026**.
 - **Frozen R semantic-reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **gpbiometrics article:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
-Recommended citation:
+Until Zenodo mints the genuine 0.1.7 version DOI, cite the immutable GitHub release:
 
-> Balaskas, S. (2026). *gpbiometricspy: Python tools for Gazepoint biometric workflows* (Version 0.1.6) [Computer software]. GitHub. https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.6
+> Balaskas, S. (2026). *gpbiometricspy: Python tools for Gazepoint biometric workflows* (Version 0.1.7) [Computer software]. GitHub. https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.7
 
 The frozen R source/tests/docs/articles remain under `reference/` as the semantic reference used for parity work. See [`VALIDATION.md`](VALIDATION.md) and the documentation site for the complete evidence trail.

@@ -11,8 +11,8 @@ Choose the path that matches what you are trying to do. This page is intentional
 </div>
 
 <div class="gp-chip-row">
-<span class="gp-chip">Stable 0.1.6</span>
-<span class="gp-chip">Development 0.1.7.dev0</span>
+<span class="gp-chip">Stable 0.1.7</span>
+<span class="gp-chip">Released 2026-09-21</span>
 <span class="gp-chip">406 / 406 frozen exports</span>
 <span class="gp-chip">Python 3.11–3.14</span>
 <span class="gp-chip">Synthetic-first examples</span>

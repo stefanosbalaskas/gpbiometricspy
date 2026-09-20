@@ -195,6 +195,7 @@ nav:
       - Measurement accountability: measurement-accountability.md
       - Interpretation guardrails: interpretation.md
   - Release & development:
+      - Release 0.1.7: release-0.1.7.md
       - Release 0.1.6: release-0.1.6.md
       - Release 0.1.5: release-0.1.5.md
       - Development: development.md
