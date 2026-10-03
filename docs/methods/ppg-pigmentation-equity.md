@@ -1,32 +1,71 @@
 # PPG pigmentation & measurement-equity audit
 
-`gpbiometricspy.ppg_equity` is an additive Python-native measurement-accountability layer for optical PPG workflows. It asks whether pigmentation was actually measured, how it was measured, whether acquisition quality or data retention varies across the observed pigmentation range, and whether reference agreement varies after keeping retention separate from accuracy.
+<script>
+window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]], processEscapes: true}};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-The module does **not** treat race or ethnicity as a skin-pigmentation measurement, does not label a device "fair" or "unfair", does not automatically exclude observations because of pigmentation, and does not apply a pigmentation-based correction to a signal.
+<div class="gp-page-intro">
+`gpbiometricspy.ppg_equity` is a Python-native measurement-accountability layer for optical PPG workflows. It keeps **pigmentation provenance**, **raw signal quality**, **data retention**, and **reference agreement** separate so that one stable error statistic cannot hide differential missingness or acquisition quality.
+</div>
 
-## Why the audit separates three outcomes
+<div class="gp-version-note">
+<strong>Post-0.1.7 development feature.</strong> This functionality is present on current development <code>main</code> but is not part of the frozen 0.1.7 release. The next release will be frozen only after the evidence/documentation tranche is complete.
+</div>
 
-Optical-device performance can differ at more than one stage. A final heart-rate error metric can appear stable even when one part of the sample has more missing, rejected, or low-quality observations. The audit therefore keeps these outcomes distinct:
+## Start with the scientific question
 
-1. **Acquisition quality** — finite waveform proportion, missingness, flatness, robust AC amplitude, DC level, AC/DC ratio, spectral SNR, and beat-template correlation.
-2. **Retention** — whether a participant/window survives the package's existing waveform-quality rules, and whether a reference-available measurement remains available in the candidate signal.
-3. **Reference agreement** — bias, MAE, RMSE, Lin's concordance correlation coefficient, and Bland–Altman limits for paired measurements.
+The audit is designed to answer five questions in order:
 
-The three layers should not be collapsed into a single verdict.
+1. **Was pigmentation actually measured?**
+2. **How, where, and with which instrument was it measured?**
+3. **Did raw PPG quality or data retention vary across the observed pigmentation range?**
+4. **Did paired reference accuracy vary?**
+5. **Do those patterns change across device/activity/acquisition context?**
 
-## Pigmentation metadata comes first
+The module does **not** infer pigmentation from race or ethnicity, does not label a device "fair" or "unfair", does not apply a pigmentation-based correction, and does not automatically exclude observations because of pigmentation.
 
-The preferred optical representation is an objective measurement when available. `compute_skin_ita()` derives continuous Individual Typology Angle (ITA) from CIELAB `L*` and `b*` values:
+## The three analytical layers
 
 \[
-ITA^\circ = \arctan\left(\frac{L^* - 50}{b^*}\right)\frac{180}{\pi}.
+\boxed{\text{Acquisition quality}}
+\;\longrightarrow\;
+\boxed{\text{Retention / missingness}}
+\;\longrightarrow\;
+\boxed{\text{Reference agreement}}
 \]
 
-Conventional ITA categories can be added for presentation, but the continuous value remains primary for analysis.
+The layers are related but not interchangeable. A device can show stable MAE while retaining substantially fewer observations in part of the measured pigmentation range.
+
+![Synthetic retention over ITA](../assets/ppg-equity/ppg-equity-synthetic-retention.svg)
+
+![Synthetic reference error over ITA](../assets/ppg-equity/ppg-equity-synthetic-reference-error.svg)
+
+The figures above come from the deterministic [synthetic worked example](../examples/ppg-equity-synthetic/). They are deliberately constructed so retention varies while the HR-error mechanism is ITA-neutral.
+
+## Public Python-native surface
 
 ```python
-from gpbiometricspy.ppg_equity import compute_skin_ita
+from gpbiometricspy.ppg_equity import (
+    compute_skin_ita,
+    validate_skin_pigmentation_metadata,
+    summarize_ppg_quality_by_pigmentation,
+    compare_ppg_reference_by_pigmentation,
+    ppg_pigmentation_audit,
+)
+```
 
+These functions are additive Python-native methods and are intentionally **outside the frozen 406-export R-parity registry**.
+
+## 1. Objective pigmentation and ITA
+
+When CIELAB measurements are available, the package derives Individual Typology Angle as
+
+\[
+ITA^\circ = \arctan\left(\frac{L^*-50}{b^*}\right)\frac{180}{\pi}.
+\]
+
+```python
 ita = compute_skin_ita(
     l_star=[68.4, 55.1, 39.8],
     b_star=[18.7, 20.2, 16.4],
@@ -34,11 +73,11 @@ ita = compute_skin_ita(
 )
 ```
 
-`validate_skin_pigmentation_metadata()` preserves the measurement method, site, instrument, assessor, missingness reason, raw CIELAB values when present, and whether the pigmentation-measurement site matches the PPG sensor site.
+The continuous ITA is primary. Conventional ITA categories are available for presentation but are not treated as interchangeable with Monk Skin Tone, Fitzpatrick phototype, Pantone, von Luschan, race, ethnicity, or melanin-index measurements.
+
+`validate_skin_pigmentation_metadata()` preserves method, measurement site, PPG sensor site, instrument, assessor, raw CIELAB values, derived ITA, missingness provenance, and whether measurement/sensor sites match.
 
 ```python
-from gpbiometricspy.ppg_equity import validate_skin_pigmentation_metadata
-
 meta = validate_skin_pigmentation_metadata(
     data,
     metric="cielab",
@@ -50,28 +89,25 @@ meta = validate_skin_pigmentation_metadata(
     sensor_site="sensor_site",
     instrument_manufacturer="instrument_vendor",
     instrument_model="instrument_model",
-    assessor="assessor_id",
     missing_reason_col="pigmentation_missing_reason",
 )
 ```
 
-Supported measurement families are deliberately distinguished:
+### Evidence classes
 
-| Evidence class | Examples | Default analytical use |
+| Evidence class | Examples | Analytical default |
 | --- | --- | --- |
-| Objective | ITA, CIELAB-derived ITA, melanin index | Continuous association + descriptive strata |
-| Subjective | Monk, Fitzpatrick, Pantone, von Luschan | Descriptive strata; no automatic continuous model |
-| Demographic proxy | race, ethnicity | **Not treated as pigmentation**; pigmentation-stratified audit is not run |
+| Objective | ITA, CIELAB-derived ITA, melanin index | continuous descriptive association + optional strata |
+| Subjective | Monk, Fitzpatrick, Pantone, von Luschan | descriptive strata only |
+| Demographic proxy | race, ethnicity | **not treated as pigmentation** |
 
-No crosswalk is performed between ITA, Monk, Fitzpatrick, race, ethnicity, or other scales.
+If only race/ethnicity is supplied, the integrated report explicitly records that pigmentation was **not measured** and skips pigmentation-stratified optical analysis.
 
-## PPG quality and retention
+## 2. Raw PPG quality
 
-`summarize_ppg_quality_by_pigmentation()` reuses the existing `assess_gazepoint_hrp_waveform_quality()` decision path for the QC status and adds PPG-specific signal-quality indicators.
+`summarize_ppg_quality_by_pigmentation()` reuses the existing Gazepoint HRP waveform-quality path and adds descriptive PPG SQIs.
 
 ```python
-from gpbiometricspy.ppg_equity import summarize_ppg_quality_by_pigmentation
-
 quality = summarize_ppg_quality_by_pigmentation(
     data,
     participant_col="participant",
@@ -79,35 +115,63 @@ quality = summarize_ppg_quality_by_pigmentation(
     pigmentation_col="ita_degrees",
     pigmentation_metric="ita",
     time_col="time_s",
-    group_cols=["condition"],
+    group_cols=["activity"],
     sampling_rate_hz=60,
     n_boot=1000,
-    random_state=2026,
+    random_state=20261003,
 )
 ```
 
-The group-level table includes:
+A robust AC amplitude is
 
-- finite and missing waveform proportions;
-- the existing waveform-quality status and a retained/not-retained indicator based on that existing status;
-- robust AC amplitude and DC level;
-- AC/DC ratio;
-- spectral PPG SNR using the dominant pulse-band component against remaining 0.5–5 Hz power;
-- mean beat-template correlation where the waveform supports beat extraction;
-- sampling-rate provenance;
-- pigmentation consistency within the analysis group.
+\[
+AC = \frac{Q_{0.95}(PPG)-Q_{0.05}(PPG)}{2},
+\]
 
-For objective pigmentation measurements, continuous slopes are accompanied by **participant-cluster bootstrap** confidence intervals. The participant, not the sample row, is the resampling unit.
+with
 
-For subjective scales, the module reports descriptive strata but does not silently treat the scale as an interval-valued optical measurement.
+\[
+DC=\operatorname{median}(PPG),
+\qquad
+AC/DC=\frac{AC}{|DC|}.
+\]
 
-## Reference agreement and missing candidate measurements
+The spectral signal-to-noise statistic is
 
-`compare_ppg_reference_by_pigmentation()` separates the paired-error denominator from the acquisition denominator.
+\[
+SNR_{dB}=10\log_{10}\left(\frac{P_{pulse}}{P_{noise}}\right).
+\]
+
+The quality table also retains finite/missing proportions, flatness, sampling-rate provenance, beat-template correlation, and the existing waveform-QC status.
+
+![Synthetic raw waveforms used to exercise SQIs](../assets/ppg-equity/ppg-equity-synthetic-waveforms.svg)
+
+No one SQI automatically defines scientific validity.
+
+## 3. Retention as its own outcome
+
+The reference-analysis denominator is intentionally different from the paired-error denominator. If a reference measurement exists but the candidate PPG-derived value is absent, the row contributes to **retention** even though it cannot contribute to MAE.
+
+For objective pigmentation, a descriptive retention association is estimated conceptually as
+
+\[
+\operatorname{logit}\{P(R_{ij}=1)\}
+=\gamma_0+\gamma_1 ITA_i,
+\]
+
+where repeated observations remain clustered within participant.
+
+The reported odds ratio is scaled per 10 pigmentation units:
+
+\[
+OR_{10}=\exp(10\gamma_1).
+\]
+
+This is an association, not a causal optical mechanism.
+
+## 4. Reference agreement
 
 ```python
-from gpbiometricspy.ppg_equity import compare_ppg_reference_by_pigmentation
-
 agreement = compare_ppg_reference_by_pigmentation(
     data,
     participant_col="participant",
@@ -119,28 +183,54 @@ agreement = compare_ppg_reference_by_pigmentation(
     device_col="device",
     condition_col="activity",
     n_boot=1000,
-    random_state=2026,
+    random_state=20261003,
 )
 ```
 
-The output contains:
+The paired-measurement outputs include
 
-- `agreement`: bias, MAE, RMSE, Bland–Altman limits, Lin's CCC, and retention;
-- `agreement_ci`: participant-cluster bootstrap intervals for the principal metrics;
-- `category_summary`: descriptive pigmentation strata, optionally within device/condition strata;
-- `associations`: participant-clustered continuous slopes for signed and absolute error when the pigmentation variable is objective;
-- `retention_association`: a participant-cluster bootstrap logistic association for measurement retention, reported as an odds ratio per 10 pigmentation units;
-- `row_level`: analysis-ready reference availability, retention, signed error, and absolute error fields.
+\[
+\text{Bias}=\frac{1}{n}\sum_{k=1}^n d_k,
+\qquad d_k=Y_k-X_k,
+\]
 
-The retention denominator is all rows with an available reference. Missing candidate measurements are therefore not allowed to disappear from the analysis simply because an error cannot be computed for them.
+\[
+MAE=\frac{1}{n}\sum_{k=1}^n |d_k|,
+\]
 
-## Integrated audit
+\[
+RMSE=\sqrt{\frac{1}{n}\sum_{k=1}^n d_k^2},
+\]
 
-`ppg_pigmentation_audit()` combines metadata validation, quality/retention analysis, optional reference agreement, provenance, warnings, and conservative reporting text.
+and Bland--Altman limits
+
+\[
+\bar d\pm1.96s_d.
+\]
+
+Lin's concordance correlation coefficient is
+
+\[
+\rho_c=\frac{2\operatorname{cov}(X,Y)}{\operatorname{var}(X)+\operatorname{var}(Y)+(\mu_X-\mu_Y)^2}.
+\]
+
+The result object keeps agreement, bootstrap confidence intervals, pigmentation strata, continuous associations when scientifically appropriate, retention association, and row-level analysis flags separate.
+
+## 5. Participant-cluster uncertainty
+
+Waveform and repeated-HR rows from the same participant are not independent. The bootstrap therefore resamples **participants** rather than individual signal samples.
+
+For bootstrap replicate \(b\),
+
+\[
+\mathcal I^{(b)}=\{i_1^{(b)},\ldots,i_N^{(b)}\},
+\]
+
+where participant identifiers are sampled with replacement and all their rows are retained together. The default 95% interval uses the 2.5th and 97.5th percentiles of the bootstrap distribution.
+
+## 6. Integrated audit
 
 ```python
-from gpbiometricspy.ppg_equity import ppg_pigmentation_audit
-
 result = ppg_pigmentation_audit(
     data,
     participant_col="participant",
@@ -163,11 +253,11 @@ result = ppg_pigmentation_audit(
     device_col="device",
     condition_col="activity",
     n_boot=1000,
-    random_state=2026,
+    random_state=20261003,
 )
 ```
 
-Main result objects are:
+Main result objects:
 
 ```text
 metadata
@@ -179,72 +269,102 @@ provenance
 settings
 ```
 
-If no reference/candidate pair is supplied, reference agreement is returned as `not_assessed` rather than inferred. If only race or ethnicity is supplied, the audit records that pigmentation was not measured and does not run pigmentation-stratified PPG analyses.
+If no reference/candidate pair is supplied, reference agreement is returned as `not_assessed`. If only a demographic proxy is supplied, pigmentation analysis is not silently substituted.
 
-## Interpretation boundary
+## Synthetic worked example
 
-A safe interpretation is:
+The deterministic synthetic example is the executable teaching and regression artifact for this method.
 
-> PPG waveform retention decreased across the observed objective pigmentation range in this sample. Because pigmentation was observational and acquisition conditions may differ across participants, the association does not establish pigmentation or melanin as the causal source of the difference.
+**[Open the complete synthetic worked example →](../examples/ppg-equity-synthetic/)**
 
-A second valid pattern is:
+It documents the data-generating process in equations, explains every output family, regenerates the figures on this page, and demonstrates the central distinction:
 
-> Reference heart-rate error showed little evidence of association with the objective pigmentation measure, while usable-data retention differed across the observed range.
+\[
+\text{amplitude}\neq\text{quality}\neq\text{retention}\neq\text{accuracy}.
+\]
 
-Avoid statements such as:
+Generate it with:
 
-- "the device is unbiased across skin tones" based only on paired error;
-- "dark skin caused poorer PPG performance" from an observational association;
-- "race was used as skin tone";
-- "the software corrected skin-tone bias".
+```bash
+python scripts/generate_ppg_equity_synthetic_demo.py \
+  --output-dir docs/assets/ppg-equity \
+  --seed 20261003 \
+  --participants 36 \
+  --n-boot 400
+```
 
-The module intentionally does not generate these claims.
+## External evidence: STEP and ENCoDE
+
+The pre-release external-evidence programme is documented separately:
+
+**[Open the STEP + ENCoDE external-evidence protocol →](../ppg-equity-external-evidence/)**
+
+Two executable adapters are included:
+
+```bash
+python scripts/run_step_ppg_equity_evidence.py \
+  --csv /secure/path/to/step.csv \
+  --output-dir external-evidence/step
+
+python scripts/run_encode_pigmentation_schema_stress.py \
+  --data-dir /secure/path/to/encode \
+  --output-dir external-evidence/encode
+```
+
+The public repository does **not** redistribute either restricted dataset. Current status is explicit:
+
+| Evidence layer | STEP | ENCoDE |
+| --- | --- | --- |
+| official public schema/source verified | yes | yes |
+| adapter implemented | yes | yes |
+| contract-faithful synthetic fixture tested | yes | yes |
+| restricted source rows empirically executed in public repo | **no** | **no** |
+
+This distinction is deliberate. The repository will not claim external empirical validation until authorized local data have actually been run.
+
+## Scientific anchors for the STEP adapter
+
+The original STEP study evaluated 53 participants across six wearable devices and multiple activities. It reported no overall skin-tone association with HR measurement error in the marginal model, substantial device/activity effects, and a skin-tone-by-device interaction. Those historical results are useful **anchors**, not pass/fail targets for the package.
+
+The adapter therefore preserves device and activity strata and reports retention separately from paired error rather than attempting to recreate one headline p-value.
 
 ## Anatomical site and acquisition configuration
 
-Pigmentation measurement and sensor placement are stored separately because skin optical properties vary by anatomical site. Where available, retain:
+Where available, retain:
 
 - pigmentation measurement site;
 - PPG sensor site;
-- measurement method and instrument;
+- method and instrument;
 - device manufacturer/model and firmware;
 - wavelength or wavelength set;
-- source–detector geometry;
+- source--detector geometry;
 - sampling rate;
-- contact pressure or fit information;
-- posture/activity;
-- ambient and skin temperature;
+- contact pressure/fit;
+- activity and posture;
+- ambient/skin temperature;
 - tattoo/hair/site context.
 
-Unknown acquisition parameters should remain unknown rather than being inferred from device category.
+Unknown values remain unknown. Device category is never used to invent wavelength or optical geometry.
 
-## Scope boundary: PPG/HR/PRV, not clinical SpO2 validation
+## Interpretation boundary
 
-This tranche is designed for optical PPG waveform quality, pulse/heart-rate measurements, beat/IBI retention, and metric-specific PRV/HRV comparison. It is **not** a clinical pulse-oximeter validation module.
+Safe generated wording looks like:
 
-A future SpO2/SaO2 extension would require a dedicated clinical design with paired arterial reference measurements, desaturation-range coverage, ARMS and threshold-detection analyses, and pulse-oximeter-specific standards. Those claims are deliberately outside this module.
+> PPG waveform retention decreased across the observed objective pigmentation range in this sample. Because pigmentation was observational and acquisition conditions may differ across participants, the association does not establish pigmentation or melanin as the causal source of the difference.
 
-## External validation targets
+Or:
 
-The code is designed so external validation can be performed without redistributing restricted source data:
+> Reference heart-rate error showed little evidence of association with the objective pigmentation measure, while usable-data retention differed across the observed range.
 
-- **BigIdeasLab STEP** — synchronized reference ECG and wearable HR across deliberately varied Fitzpatrick types and activities; useful for reference-error × retention × device/activity checks.
-- **ENCoDE** — prospective skin-tone data using multiple sites and multiple objective/subjective measurement systems; useful for stress-testing the pigmentation metadata model.
-- **OpenOximetry** — relevant to a future dedicated SpO2/SaO2 extension, not used to imply clinical validation of the current PPG audit.
+Avoid:
 
-External datasets should remain external. Only reproducible analysis code and legally redistributable derived summaries should enter the repository.
+- "the device is unbiased across skin tones" based only on paired error;
+- "dark skin caused poorer PPG performance" from observational association;
+- "race was used as skin tone";
+- "the software corrected skin-tone bias".
 
-## Methodological anchors
+## Scope boundary
 
-The tranche was motivated by the recent literature showing that optical measurement performance must be separated into signal quality, availability/retention, and final reference error; that objective pigmentation measurement is preferable to demographic proxies; and that wavelength, geometry, site, perfusion, motion, and contact conditions can interact with pigmentation.
+This tranche covers PPG waveform quality, pulse/heart rate, beat/IBI retention, and metric-specific PRV/HRV comparison. It is **not** a clinical pulse-oximeter validation module.
 
-Key anchors include:
-
-- Singh et al. (2024), systematic review/meta-analysis of skin tone and pulse oximetry/wearable pulse-rate accuracy.
-- FDA (2025), draft guidance on pulse oximeters and skin pigmentation measurement.
-- ISO 80601-2-61:2026, pulse oximeter equipment standard.
-- Hu et al. (2025), multi-wavelength PPG signal quality across objectively characterized skin pigmentation.
-- Mulholland et al. (2025), wearable HR accuracy and data availability across objective pigmentation during exercise.
-- ENCoDE (2026), multi-method and multi-site skin-tone dataset.
-
-These sources motivate measurement accountability; they do not justify a universal claim that pigmentation causes error in every PPG device or metric.
+A future SpO2/SaO2 extension would require paired arterial reference measurements, desaturation-range coverage, pulse-oximeter-specific standards, ARMS, diagnostic-threshold behavior, and clinical validation language. Those claims are intentionally outside the current module.
