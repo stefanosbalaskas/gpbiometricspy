@@ -2,22 +2,21 @@
   "schema_version": 1,
   "scope": "gpbiometricspy 0.1.7.dev0 branch-coverage structural debt",
   "baseline_commit": "33175e1d0507109c2af1f526b460f0f3ba6a7063",
-  "coverage_denominator": 7178,
-  "raw_covered_branches": 7159,
-  "raw_branch_coverage_percent": 99.7353,
+  "coverage_denominator": 7334,
+  "raw_covered_branches": 7315,
+  "raw_branch_coverage_percent": 99.7409,
   "structural_missing_count": 19,
   "evidence": {
-    "workflow_artifact_id": 10388795823,
-    "workflow_artifact_digest": "sha256:2f941e8c5ca8130fb6b241b8363c4d918963efe5fa027ea7346a1f6f86347206",
-    "diagnostic_note": "The formal scientific certification base before this tranche is 33175e1d0507109c2af1f526b460f0f3ba6a7063, with 7,044 total branches, 7,025 raw covered, and the same 19 audited structural/caller-dominated arcs. PR #136 adds the crossed participant-item joint location+scale random-slope model plus its focused validation and documentation. Tree-equivalent diagnostic Branch Coverage run 34947682650 (#408) on tree dd038213b1c0b2db7d12b9ba69439becba93643d passed 850/850 tests, 15,171/15,171 statements, and 7,159/7,178 raw branches = 99.7353%. Both new production modules reached 100% statement and branch coverage. The only 19 missing arcs are exactly the pre-existing audited structural/caller-dominated entries below: 0 unexpected, 0 stale, 0 unaudited. Artifact 10388795823 has SHA-256 digest 2f941e8c5ca8130fb6b241b8363c4d918963efe5fa027ea7346a1f6f86347206. The final normalized candidate must reproduce this contract in fresh exact-head CI before merge promotion.",
+    "workflow_artifact_id": 11271504325,
+    "workflow_artifact_digest": "sha256:63622211b3f949c3c7654fee77d469ccffed7fe6f82cb2385a469996cb1fb1ac",
+    "diagnostic_note": "The formal scientific certification base remains 33175e1d0507109c2af1f526b460f0f3ba6a7063. PR #164 adds the Python-native PPG pigmentation and measurement-equity audit without altering the frozen 406-export R-parity surface. Branch Coverage run 37117557771 (#417) on PR #164 passed 870/870 tests and 15,612/15,612 statements. The new src/gpbiometricspy/ppg_equity.py module reached 441/441 statements and 156/156 branches. The package-wide branch denominator therefore grows from 7,178 to 7,334 solely because of 156 newly introduced, fully covered branch arcs. Raw package branch coverage is 7,315/7,334 = 99.7409%. The only 19 missing arcs are exactly the pre-existing audited structural/caller-dominated entries below: 0 unexpected, 0 stale, 0 unaudited. Audited branch accounting is 7,334/7,334 = 100.0000%. Artifact 11271504325 has SHA-256 digest 63622211b3f949c3c7654fee77d469ccffed7fe6f82cb2385a469996cb1fb1ac. No new structural-debt exemption is introduced by PR #164.",
     "candidate_expected_increment": {
       "source_modules": [
-        "src/gpbiometricspy/hierarchical_location_scale_crossed_joint_random_slopes.py",
-        "src/gpbiometricspy/hierarchical_location_scale_crossed_joint_random_slopes_core.py"
+        "src/gpbiometricspy/ppg_equity.py"
       ],
-      "focused_tests": 26,
-      "statements": 414,
-      "branches": 134
+      "focused_tests": 15,
+      "statements": 441,
+      "branches": 156
     }
   },
   "policy": "Every raw missing branch must match exactly one audited structural/caller-dominated entry below. Unexpected missing arcs and stale ledger entries fail CI. This ledger does not redefine raw branch coverage as 100%.",
