@@ -23,7 +23,7 @@ The methods here are **additive Python-native extensions**. They do not alter th
 | Model one-factor mean + residual-scale heterogeneity | [Hierarchical location–scale](hierarchical-location-scale.md) | Gaussian conditional structure is defensible |
 | Retain that structure with heavier tails | [Robust Student-t location–scale](robust-hierarchical-location-scale.md) | heavy conditional tails are plausible |
 | Let a mean association vary by group | [Location random slope](random-slope-location-scale.md) | a fixed association is too restrictive |
-| Let a dispersion association vary by group | [Scale random slope](random-scale-slopes-location-scale.md) | log-scale heterogeneity has a supported contrast |
+| Let a dispersion association vary by group | [Scale random slope](random-scale-slope-location-scale.md) | log-scale heterogeneity has a supported contrast |
 | Let both associations vary by group | [Joint random slopes](joint-random-slopes-location-scale.md) | both random slopes are scientifically required |
 | Model participant + item intercept heterogeneity | [Crossed intercepts](crossed-location-scale.md) | both crossed factors contribute clustering |
 | Add participant + item mean slopes | [Crossed location slopes](crossed-random-slopes-location-scale.md) | both factors require location-slope variation |
