@@ -13,6 +13,7 @@ site/
 .ruff_cache/
 private-data/
 real-data/
+external-evidence/
 artifacts/real-data/
 artifacts/golden/
 studio-production-metrics.json
