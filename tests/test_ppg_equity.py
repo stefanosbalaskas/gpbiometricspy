@@ -219,6 +219,8 @@ def test_integrated_audit_proxy_and_reference_pair_guardrails():
     assert proxy["acquisition_quality"]["overview"].loc[0, "status"] == "not_assessed_proxy_is_not_pigmentation"
     assert proxy["reference_agreement"]["status"] == "not_assessed"
     assert "pigmentation_not_measured" in proxy["warnings"]
+    assert "Pigmentation was not measured" in proxy["reporting_text"]
+    assert "treated as a measured acquisition characteristic" not in proxy["reporting_text"]
     with pytest.raises(ValueError):
         ppg_pigmentation_audit(
             d,
