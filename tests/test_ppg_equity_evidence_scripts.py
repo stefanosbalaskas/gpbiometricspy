@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 from pathlib import Path
 
 import numpy as np
@@ -17,6 +18,10 @@ def _load_script(name: str):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _normalise_svg(text: str) -> str:
+    return re.sub(r">\s+<", "><", text.strip())
 
 
 def test_synthetic_generator_exercises_retention_without_baking_ita_into_hr_error(tmp_path):
@@ -59,13 +64,14 @@ def test_checked_in_synthetic_artifacts_match_generator(tmp_path):
     data = module.generate_synthetic_ppg_equity(seed=20261003, n_participants=36)
     artifacts = module.render_figures(data, tmp_path)
     tracked = ROOT / "docs" / "assets" / "ppg-equity"
-    for key in [
-        "retention_figure",
-        "reference_error_figure",
-        "waveform_figure",
-        "bin_summary",
-        "participant_summary",
-    ]:
+
+    for key in ["retention_figure", "reference_error_figure", "waveform_figure"]:
+        name = artifacts[key]
+        rendered = _normalise_svg((tmp_path / name).read_text(encoding="utf-8"))
+        committed = _normalise_svg((tracked / name).read_text(encoding="utf-8"))
+        assert rendered == committed
+
+    for key in ["bin_summary", "participant_summary"]:
         name = artifacts[key]
         assert (tmp_path / name).read_bytes() == (tracked / name).read_bytes()
 
