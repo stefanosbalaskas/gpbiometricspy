@@ -169,6 +169,8 @@ OR_{10}=\exp(10\gamma_1).
 
 This is an association, not a causal optical mechanism.
 
+For datasets such as STEP, where devices report at materially different cadences, a row-level retention field may primarily represent **paired availability/reporting density** on the source time grid. It must not automatically be interpreted as generic device missingness or dropout.
+
 ## 4. Reference agreement
 
 ```python
@@ -293,23 +295,13 @@ python scripts/generate_ppg_equity_synthetic_demo.py \
   --n-boot 400
 ```
 
-## External evidence: STEP and ENCoDE
+## External evidence: STEP executed; ENCoDE deferred
 
-The pre-release external-evidence programme is documented separately:
+The external-evidence programme is documented separately:
 
-**[Open the STEP + ENCoDE external-evidence protocol →](../ppg-equity-external-evidence/)**
+**[Open the external-evidence record →](../ppg-equity-external-evidence/)**
 
-Two executable adapters are included:
-
-```bash
-python scripts/run_step_ppg_equity_evidence.py \
-  --csv /secure/path/to/step.csv \
-  --output-dir external-evidence/step
-
-python scripts/run_encode_pigmentation_schema_stress.py \
-  --data-dir /secure/path/to/encode \
-  --output-dir external-evidence/encode
-```
+The release-facing external empirical evidence is now **STEP-only**. ENCoDE remains an implemented future provenance/schema stress test but is not a prerequisite for this tranche.
 
 The public repository does **not** redistribute either restricted dataset. Current status is explicit:
 
@@ -318,15 +310,37 @@ The public repository does **not** redistribute either restricted dataset. Curre
 | official public schema/source verified | yes | yes |
 | adapter implemented | yes | yes |
 | contract-faithful synthetic fixture tested | yes | yes |
-| restricted source rows empirically executed in public repo | **no** | **no** |
+| authorized restricted-data execution completed | **yes** | **deferred** |
+| restricted participant rows redistributed | **no** | **no** |
 
-This distinction is deliberate. The repository will not claim external empirical validation until authorized local data have actually been run.
+### STEP execution record
 
-## Scientific anchors for the STEP adapter
+Authorized BigIdeasLab_STEP v1.0 data were executed locally against exact source commit:
+
+```text
+dc2b539154f65061a90d360f01503108ad1fd39f
+```
+
+The run used 53 participants and yielded 1,431,570 long-format device rows, 1,328,850 rows with an available ECG reference, and 361,675 paired wearable/ECG measurements. The final derived-only bundle was recorded as:
+
+```text
+gpbiometricspy_STEP_derived_evidence.zip
+SHA256 65EF1DE84CF711F9E6753DB771E3E2386FD6926A104E0D4DC1618EE88E8744B1
+```
+
+Fitzpatrick 1–6 was retained as **subjective categorical phototype**. Continuous pigmentation association and retention models were therefore not fitted; the two corresponding derived CSVs are intentionally empty and the package emits `continuous_association_models_not_run_for_nonobjective_pigmentation_metric`.
+
+The authorized source also contained an unlabeled/NA activity stratum. It is reported as unlabeled/NA and is not assigned a physiological interpretation without source evidence.
+
+### Scientific anchors for the STEP adapter
 
 The original STEP study evaluated 53 participants across six wearable devices and multiple activities. It reported no overall skin-tone association with HR measurement error in the marginal model, substantial device/activity effects, and a skin-tone-by-device interaction. Those historical results are useful **anchors**, not pass/fail targets for the package.
 
-The adapter therefore preserves device and activity strata and reports retention separately from paired error rather than attempting to recreate one headline p-value.
+The adapter therefore preserves device and activity strata and keeps row-level paired availability separate from paired error rather than attempting to recreate one headline p-value.
+
+### ENCoDE status
+
+`scripts/run_encode_pigmentation_schema_stress.py` and its contract-faithful tests remain in the repository. Restricted ENCoDE data were not executed for this release tranche, so ENCoDE must not be described as empirical external validation. It remains future optional evidence for richer objective/instrumental pigmentation provenance.
 
 ## Anatomical site and acquisition configuration
 
@@ -356,12 +370,15 @@ Or:
 
 > Reference heart-rate error showed little evidence of association with the objective pigmentation measure, while usable-data retention differed across the observed range.
 
+For STEP specifically, Fitzpatrick is not an objective pigmentation measure, so the release-facing interpretation remains descriptive by Fitzpatrick category and device/activity stratum.
+
 Avoid:
 
 - "the device is unbiased across skin tones" based only on paired error;
 - "dark skin caused poorer PPG performance" from observational association;
 - "race was used as skin tone";
-- "the software corrected skin-tone bias".
+- "the software corrected skin-tone bias";
+- interpreting STEP row-level availability as a directly comparable device failure rate despite different reporting cadences.
 
 ## Scope boundary
 
