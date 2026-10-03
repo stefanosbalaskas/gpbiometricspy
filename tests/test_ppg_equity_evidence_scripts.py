@@ -54,6 +54,22 @@ def test_synthetic_generator_exercises_retention_without_baking_ita_into_hr_erro
         assert (tmp_path / artifacts[key]).exists()
 
 
+def test_checked_in_synthetic_artifacts_match_generator(tmp_path):
+    module = _load_script("generate_ppg_equity_synthetic_demo.py")
+    data = module.generate_synthetic_ppg_equity(seed=20261003, n_participants=36)
+    artifacts = module.render_figures(data, tmp_path)
+    tracked = ROOT / "docs" / "assets" / "ppg-equity"
+    for key in [
+        "retention_figure",
+        "reference_error_figure",
+        "waveform_figure",
+        "bin_summary",
+        "participant_summary",
+    ]:
+        name = artifacts[key]
+        assert (tmp_path / name).read_bytes() == (tracked / name).read_bytes()
+
+
 def test_step_adapter_validates_official_schema_and_runs_reference_audit(tmp_path):
     module = _load_script("run_step_ppg_equity_evidence.py")
     rows = []
