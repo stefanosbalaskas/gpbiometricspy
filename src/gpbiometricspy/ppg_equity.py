@@ -842,7 +842,11 @@ def ppg_pigmentation_audit(
         warnings.extend(reference_agreement["warnings"])
 
     reporting_parts = [
-        "Pigmentation was treated as a measured acquisition characteristic with explicit provenance rather than inferred from race or ethnicity.",
+        (
+            "Pigmentation was not measured; race or ethnicity was retained only as demographic context and was not converted into an optical pigmentation value."
+            if evidence_class == "proxy"
+            else "Pigmentation was treated as a measured acquisition characteristic with explicit provenance rather than inferred from race or ethnicity."
+        ),
         acquisition_quality["reporting_text"],
     ]
     if isinstance(reference_agreement, dict) and "reporting_text" in reference_agreement:
