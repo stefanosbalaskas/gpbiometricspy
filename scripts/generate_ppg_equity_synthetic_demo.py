@@ -68,7 +68,6 @@ def generate_synthetic_ppg_equity(
             )
             dropout = rng.random(n_samples) < dropout_prob
             if activity == "Walk":
-                # A deterministic short motion-loss burst makes the QC example visible.
                 burst_start = int(1.8 * sampling_rate_hz)
                 burst_stop = min(n_samples, burst_start + int(0.35 * sampling_rate_hz))
                 dropout[burst_start:burst_stop] = True
@@ -226,6 +225,7 @@ def render_figures(data: pd.DataFrame, output_dir: Path) -> dict[str, str]:
             x_label="Synthetic ITA (degrees)",
             y_label="Candidate-HR retention",
             y_limits=(0.0, 1.0),
+            show_points=False,
         ),
         encoding="utf-8",
     )
@@ -237,6 +237,7 @@ def render_figures(data: pd.DataFrame, output_dir: Path) -> dict[str, str]:
             title="Synthetic reference error is driven by activity, not ITA",
             x_label="Synthetic ITA (degrees)",
             y_label="Mean absolute HR error (bpm)",
+            show_points=False,
         ),
         encoding="utf-8",
     )
@@ -246,7 +247,7 @@ def render_figures(data: pd.DataFrame, output_dir: Path) -> dict[str, str]:
     chosen = [participant_ita.index[1], participant_ita.index[len(participant_ita) // 2], participant_ita.index[-2]]
     waveform_series = []
     for participant in chosen:
-        g = rest[rest["participant"] == participant].head(180)
+        g = rest[rest["participant"] == participant].head(180).iloc[::2]
         ita = float(g["ita_degrees"].iloc[0])
         waveform_series.append(
             (f"{participant}: ITA={ita:.1f} deg", g["time_s"].to_numpy(float), g["HRP"].to_numpy(float))
