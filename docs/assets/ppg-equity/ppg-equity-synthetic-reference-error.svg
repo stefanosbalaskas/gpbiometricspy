@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img">
+<style>text{font-family:system-ui,-apple-system,Segoe UI,sans-serif;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.axis{stroke:#374151;stroke-width:1.2}.series{fill:none;stroke-width:2}.pt{stroke-width:0}.legend{font-size:14px}.tick{font-size:12px}</style>
+<text x="450.0" y="30" text-anchor="middle" font-size="20" font-weight="600">Synthetic reference error is driven by activity, not ITA</text>
+<line class="grid" x1="88.00" y1="58" x2="88.00" y2="448"/><text class="tick" x="88.00" y="470" text-anchor="middle">-20</text>
+<line class="grid" x1="244.80" y1="58" x2="244.80" y2="448"/><text class="tick" x="244.80" y="470" text-anchor="middle">-3</text>
+<line class="grid" x1="401.60" y1="58" x2="401.60" y2="448"/><text class="tick" x="401.60" y="470" text-anchor="middle">15</text>
+<line class="grid" x1="558.40" y1="58" x2="558.40" y2="448"/><text class="tick" x="558.40" y="470" text-anchor="middle">32</text>
+<line class="grid" x1="715.20" y1="58" x2="715.20" y2="448"/><text class="tick" x="715.20" y="470" text-anchor="middle">50</text>
+<line class="grid" x1="872.00" y1="58" x2="872.00" y2="448"/><text class="tick" x="872.00" y="470" text-anchor="middle">67</text>
+<line class="grid" x1="88" y1="448.00" x2="872" y2="448.00"/><text class="tick" x="78" y="452.00" text-anchor="end">0.71</text>
+<line class="grid" x1="88" y1="370.00" x2="872" y2="370.00"/><text class="tick" x="78" y="374.00" text-anchor="end">1.48</text>
+<line class="grid" x1="88" y1="292.00" x2="872" y2="292.00"/><text class="tick" x="78" y="296.00" text-anchor="end">2.26</text>
+<line class="grid" x1="88" y1="214.00" x2="872" y2="214.00"/><text class="tick" x="78" y="218.00" text-anchor="end">3.03</text>
+<line class="grid" x1="88" y1="136.00" x2="872" y2="136.00"/><text class="tick" x="78" y="140.00" text-anchor="end">3.81</text>
+<line class="grid" x1="88" y1="58.00" x2="872" y2="58.00"/><text class="tick" x="78" y="62.00" text-anchor="end">4.58</text>
+<line class="axis" x1="88" y1="448" x2="872" y2="448"/><line class="axis" x1="88" y1="58" x2="88" y2="448"/>
+<text x="480.0" y="502" text-anchor="middle" font-size="14">Synthetic ITA (degrees)</text>
+<text transform="translate(20 253.0) rotate(-90)" text-anchor="middle" font-size="14">Mean absolute HR error (bpm)</text>
+<polyline class="series" stroke="#2563eb" points="88.00,405.32 105.37,404.95 125.87,403.48 159.23,400.00 167.68,410.30 199.71,404.98 237.17,405.37 247.81,405.62 282.39,405.18 304.19,421.10 328.86,404.99 330.32,408.33 367.52,413.51 383.67,399.17 397.51,408.47 424.11,408.73 465.53,408.50 492.37,408.61 496.88,406.83 515.65,406.38 541.55,407.58 559.79,403.69 595.15,410.57 604.49,407.35 621.22,406.71 639.45,407.52 678.65,403.64 706.72,406.62 741.40,410.67 769.32,402.67 791.11,410.08 792.91,405.68 820.10,406.21 843.77,398.76 863.63,401.54 872.00,396.14"/>
+<line x1="717" y1="72" x2="737" y2="72" stroke="#2563eb" stroke-width="2"/><text class="legend" x="744" y="76">Rest</text>
+<polyline class="series" stroke="#059669" points="88.00,323.96 105.37,316.63 125.87,339.68 159.23,335.04 167.68,315.74 199.71,321.67 237.17,328.60 247.81,320.13 282.39,321.17 304.19,316.84 328.86,332.62 330.32,327.49 367.52,322.65 383.67,333.95 397.51,327.02 424.11,316.86 465.53,325.00 492.37,330.67 496.88,322.47 515.65,329.64 541.55,321.73 559.79,318.00 595.15,322.97 604.49,327.44 621.22,328.06 639.45,333.56 678.65,327.06 706.72,313.10 741.40,317.32 769.32,321.74 791.11,329.75 792.91,341.13 820.10,331.58 843.77,333.37 863.63,328.97 872.00,318.88"/>
+<line x1="717" y1="94" x2="737" y2="94" stroke="#059669" stroke-width="2"/><text class="legend" x="744" y="98">Typing</text>
+<polyline class="series" stroke="#d97706" points="88.00,115.38 105.37,137.18 125.87,84.90 159.23,113.52 167.68,129.88 199.71,109.80 237.17,123.37 247.81,123.07 282.39,120.23 304.19,103.75 328.86,135.12 330.32,104.67 367.52,123.94 383.67,135.07 397.51,137.40 424.11,114.05 465.53,120.72 492.37,104.80 496.88,119.43 515.65,103.54 541.55,129.23 559.79,124.94 595.15,120.06 604.49,125.61 621.22,121.10 639.45,126.12 678.65,124.33 706.72,110.61 741.40,129.55 769.32,115.75 791.11,131.53 792.91,119.61 820.10,126.73 843.77,119.83 863.63,130.08 872.00,134.70"/>
+<line x1="717" y1="116" x2="737" y2="116" stroke="#d97706" stroke-width="2"/><text class="legend" x="744" y="120">Walk</text>
+</svg>
