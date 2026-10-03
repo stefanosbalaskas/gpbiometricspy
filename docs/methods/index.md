@@ -17,12 +17,13 @@ The methods here are **additive Python-native extensions**. They do not alter th
 |---|---|---|
 | Audit recorded clocks or align streams | [Timebase provenance](timebase-provenance.md) | drift/anchors need an explicit mapping and certificate |
 | Establish cardiac input identity | [Cardiac source provenance](cardiac-source-provenance.md) | HRV/PRV interpretation depends on ECG, PPG, device intervals or sampled HR |
+| Audit PPG pigmentation measurement, quality, retention and reference agreement | [PPG pigmentation & measurement equity](ppg-pigmentation-equity.md) | objective pigmentation and repeated-measure evidence support stratified/continuous analysis |
 | Predict a continuous repeated outcome | [Grouped mixed-effects boosting](grouped-mixed-boosting.md) | nonlinear predictive structure and unseen-group validation matter |
 | Predict an ordered repeated outcome | [Grouped ordinal boosting](grouped-ordinal-boosting.md) | the response has meaningful ordered categories |
 | Model one-factor mean + residual-scale heterogeneity | [Hierarchical location–scale](hierarchical-location-scale.md) | Gaussian conditional structure is defensible |
 | Retain that structure with heavier tails | [Robust Student-t location–scale](robust-hierarchical-location-scale.md) | heavy conditional tails are plausible |
 | Let a mean association vary by group | [Location random slope](random-slope-location-scale.md) | a fixed association is too restrictive |
-| Let a dispersion association vary by group | [Scale random slope](random-scale-slope-location-scale.md) | log-scale heterogeneity has a supported contrast |
+| Let a dispersion association vary by group | [Scale random slope](random-scale-slopes-location-scale.md) | log-scale heterogeneity has a supported contrast |
 | Let both associations vary by group | [Joint random slopes](joint-random-slopes-location-scale.md) | both random slopes are scientifically required |
 | Model participant + item intercept heterogeneity | [Crossed intercepts](crossed-location-scale.md) | both crossed factors contribute clustering |
 | Add participant + item mean slopes | [Crossed location slopes](crossed-random-slopes-location-scale.md) | both factors require location-slope variation |
@@ -35,11 +36,13 @@ The methods here are **additive Python-native extensions**. They do not alter th
 
 ## Method families
 
-### Provenance before modelling
+### Provenance and measurement accountability before modelling
 
 **[Timebase provenance and multimodal alignment →](timebase-provenance.md)** audits observed timing, jitter, gaps, duplicates and clock mappings, then binds the evidence into deterministic certificates.
 
 **[Cardiac variability source provenance →](cardiac-source-provenance.md)** separates ECG-NN/RR, PPG pulse intervals, device-derived intervals, vendor metrics and sampled heart-rate series before variability analysis.
+
+**[PPG pigmentation & measurement equity →](ppg-pigmentation-equity.md)** preserves pigmentation-measurement provenance, derives ITA only from CIELAB when available, keeps acquisition quality and retention separate from reference error, and uses participant-clustered uncertainty without inferring pigmentation from race/ethnicity or applying a skin-tone correction.
 
 ### Grouped predictive models
 
@@ -96,4 +99,4 @@ These pages document statistical and computational methods, not automatic scient
 - identifies causal effects; or
 - infers emotion, stress, trust, preference, cognition, diagnosis or other latent states from recorded measurements.
 
-Grouped boosting is predictive rather than causal. Random effects/slopes describe modelled heterogeneity rather than stable traits. Log-scale effects describe conditional residual heterogeneity rather than measurement quality by definition. Robust heavy tails are a distributional assumption, not an artifact score. Timebase and cardiac certificates bind declared provenance evidence; they do not prove hardware synchronization or sensor validity.
+The PPG pigmentation audit treats pigmentation as a measured acquisition characteristic rather than a demographic inference, and it keeps signal quality, retention and reference agreement distinct. Grouped boosting is predictive rather than causal. Random effects/slopes describe modelled heterogeneity rather than stable traits. Log-scale effects describe conditional residual heterogeneity rather than measurement quality by definition. Robust heavy tails are a distributional assumption, not an artifact score. Timebase and cardiac certificates bind declared provenance evidence; they do not prove hardware synchronization or sensor validity.
