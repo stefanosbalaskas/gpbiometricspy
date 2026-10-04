@@ -10,7 +10,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 </div>
 
 <div class="gp-version-note">
-<strong>Post-0.1.7 development feature.</strong> This functionality is present on current development <code>main</code> but is not part of the frozen 0.1.7 release. The next release will be frozen only after the evidence/documentation tranche is complete.
+<strong>Included in the 0.1.8 stable-freeze candidate.</strong> The public API, deterministic synthetic evidence, and STEP-only external evidence record are part of the 0.1.8 release scope. Publication remains fail-closed behind the protected release gates; ENCoDE remains deferred and no clinical SpO₂ validation is claimed.
 </div>
 
 ## Start with the scientific question
