@@ -141,7 +141,7 @@ nav:
               - Overview: articles/python-native/index.md
               - Research pipeline blueprint: articles/python-native/research-pipeline-blueprint.md
               - Measurement before modelling: articles/python-native/measurement-before-modelling.md
-              - Auditing PPG measurement equity: articles/python-native/ppg-measurement-equity.md
+              - Auditing PPG measurement equity: articles/python-native/ppg-measurement-equity/index.md
               - Choosing a location-scale model: articles/python-native/model-selection-location-scale.md
               - Reproducible multimodal studies: articles/python-native/reproducible-multimodal-study.md
           - Start + overview:
