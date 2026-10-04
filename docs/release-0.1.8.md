@@ -5,10 +5,10 @@ Published **2026-10-04**.
 `gpbiometricspy 0.1.8` preserves the frozen **406/406** `gpbiometrics 2.0.0` semantic contract with **0 pending exports** while promoting the post-0.1.7 PPG pigmentation / measurement-equity programme into the stable release scope.
 
 <div class="gp-actions">
-<a class="md-button md-button--primary" href="articles/python-native/ppg-measurement-equity/">Read the PPG measurement-equity article</a>
-<a class="md-button" href="examples/ppg-equity-synthetic/">Run the synthetic example</a>
-<a class="md-button" href="plot-gallery/">View the 0.1.8 figures</a>
-<a class="md-button" href="ppg-equity-external-evidence/">Inspect STEP evidence</a>
+<a class="md-button md-button--primary" href="../articles/python-native/ppg-measurement-equity/">Read the PPG measurement-equity article</a>
+<a class="md-button" href="../examples/ppg-equity-synthetic/">Run the synthetic example</a>
+<a class="md-button" href="../plot-gallery/">View the 0.1.8 figures</a>
+<a class="md-button" href="../ppg-equity-external-evidence/">Inspect STEP evidence</a>
 </div>
 
 ## Exact release source and qualification
@@ -51,15 +51,15 @@ The package does not apply a universal pigmentation correction, does not automat
 
 <div class="gp-gallery">
 <figure>
-<img src="assets/ppg-equity/ppg-equity-synthetic-waveforms.svg" alt="Synthetic PPG waveforms used for 0.1.8 measurement-equity diagnostics" loading="lazy" decoding="async">
+<img src="../assets/ppg-equity/ppg-equity-synthetic-waveforms.svg" alt="Synthetic PPG waveforms used for 0.1.8 measurement-equity diagnostics" loading="lazy" decoding="async">
 <figcaption><strong>Acquisition quality.</strong> Raw waveform/SQI evidence is retained as a separate analytical layer.</figcaption>
 </figure>
 <figure>
-<img src="assets/ppg-equity/ppg-equity-synthetic-retention.svg" alt="Synthetic candidate heart-rate retention across ITA values" loading="lazy" decoding="async">
+<img src="../assets/ppg-equity/ppg-equity-synthetic-retention.svg" alt="Synthetic candidate heart-rate retention across ITA values" loading="lazy" decoding="async">
 <figcaption><strong>Availability.</strong> Candidate-HR retention varies across ITA in the known-truth generator.</figcaption>
 </figure>
 <figure>
-<img src="assets/ppg-equity/ppg-equity-synthetic-reference-error.svg" alt="Synthetic reference error across ITA values" loading="lazy" decoding="async">
+<img src="../assets/ppg-equity/ppg-equity-synthetic-reference-error.svg" alt="Synthetic reference error across ITA values" loading="lazy" decoding="async">
 <figcaption><strong>Reference agreement.</strong> HR error remains ITA-neutral in the same generator.</figcaption>
 </figure>
 </div>
