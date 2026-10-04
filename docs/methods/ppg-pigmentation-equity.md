@@ -13,6 +13,13 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 <strong>Released in gpbiometricspy 0.1.8.</strong> The public API, deterministic synthetic evidence, and STEP-only external evidence record are part of the current stable release. ENCoDE remains deferred and no clinical SpO₂ validation is claimed.
 </div>
 
+<div class="gp-actions">
+<a class="md-button md-button--primary" href="../articles/python-native/ppg-measurement-equity/">Read the explanation article</a>
+<a class="md-button" href="../examples/ppg-equity-synthetic/">Run the synthetic example</a>
+<a class="md-button" href="../ppg-equity-external-evidence/">Inspect STEP evidence</a>
+<a class="md-button" href="../plot-gallery/">See the figures</a>
+</div>
+
 ## Start with the scientific question
 
 The audit is designed to answer five questions in order:
@@ -295,6 +302,8 @@ python scripts/generate_ppg_equity_synthetic_demo.py \
   --n-boot 400
 ```
 
+For a conceptual walkthrough that connects these figures to the external-data evidence layer, read **[Auditing PPG measurement equity: separating signal quality, availability, and reference agreement →](../articles/python-native/ppg-measurement-equity/)**.
+
 ## External evidence: STEP executed; ENCoDE deferred
 
 The external-evidence programme is documented separately:
@@ -327,6 +336,10 @@ The run used 53 participants and yielded 1,431,570 long-format device rows, 1,32
 gpbiometricspy_STEP_derived_evidence.zip
 SHA256 65EF1DE84CF711F9E6753DB771E3E2386FD6926A104E0D4DC1618EE88E8744B1
 ```
+
+![Aggregate-only STEP external-evidence summary](../assets/ppg-equity/step-aggregate-evidence.svg)
+
+The figure above contains only DUA-safe aggregate counts retained in the public evidence record; it does not reproduce participant-level rows.
 
 Fitzpatrick 1–6 was retained as **subjective categorical phototype**. Continuous pigmentation association and retention models were therefore not fitted; the two corresponding derived CSVs are intentionally empty and the package emits `continuous_association_models_not_run_for_nonobjective_pigmentation_metric`.
 
