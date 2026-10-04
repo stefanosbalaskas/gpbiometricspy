@@ -145,7 +145,7 @@ graph LR
 | Adapt an unfamiliar export | [Bring your own export safely](guides/bring-your-own-export.md) | Preserves source semantics and records mapping, schema, timing and event evidence before standardisation. |
 | Learn by doing | [First analysis](guides/first-analysis.md) | A short successful path using bundled synthetic data. |
 | Work with a specific signal | [Workflow map](workflows.md) | Routes by EDA, PPG/HRV, pupil/gaze, events, or external tools. |
-| Audit PPG measurement equity | [PPG measurement-equity article](articles/python-native/ppg-measurement-equity.md) | Separates pigmentation provenance, signal quality, paired availability and reference agreement and links the synthetic and STEP evidence layers. |
+| Audit PPG measurement equity | [PPG measurement-equity article](articles/python-native/ppg-measurement-equity/index.md) | Separates pigmentation provenance, signal quality, paired availability and reference agreement and links the synthetic and STEP evidence layers. |
 | See outputs before reading code | [Plot gallery](plot-gallery.md) | Generated figures from the package's plotting surface, including the 0.1.8 PPG-equity visuals. |
 | Understand the design philosophy | [Research pipeline blueprint](articles/python-native/research-pipeline-blueprint.md) | Explains why QC, provenance, processing, modelling, and reporting are separate layers. |
 | Find a function | [API browser](api/index.md) | Domain-organized entry point to the complete 406-function reference. |
