@@ -64,7 +64,7 @@ The package does not apply a universal pigmentation correction, does not automat
 </figure>
 </div>
 
-See [PPG pigmentation & measurement-equity audit](methods/ppg-pigmentation-equity.md), the [synthetic worked example](examples/ppg-equity-synthetic.md), and the explanation article [Auditing PPG measurement equity](articles/python-native/ppg-measurement-equity.md).
+See [PPG pigmentation & measurement-equity audit](methods/ppg-pigmentation-equity.md), the [synthetic worked example](examples/ppg-equity-synthetic.md), and the explanation article [Auditing PPG measurement equity](articles/python-native/ppg-measurement-equity/index.md).
 
 ## STEP external evidence
 
