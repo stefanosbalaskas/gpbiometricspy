@@ -1,0 +1,7 @@
+{
+  "retention_figure": "ppg-equity-synthetic-retention.svg",
+  "reference_error_figure": "ppg-equity-synthetic-reference-error.svg",
+  "waveform_figure": "ppg-equity-synthetic-waveforms.svg",
+  "bin_summary": "ppg-equity-synthetic-bin-summary.csv",
+  "participant_summary": "ppg-equity-synthetic-participant-summary.csv"
+}
