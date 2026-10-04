@@ -104,7 +104,7 @@ def test_legacy_plot_gallery_route_preserves_section_anchor(
 ) -> None:
     page.goto(f"{gallery_docs_base_url}/examples/plot-gallery/#ppg-and-hrv")
     page.wait_for_url(re.compile(r"/plot-gallery/#ppg-and-hrv$"), timeout=10_000)
-    expect(page.get_by_role("heading", name="PPG and HRV", exact=True)).to_be_visible()
+    expect(page.locator("#ppg-and-hrv")).to_be_visible()
 
 
 def test_ppg_equity_display_math_is_typeset(
