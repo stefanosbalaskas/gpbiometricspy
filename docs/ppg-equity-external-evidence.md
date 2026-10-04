@@ -6,7 +6,13 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 <div class="gp-page-intro">
-This page records the external-evidence programme for the Python-native PPG Pigmentation & Measurement-Equity Audit. Restricted PhysioNet source rows are **not redistributed** by gpbiometricspy. The release-facing evidence scope is now intentionally **STEP-only**; ENCoDE remains implemented as future provenance/schema evidence but is not a prerequisite for the next release.
+This page records the external-evidence programme for the Python-native PPG Pigmentation & Measurement-Equity Audit. Restricted PhysioNet source rows are **not redistributed** by gpbiometricspy. The release-facing evidence scope is intentionally **STEP-only**; ENCoDE remains implemented as future provenance/schema evidence but is not a prerequisite for the current stable release.
+</div>
+
+<div class="gp-actions">
+<a class="md-button md-button--primary" href="../articles/python-native/ppg-measurement-equity/">Read the explanation article</a>
+<a class="md-button" href="../examples/ppg-equity-synthetic/">Run the synthetic example</a>
+<a class="md-button" href="../methods/ppg-pigmentation-equity/">Read the method specification</a>
 </div>
 
 ## Evidence status
@@ -53,6 +59,10 @@ Observed real-data counts were:
 | Paired wearable/ECG measurements | 361,675 |
 | Wearable devices | 6 |
 | Fitzpatrick range | 1–6 |
+
+![Aggregate-only STEP external-evidence summary](assets/ppg-equity/step-aggregate-evidence.svg)
+
+The figure above is built only from the DUA-safe aggregate counts retained in this public evidence record. It does not reproduce or encode participant-level rows.
 
 All required derived output files were produced. The final local derived-only evidence archive was:
 
@@ -195,4 +205,4 @@ while the authorized STEP execution provides:
 \text{external evidence} \Rightarrow \text{behavior on independently collected measurements}.
 \]
 
-The two evidence layers are complementary and are reported separately.
+The two evidence layers are complementary and are reported separately. The [PPG measurement-equity explanation article](articles/python-native/ppg-measurement-equity/index.md) connects them in one narrative without treating either as stronger evidence than it is.
