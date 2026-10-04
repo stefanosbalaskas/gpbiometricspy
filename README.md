@@ -76,6 +76,18 @@ Additive Python-native methods sit outside the frozen `gpbiometrics 2.0.0` parit
 
 The PPG equity workflow supports objective CIELAB/ITA-style pigmentation metadata when available and preserves subjective scales such as Fitzpatrick as subjective provenance rather than converting them into objective pigmentation, race, ethnicity, melanin or ITA. It does not apply a universal pigmentation correction and does not provide clinical SpO₂ validation.
 
+### New in 0.1.8 — PPG measurement equity
+
+The 0.1.8 release now has a complete documentation path around this method:
+
+- **[Explanation article: Auditing PPG measurement equity](https://stefanosbalaskas.github.io/gpbiometricspy/articles/python-native/ppg-measurement-equity/)** — why signal quality, paired availability and reference agreement must remain separate;
+- **[Synthetic worked example](https://stefanosbalaskas.github.io/gpbiometricspy/examples/ppg-equity-synthetic/)** — deterministic known-truth figures and participant-cluster uncertainty;
+- **[Method specification](https://stefanosbalaskas.github.io/gpbiometricspy/methods/ppg-pigmentation-equity/)** — public API, equations and interpretation guardrails;
+- **[STEP external evidence](https://stefanosbalaskas.github.io/gpbiometricspy/ppg-equity-external-evidence/)** — authorized aggregate-only wearable–ECG evidence under the applicable PhysioNet DUA;
+- **[Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/)** — 20 showcased deterministic figures, including the three PPG measurement-equity SVGs.
+
+The STEP evidence uses only derived aggregate outputs publicly; participant-level restricted rows are not redistributed. Fitzpatrick remains subjective categorical provenance, and row-level paired availability is not relabelled as generic device failure or fairness.
+
 Use the **[model-selection guide](https://stefanosbalaskas.github.io/gpbiometricspy/guides/model-selection/)** to add complexity only when the design and scientific question require it.
 
 ## Current stable release — 0.1.8
@@ -113,7 +125,7 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 - **[Studio](https://stefanosbalaskas.github.io/gpbiometricspy/studio/)** — guided visual workflow and local/public boundaries.
 - **[Workflows](https://stefanosbalaskas.github.io/gpbiometricspy/workflows/)** — EDA, cardiac, eye tracking, multimodal alignment, QC and interoperability.
 - **[Methods](https://stefanosbalaskas.github.io/gpbiometricspy/methods/)** — Python-native modelling and provenance methods.
-- **[Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/)** — 17 deterministic figures generated in docs CI.
+- **[Plot gallery](https://stefanosbalaskas.github.io/gpbiometricspy/plot-gallery/)** — 20 showcased deterministic figures: 17 CI-generated core figures plus 3 PPG measurement-equity SVGs.
 - **[API](https://stefanosbalaskas.github.io/gpbiometricspy/api/)** — domain-organized 406-function frozen-parity reference.
 - **[Validation & trust](https://stefanosbalaskas.github.io/gpbiometricspy/deep-validation/)** — parity, coverage, real-data and application validation.
 
