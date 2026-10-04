@@ -17,7 +17,7 @@ This page takes you from installation to a validated, event-aware biometric work
       "gpbiometricspy @ git+https://github.com/stefanosbalaskas/gpbiometricspy.git@main"
     ```
 
-The package supports **Python 3.11–3.14**. Version **0.1.8** is the stable-freeze candidate prepared from qualified source `a75eb1d73791213e6e830ff94975f632455632e2`; the PyPI command above becomes valid only after the protected exact-main release gates create and publish the immutable release.
+The package supports **Python 3.11–3.14**. Version **0.1.8** is the current public stable release, published on **2026-10-04** from exact source `32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d` after the protected exact-main release gates completed successfully. The immutable GitHub release and PyPI package are both public.
 
 ## 2. Load the packaged demo
 
