@@ -7,7 +7,7 @@
     }
   ],
   "title": "gpbiometricspy: Python tools for Gazepoint biometric workflows",
-  "description": "gpbiometricspy is the Python counterpart of gpbiometrics, with gpbiometrics 2.0.0 frozen as its initial semantic reference. It provides Gazepoint-native workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event alignment, multimodal quality control, analysis, plotting, reporting, simulation, reproducibility, and interoperability. Version 0.1.7 preserves the complete 406-export scientific contract and literal 100% statement coverage, freezes 855 passing exact-main tests and 15,171/15,171 covered statements, retains 7,159/7,178 = 99.7353% raw branch coverage with exactly 19 reviewed residual arcs and zero unexpected, stale, or unaudited branch debt, and hardens structural branch-debt auditing across Windows and POSIX path representations.",
+  "description": "gpbiometricspy is the Python counterpart of gpbiometrics, with gpbiometrics 2.0.0 frozen as its initial semantic reference. It provides Gazepoint-native workflows for EDA/GSR/SCR, PPG/HRV, pupil, gaze, fixation, AOI, TTL/event alignment, multimodal quality control, analysis, plotting, reporting, simulation, reproducibility, and interoperability. Version 0.1.8 preserves the complete 406-export scientific contract, freezes 874 passing exact-main tests and 15,612/15,612 covered statements, retains 7,315/7,334 = 99.7409% raw branch coverage with exactly 19 reviewed residual arcs and zero unexpected, stale, or unaudited branch debt, and adds the Python-native PPG pigmentation / measurement-equity audit with deterministic synthetic evidence plus an authorized STEP wearable-heart-rate execution. STEP Fitzpatrick phototype is treated as subjective categorical provenance only; ENCoDE remains deferred and no clinical SpO2 validation is claimed.",
   "access_right": "open",
   "license": "mit",
   "upload_type": "software",
@@ -33,5 +33,5 @@
       "relation": "isDerivedFrom"
     }
   ],
-  "version": "0.1.7"
+  "version": "0.1.8"
 }
