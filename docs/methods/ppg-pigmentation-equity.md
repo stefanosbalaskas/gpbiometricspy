@@ -14,10 +14,10 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 </div>
 
 <div class="gp-actions">
-<a class="md-button md-button--primary" href="../articles/python-native/ppg-measurement-equity/">Read the explanation article</a>
-<a class="md-button" href="../examples/ppg-equity-synthetic/">Run the synthetic example</a>
-<a class="md-button" href="../ppg-equity-external-evidence/">Inspect STEP evidence</a>
-<a class="md-button" href="../plot-gallery/">See the figures</a>
+<a class="md-button md-button--primary" href="../../articles/python-native/ppg-measurement-equity/">Read the explanation article</a>
+<a class="md-button" href="../../examples/ppg-equity-synthetic/">Run the synthetic example</a>
+<a class="md-button" href="../../ppg-equity-external-evidence/">Inspect STEP evidence</a>
+<a class="md-button" href="../../plot-gallery/">See the figures</a>
 </div>
 
 ## Start with the scientific question
