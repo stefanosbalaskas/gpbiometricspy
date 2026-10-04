@@ -7,7 +7,7 @@ This page takes you from installation to a validated, event-aware biometric work
 === "Stable from PyPI"
 
     ```bash
-    python -m pip install "gpbiometricspy==0.1.7"
+    python -m pip install "gpbiometricspy==0.1.8"
     ```
 
 === "Development from GitHub"
@@ -17,7 +17,7 @@ This page takes you from installation to a validated, event-aware biometric work
       "gpbiometricspy @ git+https://github.com/stefanosbalaskas/gpbiometricspy.git@main"
     ```
 
-The package supports **Python 3.11–3.14**. Stable **0.1.7** is the frozen release source; public PyPI publication is performed only after the protected exact-main release gates succeed.
+The package supports **Python 3.11–3.14**. Version **0.1.8** is the stable-freeze candidate prepared from qualified source `a75eb1d73791213e6e830ff94975f632455632e2`; the PyPI command above becomes valid only after the protected exact-main release gates create and publish the immutable release.
 
 ## 2. Load the packaged demo
 
