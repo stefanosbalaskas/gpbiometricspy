@@ -3,7 +3,7 @@
 `gpbiometricspy` is archived through Zenodo.
 
 <div class="gp-version-note">
-<strong>Current citation state:</strong> Python release <code>0.1.8</code> is being frozen on <strong>2026-10-04</strong> from qualified source <code>a75eb1d73791213e6e830ff94975f632455632e2</code>. The software concept DOI remains <strong>10.5281/zenodo.22150872</strong>. A 0.1.8 version DOI will be recorded only after Zenodo genuinely ingests an immutable <code>v0.1.8</code> GitHub release.
+<strong>Current citation state:</strong> Python release <code>0.1.8</code> was published on <strong>2026-10-04</strong> from exact stable source <code>32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d</code>. The software concept DOI remains <strong>10.5281/zenodo.22150872</strong>. A 0.1.8 version DOI will be recorded only after Zenodo genuinely ingests and exposes the immutable <code>v0.1.8</code> GitHub release.
 </div>
 
 ## Cite the Python software
@@ -11,6 +11,8 @@
 For reproducibility, cite the exact software release used.
 
 - **0.1.8 version DOI:** pending genuine Zenodo ingestion; no DOI is invented before minting.
+- **0.1.8 GitHub release:** **[v0.1.8](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)**
+- **0.1.8 PyPI release:** **[gpbiometricspy 0.1.8](https://pypi.org/project/gpbiometricspy/0.1.8/)**
 - **0.1.7 version DOI:** still pending independent Zenodo verification.
 - **0.1.6 version DOI:** still pending independent Zenodo verification.
 - **0.1.5 version DOI:** **[10.5281/zenodo.22672823](https://doi.org/10.5281/zenodo.22672823)**
@@ -19,9 +21,9 @@ For reproducibility, cite the exact software release used.
 - **0.1.2 version DOI:** **[10.5281/zenodo.22150873](https://doi.org/10.5281/zenodo.22150873)**
 - **Software concept DOI:** **[10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)**
 
-Before `v0.1.8` is actually created, cite the latest public stable release used in the analysis together with the concept DOI. After publication, cite the immutable `v0.1.8` release together with version `0.1.8` until a genuine version DOI is independently verified.
+Until Zenodo mints and exposes a genuine 0.1.8 version DOI, cite the immutable `v0.1.8` release together with version `0.1.8` and the software concept DOI.
 
-GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control. The 0.1.8 stable-freeze metadata is pinned to version `0.1.8` and release date `2026-10-04`; its DOI field is deliberately absent before Zenodo minting.
+GitHub reads [`CITATION.cff`](https://github.com/stefanosbalaskas/gpbiometricspy/blob/main/CITATION.cff) for its **Cite this repository** control. The 0.1.8 metadata is pinned to version `0.1.8` and release date `2026-10-04`; its DOI field remains deliberately absent until genuine Zenodo minting is verified.
 
 ## Published gpbiometrics paper
 
@@ -39,9 +41,9 @@ That DOI identifies the R reference package. `.zenodo.json` preserves it with re
 
 ## Metadata files
 
-- `CITATION.cff` identifies the 0.1.8 stable-freeze identity and date 2026-10-04; the version DOI is intentionally absent until genuine Zenodo minting.
+- `CITATION.cff` identifies version `0.1.8` and release date `2026-10-04`; the version DOI remains absent until genuine Zenodo minting.
 - `.zenodo.json` identifies software version 0.1.8 and preserves the R-reference provenance relationship.
-- `pyproject.toml` retains the software concept DOI and independently verified historical DOI links; no 0.1.7 or 0.1.8 version DOI is invented.
+- `pyproject.toml` retains the software concept DOI and independently verified historical DOI links; no unverified 0.1.7 or 0.1.8 version DOI is invented.
 - README and documentation retain prior verified version DOIs for reproducible citation.
 
 ## Interpretation
