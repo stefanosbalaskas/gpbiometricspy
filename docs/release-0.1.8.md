@@ -4,6 +4,13 @@ Published **2026-10-04**.
 
 `gpbiometricspy 0.1.8` preserves the frozen **406/406** `gpbiometrics 2.0.0` semantic contract with **0 pending exports** while promoting the post-0.1.7 PPG pigmentation / measurement-equity programme into the stable release scope.
 
+<div class="gp-actions">
+<a class="md-button md-button--primary" href="articles/python-native/ppg-measurement-equity/">Read the PPG measurement-equity article</a>
+<a class="md-button" href="examples/ppg-equity-synthetic/">Run the synthetic example</a>
+<a class="md-button" href="plot-gallery/">View the 0.1.8 figures</a>
+<a class="md-button" href="ppg-equity-external-evidence/">Inspect STEP evidence</a>
+</div>
+
 ## Exact release source and qualification
 
 The immutable `v0.1.8` tag and public release artifacts resolve to exact stable source:
@@ -42,7 +49,22 @@ The method separates pigmentation provenance, acquisition quality, retention/pai
 
 The package does not apply a universal pigmentation correction, does not automatically exclude observations because of pigmentation, and does not label a device “fair” or “unfair”.
 
-See [PPG pigmentation & measurement-equity audit](methods/ppg-pigmentation-equity.md) and the [synthetic worked example](examples/ppg-equity-synthetic.md).
+<div class="gp-gallery">
+<figure>
+<img src="assets/ppg-equity/ppg-equity-synthetic-waveforms.svg" alt="Synthetic PPG waveforms used for 0.1.8 measurement-equity diagnostics" loading="lazy" decoding="async">
+<figcaption><strong>Acquisition quality.</strong> Raw waveform/SQI evidence is retained as a separate analytical layer.</figcaption>
+</figure>
+<figure>
+<img src="assets/ppg-equity/ppg-equity-synthetic-retention.svg" alt="Synthetic candidate heart-rate retention across ITA values" loading="lazy" decoding="async">
+<figcaption><strong>Availability.</strong> Candidate-HR retention varies across ITA in the known-truth generator.</figcaption>
+</figure>
+<figure>
+<img src="assets/ppg-equity/ppg-equity-synthetic-reference-error.svg" alt="Synthetic reference error across ITA values" loading="lazy" decoding="async">
+<figcaption><strong>Reference agreement.</strong> HR error remains ITA-neutral in the same generator.</figcaption>
+</figure>
+</div>
+
+See [PPG pigmentation & measurement-equity audit](methods/ppg-pigmentation-equity.md), the [synthetic worked example](examples/ppg-equity-synthetic.md), and the explanation article [Auditing PPG measurement equity](articles/python-native/ppg-measurement-equity.md).
 
 ## STEP external evidence
 
@@ -59,7 +81,9 @@ The retained aggregate record includes:
 - participant-cluster bootstrap with 1,000 replicates and seed `20261003`;
 - derived-only bundle SHA256 `65EF1DE84CF711F9E6753DB771E3E2386FD6926A104E0D4DC1618EE88E8744B1`.
 
-Restricted participant-level rows were not committed or redistributed.
+![Aggregate-only STEP external-evidence summary](assets/ppg-equity/step-aggregate-evidence.svg)
+
+Restricted participant-level rows were not committed or redistributed. The visual above uses only DUA-safe aggregate counts already retained in the public evidence record.
 
 Fitzpatrick 1–6 is retained as **subjective categorical phototype**, not objective pigmentation. STEP row-level retention is interpreted as **paired availability/reporting density** because device reporting cadence differs materially. The observed unlabeled/NA activity stratum remains unlabeled. Agreement results are observational and device/activity-specific.
 
