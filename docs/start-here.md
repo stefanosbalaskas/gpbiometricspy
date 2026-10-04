@@ -46,6 +46,12 @@ Choose the path that matches what you are trying to do. This page is intentional
 <p>Choose EDA/SCR, PPG/HRV, pupil/gaze/AOI, multimodal alignment, QC/reporting, or interoperability and follow the shortest defensible path.</p>
 </a>
 
+<a class="gp-route-card" href="../articles/python-native/ppg-measurement-equity/">
+<span class="gp-route-label">PPG · new in 0.1.8</span>
+<h3>Audit PPG measurement equity</h3>
+<p>Separate pigmentation provenance, raw signal quality, paired availability and reference agreement; then connect the synthetic known-truth example with the authorized STEP external-evidence record.</p>
+</a>
+
 <a class="gp-route-card" href="../studio/">
 <span class="gp-route-label">Visual workflow</span>
 <h3>Use gpbiometricspy Studio</h3>
@@ -70,6 +76,16 @@ Choose the path that matches what you are trying to do. This page is intentional
 <p>Trace frozen R parity, deep validation, private real-data smoke testing, measurement accountability, and explicit interpretation guardrails.</p>
 </a>
 
+</div>
+
+## PPG / HRV and measurement-equity route
+
+Use the ordinary [PPG / HRV example](examples/ppg-hrv.md) when the question is pulse detection, IBI provenance or variability metrics. Use the [PPG measurement-equity synthetic example](examples/ppg-equity-synthetic.md) when the question is whether pigmentation provenance, signal quality, paired availability and reference agreement remain analytically distinct.
+
+<div class="gp-actions">
+<a class="md-button md-button--primary" href="../examples/ppg-equity-synthetic/">Run the PPG equity example</a>
+<a class="md-button" href="../methods/ppg-pigmentation-equity/">Read the method</a>
+<a class="md-button" href="../ppg-equity-external-evidence/">Inspect STEP external evidence</a>
 </div>
 
 ## Bringing your own research data
@@ -129,7 +145,8 @@ graph LR
 | Adapt an unfamiliar export | [Bring your own export safely](guides/bring-your-own-export.md) | Preserves source semantics and records mapping, schema, timing and event evidence before standardisation. |
 | Learn by doing | [First analysis](guides/first-analysis.md) | A short successful path using bundled synthetic data. |
 | Work with a specific signal | [Workflow map](workflows.md) | Routes by EDA, PPG/HRV, pupil/gaze, events, or external tools. |
-| See outputs before reading code | [Plot gallery](plot-gallery.md) | Generated figures from the package's plotting surface. |
+| Audit PPG measurement equity | [PPG measurement-equity article](articles/python-native/ppg-measurement-equity.md) | Separates pigmentation provenance, signal quality, paired availability and reference agreement and links the synthetic and STEP evidence layers. |
+| See outputs before reading code | [Plot gallery](plot-gallery.md) | Generated figures from the package's plotting surface, including the 0.1.8 PPG-equity visuals. |
 | Understand the design philosophy | [Research pipeline blueprint](articles/python-native/research-pipeline-blueprint.md) | Explains why QC, provenance, processing, modelling, and reporting are separate layers. |
 | Find a function | [API browser](api/index.md) | Domain-organized entry point to the complete 406-function reference. |
 | Choose a hierarchical model | [Modelling strategy guide](guides/model-selection.md) | Compares the current Python-native modelling families and their boundaries. |
