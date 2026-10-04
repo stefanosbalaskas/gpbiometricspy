@@ -5,7 +5,7 @@ Optical PPG performance can vary with acquisition context, device design, motion
 </div>
 
 <div class="gp-version-note">
-<strong>Added in 0.1.8.</strong> The public method is documented at <a href="../../methods/ppg-pigmentation-equity/">PPG pigmentation & measurement equity</a>, the fully reproducible known-truth demonstration is the <a href="../../examples/ppg-equity-synthetic/">synthetic worked example</a>, and the independent restricted-data stress test is recorded in the <a href="../../ppg-equity-external-evidence/">STEP external-evidence record</a>.
+<strong>Added in 0.1.8.</strong> The public method is documented at <a href="../../../methods/ppg-pigmentation-equity/">PPG pigmentation & measurement equity</a>, the fully reproducible known-truth demonstration is the <a href="../../../examples/ppg-equity-synthetic/">synthetic worked example</a>, and the independent restricted-data stress test is recorded in the <a href="../../../ppg-equity-external-evidence/">STEP external-evidence record</a>.
 </div>
 
 ## Why one number is not enough
@@ -28,15 +28,15 @@ These layers can diverge. The synthetic example intentionally demonstrates exact
 
 <div class="gp-gallery">
 <figure>
-<img src="../../assets/ppg-equity/ppg-equity-synthetic-waveforms.svg" alt="Synthetic PPG waveforms illustrating acquisition-quality differences" loading="lazy" decoding="async">
+<img src="../../../assets/ppg-equity/ppg-equity-synthetic-waveforms.svg" alt="Synthetic PPG waveforms illustrating acquisition-quality differences" loading="lazy" decoding="async">
 <figcaption><strong>Acquisition quality.</strong> Raw waveform amplitude and SQI evidence are inspected before reference-error summaries.</figcaption>
 </figure>
 <figure>
-<img src="../../assets/ppg-equity/ppg-equity-synthetic-retention.svg" alt="Synthetic candidate-heart-rate retention across ITA values" loading="lazy" decoding="async">
+<img src="../../../assets/ppg-equity/ppg-equity-synthetic-retention.svg" alt="Synthetic candidate-heart-rate retention across ITA values" loading="lazy" decoding="async">
 <figcaption><strong>Availability.</strong> The known-truth synthetic mechanism changes candidate-HR retention across the observed ITA range.</figcaption>
 </figure>
 <figure>
-<img src="../../assets/ppg-equity/ppg-equity-synthetic-reference-error.svg" alt="Synthetic reference error across ITA values" loading="lazy" decoding="async">
+<img src="../../../assets/ppg-equity/ppg-equity-synthetic-reference-error.svg" alt="Synthetic reference error across ITA values" loading="lazy" decoding="async">
 <figcaption><strong>Reference agreement.</strong> The synthetic HR-error mechanism is intentionally ITA-neutral even though retention changes.</figcaption>
 </figure>
 </div>
@@ -233,8 +233,8 @@ Use the following sequence when adapting the method to another dataset:
 9. retain warnings and provenance text with manuscript-ready outputs.
 
 <div class="gp-actions">
-<a class="md-button md-button--primary" href="../../examples/ppg-equity-synthetic/">Run the synthetic worked example</a>
-<a class="md-button" href="../../methods/ppg-pigmentation-equity/">Read the method specification</a>
-<a class="md-button" href="../../ppg-equity-external-evidence/">Inspect STEP evidence</a>
-<a class="md-button" href="../../plot-gallery/">Open the plot gallery</a>
+<a class="md-button md-button--primary" href="../../../examples/ppg-equity-synthetic/">Run the synthetic worked example</a>
+<a class="md-button" href="../../../methods/ppg-pigmentation-equity/">Read the method specification</a>
+<a class="md-button" href="../../../ppg-equity-external-evidence/">Inspect STEP evidence</a>
+<a class="md-button" href="../../../plot-gallery/">Open the plot gallery</a>
 </div>
