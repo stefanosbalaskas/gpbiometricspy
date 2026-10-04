@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -19,6 +20,8 @@ class _QuietHandler(SimpleHTTPRequestHandler):
 def gallery_docs_base_url() -> str:
     site = Path("site").resolve()
     assert (site / "plot-gallery" / "index.html").exists(), site
+    assert (site / "examples" / "plot-gallery" / "index.html").exists(), site
+    assert (site / "examples" / "ppg-equity-synthetic" / "index.html").exists(), site
     assert (site / "api" / "index.html").exists(), site
 
     handler = partial(_QuietHandler, directory=str(site))
@@ -75,3 +78,42 @@ def test_plot_gallery_filtered_api_handoffs_keep_domain_state(
         "aria-pressed", "true"
     )
     expect(page.locator("main")).to_contain_text("Bookmark or share")
+
+
+def test_plot_gallery_all_showcase_images_load(
+    page: Page, gallery_docs_base_url: str
+) -> None:
+    page.goto(f"{gallery_docs_base_url}/plot-gallery/")
+
+    images = page.locator(".gp-gallery img")
+    expect(images).to_have_count(20)
+    for index in range(images.count()):
+        image = images.nth(index)
+        image.scroll_into_view_if_needed()
+        handle = image.element_handle()
+        assert handle is not None
+        page.wait_for_function(
+            "img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0",
+            arg=handle,
+            timeout=10_000,
+        )
+
+
+def test_legacy_plot_gallery_route_preserves_section_anchor(
+    page: Page, gallery_docs_base_url: str
+) -> None:
+    page.goto(f"{gallery_docs_base_url}/examples/plot-gallery/#ppg-and-hrv")
+    page.wait_for_url(re.compile(r"/plot-gallery/#ppg-and-hrv$"), timeout=10_000)
+    expect(page.locator("#ppg-and-hrv")).to_be_visible()
+
+
+def test_ppg_equity_display_math_is_typeset(
+    page: Page, gallery_docs_base_url: str
+) -> None:
+    page.goto(f"{gallery_docs_base_url}/examples/ppg-equity-synthetic/")
+    page.wait_for_selector("mjx-container", timeout=15_000)
+
+    assert page.locator("mjx-container").count() >= 2
+    rendered_text = page.locator("main").inner_text()
+    assert r"\arctan" not in rendered_text
+    assert r"\frac" not in rendered_text
