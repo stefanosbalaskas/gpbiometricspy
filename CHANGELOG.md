@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.8 — 2026-10-04 — PPG measurement equity and STEP evidence freeze
+
+- preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** while adding the PPG pigmentation / measurement-equity workflow as a Python-native surface outside that parity registry;
+- freezes the qualified pre-release source at **`a75eb1d73791213e6e830ff94975f632455632e2`**, with **12 / 12** OS × Python 3.11–3.14 test lanes green, **874 passing tests**, and **15,612 / 15,612 = 100.00% statement coverage**;
+- retains honest raw branch coverage at **7,315 / 7,334 = 99.7409%**, exactly **19** reviewed structural arcs, **0 unexpected / 0 stale / 0 unaudited** branch debt, and **7,334 / 7,334 = 100.0000% audited branch accounting**;
+- adds deterministic synthetic PPG-equity evidence that keeps waveform amplitude, raw signal quality, retention/paired availability, and reference accuracy distinct;
+- adds objective CIELAB/ITA-aware pigmentation metadata handling while retaining subjective scales such as Fitzpatrick as subjective provenance rather than converting them into objective pigmentation, melanin, race, ethnicity or ITA;
+- records an authorized local execution of BigIdeasLab_STEP v1.0 against exact scientific source `dc2b539154f65061a90d360f01503108ad1fd39f`, with aggregate derived evidence only and no restricted participant rows redistributed;
+- documents STEP row-level retention as **paired availability/reporting density** whose interpretation depends on device reporting cadence, not as generic device missingness, dropout or fairness;
+- keeps the observed STEP unlabeled/NA activity stratum explicitly unlabeled and avoids inventing physiological meaning from the data alone;
+- defers ENCoDE empirical execution while retaining its adapter/schema fixture as future optional evidence; no ENCoDE execution is claimed in this release;
+- explicitly excludes clinical SpO₂ validation, universal pigmentation correction, race/ethnicity-as-pigmentation substitution, causal optical claims, and device “fair/unfair” labels;
+- preserves docs/Pages, CodeQL, deep R↔Python parity, optional-backend interoperability, privacy-safe real-data validation and release-handoff safety as exact-main release gates;
+- freezes package/runtime/CFF/Zenodo/generated-documentation identity to **0.1.8** without inventing a 0.1.7 or 0.1.8 Zenodo version DOI before genuine independent verification.
+
 ## 0.1.7 — 2026-09-21 — exact-main validation and cross-platform release hardening
 
 - preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports**;
