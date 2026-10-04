@@ -1,16 +1,18 @@
 # gpbiometricspy 0.1.8 — PPG measurement equity and STEP evidence
 
-Stable-freeze candidate prepared **2026-10-04**.
+Published **2026-10-04**.
 
 `gpbiometricspy 0.1.8` preserves the frozen **406/406** `gpbiometrics 2.0.0` semantic contract with **0 pending exports** while promoting the post-0.1.7 PPG pigmentation / measurement-equity programme into the stable release scope.
 
-## Exact qualification baseline
+## Exact release source and qualification
 
-The candidate is frozen from exact qualified `main` source:
+The immutable `v0.1.8` tag and public release artifacts resolve to exact stable source:
 
 ```text
-a75eb1d73791213e6e830ff94975f632455632e2
+32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d
 ```
+
+The scientific qualification baseline immediately before the stable freeze was `a75eb1d73791213e6e830ff94975f632455632e2`. The merged 0.1.8 source then passed the complete protected exact-main release gate set before the immutable tag and public artifacts were created.
 
 - **12/12** OS × Python 3.11–3.14 test lanes green;
 - **874/874** tests;
@@ -19,9 +21,18 @@ a75eb1d73791213e6e830ff94975f632455632e2
 - exactly **19** reviewed structural arcs;
 - **0 unexpected / 0 stale / 0 unaudited** branch debt;
 - **7,334/7,334 = 100.0000%** audited branch accounting;
-- docs/Pages, CodeQL, deep parity, interoperability, private real-data validation and release-handoff safety green.
+- docs/Pages, CodeQL, deep parity, interoperability, private real-data validation and release-handoff safety green;
+- Windows install/repair/upgrade/downgrade release-policy proof green;
+- canonical GitHub Release and PyPI Trusted Publishing completed successfully.
 
-The stable-freeze PR and merged stable source still require their own exact-head/exact-main qualification before publication.
+## Public release artifacts
+
+- GitHub Release: [`v0.1.8`](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)
+- PyPI: [`gpbiometricspy 0.1.8`](https://pypi.org/project/gpbiometricspy/0.1.8/)
+- wheel SHA-256: `b1a88c2306843df2cc324b8987335bba413d27715a81f451ba0a036afe0a39f0`
+- sdist SHA-256: `231c14bab9eeddb0e0e6e9dce0cc095451cf48d7dcd160c5c553005482d7c24d`
+
+PyPI Trusted Publishing generated and uploaded digital attestations for both distributions.
 
 ## PPG measurement-equity surface
 
@@ -69,8 +80,8 @@ ENCoDE remains deferred future evidence infrastructure.
 
 ## Archival state
 
-The software concept DOI remains **10.5281/zenodo.22150872** and the frozen R reference DOI remains **10.5281/zenodo.21434608**. No 0.1.7 or 0.1.8 version DOI is fabricated before genuine independent Zenodo verification.
+The software concept DOI remains **10.5281/zenodo.22150872** and the frozen R reference DOI remains **10.5281/zenodo.21434608**. A 0.1.8 version DOI is not claimed until genuine independent Zenodo ingestion is verified.
 
 ## Publication state
 
-This page documents the stable-freeze candidate. `v0.1.8`, GitHub Release artifacts and PyPI publication are not considered complete until the protected release pipeline succeeds on the exact merged stable `main` commit.
+`gpbiometricspy 0.1.8` is the current public stable release. The immutable `v0.1.8` tag, GitHub Release assets, canonical wheel/sdist hashes, PyPI publication through Trusted Publishing, and digital attestations have all been verified against exact source `32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d`.
