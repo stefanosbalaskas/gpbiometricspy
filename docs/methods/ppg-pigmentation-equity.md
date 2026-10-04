@@ -10,7 +10,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 </div>
 
 <div class="gp-version-note">
-<strong>Included in the 0.1.8 stable-freeze candidate.</strong> The public API, deterministic synthetic evidence, and STEP-only external evidence record are part of the 0.1.8 release scope. Publication remains fail-closed behind the protected release gates; ENCoDE remains deferred and no clinical SpO₂ validation is claimed.
+<strong>Released in gpbiometricspy 0.1.8.</strong> The public API, deterministic synthetic evidence, and STEP-only external evidence record are part of the current stable release. ENCoDE remains deferred and no clinical SpO₂ validation is claimed.
 </div>
 
 ## Start with the scientific question
