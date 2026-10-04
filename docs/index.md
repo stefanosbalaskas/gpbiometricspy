@@ -19,8 +19,8 @@ Start from the research task you need to complete—not from a list of functions
 </div>
 
 <div class="gp-status-grid gp-status-grid-home">
-<div><span class="gp-status-value">0.1.8</span><span class="gp-status-label">stable-freeze candidate</span></div>
-<div><span class="gp-status-value">2026-10-04</span><span class="gp-status-label">freeze date</span></div>
+<div><span class="gp-status-value">0.1.8</span><span class="gp-status-label">current stable release</span></div>
+<div><span class="gp-status-value">2026-10-04</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
 <div><span class="gp-status-value">874 / 874</span><span class="gp-status-label">exact-main tests</span></div>
 <div><span class="gp-status-value">99.7409%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
@@ -195,7 +195,7 @@ Every figure below is generated from the checked-out Python package during docum
 <div class="gp-metric-card"><strong>14 / 14</strong><span>optional-backend interoperability lanes green</span></div>
 </div>
 
-The 0.1.8 release-preparation baseline is exact-main SHA **`a75eb1d73791213e6e830ff94975f632455632e2`**. All 12 platform/Python 3.11–3.14 lanes passed, with 874/874 tests and 15,612/15,612 statements on the canonical scientific suite. Branch evidence records 7,315/7,334 raw branches = 99.7409%, exactly 19 audited residual arcs, 0 unexpected, stale, or unaudited branch debt, and 7,334/7,334 audited branch accounting. Docs/Pages, CodeQL, Deep Parity, Interoperability, Private Real Data Validation, and release-handoff safety are green.
+The current public stable release is **0.1.8**, exact source SHA **`32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d`**. Its scientific qualification baseline immediately before the stable freeze was `a75eb1d73791213e6e830ff94975f632455632e2`. All 12 platform/Python 3.11–3.14 lanes passed, with 874/874 tests and 15,612/15,612 statements on the canonical scientific suite. Branch evidence records 7,315/7,334 raw branches = 99.7409%, exactly 19 audited residual arcs, 0 unexpected, stale, or unaudited branch debt, and 7,334/7,334 audited branch accounting. Docs/Pages, CodeQL, Deep Parity, Interoperability, Private Real Data Validation, release-handoff safety, Studio packaging, and Windows release-policy validation are green.
 
 The 0.1.8 PPG measurement-equity tranche also includes deterministic synthetic evidence and an authorized local BigIdeasLab_STEP v1.0 execution. STEP Fitzpatrick phototype is retained as subjective categorical provenance; row-level paired availability is not relabelled as generic device missingness or fairness. ENCoDE remains deferred, and this release does not claim clinical SpO₂ validation.
 
@@ -204,9 +204,16 @@ The 0.1.8 PPG measurement-equity tranche also includes deterministic synthetic e
 !!! info "Scientific boundary"
     Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Random effects and random slopes describe modelled heterogeneity; predictive importance is not causal importance; provenance certificates bind declared evidence rather than proving sensor validity. PPG pigmentation analyses distinguish signal quality, availability and reference agreement and do not establish device fairness or causal optical effects. Scientific interpretation remains constrained by acquisition quality, study design and model assumptions.
 
-## Stable-freeze candidate 0.1.8
+## Current stable release 0.1.8
 
-**gpbiometricspy 0.1.8** is being frozen on **4 October 2026** from the exact qualified source above. Immutable GitHub/PyPI publication follows only after the stable candidate passes the protected pull-request and exact-main release gates; until then, `v0.1.8` must not be treated as published.
+**gpbiometricspy 0.1.8** was published on **4 October 2026** after the protected pull-request, exact-main, canonical release, and Trusted Publishing gates completed successfully.
+
+- [GitHub Release `v0.1.8`](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)
+- [PyPI `gpbiometricspy 0.1.8`](https://pypi.org/project/gpbiometricspy/0.1.8/)
+- wheel SHA-256: `b1a88c2306843df2cc324b8987335bba413d27715a81f451ba0a036afe0a39f0`
+- sdist SHA-256: `231c14bab9eeddb0e0e6e9dce0cc095451cf48d7dcd160c5c553005482d7c24d`
+
+PyPI Trusted Publishing generated digital attestations for both distributions. A 0.1.8 Zenodo version DOI remains unclaimed until genuine ingestion is independently verified.
 
 <div class="gp-mini-grid">
 <a href="learning-paths/">Learning paths</a>
