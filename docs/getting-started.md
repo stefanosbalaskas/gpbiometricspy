@@ -57,8 +57,12 @@ A useful default order is:
 <div class="gp-card-grid gp-card-grid-compact">
 <a class="gp-card gp-card-link" href="../examples/eda-scr/"><h3>EDA / SCR</h3><p>Artifacts, decomposition, SCR events and summaries.</p><span class="gp-card-cta">Start EDA →</span></a>
 <a class="gp-card gp-card-link" href="../examples/ppg-hrv/"><h3>PPG / HRV</h3><p>Pulse detection, IBI, HRV and toolbox-style cross-checks.</p><span class="gp-card-cta">Start PPG →</span></a>
+<a class="gp-card gp-card-link" href="../examples/ppg-equity-synthetic/"><h3>PPG measurement equity</h3><p>Pigmentation provenance, raw signal quality, paired availability, reference agreement, and the 0.1.8 synthetic/STEP evidence path.</p><span class="gp-card-cta">Audit PPG equity →</span></a>
 <a class="gp-card gp-card-link" href="../examples/pupil-gaze/"><h3>Pupil / gaze</h3><p>Pupil QC, gaze/AOI summaries and saccade diagnostics.</p><span class="gp-card-cta">Start gaze →</span></a>
 </div>
+
+!!! info "PPG / HRV versus PPG measurement equity"
+    Use the ordinary PPG / HRV route for pulse detection, IBI provenance and variability metrics. Use the measurement-equity route when you need to keep pigmentation provenance, acquisition quality, candidate-value availability and reference agreement separate. The [explanation article](articles/python-native/ppg-measurement-equity.md) connects the synthetic known-truth example to the authorized STEP external-evidence run.
 
 ## 5. A compact physiological example
 
@@ -79,6 +83,8 @@ ppg = gp.process_gazepoint_ppg_heartpy_style(
     time_col="TIME",
 )
 ```
+
+For the 0.1.8 measurement-equity workflow, continue with the [synthetic worked example](examples/ppg-equity-synthetic.md), the [method specification](methods/ppg-pigmentation-equity.md), or the [STEP external-evidence record](ppg-equity-external-evidence.md).
 
 ## 6. Add optional backends only when needed
 
