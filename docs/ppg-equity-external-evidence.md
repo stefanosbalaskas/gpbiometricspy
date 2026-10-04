@@ -205,4 +205,4 @@ while the authorized STEP execution provides:
 \text{external evidence} \Rightarrow \text{behavior on independently collected measurements}.
 \]
 
-The two evidence layers are complementary and are reported separately. The [PPG measurement-equity explanation article](articles/python-native/ppg-measurement-equity.md) connects them in one narrative without treating either as stronger evidence than it is.
+The two evidence layers are complementary and are reported separately. The [PPG measurement-equity explanation article](articles/python-native/ppg-measurement-equity/index.md) connects them in one narrative without treating either as stronger evidence than it is.
