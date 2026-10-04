@@ -78,25 +78,26 @@ The PPG equity workflow supports objective CIELAB/ITA-style pigmentation metadat
 
 Use the **[model-selection guide](https://stefanosbalaskas.github.io/gpbiometricspy/guides/model-selection/)** to add complexity only when the design and scientific question require it.
 
-## Certified release-preparation baseline
+## Current stable release — 0.1.8
 
-The exact current-main source qualified immediately before the 0.1.8 stable freeze is:
+`gpbiometricspy 0.1.8` was published on **4 October 2026**.
 
-- commit **`a75eb1d73791213e6e830ff94975f632455632e2`**;
-- frozen semantic reference **`gpbiometrics 2.0.0`**;
+- immutable release source: **`32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d`**;
+- immutable tag: **[`v0.1.8`](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)**;
+- public package: **[PyPI 0.1.8](https://pypi.org/project/gpbiometricspy/0.1.8/)**;
+- frozen semantic reference: **`gpbiometrics 2.0.0`**;
 - **406 / 406** frozen exports implemented, **0 pending**;
 - exact-main tests: **12 / 12** OS × Python 3.11–3.14 lanes green;
 - canonical scientific suite: **874 / 874 tests**, **15,612 / 15,612 statements = 100.00%**;
 - raw branch coverage **7,315 / 7,334 = 99.7409%**;
 - exactly **19** reviewed structural arcs with **0 unexpected / 0 stale / 0 unaudited** branch debt;
 - audited branch accounting **7,334 / 7,334 = 100.0000%**;
-- docs/Pages, CodeQL, deep R↔Python parity, optional-backend interoperability, private real-data validation and release-handoff safety all green.
+- docs/Pages, CodeQL, deep R↔Python parity, optional-backend interoperability, private real-data validation, release-handoff safety, Studio packaging and Windows upgrade-policy validation all green;
+- wheel SHA-256: **`b1a88c2306843df2cc324b8987335bba413d27715a81f451ba0a036afe0a39f0`**;
+- sdist SHA-256: **`231c14bab9eeddb0e0e6e9dce0cc095451cf48d7dcd160c5c553005482d7c24d`**;
+- PyPI Trusted Publishing completed with digital attestations for both distributions.
 
-The STEP evidence tranche was also completed on an authorized local copy of BigIdeasLab_STEP v1.0 under the applicable PhysioNet DUA using exact scientific source `dc2b539154f65061a90d360f01503108ad1fd39f`. The public repository records only derived aggregate evidence and interpretation boundaries; participant-level restricted rows are not redistributed. ENCoDE remains deferred and is not claimed as empirically executed.
-
-### Stable release record
-
-**0.1.8** is being frozen from this qualified source on **4 October 2026**. Public GitHub/PyPI publication remains fail-closed: the stable candidate must pass the protected pull-request and exact-main release gates before immutable `v0.1.8` creation and Trusted Publishing.
+The scientific qualification baseline immediately before the stable freeze was commit `a75eb1d73791213e6e830ff94975f632455632e2`. The STEP evidence tranche was completed on an authorized local copy of BigIdeasLab_STEP v1.0 under the applicable PhysioNet DUA using exact scientific source `dc2b539154f65061a90d360f01503108ad1fd39f`. The public repository records only derived aggregate evidence and interpretation boundaries; participant-level restricted rows are not redistributed. ENCoDE remains deferred and is not claimed as empirically executed.
 
 ## Interpretation boundary
 
@@ -118,9 +119,11 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 
 ## Citation and archival record
 
-`gpbiometricspy 0.1.8` is being frozen on **4 October 2026**.
+`gpbiometricspy 0.1.8` is the current public stable release.
 
 - **0.1.8 version DOI:** pending genuine Zenodo ingestion of `v0.1.8`; no DOI is fabricated before minting
+- **0.1.8 GitHub release:** [v0.1.8](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)
+- **0.1.8 PyPI release:** [gpbiometricspy 0.1.8](https://pypi.org/project/gpbiometricspy/0.1.8/)
 - **0.1.7 version DOI:** still pending independent Zenodo verification
 - **0.1.6 version DOI:** still pending independent Zenodo verification
 - **Software concept DOI:** [10.5281/zenodo.22150872](https://doi.org/10.5281/zenodo.22150872)
@@ -131,6 +134,6 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 - **Frozen R semantic-reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **gpbiometrics article:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
-Until Zenodo mints a genuine 0.1.8 version DOI, cite the immutable GitHub release only after `v0.1.8` has actually been created. Before publication, cite the latest public stable release and the software concept DOI.
+Until Zenodo mints and exposes a genuine 0.1.8 version DOI, cite the immutable `v0.1.8` release together with version `0.1.8` and the software concept DOI.
 
 The frozen R source/tests/docs/articles remain under `reference/` as the semantic reference used for parity work. See [`VALIDATION.md`](VALIDATION.md) and the documentation site for the complete evidence trail.
