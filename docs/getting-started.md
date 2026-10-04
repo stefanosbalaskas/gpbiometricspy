@@ -62,7 +62,7 @@ A useful default order is:
 </div>
 
 !!! info "PPG / HRV versus PPG measurement equity"
-    Use the ordinary PPG / HRV route for pulse detection, IBI provenance and variability metrics. Use the measurement-equity route when you need to keep pigmentation provenance, acquisition quality, candidate-value availability and reference agreement separate. The [explanation article](articles/python-native/ppg-measurement-equity.md) connects the synthetic known-truth example to the authorized STEP external-evidence run.
+    Use the ordinary PPG / HRV route for pulse detection, IBI provenance and variability metrics. Use the measurement-equity route when you need to keep pigmentation provenance, acquisition quality, candidate-value availability and reference agreement separate. The [explanation article](articles/python-native/ppg-measurement-equity/index.md) connects the synthetic known-truth example to the authorized STEP external-evidence run.
 
 ## 5. A compact physiological example
 
