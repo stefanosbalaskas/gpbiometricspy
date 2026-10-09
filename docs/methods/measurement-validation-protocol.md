@@ -1,11 +1,11 @@
 # Experimental physiological measurement-validation protocol
 
-**Research status:** module-scoped development utility, not part of the frozen gpbiometrics R parity surface and not a stable published guarantee.
+**Research status:** source-checkout-only (not pip-installed) development utility, not part of the frozen gpbiometrics R parity surface and not a stable published guarantee.
 
 The 18 September methods briefing distinguished *construct responsiveness* from *convergent reference-device agreement*. These are not interchangeable. The 12 and 24 September briefings additionally distinguished hardware-native sampling from SDK-provided and observed rates.
 
 ```python
-from gpbiometricspy.methods_briefing_validation import (
+from research.methods_briefing_2026.methods_briefing_validation import (
     summarize_acquisition_rate_lineage,
     validate_biosignal_measurement,
 )
