@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from gpbiometricspy.methods_briefing_validation import (
+from research.methods_briefing_2026.methods_briefing_validation import (
     summarize_acquisition_rate_lineage,
     validate_biosignal_measurement,
 )
