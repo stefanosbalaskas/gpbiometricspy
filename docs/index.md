@@ -1,3 +1,6 @@
+!!! warning "v0.1.9 release transition — PyPI approval required"
+    The [v0.1.9 GitHub Release](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9) was created on 21 October 2026 with its canonical wheel, source distribution and checksums. At the time of this documentation update, the [PyPI Trusted Publishing workflow](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318) is **waiting for the protected `pypi` environment approval**. The independently verified PyPI installation remains **0.1.8** until v0.1.9 is actually published. The October scientific research modules remain source-only, not newly qualified installed APIs.
+
 <div class="gp-landing-hero" markdown>
 
 <span class="gp-kicker">Scientific Python + a guided research application</span>
