@@ -62,3 +62,20 @@ def test_device_placement_unqualified_strata_not_silently_dropped():
         "evaluable", "insufficient_independent_evidence",
     }
     assert result.loc[result.device_id == "b", "balanced_accuracy"].isna().all()
+
+
+
+def test_fractional_labels_cannot_silently_become_binary():
+    d = _data()
+    d.loc[0, "outcome"] = 0.5
+    with pytest.raises(ValueError, match="exact binary"):
+        external_classifier_validation(
+            d, training_participants=["train"], training_datasets=["development"]
+        )
+    with pytest.raises(ValueError, match="exact binary"):
+        modality_ablation_audit(d)
+
+
+def test_ablation_threshold_must_be_declared_probability_threshold():
+    with pytest.raises(ValueError, match="threshold"):
+        modality_ablation_audit(_data(), threshold=1.1)
