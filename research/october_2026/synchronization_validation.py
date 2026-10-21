@@ -30,6 +30,8 @@ def audit_clock_and_event_alignment(
     if fit not in {"offset", "affine"}:
         raise ValueError("fit must be offset or affine")
     group_cols = [participant_col, session_col]
+    if anchors.empty or events.empty:
+        raise ValueError("nonempty anchor and independent event tables required")
     if not set(group_cols + [anchor_reference_col, anchor_device_col]).issubset(anchors):
         raise ValueError("matched clock anchors required")
     if not set(group_cols + [event_reference_col, event_device_col]).issubset(events):
