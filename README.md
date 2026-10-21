@@ -90,6 +90,10 @@ The STEP evidence uses only derived aggregate outputs publicly; participant-leve
 
 Use the **[model-selection guide](https://stefanosbalaskas.github.io/gpbiometricspy/guides/model-selection/)** to add complexity only when the design and scientific question require it.
 
+## 21 October 2026 release transition
+
+GitHub [v0.1.9](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9) has been published with checksummed canonical distributions. At this audit, the [PyPI Trusted Publishing deployment](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318) is waiting for the required `pypi` environment approval; we **do not claim 0.1.9 is installed from PyPI**. Continue using the published 0.1.8 package unless and until v0.1.9 publication is confirmed. The October synthetic research figures and code remain outside the installed stable API.
+
 ## Current stable release — 0.1.8
 
 `gpbiometricspy 0.1.8` was published on **4 October 2026**.
