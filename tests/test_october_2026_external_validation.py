@@ -67,6 +67,7 @@ def test_device_placement_unqualified_strata_not_silently_dropped():
 
 def test_fractional_labels_cannot_silently_become_binary():
     d = _data()
+    d["outcome"] = d["outcome"].astype(float)
     d.loc[0, "outcome"] = 0.5
     with pytest.raises(ValueError, match="exact binary"):
         external_classifier_validation(
