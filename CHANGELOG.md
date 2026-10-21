@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.9 — 2026-10-21 — experimental methods documentation maintenance
+
+- Add the October 2026 physiological synchronization, EDABE artifact-reference intake, external prediction and modality ablation research article and original synthetic plots to the website source.
+- Preserve the 406-function frozen R parity contract and installed stable API; modules in `research/october_2026/` remain source-only and do not imply empirical device or classifier calibration.
+- Align PyPI package metadata, CFF and Zenodo archive metadata for the candidate; do not assign or fabricate a version DOI before independent registration.
+- Require all exact-main scientific, docs, Studio, real-data and cross-platform release checks prior to GitHub tag and PyPI Trusted Publishing. The outstanding empirical work is tracked in issue #176.
+
+
 ## 0.1.8 — 2026-10-04 — PPG measurement equity and STEP evidence freeze
 
 - preserves the frozen **406 / 406** `gpbiometrics 2.0.0` export contract with **0 pending exports** while adding the PPG pigmentation / measurement-equity workflow as a Python-native surface outside that parity registry;

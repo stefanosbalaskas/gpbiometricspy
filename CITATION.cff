@@ -22,8 +22,8 @@ keywords:
   - pupillometry
   - multimodal research
   - scientific Python
-version: 0.1.8
-date-released: 2026-10-04
+version: 0.1.9
+date-released: 2026-10-21
 license: MIT
 repository-code: "https://github.com/stefanosbalaskas/gpbiometricspy"
 url: "https://stefanosbalaskas.github.io/gpbiometricspy/"
