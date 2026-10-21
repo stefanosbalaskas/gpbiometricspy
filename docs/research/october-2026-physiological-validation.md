@@ -1,5 +1,7 @@
 # From cleaner signals to scientifically better measurements
 
+![Rendered synthetic plot](../assets/october-2026-plot.svg)
+
 **Research implementation, 21 October 2026 — not a validated device benchmark or released API.**
 
 ![Three independent validation levels](../assets/october-2026-physiology.svg)
