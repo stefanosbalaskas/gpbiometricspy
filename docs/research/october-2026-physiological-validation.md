@@ -108,3 +108,35 @@ print(audit["clock_fits"], audit["independent_event_errors"])
 ~~~
 
 The illustration depicts synthetic clocks. Anchor/event independence must be verified from acquisition metadata in empirical use. Even a near-zero affine residual is not a hardware latency certificate.
+
+
+## EDABE external evidence intake (not yet executed on the original dataset)
+
+The EDABE benchmark documentation provides raw electrodermal signals, human-edited reference signals and **artifact** labels. Those labels are not independently annotated skin-conductance responses. The research-only `edabe_reference.py` adapter requires original export column names, recording IDs, explicit participant-disjoint train/test labels, and matching timestamps before computing waveform error and artifact-label recall.
+
+**Primary source:** [EDABE dataset record](https://zenodo.org/records/7248135); [EDABE v2 and research use conditions](https://data.mendeley.com/datasets/w8fxrg4pv5/2); [FairEDA public reproducibility materials](https://github.com/rtb-1005/FairEDA). Dataset access/reuse conditions remain the researcher's responsibility. This repository includes only synthetic fixtures, not copyrighted or restricted underlying recordings.
+
+![Synthetic EDABE waveform comparison](../assets/october-2026-edabe-waveform.svg)
+
+~~~python
+import pandas as pd
+from research.october_2026.edabe_reference import audit_edabe_reference_export
+rows = []
+for subject, split in [("synthetic-train", "train"), ("synthetic-test", "test")]:
+    for time, raw, reference, clean, artifact in [
+        (0,1,1,1,0), (1,2,1,1,1), (2,1,1,1,0), (3,2,1,1,1)
+    ]:
+        rows.append(dict(participant_id=subject, recording_id="trial",
+            benchmark_split=split, time=time, rawdata=raw,
+            cleandata=reference, signal_automatic=clean,
+            binarytarget=artifact, predArtifacts=artifact,
+            postProcessedPredArtifacts=artifact))
+summary = audit_edabe_reference_export(pd.DataFrame(rows))
+print(summary["recording_metrics"])
+~~~
+
+**Pending:** obtain properly licensed genuine EDABE data, confirm supplied participant split against the source manifest, compare all algorithms under identical contamination strata, and test SCR/inferential outcomes against separate expert event or experimental references. These results have **not** been computed here.
+
+## AICOS-HAR cross-device validation pathway
+
+[AICOS-HAR v1](https://zenodo.org/records/19452049) contains inertial recordings across devices and placements. A legitimate external HAR evaluation requires sensor/site/device metadata, prespecified activities, leave-device/placement-out splits and provenance-constrained thresholds. This is a proposed **external validation exercise**, not an integration already run and not evidence of eye-tracking or EDA validity. The dataset is approximately 2.5 GB and must be obtained subject to its reuse conditions.
