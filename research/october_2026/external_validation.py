@@ -5,6 +5,14 @@ import numpy as np
 import pandas as pd
 
 
+def _strict_binary_outcome(values):
+    """Reject fractional, missing, or nonnumeric labels before integer conversion."""
+    numeric = pd.to_numeric(pd.Series(values), errors="coerce").to_numpy(dtype=float)
+    if not np.isfinite(numeric).all() or not np.isin(numeric, [0., 1.]).all():
+        raise ValueError("outcomes must be exact binary zero/one labels")
+    return numeric.astype(int)
+
+
 def _metrics(y, probabilities, threshold):
     predicted = probabilities >= threshold
     positive = y == 1
@@ -65,7 +73,7 @@ def external_classifier_validation(
         raise ValueError("participant leakage between training and evaluation")
     if set(evaluation[dataset_col]) & set(training_datasets):
         raise ValueError("external validation requires disjoint dataset identities")
-    y = evaluation[outcome_col].to_numpy(dtype=int)
+    y = _strict_binary_outcome(evaluation[outcome_col])
     p = evaluation[probability_col].to_numpy(dtype=float)
     if not np.isin(y, [0, 1]).all() or not np.isfinite(p).all() or np.any((p < 0) | (p > 1)):
         raise ValueError("binary outcomes and probability scores required")
@@ -112,13 +120,17 @@ def modality_ablation_audit(
         raise ValueError("matched prediction columns required")
     if predictions[required].isna().any().any():
         raise ValueError("matched predictions must be complete")
-    y = predictions[outcome_col].to_numpy(dtype=int)
+    y = _strict_binary_outcome(predictions[outcome_col])
     a = predictions[full_col].to_numpy(dtype=float)
     b = predictions[ablated_col].to_numpy(dtype=float)
     if not np.isin(y, [0, 1]).all() or len(np.unique(y)) != 2 or (
         not np.isfinite(a).all() or not np.isfinite(b).all() or
         np.any((a < 0) | (a > 1)) or np.any((b < 0) | (b > 1))):
         raise ValueError("binary outcomes and finite probability predictions required")
+    if predictions[participant_col].isna().any() or predictions.empty:
+        raise ValueError("complete nonempty participant identities required")
+    if not 0 < threshold < 1:
+        raise ValueError("threshold must lie strictly between 0 and 1")
     ids = predictions[participant_col].unique()
     if len(ids) < 2 or bootstrap_replicates < 99:
         raise ValueError("participant-level replication required")
@@ -167,7 +179,7 @@ def external_device_placement_strata(
     for (device, placement), group in evaluation.groupby(
         [device_col,placement_col],sort=True
     ):
-        y=group[outcome_col].to_numpy()
+        y=_strict_binary_outcome(group[outcome_col])
         scores=pd.to_numeric(group[probability_col],errors="coerce").to_numpy(dtype=float)
         if not np.isin(y,[0,1]).all() or not np.isfinite(scores).all() or (
             np.any((scores<0)|(scores>1))
