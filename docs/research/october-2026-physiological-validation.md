@@ -145,3 +145,9 @@ print(summary["recording_metrics"])
 ### Baseline-window and device-strata sensitivity
 
 The module now exposes `baseline_window_sensitivity()`, which preserves **every prespecified window**, including those with insufficient valid observations, rather than selecting the window that favors the desired effect. `external_device_placement_strata()` analogously retains all device-by-body-placement cells, records class prevalence and participant counts, and refuses to manufacture performance metrics for cells with inadequate independent evidence. These are validation-design helpers, not results from AICOS-HAR or a recommendation for universal baseline durations.
+
+## Publication and qualification status (21 October 2026)
+
+This page and its original synthetic figures are merged into the GitHub documentation source. The worked research modules are under `research/october_2026/` and **are not automatically included in installed PyPI wheels or exported as stable package APIs**. Their empirical accuracy, device transfer and inferential calibration are not implied by a green CI test or a successful website build.
+
+The explicit outstanding scientific acceptance criteria and eligible real-data benchmarks are tracked in [research-to-release issue #176](https://github.com/stefanosbalaskas/gpbiometricspy/issues/176). This source-only research contribution is separate from the existing stable package version, and a new maintenance release must not claim these experiments as installed features.

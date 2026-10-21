@@ -149,3 +149,9 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 Until Zenodo mints and exposes a genuine 0.1.8 version DOI, cite the immutable `v0.1.8` release together with version `0.1.8` and the software concept DOI.
 
 The frozen R source/tests/docs/articles remain under `reference/` as the semantic reference used for parity work. See [`VALIDATION.md`](VALIDATION.md) and the documentation site for the complete evidence trail.
+
+## October 2026 research article and figure
+
+[**Physiological validation, synchronization and external-reference intake**](docs/research/october-2026-physiological-validation.md) documents experimental, source-only validation methods and reproducible synthetic examples. It is available in the website navigation, while independently qualified external empirical claims and stable PyPI APIs remain separate ([scientific acceptance criteria](https://github.com/stefanosbalaskas/gpbiometricspy/issues/176)).
+
+![Original synthetic research figure](docs/assets/october-2026-physiology.svg)
