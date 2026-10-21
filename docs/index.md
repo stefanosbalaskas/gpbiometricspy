@@ -1,3 +1,6 @@
+!!! success "Stable 0.1.9 — GitHub and PyPI published"
+    [gpbiometricspy 0.1.9](https://pypi.org/project/gpbiometricspy/0.1.9/) was published via the successful [protected GitHub Actions Trusted Publishing workflow](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318) on 21 October 2026. Both canonical distributions returned HTTP 200 from PyPI and have publish attestations. The [GitHub v0.1.9 Release](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9) retains wheel, sdist and checksums. This documentation-only patch preserves the previously qualified stable scientific APIs; October experimental research modules remain source-only.
+
 <div class="gp-landing-hero" markdown>
 
 <span class="gp-kicker">Scientific Python + a guided research application</span>
@@ -19,10 +22,10 @@ Start from the research task you need to complete—not from a list of functions
 </div>
 
 <div class="gp-status-grid gp-status-grid-home">
-<div><span class="gp-status-value">0.1.8</span><span class="gp-status-label">current stable release</span></div>
-<div><span class="gp-status-value">2026-10-04</span><span class="gp-status-label">release date</span></div>
+<div><span class="gp-status-value">0.1.9</span><span class="gp-status-label">current stable release</span></div>
+<div><span class="gp-status-value">2026-10-21</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">874 / 874</span><span class="gp-status-label">exact-main tests</span></div>
+<div><span class="gp-status-value">874 / 874</span><span class="gp-status-label">0.1.8 scientific baseline tests</span></div>
 <div><span class="gp-status-value">99.7409%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
 <div><span class="gp-status-value">12 / 12</span><span class="gp-status-label">platform/Python test lanes green</span></div>
 </div>
@@ -226,7 +229,7 @@ The PPG measurement-equity route separates pigmentation provenance, raw signal q
 <div class="gp-metric-card"><strong>14 / 14</strong><span>optional-backend interoperability lanes green</span></div>
 </div>
 
-The current public stable release is **0.1.8**, exact source SHA **`32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d`**. Its scientific qualification baseline immediately before the stable freeze was `a75eb1d73791213e6e830ff94975f632455632e2`. All 12 platform/Python 3.11–3.14 lanes passed, with 874/874 tests and 15,612/15,612 statements on the canonical scientific suite. Branch evidence records 7,315/7,334 raw branches = 99.7409%, exactly 19 audited residual arcs, 0 unexpected, stale, or unaudited branch debt, and 7,334/7,334 audited branch accounting. Docs/Pages, CodeQL, Deep Parity, Interoperability, Private Real Data Validation, release-handoff safety, Studio packaging, and Windows release-policy validation are green.
+The **0.1.9** release is now the current public stable version. The preceding **0.1.8** scientific qualification is preserved at exact source SHA **`32cafd5565bdf4a7575dcf5c5d6bb2bfbe101e5d`**. Its scientific qualification baseline immediately before the stable freeze was `a75eb1d73791213e6e830ff94975f632455632e2`. All 12 platform/Python 3.11–3.14 lanes passed, with 874/874 tests and 15,612/15,612 statements on the canonical scientific suite. Branch evidence records 7,315/7,334 raw branches = 99.7409%, exactly 19 audited residual arcs, 0 unexpected, stale, or unaudited branch debt, and 7,334/7,334 audited branch accounting. Docs/Pages, CodeQL, Deep Parity, Interoperability, Private Real Data Validation, release-handoff safety, Studio packaging, and Windows release-policy validation are green.
 
 The 0.1.8 PPG measurement-equity tranche also includes deterministic synthetic evidence and an authorized local BigIdeasLab_STEP v1.0 execution. STEP Fitzpatrick phototype is retained as subjective categorical provenance; row-level paired availability is not relabelled as generic device missingness or fairness. ENCoDE remains deferred, and this release does not claim clinical SpO₂ validation.
 
@@ -235,7 +238,16 @@ The 0.1.8 PPG measurement-equity tranche also includes deterministic synthetic e
 !!! info "Scientific boundary"
     Physiological and eye-tracking signals are measurements, not direct proof of emotion, stress, trust, preference, cognition, health status or diagnosis. Random effects and random slopes describe modelled heterogeneity; predictive importance is not causal importance; provenance certificates bind declared evidence rather than proving sensor validity. PPG pigmentation analyses distinguish signal quality, availability and reference agreement and do not establish device fairness or causal optical effects. Scientific interpretation remains constrained by acquisition quality, study design and model assumptions.
 
-## Current stable release 0.1.8
+## Current stable release 0.1.9
+
+**gpbiometricspy 0.1.9** was published on **21 October 2026** through the canonical artifact pipeline, protected PyPI Trusted Publishing and verified package uploads.
+
+- [GitHub Release `v0.1.9`](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9)
+- [PyPI `gpbiometricspy 0.1.9`](https://pypi.org/project/gpbiometricspy/0.1.9/)
+- [Successful publishing workflow and attestation evidence](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318)
+- The October methods article and synthetic plots document **source-only** research. External empirical qualification remains open and is not inferred from release CI.
+
+## Archived release 0.1.8
 
 **gpbiometricspy 0.1.8** was published on **4 October 2026** after the protected pull-request, exact-main, canonical release, and Trusted Publishing gates completed successfully.
 
