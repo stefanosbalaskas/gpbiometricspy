@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520" role="img">
+<style>text{font-family:system-ui,-apple-system,Segoe UI,sans-serif;fill:#111827}.grid{stroke:#e5e7eb;stroke-width:1}.axis{stroke:#374151;stroke-width:1.2}.series{fill:none;stroke-width:2}.pt{stroke-width:0}.legend{font-size:14px}.tick{font-size:12px}</style>
+<text x="450.0" y="30" text-anchor="middle" font-size="20" font-weight="600">Synthetic retention varies while accuracy mechanism is ITA-neutral</text>
+<line class="grid" x1="88.00" y1="58" x2="88.00" y2="448"/><text class="tick" x="88.00" y="470" text-anchor="middle">-20</text>
+<line class="grid" x1="244.80" y1="58" x2="244.80" y2="448"/><text class="tick" x="244.80" y="470" text-anchor="middle">-3</text>
+<line class="grid" x1="401.60" y1="58" x2="401.60" y2="448"/><text class="tick" x="401.60" y="470" text-anchor="middle">15</text>
+<line class="grid" x1="558.40" y1="58" x2="558.40" y2="448"/><text class="tick" x="558.40" y="470" text-anchor="middle">32</text>
+<line class="grid" x1="715.20" y1="58" x2="715.20" y2="448"/><text class="tick" x="715.20" y="470" text-anchor="middle">50</text>
+<line class="grid" x1="872.00" y1="58" x2="872.00" y2="448"/><text class="tick" x="872.00" y="470" text-anchor="middle">67</text>
+<line class="grid" x1="88" y1="448.00" x2="872" y2="448.00"/><text class="tick" x="78" y="452.00" text-anchor="end">0.00</text>
+<line class="grid" x1="88" y1="370.00" x2="872" y2="370.00"/><text class="tick" x="78" y="374.00" text-anchor="end">0.20</text>
+<line class="grid" x1="88" y1="292.00" x2="872" y2="292.00"/><text class="tick" x="78" y="296.00" text-anchor="end">0.40</text>
+<line class="grid" x1="88" y1="214.00" x2="872" y2="214.00"/><text class="tick" x="78" y="218.00" text-anchor="end">0.60</text>
+<line class="grid" x1="88" y1="136.00" x2="872" y2="136.00"/><text class="tick" x="78" y="140.00" text-anchor="end">0.80</text>
+<line class="grid" x1="88" y1="58.00" x2="872" y2="58.00"/><text class="tick" x="78" y="62.00" text-anchor="end">1.00</text>
+<line class="axis" x1="88" y1="448" x2="872" y2="448"/><line class="axis" x1="88" y1="58" x2="88" y2="448"/>
+<text x="480.0" y="502" text-anchor="middle" font-size="14">Synthetic ITA (degrees)</text>
+<text transform="translate(20 253.0) rotate(-90)" text-anchor="middle" font-size="14">Candidate-HR retention</text>
+<polyline class="series" stroke="#2563eb" points="88.00,81.83 105.37,76.42 125.87,86.17 159.23,72.08 167.68,69.92 199.71,76.42 237.17,69.92 247.81,73.17 282.39,65.58 304.19,67.75 328.86,68.83 330.32,67.75 367.52,63.42 383.67,67.75 397.51,63.42 424.11,63.42 465.53,62.33 492.37,69.92 496.88,62.33 515.65,65.58 541.55,61.25 559.79,66.67 595.15,67.75 604.49,62.33 621.22,62.33 639.45,65.58 678.65,59.08 706.72,61.25 741.40,61.25 769.32,61.25 791.11,60.17 792.91,60.17 820.10,66.67 843.77,58.00 863.63,59.08 872.00,62.33"/>
+<line x1="717" y1="72" x2="737" y2="72" stroke="#2563eb" stroke-width="2"/><text class="legend" x="744" y="76">Rest</text>
+<polyline class="series" stroke="#059669" points="88.00,92.67 105.37,90.50 125.87,78.58 159.23,79.67 167.68,82.92 199.71,74.25 237.17,71.00 247.81,76.42 282.39,72.08 304.19,73.17 328.86,75.33 330.32,74.25 367.52,71.00 383.67,64.50 397.51,67.75 424.11,71.00 465.53,68.83 492.37,60.17 496.88,65.58 515.65,64.50 541.55,65.58 559.79,63.42 595.15,59.08 604.49,63.42 621.22,61.25 639.45,64.50 678.65,67.75 706.72,63.42 741.40,63.42 769.32,62.33 791.11,59.08 792.91,62.33 820.10,63.42 843.77,63.42 863.63,60.17 872.00,61.25"/>
+<line x1="717" y1="94" x2="737" y2="94" stroke="#059669" stroke-width="2"/><text class="legend" x="744" y="98">Typing</text>
+<polyline class="series" stroke="#d97706" points="88.00,113.25 105.37,104.58 125.87,114.33 159.23,101.33 167.68,105.67 199.71,98.08 237.17,86.17 247.81,97.00 282.39,95.92 304.19,84.00 328.86,94.83 330.32,84.00 367.52,78.58 383.67,84.00 397.51,74.25 424.11,78.58 465.53,78.58 492.37,73.17 496.88,76.42 515.65,76.42 541.55,76.42 559.79,71.00 595.15,72.08 604.49,73.17 621.22,67.75 639.45,66.67 678.65,68.83 706.72,66.67 741.40,72.08 769.32,61.25 791.11,65.58 792.91,63.42 820.10,71.00 843.77,65.58 863.63,63.42 872.00,62.33"/>
+<line x1="717" y1="116" x2="737" y2="116" stroke="#d97706" stroke-width="2"/><text class="legend" x="744" y="120">Walk</text>
+</svg>
