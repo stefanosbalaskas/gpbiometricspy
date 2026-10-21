@@ -84,3 +84,27 @@ print(external["metrics"], ablation["delta_balanced_accuracy"])
 ![Synthetic modality-ablation metric comparison](../assets/october-2026-modality-ablation.svg)
 
 Both the external classifier and ablation checks are **descriptive research diagnostics**. A statistically meaningful between-modality difference requires prespecified endpoints, valid independent participant units, adequate sample size and external domain evidence. The example is synthetic and establishes no sensor complementarity.
+
+
+## Clock synchronization versus event timing
+
+The experimental `synchronization_validation.py` reports participant/session-specific affine or offset clock mapping from matched anchors **and separately** evaluates events that were not used as anchors. Low anchor residuals are not sufficient evidence of low event error.
+
+![Independent validation of clock versus event timing](../assets/october-2026-clock.svg)
+
+~~~python
+import pandas as pd
+from research.october_2026.synchronization_validation import audit_clock_and_event_alignment
+anchors = pd.DataFrame({
+    "participant_id": ["P"]*4, "session_id":["S"]*4,
+    "device_time_s":[1,2,3,4], "reference_time_s":[1.1,2.1,3.1,4.1],
+})
+events = pd.DataFrame({
+    "participant_id":["P"]*2, "session_id":["S"]*2,
+    "device_event_time_s":[1.5,3.5], "reference_event_time_s":[1.6,3.6],
+})
+audit = audit_clock_and_event_alignment(anchors, events, fit="affine")
+print(audit["clock_fits"], audit["independent_event_errors"])
+~~~
+
+The illustration depicts synthetic clocks. Anchor/event independence must be verified from acquisition metadata in empirical use. Even a near-zero affine residual is not a hardware latency certificate.
