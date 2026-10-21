@@ -41,3 +41,9 @@ def test_refuses_unmatched_sessions():
     events["session_id"] = "other"
     with pytest.raises(ValueError, match="independent event"):
         audit_clock_and_event_alignment(anchors, events)
+
+
+def test_empty_alignment_refused():
+    anchors, events = _data()
+    with pytest.raises(ValueError, match="nonempty anchor"):
+        audit_clock_and_event_alignment(anchors.iloc[:0], events)
