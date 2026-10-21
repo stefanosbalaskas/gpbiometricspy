@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import tomllib
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,9 +64,15 @@ def test_upgrade_policy_allows_repair_and_upgrade_but_blocks_downgrade_fail_clos
     assert "Upgrade policy: downgrade blocked" in ISS
     assert "existing installation has indeterminate version; setup blocked fail-closed" in ISS
     assert "RegKeyExists(HKCU, UninstallRegistrationKey)" in ISS
-    assert '$PreviousFileVersion = "0.1.7.0"' in SCRIPT
-    assert '$TargetFileVersion -ne "0.1.8.0"' in SCRIPT
-    assert '$FutureFileVersion = "0.1.9.0"' in SCRIPT
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+    major, minor, patch = (int(token) for token in version.split("."))
+    assert patch > 0
+    previous = f"{major}.{minor}.{patch - 1}.0"
+    target = f"{major}.{minor}.{patch}.0"
+    future = f"{major}.{minor}.{patch + 1}.0"
+    assert f'$PreviousFileVersion = "{previous}"' in SCRIPT
+    assert f'$TargetFileVersion -ne "{target}"' in SCRIPT
+    assert f'$FutureFileVersion = "{future}"' in SCRIPT
     assert "$DowngradeProcess.ExitCode -ne 7" in SCRIPT
     assert "Blocked downgrade mutated the installed executable." in SCRIPT
     assert "Blocked downgrade mutated the installed version marker." in SCRIPT
