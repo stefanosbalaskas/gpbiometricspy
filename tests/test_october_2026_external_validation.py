@@ -1,7 +1,12 @@
 import pandas as pd
 import pytest
 
-from research.october_2026.external_validation import (
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from research.october_2026.external_validation import (  # noqa: E402
     external_classifier_validation,
     modality_ablation_audit,
 )
