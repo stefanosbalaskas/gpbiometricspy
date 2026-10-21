@@ -133,3 +133,62 @@ def preprocessing_to_inference_audit(
         "bootstrap_unit": "participant",
         "claim_boundary": "Descriptive matched comparisons; no superiority, equivalence or causal claim.",
     }
+
+
+def baseline_window_sensitivity(
+    frame: pd.DataFrame,
+    windows,
+    *,
+    participant_col: str = "participant_id",
+    time_col: str = "time_s",
+    value_col: str = "value",
+    minimum_valid: int = 4,
+) -> pd.DataFrame:
+    """Retain *all* prespecified baseline windows, including failures.
+
+    Absolute time windows are closed [start,end]. This function deliberately
+    does not select the best-looking baseline. Failed windows are recorded,
+    not removed from the analysis plan; no cardiovascular/EDA universal
+    stabilization time is implied.
+    """
+    if not windows:
+        raise ValueError("at least one prespecified window is required")
+    required = [participant_col, time_col, value_col]
+    if not set(required).issubset(frame):
+        raise ValueError("baseline observation columns missing")
+    if frame.empty or frame[participant_col].isna().any():
+        raise ValueError("nonempty identified participant observations required")
+    result = []
+    for index, candidate in enumerate(windows):
+        if len(candidate) != 2:
+            raise ValueError("window requires a start and end")
+        start, end = map(float, candidate)
+        if not np.isfinite([start, end]).all() or start >= end:
+            raise ValueError("baseline window start must precede end")
+        for person, samples in frame.groupby(participant_col, sort=False):
+            times = pd.to_numeric(samples[time_col], errors="coerce").to_numpy(dtype=float)
+            values = pd.to_numeric(samples[value_col], errors="coerce").to_numpy(dtype=float)
+            if not np.isfinite(times).all() or np.any(np.diff(times) <= 0):
+                raise ValueError("timestamps must be finite and strictly increasing")
+            selected = (times >= start) & (times <= end)
+            sub = samples.loc[selected, required]
+            n_valid = int(np.isfinite(values[selected]).sum())
+            entry = {
+                "participant_id": person, "window_index": index,
+                "window_start_s": start, "window_end_s": end,
+                "selected_n": int(selected.sum()), "valid_n": n_valid,
+                "status": "evaluable" if n_valid >= minimum_valid else "insufficient_valid",
+                "mean_value": np.nan, "slope_per_s": np.nan,
+                "early_minus_late": np.nan,
+            }
+            if n_valid >= minimum_valid:
+                estimate = baseline_stability_audit(
+                    sub, participant_col=participant_col,
+                    time_col=time_col, value_col=value_col,
+                    minimum_valid=minimum_valid,
+                ).iloc[0]
+                entry["mean_value"] = float(estimate.baseline_mean)
+                entry["slope_per_s"] = float(estimate.slope_per_s)
+                entry["early_minus_late"] = float(estimate.early_minus_late)
+            result.append(entry)
+    return pd.DataFrame(result)
