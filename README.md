@@ -33,7 +33,7 @@
 **Studio** is the guided application over the same scientific package functions used by the Python API:
 
 ```bash
-python -m pip install "gpbiometricspy[studio]==0.1.8"
+python -m pip install "gpbiometricspy[studio]==0.1.9"
 gpbiometricspy-studio
 ```
 
@@ -90,11 +90,11 @@ The STEP evidence uses only derived aggregate outputs publicly; participant-leve
 
 Use the **[model-selection guide](https://stefanosbalaskas.github.io/gpbiometricspy/guides/model-selection/)** to add complexity only when the design and scientific question require it.
 
-## 21 October 2026 release transition
+## Current stable release — 0.1.9
 
-GitHub [v0.1.9](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9) has been published with checksummed canonical distributions. At this audit, the [PyPI Trusted Publishing deployment](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318) is waiting for the required `pypi` environment approval; we **do not claim 0.1.9 is installed from PyPI**. Continue using the published 0.1.8 package unless and until v0.1.9 publication is confirmed. The October synthetic research figures and code remain outside the installed stable API.
+**gpbiometricspy 0.1.9 was published on 21 October 2026** as a documentation-maintenance release. The [GitHub v0.1.9 release](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9) contains checked canonical wheel and source artifacts. The protected [PyPI Trusted Publishing workflow](https://github.com/stefanosbalaskas/gpbiometricspy/actions/runs/39658400318) completed successfully with HTTP 200 uploads for both files and digital publication attestations. [Install 0.1.9 from PyPI](https://pypi.org/project/gpbiometricspy/0.1.9/). This version **does not** promote October experimental source-only research modules to public installed APIs; external empirical scientific qualification remains separate.
 
-## Current stable release — 0.1.8
+## Archived 0.1.8 scientific and release qualification
 
 `gpbiometricspy 0.1.8` was published on **4 October 2026**.
 
@@ -135,8 +135,11 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 
 ## Citation and archival record
 
-`gpbiometricspy 0.1.8` is the current public stable release.
+`gpbiometricspy 0.1.9` is the current public stable release. The 0.1.8 records below are retained as historical evidence.
 
+- **0.1.9 version DOI:** pending independent confirmation of an actual Zenodo version DOI; none is invented
+- **0.1.9 GitHub release:** [v0.1.9](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.9)
+- **0.1.9 PyPI release:** [gpbiometricspy 0.1.9](https://pypi.org/project/gpbiometricspy/0.1.9/)
 - **0.1.8 version DOI:** pending genuine Zenodo ingestion of `v0.1.8`; no DOI is fabricated before minting
 - **0.1.8 GitHub release:** [v0.1.8](https://github.com/stefanosbalaskas/gpbiometricspy/releases/tag/v0.1.8)
 - **0.1.8 PyPI release:** [gpbiometricspy 0.1.8](https://pypi.org/project/gpbiometricspy/0.1.8/)
@@ -150,7 +153,7 @@ See **[Interpretation guardrails](https://stefanosbalaskas.github.io/gpbiometric
 - **Frozen R semantic-reference DOI:** [10.5281/zenodo.21434608](https://doi.org/10.5281/zenodo.21434608)
 - **gpbiometrics article:** [10.3390/signals7050086](https://doi.org/10.3390/signals7050086)
 
-Until Zenodo mints and exposes a genuine 0.1.8 version DOI, cite the immutable `v0.1.8` release together with version `0.1.8` and the software concept DOI.
+For 0.1.9, cite the immutable `v0.1.9` release, package version `0.1.9`, and the software concept DOI until a genuine version-specific Zenodo DOI is verified. The same principle applies when citing the historical 0.1.8 release.
 
 The frozen R source/tests/docs/articles remain under `reference/` as the semantic reference used for parity work. See [`VALIDATION.md`](VALIDATION.md) and the documentation site for the complete evidence trail.
 
