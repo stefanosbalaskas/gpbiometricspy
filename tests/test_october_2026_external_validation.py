@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from research.october_2026.external_validation import (  # noqa: E402
     external_classifier_validation,
+    external_device_placement_strata,
     modality_ablation_audit,
 )
 
@@ -48,3 +49,16 @@ def test_modality_ablation_uses_paired_participant_units():
     result = modality_ablation_audit(_data(), seed=4)
     assert result["delta_balanced_accuracy"] == pytest.approx(.5)
     assert result["participant_bootstrap_interval"] == pytest.approx((.5, .5))
+
+
+def test_device_placement_unqualified_strata_not_silently_dropped():
+    d = _data()
+    d["device_id"] = ["a"] * 4 + ["b"] * 4
+    d["body_placement"] = ["wrist"] * 4 + ["pocket"] * 4
+    d.loc[d.device_id == "b", "outcome"] = 1
+    result = external_device_placement_strata(d)
+    assert len(result) == 2
+    assert set(result.status) == {
+        "evaluable", "insufficient_independent_evidence",
+    }
+    assert result.loc[result.device_id == "b", "balanced_accuracy"].isna().all()
