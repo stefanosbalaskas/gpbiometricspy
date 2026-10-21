@@ -2,7 +2,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from research.october_2026.physiological_validation import (
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from research.october_2026.physiological_validation import (  # noqa: E402
     baseline_stability_audit,
     preprocessing_to_inference_audit,
 )
