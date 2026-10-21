@@ -23,9 +23,9 @@ Start from the research task you need to complete—not from a list of functions
 
 <div class="gp-status-grid gp-status-grid-home">
 <div><span class="gp-status-value">0.1.9</span><span class="gp-status-label">current stable release</span></div>
-<div><span class="gp-status-value">2026-10-04</span><span class="gp-status-label">release date</span></div>
+<div><span class="gp-status-value">2026-10-21</span><span class="gp-status-label">release date</span></div>
 <div><span class="gp-status-value">406 / 406</span><span class="gp-status-label">frozen R exports implemented</span></div>
-<div><span class="gp-status-value">874 / 874</span><span class="gp-status-label">exact-main tests</span></div>
+<div><span class="gp-status-value">874 / 874</span><span class="gp-status-label">0.1.8 scientific baseline tests</span></div>
 <div><span class="gp-status-value">99.7409%</span><span class="gp-status-label">exact-main raw branch coverage</span></div>
 <div><span class="gp-status-value">12 / 12</span><span class="gp-status-label">platform/Python test lanes green</span></div>
 </div>
