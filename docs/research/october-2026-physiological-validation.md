@@ -54,3 +54,33 @@ The complete matched three-layer input requires signal reference, binary event l
 - Validate stabilization procedures by modality; a cardiovascular protocol is not automatically an EDA or pupil standard.
 
 **Status:** implementation and synthetic unit tests submitted for review; externally benchmarked clinical or scientific validity is not claimed.
+
+
+## External classifier validation and sensor ablations
+
+The complementary experimental module `research/october_2026/external_validation.py` checks explicit participant- and dataset-identity disjointness. It reports locked-threshold precision, recall, F1, balanced accuracy, average precision, external class prevalence, and whole-participant bootstrap intervals. It consumes supplied frozen predictions; it cannot prove that the model or threshold really was frozen.
+
+~~~python
+import pandas as pd
+from research.october_2026.external_validation import (
+    external_classifier_validation, modality_ablation_audit,
+)
+rows = pd.DataFrame({
+    "participant_id": ["A", "A", "B", "B", "C", "C"],
+    "dataset_id": ["external"] * 6,
+    "outcome": [0, 1] * 3,
+    "probability": [.1, .9] * 3,
+    "full_probability": [.1, .9] * 3,
+    "ablated_probability": [.1, .4] * 3,
+})
+external = external_classifier_validation(
+    rows, training_participants=["development_subject"],
+    training_datasets=["development"], locked_threshold=0.5,
+)
+ablation = modality_ablation_audit(rows)
+print(external["metrics"], ablation["delta_balanced_accuracy"])
+~~~
+
+![Synthetic modality-ablation metric comparison](../assets/october-2026-modality-ablation.svg)
+
+Both the external classifier and ablation checks are **descriptive research diagnostics**. A statistically meaningful between-modality difference requires prespecified endpoints, valid independent participant units, adequate sample size and external domain evidence. The example is synthetic and establishes no sensor complementarity.
