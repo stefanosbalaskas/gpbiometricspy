@@ -140,3 +140,8 @@ print(summary["recording_metrics"])
 ## AICOS-HAR cross-device validation pathway
 
 [AICOS-HAR v1](https://zenodo.org/records/19452049) contains inertial recordings across devices and placements. A legitimate external HAR evaluation requires sensor/site/device metadata, prespecified activities, leave-device/placement-out splits and provenance-constrained thresholds. This is a proposed **external validation exercise**, not an integration already run and not evidence of eye-tracking or EDA validity. The dataset is approximately 2.5 GB and must be obtained subject to its reuse conditions.
+
+
+### Baseline-window and device-strata sensitivity
+
+The module now exposes `baseline_window_sensitivity()`, which preserves **every prespecified window**, including those with insufficient valid observations, rather than selecting the window that favors the desired effect. `external_device_placement_strata()` analogously retains all device-by-body-placement cells, records class prevalence and participant counts, and refuses to manufacture performance metrics for cells with inadequate independent evidence. These are validation-design helpers, not results from AICOS-HAR or a recommendation for universal baseline durations.
