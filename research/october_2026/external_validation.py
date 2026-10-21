@@ -138,3 +138,54 @@ def modality_ablation_audit(
                 tuple(float(v) for v in np.quantile(boot, [.025, .975])) if boot else None),
             "accepted_bootstrap_replicates": len(boot),
             "claim_boundary": "Paired ablation association, not causal sensor complementarity."}
+
+
+def external_device_placement_strata(
+    evaluation: pd.DataFrame,
+    *,
+    participant_col="participant_id",
+    device_col="device_id",
+    placement_col="body_placement",
+    outcome_col="outcome",
+    probability_col="probability",
+    locked_threshold=0.5,
+    min_participants=2,
+) -> pd.DataFrame:
+    """Preserve all observed device-by-placement strata, including ineligible.
+
+    This is not an AICOS-HAR loader, leave-device-out fit, or external domain
+    validation by itself. Model-training provenance is required separately.
+    """
+    required=[participant_col,device_col,placement_col,outcome_col,probability_col]
+    if not set(required).issubset(evaluation):
+        raise ValueError("device, placement and prediction fields required")
+    if evaluation.empty or evaluation[required].isna().any().any():
+        raise ValueError("complete nonempty stratified predictions required")
+    if not 0 < locked_threshold < 1 or min_participants < 2:
+        raise ValueError("locked threshold or minimum participants invalid")
+    rows=[]
+    for (device, placement), group in evaluation.groupby(
+        [device_col,placement_col],sort=True
+    ):
+        y=group[outcome_col].to_numpy()
+        scores=pd.to_numeric(group[probability_col],errors="coerce").to_numpy(dtype=float)
+        if not np.isin(y,[0,1]).all() or not np.isfinite(scores).all() or (
+            np.any((scores<0)|(scores>1))
+        ):
+            raise ValueError("binary outcomes and valid probability scores required")
+        n_people=group[participant_col].nunique()
+        qualified=n_people>=min_participants and len(np.unique(y))==2
+        row={
+            "device_id":device,"body_placement":placement,
+            "n_rows":len(group),"n_participants":n_people,
+            "positive_prevalence":float(np.mean(y)),
+            "status":"evaluable" if qualified else "insufficient_independent_evidence",
+            "balanced_accuracy":np.nan,
+            "average_precision":np.nan,
+        }
+        if qualified:
+            result=_metrics(y,scores,locked_threshold)
+            row["balanced_accuracy"]=result["balanced_accuracy"]
+            row["average_precision"]=result["average_precision"]
+        rows.append(row)
+    return pd.DataFrame(rows)
