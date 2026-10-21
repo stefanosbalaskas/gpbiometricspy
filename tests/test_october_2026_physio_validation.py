@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from research.october_2026.physiological_validation import (  # noqa: E402
     baseline_stability_audit,
+    baseline_window_sensitivity,
     preprocessing_to_inference_audit,
 )
 
@@ -61,3 +62,17 @@ def test_no_participant_replication_as_independent_evidence():
                       "raw_effect": [1.] * 4, "processed_effect": [2.] * 4})
     with pytest.raises(ValueError, match="independent participants"):
         preprocessing_to_inference_audit(d)
+
+
+def test_baseline_sensitivity_retains_failed_windows():
+    d = pd.DataFrame({
+        "participant_id": ["p"] * 8,
+        "time_s": list(range(8)),
+        "value": [1., 2., 3., 4., 5., 6., 7., 8.],
+    })
+    result = baseline_window_sensitivity(d, [(0., 3.), (0., 1.), (4., 7.)])
+    assert list(result.status) == [
+        "evaluable", "insufficient_valid", "evaluable",
+    ]
+    assert result.iloc[0].slope_per_s == pytest.approx(1.)
+    assert np.isnan(result.iloc[1].mean_value)
