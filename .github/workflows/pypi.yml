@@ -200,6 +200,6 @@ jobs:
         if: steps.existing.outputs.published != 'true'
         # PyPA gh-action-pypi-publish v1.14.2, pinned to its verified release commit.
         # Trusted Publishing also generates/uploads Sigstore attestations by default.
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
         with:
           packages-dir: canonical-release/dist/
